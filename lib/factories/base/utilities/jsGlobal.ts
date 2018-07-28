@@ -1,0 +1,1 @@
+export var jsGlobal = Function('return this')();

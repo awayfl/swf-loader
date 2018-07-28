@@ -1,0 +1,25 @@
+
+export enum MovieClipProperties {
+	_x,
+	_y,
+	_xscale,
+	_yscale,
+	_currentframe,
+	_totalframes,
+	_alpha,
+	_visible,
+	_width,
+	_height,
+	_rotation,
+	_target,
+	_framesloaded,
+	_name,
+	_droptarget,
+	_url,
+	_highquality,
+	_focusrect,
+	_soundbuftime,
+	_quality,
+	_xmouse,
+	_ymouse
+}
