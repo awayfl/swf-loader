@@ -282,7 +282,7 @@
 			return isFinite(alToNumber(this.context, n));
 		}
 		public isNaN(n: any): boolean {
-			if(n==" "){
+			if(n===" "){
 				return true;
 			}
 			return isNaN(alToNumber(this.context, n));
