@@ -684,7 +684,11 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
 		}
 		var newTextVarContent:string=avm1ContextUtils.getProperty(this._textVarHolder, this._textVarPropName);
-		
+		console.log("skjffsdkfj");
+		if(typeof newTextVarContent === "object"){
+			newTextVarContent=alToString(this.context, newTextVarContent);		
+		}
+			
 		if(newTextVarContent!==this._prevTextVarContent){
 			//warning("AVM1Textfield._syncTextFieldValue - var-content has changed, update text - var:'"+this._textVarHolder.toString()+name+"' / '"+newTextVarContent+"' / '"+instance.text+"'");
 			// textvar has changed. update text from var
@@ -692,7 +696,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			this._prevTextVarContent=newTextVarContent;
 			return;
 		}
-		if(instance.text!==newTextVarContent && (!(typeof newTextVarContent==="undefined" && instance.text==""))){
+		if(instance.text!==newTextVarContent && (!(typeof newTextVarContent==="undefined" && instance.text===""))){
 			// makes sure text is set correctly in case the timeline has interferred.
 			// if newTextVarContent==undefined and newTextVarContent=="" its already correct
 			//warning("AVM1Textfield._syncTextFieldValue - text-content has changed, update text - var:'"+name+"' / '"+this._textVarHolder.toString()+newTextVarContent+"' / '"+instance.text+"'");
