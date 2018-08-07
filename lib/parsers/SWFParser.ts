@@ -377,6 +377,7 @@ export class SWFParser extends ParserBase
 				noSceneGraphDebug || console.log("symbol: ", dictionary[i].id, symbol.type, symbol);
 				switch(symbol.type){
 					case "morphshape":
+						console.warn("Warning: SWF contains shapetweening!!!");
 						//symbol.shape._smybol=symbol;
 						this._pFinalizeAsset(symbol.shape, symbol.id);
 						//symbol.shape.setRatio(0);

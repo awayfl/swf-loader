@@ -50,7 +50,7 @@ import {AVM1Stage} from "./AVM1Stage";
 
 import {AVMRaycastPicker} from "../../AVMRaycastPicker";
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
-import { AVM1EventHandler } from "./AVM1EventHandler";
+import { AVM1EventHandler, AVM1MovieClipButtonModeEvent } from "./AVM1EventHandler";
 import {AVM1LoaderHelper} from "./AVM1LoaderHelper";
 
 class SpriteSymbol{
@@ -82,19 +82,6 @@ export const enum LookupChildOptions {
 }
 
 
-class AVM1MovieClipButtonModeEvent extends AVM1EventHandler {
-	constructor(public propertyName: string,
-				public eventName: string,
-				public argsConverter: Function = null,
-				public stageEvent:boolean=false) {
-		super(propertyName, eventName, argsConverter, stageEvent);
-	}
-
-	public onBind(target: IAVM1SymbolBase): void {
-		var mc: AVM1MovieClip = <any>target;
-		mc.adaptee.buttonMode = true;
-	}
-}
 
 function convertAS3RectangeToBounds(as3Rectange: Rectangle): AVM1Object {
 	var result = alNewObject(this.context);

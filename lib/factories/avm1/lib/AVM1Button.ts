@@ -25,7 +25,7 @@ import {DisplayObject, MovieClip} from "@awayjs/scene";
 import {AVM1ButtonAction} from "../../link";
 import {LoaderInfo} from "../../customAway/LoaderInfo";
 import {AVM1Object} from "../runtime/AVM1Object";
-import { AVM1EventHandler } from "./AVM1EventHandler";
+import { AVM1EventHandler, AVM1MovieClipButtonModeEvent } from "./AVM1EventHandler";
 import {notImplemented, somewhatImplemented, warning, release, assert} from "../../base/utilities/Debug";
 
 
@@ -71,10 +71,10 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 		super.initAVM1SymbolInstance(context, awayObject);
 
 		var nativeButton = this.adaptee;
-		if (!nativeButton.timeline.avm1ButtonActions) {
-			this._initEventsHandlers();
+		//this._initEventsHandlers();
+		/*if (!nativeButton.timeline.avm1ButtonActions) {
 			return;
-		}
+		}*/
 		nativeButton.buttonMode = true;
 		nativeButton.addEventListener('addedToStage', this._addListeners.bind(this));
 		nativeButton.addEventListener('removedFromStage', this._removeListeners.bind(this));
@@ -91,6 +91,7 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 			}
 			var types:string[]=[];
 			//console.log('action.stateTransitionFlags: ' + action.stateTransitionFlags);
+			// todo : find better solution for cases when we have multiple StateTransitions in one flag
 			switch (action.stateTransitionFlags) {
 				case 274:
 				case StateTransitions.OutDownToIdle:
@@ -99,7 +100,7 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 				case StateTransitions.IdleToOverUp:
 					types[0]  = 'mouseOver3d';
 					break;
-				case StateTransitions.OverUpToIdle:
+				case StateTransitions.OverUpToIdle:// rollout
 					types[0]  = 'mouseOut3d';
 					break;
 				case StateTransitions.OverUpToOverDown:
@@ -111,6 +112,17 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 				case 72:
 					types[0]  = 'mouseUp3d';
 					types[1]  = 'mouseUpOutside3d';
+					break;
+				case 160:// dragOver
+					notImplemented('AVM1 drag over button actions');
+					break;
+				case 272:// dragOut
+					notImplemented('AVM1 drag out button actions');
+					break;
+				case 434:// rollout dragOver dragOut
+					types[0]  = 'mouseOut3d';
+					notImplemented('AVM1 drag over button actions');
+					notImplemented('AVM1 drag out button actions');
 					break;
 				case StateTransitions.OverDownToOutDown:
 				case StateTransitions.OutDownToOverDown:
@@ -325,24 +337,28 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 
 	private _initEventsHandlers() {
 		this.bindEvents([
+			new AVM1EventHandler('onData', 'data'),
 			new AVM1EventHandler('onDragOut', 'dragOut'),
 			new AVM1EventHandler('onDragOver', 'dragOver'),
-			new AVM1EventHandler('onKeyDown', 'keyDown', null, true),
-			new AVM1EventHandler('onKeyUp', 'keyUp', null, true),
+			new AVM1EventHandler('onEnterFrame', 'enterFrame'),
+			new AVM1EventHandler('onKeyDown', 'keyDown'),
+			new AVM1EventHandler('onKeyUp', 'keyUp'),
 			new AVM1EventHandler('onKillFocus', 'focusOut', function (e) {
 				return [e.relatedObject];
 			}),
 			new AVM1EventHandler('onLoad', 'load'),
 			new AVM1EventHandler('onMouseDown', 'mouseDown3d', null, true),
 			new AVM1EventHandler('onMouseUp', 'mouseUp3d', null, true),
-			new AVM1EventHandler('onPress', 'mouseDown3d'),
-			new AVM1EventHandler('onRelease', 'mouseUp3d'),
-			new AVM1EventHandler('onReleaseOutside', 'mouseUpOutside3d'),
-			new AVM1EventHandler('onRollOut', 'mouseOut3d'),
-			new AVM1EventHandler('onRollOver', 'mouseOver3d'),
+			new AVM1EventHandler('onMouseMove', 'mouseMove3d', null, true),
+			new AVM1MovieClipButtonModeEvent('onPress', 'mouseDown3d'),
+			new AVM1MovieClipButtonModeEvent('onRelease', 'mouseUp3d'),
+			new AVM1MovieClipButtonModeEvent('onReleaseOutside', 'mouseUpOutside3d'),
+			new AVM1MovieClipButtonModeEvent('onRollOut', 'mouseOut3d'),
+			new AVM1MovieClipButtonModeEvent('onRollOver', 'mouseOver3d'),
 			new AVM1EventHandler('onSetFocus', 'focusIn', function (e) {
 				return [e.relatedObject];
-			})
+			}),
+			new AVM1EventHandler( 'onUnload', 'unload')
 		]);
 	}
 }
