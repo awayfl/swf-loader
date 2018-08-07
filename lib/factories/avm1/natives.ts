@@ -995,7 +995,6 @@ export class AVM1ArrayPrototype extends AVM1Object {
 				arr.sort((a, b) => a - b)
 			}
 			else{
-
 				// ugly hack for moving undefined values to the beginning of the array
 				var i=arr.length;
 				while(i>0){
