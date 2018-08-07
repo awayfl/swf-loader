@@ -53,6 +53,25 @@ export interface IFrameScript {
 	precedence?: number[];
 	context?: MovieClip;
 }
+
+var buttonActionsMap:any={
+	// single onClipActions:
+	1:['mouseOver3d'],		// rollOver
+	2:['mouseOut3d'],		// rollOut
+	4:['mouseDown3d'],		// press
+	8:['mouseUp3d'],		// release 
+	64:['mouseUpOutside3d'],// releaseOutside
+	160:[],					// dragOver
+	272:[],					// dragOut
+
+	// combinations of onClipActions:
+	//TODO: find a betetr way to handle this
+	72:['mouseUp3d', 'mouseUpOutside3d'], 	// release + releaseOutside
+	161:['mouseOver3d'],					// rollover + dragOver
+	274:['mouseOut3d'], 					// rollOut + dragOut
+	434:['mouseOut3d'],						// rollout + dragOver + dragOut
+}
+
 export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 	private _requiredListeners: any;
 	private _actions: AVM1ButtonAction[];
@@ -89,10 +108,9 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 				//requiredListeners['keyDown'] = this._keyDownHandler.bind(this);
 				//continue;
 			}
-			var types:string[]=[];
 			//console.log('action.stateTransitionFlags: ' + action.stateTransitionFlags);
 			// todo : find better solution for cases when we have multiple StateTransitions in one flag
-			switch (action.stateTransitionFlags) {
+			/*switch (action.stateTransitionFlags) {
 				case 274:
 				case StateTransitions.OutDownToIdle:
 					types[0] = 'mouseOut3d';
@@ -135,13 +153,18 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 				default:
 					warning('Unknown AVM1 button action type: ' + action.stateTransitionFlags);
 					continue;
+			}*/
+			var types:string[]=buttonActionsMap[action.stateTransitionFlags];
+			if(types){
+				var cnt=types.length;
+				var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags)
+				while (cnt>0){
+					cnt--;
+					requiredListeners[types[cnt]] = boundListener;
+				}
 			}
-			var cnt=types.length;
-			var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags)
-			while (cnt>0){
-				cnt--;
-				requiredListeners[types[cnt]] = boundListener;
-
+			else{
+				console.warn("unknown button event flag", action.stateTransitionFlags);
 			}
 		}
 		this._initEventsHandlers();
