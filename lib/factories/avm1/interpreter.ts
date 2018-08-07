@@ -485,6 +485,8 @@ function as2DeleteProperty(context: AVM1Context, obj: any, name: any): any {
 }
 
 function as2SyncEvents(context: AVM1Context, name): void {
+	if(typeof name==="undefined")
+		return;
 	name = alCoerceString(context, name);
 	if (name[0] !== 'o' || name[1] !== 'n') { // TODO check case?
 		return;
