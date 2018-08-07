@@ -684,7 +684,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
 		}
 		var newTextVarContent:string=avm1ContextUtils.getProperty(this._textVarHolder, this._textVarPropName);
-		console.log("skjffsdkfj");
 		if(typeof newTextVarContent === "object"){
 			newTextVarContent=alToString(this.context, newTextVarContent);		
 		}
