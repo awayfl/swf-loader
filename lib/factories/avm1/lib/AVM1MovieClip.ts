@@ -668,6 +668,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		// 80pro: why does this always return movieclip ?
 		// todo: check if in as3 this could be a textfield
 		var child:DisplayObject=this.adaptee.getChildAtDepth( avm2AwayDepth(depth));
+		if(!child){
+			return null;
+		}
 		if(child.isAsset(Billboard)){
 			return this;
 		}
