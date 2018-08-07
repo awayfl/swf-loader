@@ -991,20 +991,26 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	public sort(comparefn?: AVM1Function): AVM1Object {
 		var arr = alEnsureType<AVM1ArrayNative>(this, AVM1ArrayNative).value;
 		if (!alIsFunction(comparefn)) {
-			// ugly hack for moving undefined values to the beginning of the array
-			var i=arr.length;
-			while(i>0){
-				i--;
-				if(!arr[i]){
-					arr[i]="00000000000AwayInternal";
-				}
+			if(typeof comparefn==="number" && comparefn==16){
+				arr.sort((a, b) => a - b)
 			}
-			arr.sort();
-			i=arr.length;
-			while(i>0){
-				i--;
-				if(arr[i]=="00000000000AwayInternal"){
-					arr[i]=undefined;
+			else{
+
+				// ugly hack for moving undefined values to the beginning of the array
+				var i=arr.length;
+				while(i>0){
+					i--;
+					if(!arr[i]){
+						arr[i]="00000000000AwayInternal";
+					}
+				}
+				arr.sort();
+				i=arr.length;
+				while(i>0){
+					i--;
+					if(arr[i]=="00000000000AwayInternal"){
+						arr[i]=undefined;
+					}
 				}
 			}
 		} else {
