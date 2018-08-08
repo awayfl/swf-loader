@@ -378,7 +378,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 		var oldAVMMC=this._childrenByName[name];
 
-		console.log("attachMovie", name, avm2AwayDepth(depth));
+		//console.log("attachMovie", name, avm2AwayDepth(depth));
 		var avmMc = <AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
 		if (initObject) {
 			avmMc._init(initObject);
@@ -504,7 +504,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		var mc: MovieClip = new this.context.sec.flash.display.MovieClip();
 		mc.name = name;
 		getAVM1Object(mc,  <AVM1Context>this._avm1Context);
-		console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
+		//console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
 		var avmMC:AVM1MovieClip=<AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
 		this.registerScriptObject(mc);
 		// dynamicallyCreated needs to be set after adding child, otherwise it gets reset
@@ -560,7 +560,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				i--;
 				mc_path+=names[i];
 			}
-			console.log(mc_path);
+			//console.log(mc_path);
 			return mc_path;
 
 		}
@@ -994,6 +994,10 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public swapDepths(target: any): void {
+		// if this is the scene, or if no parent exists, we do not want to do anything
+		if(this.adaptee.name=="scene" || !this.get_parent()){
+			return;
+		}
 		var parent:MovieClip = <MovieClip>getAwayJSAdaptee(this.get_parent());
 		if (!parent){
 			warning("AVM1MovieClip.swapDepth called for object with no parent");
@@ -1004,11 +1008,11 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			return;
 		}
 		if (typeof target === 'number') {
-			console.log("swap to number", this.adaptee.name, target);
+			//console.log("swap to number", this.adaptee.name, target);
 			parent.swapDepths(this.adaptee, avm2AwayDepth(target));
 		}
 		else if(target.adaptee){
-			console.log("swap to children", this.adaptee.name, target.adaptee.name);
+			//console.log("swap to children", this.adaptee.name, target.adaptee.name);
 			parent.swapChildren(this.adaptee, target.adaptee);
 		}
 

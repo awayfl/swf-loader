@@ -1390,7 +1390,7 @@ export class SWFParser extends ParserBase
 		this.frameRate = obj.frameRate;
 		this.frameCount = obj.frameCount;
 		//var str = String.fromCharCode.apply(null, data);
-		console.log(obj);
+		//console.log(obj);
 		//console.log("parseHeaderContents this.bounds", this.bounds);
 		//console.log("parseHeaderContents this.frameRate", this.frameRate);
 		//console.log("parseHeaderContents this.frameCount", this.frameCount);
