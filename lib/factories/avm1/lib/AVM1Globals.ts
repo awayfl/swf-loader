@@ -494,6 +494,11 @@
 	
 		private _gotoFrame(mc:MovieClip, frame:any, offset:number):void
 		{
+			if(typeof frame==="number"){
+				if(frame % 1!==0){
+					frame=frame.toString();
+				}
+			} 
 			if (typeof frame === "string"){
 				if(mc.timeline._labels[frame.toLowerCase()]===null){
 					frame=parseInt(frame);

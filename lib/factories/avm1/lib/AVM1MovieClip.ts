@@ -760,6 +760,11 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	private _gotoFrame(frame:any):void
 	{
+		if(typeof frame==="number"){
+			if(frame % 1!==0){
+				frame=frame.toString();
+			}
+		} 
 		if (typeof frame === "string"){
 			
 			if(this.adaptee.timeline._labels[frame.toLowerCase()]==null){
@@ -771,8 +776,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			}
 			this.adaptee.jumpToLabel(<string>frame.toLowerCase());
 		}
-		else
+		else{
 			this.adaptee.currentFrameIndex = (<number>frame) - 1;
+		}
 	}
 	public getHitArea() {
 		return this._hitArea;
