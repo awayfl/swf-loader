@@ -1049,7 +1049,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public unloadMovie() {
 		var nativeObject = this.adaptee;
-		nativeObject.parent.removeChild(nativeObject);
+		if(nativeObject.parent){
+			nativeObject.parent.removeChild(nativeObject);
+		}
 		nativeObject.stop();
 	}
 
