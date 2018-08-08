@@ -517,6 +517,10 @@ function as2Construct(ctor, args) {
 }
 
 function as2Enumerate(obj, fn: (name) => void, thisArg): void {
+	// todo: better just whitelist "typeof === object" instead of blacklisting ?
+	if(typeof obj==="boolean" || typeof obj==="string" || typeof obj==="number"  ){
+		return;
+	}
 	var processed = Object.create(null); // TODO remove/refactor
 	alForEachProperty(obj, function (name) {
 		if(name.indexOf("_internal_TF")!=-1)
