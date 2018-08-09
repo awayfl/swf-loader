@@ -236,7 +236,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if(child.adapter!=child)
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
-			if(!this._childrenByName[child.name] || this._childrenByName[child.name].parent==null){
+			if(!this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
 				this.alPut(child.name, child.adapter);
 				this._childrenByName[child.name]=child._adapter;
 			}

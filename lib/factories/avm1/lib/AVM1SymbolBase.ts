@@ -448,10 +448,12 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	}
 
 	public getTabEnabled(): boolean {
-		return this.adaptee.isTabEnabled;
+		return this.adaptee?this.adaptee.isTabEnabled:false;
 	}
 
 	public setTabEnabled(value: boolean) {
+		if(!this.adaptee)
+			return;
 		this.adaptee.isTabEnabled = value;
 	}
 
