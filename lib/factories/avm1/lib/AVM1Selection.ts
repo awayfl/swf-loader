@@ -95,6 +95,9 @@ export class AVM1Selection extends AVM1Object {
 				MouseManager.getInstance().setFocus(focusObj.adaptee);
 				return;
 			}
+			var myThis=this;
+			//MouseManager.getInstance().setFocusCallback(function(){myThis.setFocus(newFocus);});
+
 			warning("AVM1Selection.setFocus - no object found for string "+newFocus);			
 			return;
 		}
@@ -102,6 +105,7 @@ export class AVM1Selection extends AVM1Object {
 		if(focusObj && focusObj.adaptee)
 			MouseManager.getInstance().setFocus(focusObj.adaptee);
 		else{
+			//MouseManager.getInstance().setFocusCallback(function(){myThis.setFocus(newFocus);});
 			warning("AVM1Selection.setFocus - no object found '"+newFocus.toString()+"'");
 		}
 		return true;

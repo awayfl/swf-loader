@@ -126,6 +126,48 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		return this._tabEntities[0];	
 
 	}
+	public getPrevTabEntity(currentFocus:IEntity):IEntity
+	{
+		if(this._customTabEntities.length<=0 && this._tabEntities.length<=0)
+			return currentFocus;
+
+		if(this._customTabEntities.length>0){
+			var newTabIndex:number=-1;
+			if(currentFocus){
+				newTabIndex=currentFocus.tabIndex;
+			}
+			newTabIndex--;
+			var i:number=newTabIndex;
+			while(i>=0){
+				if(this._customTabEntities[i]){
+					return this._customTabEntities[i];
+				}
+				i--;
+			}
+			i=newTabIndex;
+			while(i>=0){
+				if(this._customTabEntities[i]){
+					return this._customTabEntities[i];
+				}
+				i--;
+			}
+			return currentFocus;
+		}
+		if(currentFocus){
+			var len:number=this._tabEntities.length;
+			for(var i:number=0; i<len; i++){
+				if(this._tabEntities[i]==currentFocus){
+					if(i==len-1){
+						return this._tabEntities[0];
+					}
+					return this._tabEntities[i+1];						
+				}
+			}
+		}
+		// this point we would already have exit out if tabEntities.length was 0
+		return this._tabEntities[0];	
+
+	}
 	/**
 	 * @inheritDoc
 	 */
