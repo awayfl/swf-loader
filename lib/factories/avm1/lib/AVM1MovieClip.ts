@@ -218,6 +218,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	
 	public doInitEvents():void
 	{
+		this._dropTarget="";
 		for (var key in this.adaptee.timeline.avm1InitActions)
 			this.executeScript(this.addScript(this.adaptee.timeline.avm1InitActions[key], <any> ("initActionsData" + key)));
 
@@ -539,18 +540,18 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		this.graphics.curveTo(controlX, controlY, anchorX, anchorY);
 	}
 
-	public get_droptarget() {
-		if((<AVMRaycastPicker>AVM1Stage.stage.view.mousePicker).getDropTarget()){
+	private _dropTarget:string;
+	public setDropTarget(dropTarget:DisplayObject) {
+		if(dropTarget){
 			//console.log((<AVMRaycastPicker>AVM1Stage.stage.view.mousePicker).getDropTarget().name);
-			var mc:DisplayObject=(<DisplayObject>(<AVMRaycastPicker>AVM1Stage.stage.view.mousePicker).getDropTarget());
 			var names:string[]=[];
-			while (mc){
-				if(mc.name=="scene"){
-					mc=null;
+			while (dropTarget){
+				if(dropTarget.name=="scene"){
+					dropTarget=null;
 				}
 				else{
-					names.push(mc.name);
-					mc=mc.parent;
+					names.push(dropTarget.name);
+					dropTarget=dropTarget.parent;
 				}
 			}
 			var i:number=names.length;
@@ -561,10 +562,15 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				mc_path+=names[i];
 			}
 			//console.log(mc_path);
-			return mc_path;
+			
+			this._dropTarget=mc_path;
+			return;
 
 		}
-		return "";
+		this._dropTarget="";
+	}
+	public get_droptarget() {
+		return this._dropTarget;
 
 	}
 

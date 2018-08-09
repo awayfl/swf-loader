@@ -29,7 +29,6 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 	private _ignoredEntities:IEntity[];
 
 	private _dragEntity:IEntity;
-	private _dropTarget:IEntity;
 
 
 	private _entity:IEntity;
@@ -189,10 +188,6 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		this._dragEntity = entity;
 	}
 
-	public getDropTarget():IEntity{
-		//console.log("this._dropTarget", this._dropTarget);
-		return this._dropTarget;
-	}
 
 	private isIgnored(entity:IEntity):boolean
 	{
@@ -265,7 +260,6 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		//	We can not just ignore sprites tho, because they are needed to detect collisions on their parent MCs
 
 		this._bestCollision = null;
-		this._dropTarget = null;
 
 		var len:number = this._entities.length;
 		for (var i:number = 0; i < len; i++) {
@@ -390,10 +384,12 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		if (this._bestCollision){
 			// if we have a dragEntity set, we store the droptarget
 			this.updatePosition(this._bestCollision);
-			if(this._dragEntity){
-				this._dropTarget = this._bestCollision.entity;
-			}
 			//console.log("collision:", this.printPath(<DisplayObject>this._bestCollision.entity));
+		}
+		if(this._dragEntity){
+			if(this._dragEntity.isAsset(MovieClip) && this._dragEntity.adapter){
+				(<any>this._dragEntity.adapter).setDropTarget(this._bestCollision?this._bestCollision.entity:null);
+			}
 		}
 
 		// if nothing was hit, or the scene was hit, we set the AVM1Stage as hit
