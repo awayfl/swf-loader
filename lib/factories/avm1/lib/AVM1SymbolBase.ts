@@ -134,7 +134,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		this.setEnabledListener(value);
 	}
 	public setEnabledListener(value:boolean) {
-		if (value) {
+		if (value!==false) {
 
 			for (var key in this._eventsListeners) {
 				if(key!="onenterframe"){
