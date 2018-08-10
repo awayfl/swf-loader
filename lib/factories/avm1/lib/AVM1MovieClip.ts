@@ -1066,6 +1066,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public setUseHandCursor(value) {
+		if(!this.adaptee)
+			return;
 		this.adaptee.useHandCursor=value;
 	}
 
