@@ -626,7 +626,13 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 					if (targetPath[0] === '') {
 						targetPath.shift();
 					}
-				} else {
+				} 
+				
+				else if (targetPath[0] == '_global') {
+					targetPath.shift();
+					this._textVarHolder=this.context.globals;
+				}
+				else {
 					if(!instance.parent){
 						return;
 					}
