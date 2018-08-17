@@ -1,7 +1,7 @@
 import {alDefineObjectProperties, AVM1PropertyFlags} from "../runtime";
 import {getAwayJSAdaptee, IAVM1SymbolBase, wrapAVM1NativeClass} from "./AVM1Utils";
 import {AVM1ColorTransform, toAS3ColorTransform} from "./AVM1ColorTransform";
-import {DisplayObject, MovieClip} from "@awayjs/scene";
+import {DisplayObject, MovieClip, TextField} from "@awayjs/scene";
 import {AVM1Context} from "../context";
 import {AVM1SharedObjectPrototype} from "./AVM1SharedObject";
 import {AVM1InterpretedFunction} from "../interpreter";
@@ -116,7 +116,11 @@ export class AVM1Selection extends AVM1Object {
 	// Sets the selection span of the currently focused text field.
 
 	setSelection(beginIndex:number, endIndex:number){
-		notImplemented("AVM1Selection.setSelection");
+		var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance().getFocus();
+		if(objectinFocus && objectinFocus.isAsset(TextField)){
+			(<TextField>objectinFocus).setSelection(beginIndex, endIndex);
+		}
+		
 	};
 
 }
