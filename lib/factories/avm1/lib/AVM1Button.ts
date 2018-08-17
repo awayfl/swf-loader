@@ -154,17 +154,19 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 					warning('Unknown AVM1 button action type: ' + action.stateTransitionFlags);
 					continue;
 			}*/
-			var types:string[]=buttonActionsMap[action.stateTransitionFlags];
-			if(types){
-				var cnt=types.length;
-				var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags)
-				while (cnt>0){
-					cnt--;
-					requiredListeners[types[cnt]] = boundListener;
+			if(action.stateTransitionFlags!=0){
+				var types:string[]=buttonActionsMap[action.stateTransitionFlags];
+				if(types){
+					var cnt=types.length;
+					var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags)
+					while (cnt>0){
+						cnt--;
+						requiredListeners[types[cnt]] = boundListener;
+					}
 				}
-			}
-			else{
-				console.warn("unknown button event flag", action.stateTransitionFlags);
+				else{
+					console.warn("unknown button event flag", action.stateTransitionFlags);
+				}
 			}
 		}
 		this._initEventsHandlers();
