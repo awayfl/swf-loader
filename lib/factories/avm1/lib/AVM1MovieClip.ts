@@ -141,7 +141,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 	}
 	public executeScript(actionsBlocks:any){
-		
+		AVM1TextField.syncQueedTextfields();
 		var name:string=this.adaptee.name.replace(/[^\w]/g,'');
 		if(!actionsBlocks){
 			window.alert("actionsBlocks is empty, can not execute framescript"+ name+ this.adaptee.currentFrameIndex);
