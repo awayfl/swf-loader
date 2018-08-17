@@ -36,6 +36,7 @@ import {
 import {isIndex} from "../base/utilities";
 import {Debug, release} from "../base/utilities/Debug";
 import {AVM1Object} from "./runtime/AVM1Object";
+import {AVM1Globals} from "./lib/AVM1Globals";
 import { AVM1Function } from "./runtime/AVM1Function";
 import { AVM1PropertyDescriptor } from "./runtime/AVM1PropertyDescriptor";
 
@@ -541,9 +542,13 @@ export class AVM1StringPrototype extends AVM1Object {
 	public split(separator: any, limit?: number): AVM1ArrayNative {
 		var value = alToString(this.context, this);
 		// TODO separator as regular expression?
-		separator = alToString(this.context, separator);
-		limit = (limit === undefined ? ~0 : alToInt32(this.context, limit)) >>> 0;
-		return new AVM1ArrayNative(this.context, value.split(separator, limit));
+		// for undefined seperator, flash does not do any split at all
+		if(typeof separator!=="undefined"){
+			separator = alToString(this.context, separator);
+			limit = (limit === undefined ? ~0 : alToInt32(this.context, limit)) >>> 0;
+			return new AVM1ArrayNative(this.context, value.split(separator, limit));
+		}
+		return new AVM1ArrayNative(this.context, [value]);
 	}
 
 	public substr(start: number, length?: number): string {
@@ -895,6 +900,7 @@ export class AVM1ArrayPrototype extends AVM1Object {
 			this.alPut((len-1-_i), items[_i]);
 			_i--;
 		}
+		return (<any>this).value;
 	}
 	
 	public shift(): any {
@@ -1242,6 +1248,9 @@ class AVM1MathObject extends AVM1Object {
 	}
 
 	public random(): number {
+		if(AVM1Globals.randomProvider){
+			return AVM1Globals.randomProvider.random();
+		}
 		return Math.random();
 	}
 
