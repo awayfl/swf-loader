@@ -338,9 +338,9 @@ export class Random {
 	}
 }
 
-Math.random = function random(): number {
+/*Math.random = function random(): number {
 	return Random.next();
-};
+};*/
 
 /**
  * This should only be called if you need fake time.
