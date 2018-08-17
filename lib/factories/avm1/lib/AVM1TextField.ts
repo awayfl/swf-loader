@@ -58,8 +58,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 
 	private _variable: string;
 	private _html: boolean;
-	private _prevWidth:number=100;
-	private _prev_x:number=0;
+
 	private _exitFrameHandler: (event: Event) => void;
 
 	public dispatchKeyEvent(keyCode, isShift, isCTRL, isAlt){
@@ -76,7 +75,16 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		}
 	}
 
-	public static textFieldVars:any[]=[];
+	public static textFieldVars:AVM1TextField[]=[];
+	public static syncQueedTextfields(){
+		if(AVM1TextField.textFieldVars.length>0){
+			var len=AVM1TextField.textFieldVars.length;
+			for(var i:number=0; i<len; i++){
+				AVM1TextField.textFieldVars[i].syncTextFieldValue()
+			}
+			AVM1TextField.textFieldVars.length=0;
+		}
+	}
 
 	public selectTextField(fromMouseDown:boolean=false){
 		// this is called from the adaptee whenever it is selected in MouseManager
@@ -108,9 +116,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 
 	public doInitEvents():void
 	{
-		this._prev_x=this.adaptee.x;
-		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
-		this._prevWidth=(box == null)? 0 : toTwipRound(box.width);
 		if (this.adaptee._symbol) {
 			//console.log("do init", this.adaptee._symbol.variableName, this);
 			this.setVariable(this.adaptee._symbol.variableName || '');
@@ -150,38 +155,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		//this.adaptee.antiAliasType = value;
 	}
 	
-	private _textWidthDirty:boolean=false;
 	
-	/* 	
-		FlashPlayer has a very weird behavior with getter of _width and _x
-		If a textfield with AutoSize is filled with smaller content, 
-		we would expect flash to resize the textfield to match the chars.
-		Visually it does it fine (you can inspect it by activate the border on textfield),
-		but when using _width and _x getters it returns values that are larger than expected. 
-		If we keep calling the getter of _width or _x, it will gradually get closer to the expected results,.
-		Evantually it land on the expected values
-		This function is trying to replicate this behavior by looking at prev_width and prev_x	
-		it is called from the getter of _x and _width
-	*/	
-	public replicateWeirdFlashBehavior()
-	{
-		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
-		var newWidth:number = (box == null)? 0 : toTwipRound(box.width);
-	/*	if(newWidth<this._prevWidth){
-			newWidth = toTwipRound(4 + (this.adaptee.textWidth + ((this._prevWidth-4) - this.adaptee.textWidth) / 2));
-			
-			if (this.adaptee.autoSize==TextFieldAutoSize.RIGHT){
-				this._prev_x -= newWidth-this._prevWidth;
-			} else if (this.adaptee.autoSize==TextFieldAutoSize.CENTER){
-				this._prev_x -= (newWidth-this._prevWidth)/2;
-			}
-		}
-		else{			
-			this._prev_x=this.adaptee.x;
-		}*/
-		this._prev_x=this.adaptee.x;
-		this._prevWidth=newWidth;
-	}
 	public get_width(): number
 	{
 		this.syncTextFieldValue();
@@ -216,7 +190,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 	public set_x(value: number) {
 		this.syncTextFieldValue();
-		this._prev_x=value;
 		this.adaptee.x=toTwipFloor(value-(this.adaptee.scaleX * this.adaptee.textOffsetX));
 	}
 	public set_y(value: number) {
@@ -496,11 +469,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public setText(value: string) {
-		this._textWidthDirty=true;
 		
-		this._prev_x=this.adaptee.x;
-		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
-		this._prevWidth=(box == null)? 0 : toTwipRound(box.width);
 		// alToString turns `undefined` into an empty string, but we really do want "undefined" here.
 		value = value === undefined ? '' : alToString(this.context, value);
 		var avm1ContextUtils = this.context.utils;
@@ -671,15 +640,23 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		
 		if (!this._textVarHolder) {
 			// the object that holds the variable could not be found yet
-			// this happens when the textfield was not added to scenegraph yet
-			//warning("AVM1Textfield._syncTextFieldValue - object that holds the variable could not be found"+this._textVarHolder.toString());
+			// we add it to a queue that will be worked off before any script executes
+			AVM1TextField.textFieldVars.push(this);
+			if(instance.html){
+				return this._prevTextVarContent=instance.htmlText;
+			}
 			this._prevTextVarContent=instance.text;
 			return;
 		}
 
 		if (!avm1ContextUtils.hasProperty(this._textVarHolder, this._textVarPropName)) {
 			// the textvar does not exists yet. we create it and fill it with text-content
-			//warning("AVM1Textfield._syncTextFieldValue - no var found, create it and fill it from text var:'"+this._textVarHolder.toString()+name+"' / '"+instance.text+"'");
+			if(instance.html){	
+				avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, instance.htmlText);
+				avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
+				this._prevTextVarContent=instance.htmlText;
+				return;
+			}
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, instance.text);
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
 			this._prevTextVarContent=instance.text;
@@ -690,22 +667,34 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
 		}
 		var newTextVarContent:string=avm1ContextUtils.getProperty(this._textVarHolder, this._textVarPropName);
-		if(typeof newTextVarContent === "object"){
+		if(typeof newTextVarContent !== "string"){
 			newTextVarContent=alToString(this.context, newTextVarContent);		
 		}
-			
-		if(newTextVarContent!==this._prevTextVarContent){
-			//warning("AVM1Textfield._syncTextFieldValue - var-content has changed, update text - var:'"+this._textVarHolder.toString()+name+"' / '"+newTextVarContent+"' / '"+instance.text+"'");
-			// textvar has changed. update text from var
-			instance.text = (typeof newTextVarContent==="undefined") ? "" : newTextVarContent;
-			this._prevTextVarContent=newTextVarContent;
-			return;
+		if(instance.html){	
+			if(newTextVarContent!==this._prevTextVarContent){
+				// textvar has changed. update text from var
+				instance.htmlText = (typeof newTextVarContent === "undefined") ? "" : newTextVarContent;
+				this._prevTextVarContent=newTextVarContent;
+				return;
+			}
+			if(instance.htmlText!==newTextVarContent && (!(typeof newTextVarContent==="undefined" && instance.htmlText===""))){
+				// makes sure text is set correctly in case the timeline has interferred.
+				instance.htmlText = (typeof newTextVarContent === "undefined") ? "" : newTextVarContent;
+
+			}
 		}
-		if(instance.text!==newTextVarContent && (!(typeof newTextVarContent==="undefined" && instance.text===""))){
-			// makes sure text is set correctly in case the timeline has interferred.
-			// if newTextVarContent==undefined and newTextVarContent=="" its already correct
-			//warning("AVM1Textfield._syncTextFieldValue - text-content has changed, update text - var:'"+name+"' / '"+this._textVarHolder.toString()+newTextVarContent+"' / '"+instance.text+"'");
-			instance.text=(typeof newTextVarContent==="undefined") ? "" : newTextVarContent;
+		else{
+			if(newTextVarContent!==this._prevTextVarContent){
+				// textvar has changed. update text from var
+				instance.text = (typeof newTextVarContent === "undefined") ? "" : newTextVarContent;
+				this._prevTextVarContent=newTextVarContent;
+				return;
+			}
+			if(instance.text!==newTextVarContent && (!(typeof newTextVarContent==="undefined" && instance.text===""))){
+				// makes sure text is set correctly in case the timeline has interferred.
+				instance.text = (typeof newTextVarContent === "undefined") ? "" : newTextVarContent;
+
+			}
 
 		}
 	}
