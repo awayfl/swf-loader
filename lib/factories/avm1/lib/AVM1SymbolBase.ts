@@ -482,6 +482,8 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		return path;
 	}
 
+	/*
+	// transform is only available in FP8, and cause problems in FP6
 	public getTransform(): AVM1Object {
 		somewhatImplemented("AVM1SymbolBase.setTransform");
 		var transformCtor = <AVM1Function>this.context.globals.Transform;
@@ -495,7 +497,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		var as3Transform = value.as3Transform;
 		notImplemented("AVM1SymbolBase.setTransform");
 		//this.adaptee.transform = as3Transform;
-	}
+	}*/
 
 	public get_visible(): boolean {
 		return this.adaptee.visible;

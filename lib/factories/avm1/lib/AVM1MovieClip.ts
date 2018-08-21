@@ -111,7 +111,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				'play', 'prevFrame', '_quality#', 'removeMovieClip', '_root#', '_rotation#',
 				'scale9Grid#', 'scrollRect#', 'setMask', '_soundbuftime#', 'startDrag',
 				'stop', 'stopDrag', 'swapDepths', 'tabChildren#', 'tabEnabled#', 'tabIndex#',
-				'_target#', '_totalframes#', 'trackAsMenu#', 'transform#', 'toString',
+				'_target#', '_totalframes#', 'trackAsMenu#', 'toString',
 				'unloadMovie', '_url#', 'useHandCursor#', '_visible#', '_width#',
 				'_x#', '_xmouse#', '_xscale#', '_y#', '_ymouse#', '_yscale#']);
 	}
