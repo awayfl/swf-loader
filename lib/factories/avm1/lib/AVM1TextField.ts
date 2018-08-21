@@ -75,6 +75,18 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		}
 	}
 
+	public static allTextfields:any={};
+	public static syncAllTextfields(){
+		for (var key in AVM1TextField.allTextfields){
+			if(AVM1TextField.allTextfields[key]){
+				AVM1TextField.allTextfields[key].syncTextFieldValue();
+
+			}
+			else{
+				delete AVM1TextField.allTextfields[key];
+			}
+		}
+	}
 	public static textFieldVars:AVM1TextField[]=[];
 	public static syncQueedTextfields(){
 		if(AVM1TextField.textFieldVars.length>0){
@@ -535,6 +547,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		
 
 		var instance = this.adaptee;
+		AVM1TextField.allTextfields[instance.id]=this;
 		this._prevTextVarContent=this.adaptee.text;
 		this._syncTextFieldValue(instance, name);
 		if (this._exitFrameHandler && !name) {
