@@ -172,6 +172,19 @@ export class AVMAwayStage extends Sprite{
 		}
 
 		if( this.SHOW_FRAME_RATE ) {
+            this._fpsTextField = <HTMLDivElement> document.createElement( 'div' ); // disable in RC
+            this._fpsTextField.style.cssFloat   = 'none';
+            this._fpsTextField.style.position   = 'absolute';
+            this._fpsTextField.style.top        = '15px';
+            this._fpsTextField.style.width      = '200px';
+            this._fpsTextField.style.height     = '20px';
+            this._fpsTextField.style.left       =  window.innerWidth * 0.5 - 100 + 'px';
+            this._fpsTextField.style.textAlign  = 'center';
+            this._fpsTextField.style.color      = '#ff0000';
+            this._fpsTextField.style.fontSize   = '30px';
+            this._fpsTextField.style.zIndex   	= '9999';
+            this._fpsTextField.innerHTML        = "30";
+            document.body.appendChild( this._fpsTextField );
 			setInterval(() => this.updateFPS(), 1000);
 		}
 
@@ -197,7 +210,7 @@ export class AVMAwayStage extends Sprite{
 	}
 	private updateFPS(): void {
 		if(this._fpsTextField)
-			this._fpsTextField.innerText = this._currentFps.toFixed(2) + '/' + this._frameRate + " fps";
+			this._fpsTextField.innerText = this._currentFps.toFixed(2) + ' / ' + this._frameRate + " fps";
 		this._currentFps = 0;
 	}
 
@@ -230,6 +243,8 @@ export class AVMAwayStage extends Sprite{
 		this._renderer.stage.height    = h;
 		this._view.width     = w;
 		this._view.height    = h;
+		if(this._fpsTextField)
+			this._fpsTextField.style.left  =  window.innerWidth * 0.5 - 100 + 'px';
 	};
 
 	public show (){
