@@ -936,6 +936,16 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public startDrag(lock?: boolean, left?: number, top?: number, right?: number, bottom?: number): void {
 		lock = alToBoolean(this.context, lock);
 		this._dragBounds=null;
+		if(left>right){
+			var tmp=right;
+			right=left;
+			left=tmp;
+		}
+		if(top>bottom){
+			var tmp=bottom;
+			bottom=top;
+			top=tmp;
+		}
 		if (arguments.length > 1) {
 			left = alToNumber(this.context, left);
 			top = alToNumber(this.context, top);
@@ -1055,10 +1065,10 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public unloadMovie() {
 		var nativeObject = this.adaptee;
-		if(nativeObject.parent){
-			nativeObject.parent.removeChild(nativeObject);
+		nativeObject.removeChildren(0, nativeObject.numChildren);
+		if(this.dynamicallyCreated && nativeObject.parent && nativeObject.parent.adapter){
+			(<AVM1MovieClip>nativeObject.parent.adapter).unregisterScriptObject(nativeObject);
 		}
-		nativeObject.stop();
 	}
 
 	public getUseHandCursor() {
