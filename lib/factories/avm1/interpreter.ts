@@ -1647,12 +1647,12 @@ function avm1_0x1C_ActionGetVariable(ectx: ExecutionContext) {
 			if (varnames.length>1 && varnames[0]=="this"){				
 				var resolved1 = avm1ResolveVariable(ectx, varnames[0],AVM1ResolveVariableFlags.READ | AVM1ResolveVariableFlags.GET_VALUE);
 				if(resolved1 && resolved1.value && resolved1.value.adaptee && resolved1.value.adaptee.name==varnames[1]){
-					varnames.shift();
-					varnames.shift();
-					varnames.unshift("this");
-					variableName=varnames.join(".");
-					var resolved1 = avm1ResolveVariable(ectx, variableName,AVM1ResolveVariableFlags.READ | AVM1ResolveVariableFlags.GET_VALUE);
-					stack[sp]=resolved1?resolved1.value:null;
+					stack[sp]=resolved1.value;
+					return;
+				}			
+				var resolved1 = avm1ResolveVariable(ectx, varnames[1],AVM1ResolveVariableFlags.READ | AVM1ResolveVariableFlags.GET_VALUE);
+				if(resolved1 && resolved1.value && resolved1.value.adaptee){
+					stack[sp]=resolved1.value;
 					return;
 				}				
 			}
@@ -1966,9 +1966,9 @@ function avm1_0x3C_ActionDefineLocal(ectx: ExecutionContext) {
 	var value = stack.pop();
 	var name = stack.pop();
 
-	if(typeof value==="undefined" && scope.alHasProperty(name)){
+	/*if(typeof value==="undefined" && scope.alHasProperty(name)){
 		return;
-	}
+	}*/
 	scope.alPut(name, value);
 }
 
