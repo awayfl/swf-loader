@@ -37,7 +37,7 @@ import {MovieClipProperties} from "../interpreter/MovieClipProperties";
 import {
 	IMovieClipAdapter, DisplayObjectContainer, DisplayObject, MovieClip, TextField, Sprite, Billboard
 } from "@awayjs/scene";
-import {Rectangle, Point, WaveAudio} from "@awayjs/core";
+import {Rectangle, Box, Point, WaveAudio} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
 import {constructClassFromSymbol} from "../../link";
 import {Graphics} from "@awayjs/graphics";
@@ -83,12 +83,12 @@ export const enum LookupChildOptions {
 
 
 
-function convertAS3RectangeToBounds(as3Rectange: Rectangle): AVM1Object {
-	var result = alNewObject(this.context);
-	result.alPut('xMin', as3Rectange.axGetPublicProperty('left'));
-	result.alPut('yMin', as3Rectange.axGetPublicProperty('top'));
-	result.alPut('xMax', as3Rectange.axGetPublicProperty('right'));
-	result.alPut('yMax', as3Rectange.axGetPublicProperty('bottom'));
+function convertAS3RectangeToBounds(as3Rectange: any, context): AVM1Object {
+	var result = alNewObject(context);
+	result.alPut('xMin', as3Rectange.left);
+	result.alPut('yMin', as3Rectange.top);
+	result.alPut('xMax', as3Rectange.right);
+	result.alPut('yMax', as3Rectange.bottom);
 	return result;
 }
 
@@ -656,7 +656,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if (!obj) {
 			return undefined;
 		}
-		return convertAS3RectangeToBounds(this.adaptee.getBounds(obj));
+		return convertAS3RectangeToBounds(this.adaptee.getBoxBounds(obj), this.context);
 	}
 
 	public getBytesLoaded(): number {
@@ -713,7 +713,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if (!obj) {
 			return undefined;
 		}
-		return convertAS3RectangeToBounds(this.adaptee.getRect(obj));
+		return convertAS3RectangeToBounds(this.adaptee.getRect(obj), this.context);
 	}
 
 	public getSWFVersion(): number {
