@@ -522,15 +522,21 @@ function as2Enumerate(obj, fn: (name) => void, thisArg): void {
 		return;
 	}
 	var processed = Object.create(null); // TODO remove/refactor
+	var props:any[]=[];
 	alForEachProperty(obj, function (name) {
 		if(name.indexOf("_internal_TF")!=-1)
 			return;
 		if (processed[name]) {
 			return; // skipping already reported properties
 		}
-		fn.call(thisArg, name);
+		props[props.length]=name;
 		processed[name] = true;
 	}, thisArg);
+	var i=props.length;
+	while(i>0){
+		i--;
+		fn.call(thisArg, props[i]);
+	}
 }
 
 function avm1FindSuperPropertyOwner(context: AVM1Context, frame: AVM1CallFrame, propertyName: string): AVM1Object {
@@ -851,7 +857,7 @@ export class AVM1InterpretedFunction extends AVM1EvalFunction {
 								parentObj = parentObj.alGet("_parent");
 							}
 						}
-						if(parentObj && this.isOnEnter){
+						if(parentObj && this.isOnEnter && parentObj.alGet("_parent")){
 							parentObj = parentObj.alGet("_parent");
 						}
 						if(parentObj){
