@@ -52,6 +52,7 @@ import {AVMRaycastPicker} from "../../AVMRaycastPicker";
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
 import { AVM1EventHandler, AVM1MovieClipButtonModeEvent } from "./AVM1EventHandler";
 import {AVM1LoaderHelper} from "./AVM1LoaderHelper";
+import { AVM1InterpretedFunction } from '../interpreter';
 
 class SpriteSymbol{
 	avm1Name:string;
@@ -120,7 +121,18 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public static jointStyleMapStringToInt:any={"round":0, "bevel":1, "miter":2};
 
 	public clone(){
-		return <AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
+        var newClone=<AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
+        
+        if(this._avm1Context){
+            var symbolClass:AVM1InterpretedFunction=<AVM1InterpretedFunction>(<AVM1Context>this._avm1Context).getSymbolClass(parseInt(this.adaptee.name));
+            if(symbolClass){
+                newClone.alPut("__proto__", symbolClass._ownProperties.prototype.value);
+               (<MovieClip>newClone.adaptee).onCustomConstructor=function(){
+                    symbolClass.alCall(newClone);
+               }
+            }
+        }
+		return newClone;
 	}
 
 	// this is used for ordering AVM1 Framescripts into correct order

@@ -161,7 +161,7 @@ export function avm1BroadcastEvent(context: AVM1Context, target: any, propertyNa
 }
 var myCount=0;
 
-function createAVM1NativeObject(ctor, nativeObject:DisplayObject, context: AVM1Context, classDef:any) {
+function createAVM1NativeObject(ctor, nativeObject:DisplayObject, context: AVM1Context) {
 	// We need to walk on __proto__ to find right ctor.prototype.
 	var template;
 	var proto = ctor.alGetPrototypeProperty();
@@ -209,14 +209,14 @@ export function getAVM1Object(awayObject:DisplayObject, context: AVM1Context): A
 
 	if(awayObject.isAsset(MovieClip)){
 		if((<MovieClip>awayObject).timeline.isButton){
-			avmObject=<AVM1Object>createAVM1NativeObject(context.globals.Button, awayObject, context, AVM1Button);
+			avmObject=<AVM1Object>createAVM1NativeObject(context.globals.Button, awayObject, context);
 		}
-		else{
-			avmObject=<AVM1Object>createAVM1NativeObject(context.globals.MovieClip, awayObject, context, AVM1MovieClip);
+		else{     
+            avmObject=<AVM1Object>createAVM1NativeObject(context.globals.MovieClip, awayObject, context);
 		}
 	}
 	else if(awayObject.isAsset(TextField)){
-		avmObject=<AVM1Object>createAVM1NativeObject(context.globals.TextField, awayObject, context, AVM1TextField);
+		avmObject=<AVM1Object>createAVM1NativeObject(context.globals.TextField, awayObject, context);
 	}
 	if(avmObject){
 		(<any>awayObject)._as2Object=avmObject;
@@ -395,13 +395,9 @@ export function initializeAVM1Object(awayObject: any,
 			}
 			else if(eventName=="load"){
 				awayObject.onLoadedAction=handler;
-				//FrameScriptManager.add_loaded_action_to_queue(awayObject);
-				//MovieClip.avm1LoadedActions.push(awayObject);//console.log("calling construct actions for:", awayObject.id);
 			}
 			else if(eventName=="frameConstructed"){
 				awayObject.addEventListener("enterFrame", handler);
-				//instanceAVM1.addInitialEventListener("enterFrame", handler);
-
 			}
 			else{
 				instanceAVM1._addEventListener(new AVM1EventHandler(eventName, eventName, null, eventMapping.isStageEvent), handler);

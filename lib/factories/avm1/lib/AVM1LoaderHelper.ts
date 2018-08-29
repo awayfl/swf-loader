@@ -43,7 +43,8 @@ export class AVM1LoaderHelper {
 			}
 			if (asset.name == "scene") {
 				this._content=<MovieClip>asset;
-				this.result.resolve(<MovieClip>asset);
+                this.result.resolve(<MovieClip>asset);
+                (<any>asset.adapter).doInitEvents();
 			}
 		}
 	}
