@@ -18,3 +18,4 @@ export {AVM1PropertyFlags} from "./lib/factories/avm1/runtime";
 export {wrapAVM1NativeClass} from "./lib/factories/avm1/lib/AVM1Utils";
 export {AVM1Context} from "./lib/factories/avm1/context";
 export {Debug, release} from "./lib/factories/base/utilities/Debug";
+export {alIsFunction} from "./lib/factories/avm1/runtime";
