@@ -94,6 +94,14 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		}
 	}
 
+	public addListener(listener:AVM1Object):void
+	{
+        if(listener){
+            (<any>listener).eventObserver=this;
+            
+        }
+    }
+
 	public unbindEvents() {
 		var events = this._events;
 		var observer = this;

@@ -42,7 +42,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	static createAVM1Class(context: AVM1Context): AVM1Object  {
 		return wrapAVM1NativeClass(context, true, AVM1TextField,
 			[],
-			[ '_alpha#', 'antiAliasType#', 'autoSize#', 'background#', 'backgroundColor#',
+			[ '_alpha#', 'addListener', 'antiAliasType#', 'autoSize#', 'background#', 'backgroundColor#',
 				'border#',  'borderColor#', 'bottomScroll#', 'condenseWhite#', 'embedFonts#',
 				'filters#', 'getNewTextFormat', 'getTextFormat', 'gridFitType#', 'getDepth',
 				'_height#', '_highquality#', 'hscroll#', 'html#', 'htmlText#', 'length#',

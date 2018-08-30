@@ -22,7 +22,8 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 
 	public _avm1Context: IAVM1Context;
 
-	public adaptee: IAsset;
+    public adaptee: IAsset;
+    public eventObserver:any;
 	public _blockedByScript:boolean;
 	public _ctBlockedByScript:boolean;
 	protected _visibilityByScript:boolean;
