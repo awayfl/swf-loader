@@ -224,7 +224,7 @@
 						return;
 					}
 					var args = Array.prototype.slice.call(arguments, 0);
-					context.executeFunction(avmFn, null, args);
+					context.executeFunction(avmFn, obj, args);
 				};
 			}
 			var args: any[] = [];
