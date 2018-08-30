@@ -27,6 +27,7 @@ import {LoaderInfo} from "../../customAway/LoaderInfo";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1EventHandler, AVM1MovieClipButtonModeEvent } from "./AVM1EventHandler";
 import {notImplemented, somewhatImplemented, warning, release, assert} from "../../base/utilities/Debug";
+import { AVM1MovieClip } from './AVM1MovieClip';
 
 
 enum StateTransitions {
@@ -72,18 +73,31 @@ var buttonActionsMap:any={
 	434:['mouseOut3d'],						// rollout + dragOver + dragOut
 }
 
-export class AVM1Button extends AVM1SymbolBase<MovieClip> {
+export class AVM1Button extends AVM1MovieClip {
 	private _requiredListeners: any;
 	private _actions: AVM1ButtonAction[];
 
 	static createAVM1Class(context: AVM1Context) : AVM1Object {
 		return wrapAVM1NativeClass(context, true, AVM1Button,
 			[],
-			[ '_alpha#', 'blendMode#', 'cacheAsBitmap#', 'enabled#', 'filters#', '_focusrect#',
-				'getDepth', '_height#', '_highquality#', 'menu#', '_name#', '_parent#', '_quality#', 'removeMovieClip',
-				'_rotation#', 'scale9Grid#', '_soundbuftime#', 'stop', 'tabEnabled#', 'tabIndex#', '_target#',
-				'trackAsMenu#', '_url#', 'useHandCursor#', '_visible#', '_width#','toString', 
-				'_x#', '_xmouse#', '_xscale#', '_y#', '_ymouse#', '_yscale#']);
+			[ '$version#', '_alpha#', 'getAwayJSID', 'attachAudio', 'attachBitmap', 'attachMovie',
+            'beginFill', 'beginBitmapFill', 'beginGradientFill', 'blendMode#',
+            'cacheAsBitmap#', '_callFrame', 'clear', 'createEmptyMovieClip',
+            'createTextField', '_currentframe#', 'curveTo', '_droptarget#',
+            'duplicateMovieClip', 'enabled#', 'endFill', 'filters#', '_framesloaded#',
+            '_focusrect#', 'forceSmoothing#', 'getBounds',
+            'getBytesLoaded', 'getBytesTotal', 'getDepth', 'getInstanceAtDepth',
+            'getNextHighestDepth', 'getRect', 'getSWFVersion', 'getTextSnapshot',
+            'getURL', 'globalToLocal', 'gotoAndPlay', 'gotoAndStop', '_height#',
+            '_highquality#', 'hitArea#', 'hitTest', 'lineGradientStyle', 'lineStyle',
+            'lineTo', 'loadMovie', 'loadVariables', 'localToGlobal', '_lockroot#',
+            'menu#', 'moveTo', '_name#', 'nextFrame', 'opaqueBackground#', '_parent#',
+            'play', 'prevFrame', '_quality#', 'removeMovieClip', '_root#', '_rotation#',
+            'scale9Grid#', 'scrollRect#', 'setMask', '_soundbuftime#', 'startDrag',
+            'stop', 'stopDrag', 'swapDepths', 'tabChildren#', 'tabEnabled#', 'tabIndex#',
+            '_target#', '_totalframes#', 'trackAsMenu#', 'toString',
+            'unloadMovie', '_url#', 'useHandCursor#', '_visible#', '_width#',
+            '_x#', '_xmouse#', '_xscale#', '_y#', '_ymouse#', '_yscale#']);
 	}
 
 	public initAVM1SymbolInstance(context: AVM1Context, awayObject: MovieClip) {
@@ -172,105 +186,7 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 		this._initEventsHandlers();
 		this._addListeners();
 	}
-	// this is used for ordering AVM1 Framescripts into correct order
-	private compareAVM1FrameScripts(a:IFrameScript, b: IFrameScript): number {
-		if (!a.precedence) {
-			return !b.precedence ? 0 : -1;
-		} else if (!b.precedence) {
-			return 1;
-		}
-		var i = 0;
-		while (i < a.precedence.length && i < b.precedence.length && a.precedence[i] === b.precedence[i]) {
-			i++;
-		}
-		if (i >= a.precedence.length) {
-			return a.precedence.length === b.precedence.length ? 0 : -1;
-		} else {
-			return i >= b.precedence.length ? 1 : a.precedence[i] - b.precedence[i];
-		}
-	}
-	public executeScript(actionsBlocks:any){
-		
-		var name:string=this.adaptee.name.replace(/[^\w]/g,'');
-		if(!actionsBlocks){
-			window.alert("actionsBlocks is empty, can not execute framescript"+ name+ this.adaptee.currentFrameIndex);
-			return;
-		}
-		var unsortedScripts:any[]=[];
-				
-		for (let k = 0; k < actionsBlocks.length; k++) {
-			let actionsBlock:any = actionsBlocks[k];
-			let script:IFrameScript= function (actionsData) {
-				(<any>this)._avm1Context.executeActions(actionsData, this);
-			}.bind(this, actionsBlock.data);
 
-			// this uses parents of current scenegraph. so its not possible to easy preset in parser 
-			script.precedence = this.adaptee.getScriptPrecedence().concat(actionsBlock.precedence);
-
-			script.context = this.adaptee;
-			unsortedScripts.push(script);
-		}
-		if (unsortedScripts.length) {
-			unsortedScripts.sort(this.compareAVM1FrameScripts);
-			var sortedFrameScripts = unsortedScripts;
-			for (let k = 0; k < sortedFrameScripts.length; k++) {
-				var myScript = sortedFrameScripts[k];
-				var mc = myScript.context;
-				myScript.call(mc);
-			}
-		}		
-	}
-	public addScript(source:any, frameIdx:number):any{
-		let actionsBlocks=source;
-		var translatedScripts:any[]=[];
-		for (let i = 0; i < actionsBlocks.length; i++) {
-			let actionsBlock = actionsBlocks[i];
-			var mcName:any=this.adaptee.name;
-			if(typeof mcName!="string"){
-				mcName=mcName.toString();
-			}
-			actionsBlock.data=(<AVM1Context>this._avm1Context).actionsDataFactory.createActionsData(
-				actionsBlock.actionsData, 'script_'+mcName.replace(/[^\w]/g,'')+"_"+this.adaptee.id+'_frame_' + frameIdx + '_idx_' + i);
-			translatedScripts[translatedScripts.length]=actionsBlock;			
-		}
-		return translatedScripts;
-	}
-	public clone(){
-		return <AVM1Button>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
-	}
-
-	public evalScript(str:string):Function{
-		return null; //not used for avm1
-	}
-	
-	public doInitEvents():void
-	{
-		for (var key in this.adaptee.timeline.avm1InitActions)
-			this.executeScript(this.addScript(this.adaptee.timeline.avm1InitActions[key], <any> ("initActionsData" + key)));
-
-		if((<any>this).initEvents){
-			initializeAVM1Object(this.adaptee, <AVM1Context>this._avm1Context, (<any>this).initEvents);
-		}
-	}
-
-	public registerScriptObject(child:DisplayObject):void
-	{
-		// 	todo: i think buttons can not hae named instances.
-		//	if that is true, below code can be removed
-		if (child.name){
-			this.alPut(child.name, child.adapter);
-		}
-	}
-
-	public unregisterScriptObject(child:DisplayObject):void
-	{
-		// 	todo: i think buttons can not hae named instances.
-		//	if that is true, below code can be removed
-		if(child && child.adapter != child)
-			(<any>child.adapter).alPut("onEnterFrame", null);
-		if(child.name)
-			this.alDeleteProperty(child.name);
-	}
 
 	public stop() {
 		return this.adaptee.stop();
@@ -302,14 +218,6 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 		//getAwayObjectOrTemplate(this).trackAsMenu = alToBoolean(this.context, value);
 	}
 
-
-	public getUseHandCursor() {
-		this.adaptee.useHandCursor;
-	}
-
-	public setUseHandCursor(value) {
-		this.adaptee.useHandCursor=value;
-	}
 
 
 	public _addListeners() {
@@ -360,7 +268,7 @@ export class AVM1Button extends AVM1SymbolBase<MovieClip> {
 		}
 	}
 
-	private _initEventsHandlers() {
+	protected _initEventsHandlers() {
 		this.bindEvents([
 			new AVM1EventHandler('onData', 'data'),
 			new AVM1EventHandler('onDragOut', 'dragOut'),

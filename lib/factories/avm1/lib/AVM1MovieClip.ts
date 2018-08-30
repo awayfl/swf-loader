@@ -1191,7 +1191,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 	}
 
-	private _initEventsHandlers() {
+	protected _initEventsHandlers() {
 		this.bindEvents([
 			new AVM1EventHandler('onData', 'data'),
 			new AVM1EventHandler('onDragOut', 'dragOut'),
