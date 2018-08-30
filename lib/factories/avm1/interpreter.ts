@@ -852,14 +852,25 @@ export class AVM1InterpretedFunction extends AVM1EvalFunction {
 							}
 						}
 						if(!parentObj){
+                            // if the _parent was not set from oldScope, we get it from thisArg
 							parentObj=thisArg;
 							if(parentObj){
 								parentObj = parentObj.alGet("_parent");
-							}
-						}
-						if(parentObj && this.isOnEnter && parentObj.alGet("_parent")){
-							parentObj = parentObj.alGet("_parent");
-						}
+                            }
+                            //  if this is a onEnter, and the _parent was not set from oldScope,
+                            //  we need to go up another parent if possible
+                            
+                            if(parentObj && this.isOnEnter && parentObj.alGet("_parent")){
+                                parentObj = parentObj.alGet("_parent");
+                            }
+                        }
+                        /*if(this.isOnEnter){
+                            console.log("prepare on enter");
+                            console.log("oldScope parent", oldScope.alGet("_parent"));
+                            console.log("oldScope this", oldScope.alGet("this"));
+                            console.log("newscope this", newScope.alGet("_parent"));
+                            console.log("thisArg", thisArg);                            
+                        }*/
 						if(parentObj){
 							registers[i] = parentObj;
 						}
