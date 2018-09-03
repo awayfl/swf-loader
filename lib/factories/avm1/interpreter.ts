@@ -859,7 +859,7 @@ export class AVM1InterpretedFunction extends AVM1EvalFunction {
                             }
                             //  if this is a onEnter, and the _parent was not set from oldScope,
                             //  we need to go up another parent if possible
-                            
+
                             if(parentObj && this.isOnEnter && parentObj.alGet("_parent")){
                                 parentObj = parentObj.alGet("_parent");
                             }
@@ -1646,8 +1646,9 @@ function avm1_0x9E_ActionCall(ectx: ExecutionContext) {
 function avm1_0x1C_ActionGetVariable(ectx: ExecutionContext) {
 	var stack = ectx.stack;
 
-	var variableName = '' + stack.pop();
-
+	var variableName = stack.pop();
+    if(variableName)
+        variableName=alToString(ectx.context, variableName);
 	var sp = stack.length;
 	stack.push(undefined);
 
