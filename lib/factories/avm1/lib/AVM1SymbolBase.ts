@@ -486,7 +486,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			}
 			path = '/' + awayObject.name + path;
 			awayObject = awayObject.parent;
-		} while (awayObject.name !== "scene");
+		} while (awayObject && awayObject.name !== "scene");
 		return path;
 	}
 
