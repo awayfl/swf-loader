@@ -425,6 +425,7 @@ export class SWFParser extends ParserBase
 
 						awayText.textFormat.size = symbol.tag.fontHeight/20;
 						awayText.textFormat.color = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
+						awayText.textColor = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
 						awayText.textFormat.leftMargin = symbol.tag.leftMargin/20;
 						awayText.textFormat.rightMargin = symbol.tag.rightMargin/20;
 						awayText.textFormat.letterSpacing = symbol.tag.letterSpacing/20;
