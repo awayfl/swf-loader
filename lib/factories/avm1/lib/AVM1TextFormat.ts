@@ -73,7 +73,7 @@ export class AVM1TextFormat extends AVM1Object implements IHasAS3ObjectReference
 		var context = this.context;
 		font = (font == null) ? null : alToString(context, font);
 		size = (size == null) ? null : alToNumber(context, size);
-		color = (color == null) ? 0x000000 : alToNumber(context, color);
+		color = (color == null) ? null : alToNumber(context, color);
 		bold = (bold == null) ? null : alToBoolean(context, bold);
 		italic = (italic == null) ? null : alToBoolean(context, italic);
 		underline = (underline == null) ? null : alToBoolean(context, underline);

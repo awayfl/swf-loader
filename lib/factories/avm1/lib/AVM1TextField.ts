@@ -429,6 +429,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		this.adaptee.replaceSelectedText(value);
 	}
 	
+    /**
+     * for html text this will get ignored
+     */
 	public setNewTextFormat(value) {
 		var away3TextFormat:TextFormat;
 		if (value instanceof AVM1TextFormat) {
@@ -442,10 +445,14 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			this.adaptee.textFormat=new TextFormat();
 		}
 		
-		away3TextFormat.font_table=this.adaptee.textFormat.font_table;
-		this.adaptee.textFormat.applyFormat(away3TextFormat);
+        away3TextFormat.font_table=this.adaptee.textFormat.font_table;
+        this.adaptee.newTextFormat=away3TextFormat;
 	}
 
+    /**
+     * This should only have effect on text that is currently existent on the Textfield.
+     * for new text we must use setNewTextFormat
+     */
 	public setTextFormat() {
 		var beginIndex: number = -1, endIndex: number = -1, tf;
 		switch (arguments.length) {
