@@ -789,6 +789,9 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	}
 
 	public setLength(length: number) {
+        if(length===null){
+            length=0;
+        }
 		if (!isIndex(length)) {
 			return; // no action on invalid length
 		}
