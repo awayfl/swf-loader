@@ -57,7 +57,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	private _variable: string;
-	private _html: boolean;
 
 	private _exitFrameHandler: (event: Event) => void;
 
@@ -133,7 +132,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		if (this.adaptee._symbol) {
 			//console.log("do init", this.adaptee._symbol.variableName, this);
 			this.setVariable(this.adaptee._symbol.variableName || '');
-			this._html = this.adaptee._symbol.html;
 		}
 		//this._initEventsHandlers();
 	}
@@ -146,7 +144,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		this.adaptee=awayObject;
 		this._initEventsHandlers();
 		this._variable = '';
-		this._html = false;
 		this._exitFrameHandler = null;
 		this.adaptee=awayObject;
 		this.onChanged(null);
@@ -324,24 +321,24 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getHtml() {
-		return this._html;
+		return this.adaptee.html;
 	}
 
 	public setHtml(value) {
-		this._html = !!value;
+		this.adaptee.html = !!value;
 		// Flash doesn't update the displayed text at this point, but the return
 		// value of `TextField#htmlText` is as though `TextField#htmlText = TextField#text` had
 		// also been called. For now, we ignore that.
 	}
 
 	public getHtmlText(): string {
-		return this._html ? this.adaptee.htmlText : this.adaptee.text;
+		return this.adaptee.html ? this.adaptee.htmlText : this.adaptee.text;
 	}
 
 	public setHtmlText(value: string) {
 		// alToString turns `undefined` into an empty string, but we really do want "undefined" here.
 		value = value === undefined ? 'undefined' : alToString(this.context, value);
-		if (this._html) {
+		if (this.adaptee.html) {
 			this.adaptee.htmlText = value;
 		} else {
 			this.adaptee.text = value;
