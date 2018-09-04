@@ -119,6 +119,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public static capStyleMapStringToInt:any={"none":0, "round":1, "square":2};
 	public static jointStyleMapStringToInt:any={"round":0, "bevel":1, "miter":2};
+	private initialDepth:number=0;
 
 	public clone(){
         var newClone=<AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
@@ -236,7 +237,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 		if((<any>this).initEvents){
 			initializeAVM1Object(this.adaptee, <AVM1Context>this._avm1Context, (<any>this).initEvents);
-		}
+        }
+        this.initialDepth=this.adaptee._depthID;
 	}
 
 
@@ -1048,7 +1050,13 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		else if(target.adaptee){
 			//console.log("swap to children", this.adaptee.name, target.adaptee.name);
 			parent.swapChildren(this.adaptee, target.adaptee);
-		}
+        }
+        if(this.adaptee._depthID==this.initialDepth){
+            this.hasSwappedDepth=false;
+        }
+        else{
+            this.hasSwappedDepth=true;
+        }
 
 	}
 
@@ -1078,7 +1086,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public unloadMovie() {
 		var nativeObject = this.adaptee;
 		nativeObject.removeChildren(0, nativeObject.numChildren);
-		if(this.dynamicallyCreated && nativeObject.parent && nativeObject.parent.adapter){
+		if((this.dynamicallyCreated || this.hasSwappedDepth) && nativeObject.parent && nativeObject.parent.adapter){
 			(<AVM1MovieClip>nativeObject.parent.adapter).unregisterScriptObject(nativeObject);
 		}
 	}

@@ -25,6 +25,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	adaptee: T;
 	_as3ObjectTemplate: any;
 
+	public hasSwappedDepth:boolean=false;
 	public dynamicallyCreated:boolean=false;
 	public initAVM1SymbolInstance(context: AVM1Context, awayObject: T) {
 		//AVM1Object.call(this, context);
@@ -221,14 +222,14 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			return; // let's not remove root symbol
 		}
 		if(this.adaptee.parent){
-			if(this.dynamicallyCreated){
-			this.adaptee.parent.removeChild(this.adaptee);
+			if(this.dynamicallyCreated || this.hasSwappedDepth){
+			    this.adaptee.parent.removeChild(this.adaptee);
 				var avmParent = this.get_parent();
 				if(avmParent){
 					avmParent._removeChildName(this, this.adaptee.name);
 					avmParent.adaptee.removeChild(this.adaptee);
 				}
-		}
+		    }
 		}
 	}
 	// Common DisplayObject properties
