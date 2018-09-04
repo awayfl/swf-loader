@@ -863,6 +863,15 @@ export class AVM1InterpretedFunction extends AVM1EvalFunction {
                             if(parentObj && this.isOnEnter && parentObj.alGet("_parent")){
                                 parentObj = parentObj.alGet("_parent");
                             }
+                            // for setInterval: if its still not has a parent found
+                            if(!parentObj){
+                                if(this.scopeList && this.scopeList.previousScopeItem && this.scopeList.previousScopeItem.scope){
+                                    parentObj=this.scopeList.previousScopeItem.scope.alGet("this");
+                                    if(parentObj){
+                                        parentObj = parentObj.alGet("_parent");
+                                    }
+                                }
+                            }
                         }
                         /*if(this.isOnEnter){
                             console.log("prepare on enter");
@@ -1660,7 +1669,7 @@ function avm1_0x1C_ActionGetVariable(ectx: ExecutionContext) {
 			stack[sp]=true;
 		else if (variableName=="FALSE")
 			stack[sp]=false;
-		else if (variableName.indexOf(".")>=0){				
+		else if (variableName && variableName.indexOf(".")>=0){				
 			var varnames=variableName.split(".");
 			if (varnames.length>1 && varnames[0]=="this"){				
 				var resolved1 = avm1ResolveVariable(ectx, varnames[0],AVM1ResolveVariableFlags.READ | AVM1ResolveVariableFlags.GET_VALUE);
@@ -1681,7 +1690,7 @@ function avm1_0x1C_ActionGetVariable(ectx: ExecutionContext) {
 		//console.log("avm1_0x1C_ActionGetVariable", ectx, resolved, variableName);
 		return;
 	}
-	stack[sp] = resolved.value;
+	stack[sp] = resolved?resolved.value:null;
 	//console.log("avm1_0x1C_ActionGetVariable", ectx, resolved, variableName);
 }
 
