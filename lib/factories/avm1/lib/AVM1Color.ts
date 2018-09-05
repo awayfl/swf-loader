@@ -22,6 +22,7 @@ import {AVM1ColorTransform, toAS3ColorTransform} from "./AVM1ColorTransform";
 import {DisplayObject, HierarchicalProperties, MovieClip} from "@awayjs/scene";
 import {ColorTransform} from "@awayjs/core";
 import {AVM1Context} from "../context";
+import { AVM1SymbolBase } from './AVM1SymbolBase';
 
 
 export class AVM1Color extends AVM1Object {
@@ -36,22 +37,25 @@ export class AVM1Color extends AVM1Object {
 	private _targetAwayObject: DisplayObject;
 
 	public avm1Constructor(target_mc) {
-		if(target_mc){
+		if(target_mc && target_mc instanceof AVM1SymbolBase){
 			this._target = this.context.resolveTarget(target_mc);
-			if(this._target){
+			if(this._target ){
 				(<any>this._target).avmColor=this;
 				(<any>this._target)._ctBlockedByScript=true;
 				this._targetAwayObject = <DisplayObject>getAwayJSAdaptee(this._target);
-			}
+            }
 		}
 	}
 	public changeTarget(target_mc) {
-		if(target_mc){
-			this._target = target_mc;
+		if(target_mc && target_mc instanceof AVM1SymbolBase){
+			this._target = this.context.resolveTarget(target_mc);
 			(<any>this._target).avmColor=this;
 			(<any>this._target)._ctBlockedByScript=true;
 			this._targetAwayObject = <DisplayObject>getAwayJSAdaptee(this._target);
-		}		
+        }	
+        else{
+            this._target=null;
+        }	
 	}
 
 	public getRGB(): number {
