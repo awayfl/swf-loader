@@ -579,7 +579,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		//warning("AVM1Textfield.updateVarFromText - '"+this._textVarHolder.toString()+this._textVarPropName+"' / '"+this.adaptee.text+"'");
 			
 		if(this._textVarHolder){
-			this.context.utils.setProperty(this._textVarHolder, this._textVarPropName, this.adaptee.text);
+			this.context.utils.setProperty(this._textVarHolder, this._textVarPropName, this.adaptee.html?this.adaptee.htmlText:this.adaptee.text);
 			this._prevTextVarContent=this.adaptee.text;
 		}
 	}
