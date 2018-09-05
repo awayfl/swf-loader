@@ -1000,7 +1000,7 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	public sort(comparefn?: AVM1Function): AVM1Object {
 		var arr = alEnsureType<AVM1ArrayNative>(this, AVM1ArrayNative).value;
 		if (!alIsFunction(comparefn)) {
-			if(typeof comparefn==="number" && comparefn==16){
+			if(typeof comparefn==="number" && (comparefn==16 || comparefn==-1)){
 				arr.sort((a, b) => a - b)
 			}
 			else{
