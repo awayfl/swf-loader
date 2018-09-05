@@ -1012,7 +1012,19 @@ export class AVM1ArrayPrototype extends AVM1Object {
 						arr[i]="00000000000AwayInternal";
 					}
 				}
-				arr.sort();
+				arr.sort(function(a,b){
+                    while(a instanceof AVM1ArrayNative){
+                        a=alEnsureType<AVM1ArrayNative>(a, AVM1ArrayNative).value;
+                        if(a && a.length>0)
+                            a=a[0];
+                    }
+                    while(b instanceof AVM1ArrayNative){
+                        b=alEnsureType<AVM1ArrayNative>(b, AVM1ArrayNative).value;
+                        if(b && b.length>0)
+                            b=b[0];
+                    }
+                    return (a<b)?-1:1;
+                });
 				i=arr.length;
 				while(i>0){
 					i--;
