@@ -270,7 +270,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			}
 			return;
 		}
-		if(typeof v==="undefined" && (p=="_x" || p=="_y" || p=="_xscale" || p=="_yscale")){
+		if(typeof v==="undefined" && (p=="_x" || p=="_y" || p=="_xscale" || p=="_yscale" || p=="_width" || p== "_height")){
 			// todo check which properties can be init with undefined
 			return;
 		}
