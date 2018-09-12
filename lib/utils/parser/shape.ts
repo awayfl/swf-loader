@@ -19,6 +19,7 @@ import {MappingMode} from "@awayjs/renderer";
 
 import {ColorUtils, Matrix as AwayMatrix} from "@awayjs/core"
 
+import {BitmapImage2D} from "@awayjs/stage"
 import {MorphSprite} from "@awayjs/scene"
 import {ImageTexture2D, MethodMaterial} from "@awayjs/materials"
 import {PathCommand, GradientType, GradientSpreadMethod,
@@ -541,12 +542,12 @@ function processStyle(style, isLineStyle: boolean, isMorph: boolean,
 				style.type !== FillType.NonsmoothedClippedBitmap;
 			shapeStyle.repeat = style.type !== FillType.ClippedBitmap &&
 				style.type !== FillType.NonsmoothedClippedBitmap;
-			var index = dependencies.indexOf(style.bitmapId);
+			/*var index = dependencies.indexOf(style.bitmapId);
 			if (index === -1) {
 				index = dependencies.length;
 				dependencies.push(style.bitmapId);
-			}
-			shapeStyle.bitmapIndex = index;
+			}*/
+			shapeStyle.bitmapIndex = style.bitmapId;
 			scale = 0.05;
 			break;
 		default:
@@ -1127,8 +1128,16 @@ class SegmentedPath {
 
 					var material:MethodMaterial = this.parser.mapMatsForBitmaps[style.bitmapIndex];
 					if(!material){
-						material=new MethodMaterial();
-						material.ambientMethod.texture=new ImageTexture2D(this.parser.awayBitmaps[style.bitmapIndex]);
+                        material=new MethodMaterial();
+                        var myImage=this.parser.awaySymbols[style.bitmapIndex]
+                        if(!myImage || !myImage.isAsset(BitmapImage2D)){
+                            console.log("error: can not find image for bitmapfill", myImage)
+                        }
+                        material.ambientMethod.texture=new ImageTexture2D(myImage);
+                        
+                        material.alphaBlending=true;
+                        material.useColorTransform = true;
+                        material.bothSides = true;
 						this.parser.mapMatsForBitmaps[style.bitmapIndex]=material;
 					}
 
