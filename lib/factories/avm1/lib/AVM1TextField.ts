@@ -44,7 +44,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			[],
 			[ '_alpha#', 'addListener', 'antiAliasType#', 'autoSize#', 'background#', 'backgroundColor#',
 				'border#',  'borderColor#', 'bottomScroll#', 'condenseWhite#', 'embedFonts#',
-				'filters#', 'getNewTextFormat', 'getTextFormat', 'gridFitType#', 'getDepth',
+				'filters#', 'getAwayJSID', 'getNewTextFormat', 'getTextFormat', 'gridFitType#', 'getDepth',
 				'_height#', '_highquality#', 'hscroll#', 'html#', 'htmlText#', 'length#',
 				'maxChars#', 'maxhscroll#', 'maxscroll#', 'multiline#',
 				'_name#', '_parent#', 'password#', '_quality#', '_rotation#',
@@ -97,6 +97,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		}
 	}
 
+	public getAwayJSID(): number {
+		return this.adaptee.id;
+    }
 	public selectTextField(fromMouseDown:boolean=false){
 		// this is called from the adaptee whenever it is selected in MouseManager
 		if(AVM1Globals.softKeyboardManager){

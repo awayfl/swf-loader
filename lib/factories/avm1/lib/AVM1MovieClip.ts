@@ -37,11 +37,10 @@ import {MovieClipProperties} from "../interpreter/MovieClipProperties";
 import {
 	IMovieClipAdapter, DisplayObjectContainer, DisplayObject, MovieClip, TextField, Sprite, Billboard
 } from "@awayjs/scene";
-import {Rectangle, Box, Point, WaveAudio} from "@awayjs/core";
+import {AssetLibrary, Matrix3D, Rectangle, Box, Point, WaveAudio} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
 import {constructClassFromSymbol} from "../../link";
 import {Graphics} from "@awayjs/graphics";
-import {Matrix3D} from "@awayjs/core";
 import {BitmapImage2D as Bitmap} from "@awayjs/stage";
 import {LoaderInfo} from "../../customAway/LoaderInfo";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
@@ -246,18 +245,19 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public registerScriptObject(child:DisplayObject):void
 	{
-
 		if(child.adapter!=child)
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
 			if(!this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
 				this.alPut(child.name, child.adapter);
 				this._childrenByName[child.name]=child._adapter;
-			}
+            }
+            /*
 			else{
 				
 				this._unregisteredChilds[child.name]=child;
-			}
+            }
+            */
 		}
 	}
 
@@ -267,18 +267,18 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			(<any>child.adapter).alPut("onEnterFrame", null);
 		if(child.name){
 			if(this._childrenByName[child.name] && this._childrenByName[child.name].adaptee.id==child.id){
-				if(this._unregisteredChilds[child.name]){					
+				/*if(this._unregisteredChilds[child.name]){					
 					this.alPut(child.name, this._unregisteredChilds[child.name].adapter);
 					this._childrenByName[child.name]=this._unregisteredChilds[child.name].adapter;
 					delete this._unregisteredChilds[child.name];
 				}
-				else{					
+				else{	*/				
 					this.alDeleteProperty(child.name);
 					delete this._childrenByName[child.name];
-				}
+				/*}
 			}
 			if(this._unregisteredChilds[child.name] && this._unregisteredChilds[child.name].adaptee.id==child.id){
-				delete this._unregisteredChilds[child.name];
+				delete this._unregisteredChilds[child.name];*/
 			}
 		}
 	}
@@ -330,7 +330,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	
 	public getAwayJSID(): number {
 		return this.adaptee.id;
-	}
+    }
+    
 	public attachAudio(id: any): void {
 		if (isNullOrUndefined(id)) {
 			return; // ignoring all undefined objects, probably nothing to attach
@@ -355,7 +356,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		symbolId = alToString(this.context, symbolId);
 		name = alToString(this.context, name);
 
-		var symbol = this.context.getAsset(symbolId);
+		var symbol = AssetLibrary.getAsset(symbolId, this.adaptee.assetNamespace);
 		if (!symbol) {
 			return undefined;
 		}
@@ -365,7 +366,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		props.avm1Name = name;
 		*/
 		var mc:MovieClip;
-		mc = (<any>symbol.symbolProps).clone();//constructClassFromSymbol(props, this.context.sec.flash.display.MovieClip.axClass);
+		mc = (<any>symbol.adaptee).clone();//constructClassFromSymbol(props, this.context.sec.flash.display.MovieClip.axClass);
 		mc.name=name;
 		getAVM1Object(mc,<any>this._avm1Context);
 		return mc;
