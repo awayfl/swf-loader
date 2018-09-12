@@ -38,7 +38,7 @@ export class AVM1LoaderHelper {
 	private onAssetComplete(event: AssetEvent): void {
 		var asset: IAsset = event.asset;
 		if (asset.isAsset(MovieClip)) {
-			if(asset["fileurl"]!=this._url){
+			if(asset.assetNamespace!=this._url){
 				return;
 			}
 			if (asset.name == "scene") {
@@ -75,7 +75,7 @@ export class AVM1LoaderHelper {
 		AssetLibrary.addEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
 		AssetLibrary.addEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoadCompleteDelegate);
 		AssetLibrary.addEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
-		AssetLibrary.load(new URLRequest(url), null, null, new SWFParser(AVM1Globals._scenegraphFactory));
+		AssetLibrary.load(new URLRequest(url), null, url, new SWFParser(AVM1Globals._scenegraphFactory));
 		return this.result.promise;
 
 		/*
