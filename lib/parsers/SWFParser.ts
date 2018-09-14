@@ -395,7 +395,7 @@ export class SWFParser extends ParserBase
 							awayText.textFormat.font_table=<TesselatedFontTable>flashFont.away.get_font_table(flashFont.fontStyleName, TesselatedFontTable.assetType);
 						}
 						awayText.textFormat.size = symbol.tag.fontHeight/20;
-						awayText.textFormat.color = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
+						//awayText.textFormat.color = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
 						awayText.textColor = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
 						awayText.textFormat.leftMargin = symbol.tag.leftMargin/20;
 						awayText.textFormat.rightMargin = symbol.tag.rightMargin/20;
@@ -672,7 +672,9 @@ export class SWFParser extends ParserBase
 				if(!isEmpty && (swfFrames[i].labelNames && swfFrames[i].labelNames.length>0)){
 					var fl_len:number=swfFrames[i].labelNames.length;
 					for(var fl:number=0;fl<fl_len; fl++){
-						awayTimeline._labels[swfFrames[i].labelNames[fl].toLowerCase()]=keyFrameCount;
+                        var labelName=swfFrames[i].labelNames[fl].toLowerCase();
+                        if(!awayTimeline._labels[labelName])
+						    awayTimeline._labels[labelName]=keyFrameCount;
 					}
 				}
 				if(!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length>0){
