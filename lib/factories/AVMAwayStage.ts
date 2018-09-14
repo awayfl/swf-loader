@@ -395,7 +395,9 @@ export class AVMAwayStage extends Sprite{
 				}
 			}
 		}
-		MovieClip._skipAdvance=false;
+        MovieClip._skipAdvance=false;
+        FrameScriptManager.execute_queue();
+        
 		// now dispatch the onEnterFrame
 		for(i=0;i<len;i++) {
 			myLayer=this._layers[i];
@@ -408,12 +410,9 @@ export class AVMAwayStage extends Sprite{
 				}
 			}
 		}
-		// after we advanced the scenegraph, we might have some script that needs executing
 		FrameScriptManager.execute_queue();
 
-		// after we advanced the scenegraph, we might have some script that needs executing
 		FrameScriptManager.execute_intervals(dt);
-		// after we advanced the scenegraph, we might have some script that needs executing
 		FrameScriptManager.execute_queue();
 
 
