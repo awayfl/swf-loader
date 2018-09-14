@@ -18,6 +18,7 @@ import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Context} from "../context";
 import {Debug, warning, notImplemented} from "../../base/utilities/Debug";
 import {IAVM1SymbolBase, wrapAVM1NativeClass} from "./AVM1Utils";
+import {AVM1MovieClip} from "./AVM1MovieClip";
 import {ASObject} from "../../AVM2Dummys";
 import {WaveAudio, AssetLibrary} from "@awayjs/core";
 import {constructClassFromSymbol} from "../../link";
@@ -46,13 +47,15 @@ export class AVM1Sound extends AVM1Object {
 	private _sound: WaveAudio;
 	private _channel: SoundChannel;
 	private _linkageID: string;
+	private _assetNameSpace: string;
 	private _onCompleteCallback:Function;
 
 	public avm1Constructor(target_mc) {
 		this._target = this.context.resolveTarget(target_mc);
 		this._sound = null;
 		this._channel = null;
-		this._linkageID = null;
+        this._linkageID = null;
+        this._assetNameSpace=AVM1MovieClip.currentMCAssetNameSpace;
 	}
 
 	public alPut(p, v) {
@@ -71,13 +74,13 @@ export class AVM1Sound extends AVM1Object {
 	}
 	public attachSound(id: string): void {
 
-		var symbol = (<any>this).context.getAsset(id);
+		var symbol = AssetLibrary.getAsset(id, this._assetNameSpace);
 		if (!symbol) {
 			warning("AVM1Sound.attachSound no symbol found "+id);
 			return;
 		}
 		this._linkageID=id;
-		this._sound = <WaveAudio>symbol.symbolProps;
+		this._sound = <WaveAudio>symbol;
 		if(!this._sound){
 			warning("AVM1Sound.attachSound no WaveAudio found "+ id);
 			return;

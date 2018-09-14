@@ -93,6 +93,7 @@ function convertAS3RectangeToBounds(as3Rectange: any, context): AVM1Object {
 }
 
 export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieClipAdapter {
+    public static currentMCAssetNameSpace:string="";
 	public static createAVM1Class(context: AVM1Context): AVM1Object {
 		return wrapAVM1NativeClass(context, true, AVM1MovieClip,
 			[],
@@ -153,6 +154,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 	}
 	public executeScript(actionsBlocks:any){
+        AVM1MovieClip.currentMCAssetNameSpace=this.adaptee.assetNamespace;
 		AVM1TextField.syncQueedTextfields();
 		var name:string=this.adaptee.name.replace(/[^\w]/g,'');
 		if(!actionsBlocks){
