@@ -407,8 +407,14 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		return avmMc;
 	}
 
-	public beginFill(color: number, alpha: number = 100): void {
+	public beginFill(color: number, alpha: number): void {
 		color = alToInt32(this.context, color);
+        if(typeof alpha=="undefined"){
+            alpha=0;
+        }
+        if(alpha===null){
+            alpha=100;
+        }
 		alpha = alToNumber(this.context, alpha);
 		this.graphics.beginFill(color, alpha / 100.0);
 	}
@@ -518,7 +524,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public createEmptyMovieClip(name, depth): AVM1MovieClip {
 		name = alToString(this.context, name);
 		var mc: MovieClip = new this.context.sec.flash.display.MovieClip();
-		mc.name = name;
+        mc.name = name;
+        mc.assetNamespace=this.adaptee.assetNamespace;
 		getAVM1Object(mc,  <AVM1Context>this._avm1Context);
 		//console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
 		var avmMC:AVM1MovieClip=<AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
@@ -885,7 +892,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				return;
 			}
 			this.adaptee.timeline=(<MovieClip>loaderHelper.content).timeline;
-			this.adaptee["fileurl"]=loaderHelper.content["fileurl"];
+			this.adaptee.assetNamespace=loaderHelper.content.assetNamespace;
 			this.adaptee.reset(true);
 		}.bind(this));
 	}
@@ -972,7 +979,10 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if(!this.isDragging){
 			this.isDragging=true;
 			this.startDragPoint=this.adaptee.parent.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
-
+            if(lock){
+                this.adaptee.x=this.startDragPoint.x;
+                this.adaptee.y=this.startDragPoint.y;
+            }
 			this.startDragMCPosition.x=this.adaptee.x;
 			this.startDragMCPosition.y=this.adaptee.y;
 			AVM1Stage.stage.addEventListener("mouseMove3d", this.dragListenerDelegate);
