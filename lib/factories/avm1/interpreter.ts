@@ -1540,8 +1540,10 @@ function avm1_0x11_ActionOr(ectx: ExecutionContext) {
 function avm1_0x12_ActionNot(ectx: ExecutionContext) {
 	var stack = ectx.stack;
 	var isSwfVersion5 = ectx.isSwfVersion5;
-
-	var f = !alToBoolean(ectx.context, stack.pop());
+    var v=stack.pop();
+    if(typeof v === 'string')
+        v=false;
+	var f = !alToBoolean(ectx.context, v);
 	stack.push(isSwfVersion5 ? <any>f : f ? 1 : 0);
 }
 
