@@ -33,6 +33,7 @@ import {LoaderInfo} from "../customAway/LoaderInfo";
 import {AVMAwayStage} from "../AVMAwayStage";
 import { AVM1Object } from "./runtime/AVM1Object";
 import { AVM1Function } from "./runtime/AVM1Function";
+import {AssetLibrary} from "@awayjs/core";
 
 //import {WeakMap} from "es6-weak-map";
 //import {Map} from "es6-map";
@@ -219,13 +220,21 @@ export class AVM1Context implements IAVM1Context {
 		if (className === null) {
 			this.utils.warn('Cannot register class for symbol: className is missing');
 			return null;
-		}
+        }
+        var myAsset:any=AssetLibrary.getAsset(className, AVM1MovieClip.currentMCAssetNameSpace);
+        if(!myAsset.adaptee){
+            console.warn("can not find symbol to register class "+className);
+            return;
+        }
+        console.log("register", myAsset.adaptee.name, myAsset.adaptee.id);
+        (<any>myAsset.adaptee).avm1Symbol=theClass;
+        /*
 		var symbolId = this.assets[className.toLowerCase()];
 		if (symbolId === undefined) {
 			this.utils.warn('Cannot register ' + className + ' class for symbol');
 			return;
 		}
-		this.assetsClasses[symbolId] = theClass;
+		this.assetsClasses[symbolId] = theClass;*/
 	}
 	public getSymbolClass(symbolId: number) : AVM1Object {
 		return this.assetsClasses[symbolId] || null;
