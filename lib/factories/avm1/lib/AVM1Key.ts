@@ -22,17 +22,33 @@ import {AVMAwayStage} from "../../AVMAwayStage";
 import {AVM1Object} from "../runtime/AVM1Object";
 
 export class AVM1Key extends AVM1Object {
+	public static BACKSPACE: number = 8;
+	public static CAPSLOCK: number = 20;
+	public static CONTROL: number = 17;
+	public static DELETEKEY: number = 46;
 	public static DOWN: number = 40;
+	public static END: number = 35;
+	public static ENTER: number = 13;
+	public static ESCAPE: number = 27;
+	public static HOME: number = 36;
+	public static INSERT: number = 45;
 	public static LEFT: number = 37;
+	public static PGDN: number = 34;
+	public static PGUP: number = 33;
 	public static RIGHT: number = 39;
+	public static SHIFT: number = 16;
+	public static SPACE: number = 32;
+    public static TAB: number = 9;
 	public static UP: number = 38;
-
+    
 	public static _keyStates: any[];
 	public static _lastKeyCode: number;
 
 	public static createAVM1Class(context: AVM1Context): AVM1Object {
 		var wrapped = wrapAVM1NativeClass(context, false, AVM1Key,
-			['DOWN', 'LEFT', 'RIGHT', 'UP', 'isDown', 'getCode'],
+            ['BACKSPACE', 'CAPSLOCK', 'CONTROL', 'DELETEKEY', 'DOWN', 
+            'END', 'ENTER', 'ESCAPE', 'HOME', 'INSERT', 'LEFT', 
+            'PGDN','PGUP','RIGHT', 'SHIFT', 'SPACE', 'TAB', 'UP','isDown', 'getCode'],
 			[]);
 		return wrapped;
 	}
