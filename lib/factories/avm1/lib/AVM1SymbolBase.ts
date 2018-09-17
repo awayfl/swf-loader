@@ -29,7 +29,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	public dynamicallyCreated:boolean=false;
 	public initAVM1SymbolInstance(context: AVM1Context, awayObject: T) {
 		//AVM1Object.call(this, context);
-
+        this.avmType="symbol";
 		this._avm1Context = context;
 		this._ownProperties = Object.create(null);
 		this._prototype = null;
@@ -88,6 +88,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		});
 
 		if (autoUnbind) {
+            // todo: we do not dispatch removeFromStage in AwayJS yet
 			observer.adaptee.addEventListener('removedFromStage', function removedHandler() {
 				observer.adaptee.removeEventListener('removedFromStage', removedHandler);
 				observer.unbindEvents();
@@ -98,7 +99,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	public addListener(listener:AVM1Object):void
 	{
         if(listener){
-            (<any>listener).eventObserver=this;
+            listener.eventObserver=this;
             
         }
     }
@@ -132,40 +133,6 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		}
 	}
 
-	public getEnabled() {
-		return this.enabled;
-	}
-
-	public setEnabled(value) {
-		if (value == this.enabled)
-			return;
-		this.enabled = value;
-		this.setEnabledListener(value);
-	}
-	public setEnabledListener(value:any) {
-		if (value!==false && value!==0) {
-
-			for (var key in this._eventsListeners) {
-				if(key!="onenterframe"){
-					if(this._eventHandlers[key].stageEvent)
-						(<any>this.context.globals.Stage)._awayAVMStage.addAVM1EventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-					else
-						this.adaptee.addEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-				}
-			}
-		}
-		else {
-			for (var key in this._eventsListeners) {
-				if(key!="onenterframe"){
-					if(this._eventHandlers[key].stageEvent)
-						(<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-					else
-						this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-				}
-			}
-		}
-
-	}
 
 	public _addEventListener(event: AVM1EventHandler, callback:Function=null) {
 		var propertyName = this.context.normalizeName(event.propertyName);
@@ -217,23 +184,45 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		this._updateEvent(event);
 	}
 
-	public removeMovieClip() {
-		if (this.adaptee.name=="scene") {
-			return; // let's not remove root symbol
-		}
-		if(this.adaptee.parent){
-			if(this.dynamicallyCreated || this.hasSwappedDepth){
-			    this.adaptee.parent.removeChild(this.adaptee);
-				var avmParent = this.get_parent();
-				if(avmParent){
-					avmParent._removeChildName(this, this.adaptee.name);
-					avmParent.adaptee.removeChild(this.adaptee);
-				}
-		    }
-		}
-	}
-	// Common DisplayObject properties
+    
+    //  Common DisplayObject properties
+    //  they need to be listed in the arguments of wrapAVM1NativeClass of the classes that extend on AVM1Symbol 
 
+	public getEnabled() {
+		return this.enabled;
+	}
+
+	public setEnabled(value) {
+		if (value == this.enabled)
+			return;
+		this.enabled = value;
+		this.setEnabledListener(value);
+	}
+	public setEnabledListener(value:any) {
+		if (value!==false && value!==0) {
+
+			for (var key in this._eventsListeners) {
+				if(key!="onenterframe"){
+					if(this._eventHandlers[key].stageEvent)
+						(<any>this.context.globals.Stage)._awayAVMStage.addAVM1EventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+					else
+						this.adaptee.addEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+				}
+			}
+		}
+		else {
+			for (var key in this._eventsListeners) {
+				if(key!="onenterframe"){
+					if(this._eventHandlers[key].stageEvent)
+						(<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+					else
+						this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+				}
+			}
+		}
+
+    }
+    
 	public get_alpha(): number {
 		return this.adaptee.alpha * 100;
 	}
@@ -491,6 +480,21 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		return path;
 	}
 
+	public removeMovieClip() {
+		if (this.adaptee.name=="scene") {
+			return; // let's not remove root symbol
+		}
+		if(this.adaptee.parent){
+			if(this.dynamicallyCreated || this.hasSwappedDepth){
+			    this.adaptee.parent.removeChild(this.adaptee);
+				var avmParent = this.get_parent();
+				if(avmParent){
+					avmParent._removeChildName(this, this.adaptee.name);
+					avmParent.adaptee.removeChild(this.adaptee);
+				}
+		    }
+		}
+    }
 	/*
 	// transform is only available in FP8, and cause problems in FP6
 	public getTransform(): AVM1Object {
@@ -602,6 +606,8 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	}
 
 	public getDepth() {
+		if (this.protoTypeChanged)
+			return null;
 		return away2avmDepth(this.adaptee._depthID);
 	}
 	public toString() {
