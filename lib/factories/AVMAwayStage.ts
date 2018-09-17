@@ -136,9 +136,10 @@ export class AVMAwayStage extends Sprite{
 		MouseManager.getInstance()._stage=this;
 
 		// prevent backspace and other default shortcutz for our document:
-		// todo: make this optional (?)
+        // todo: make this optional (?)
+        /*
 		document.onkeydown = function (event) {
-			if (!event) { /* This will happen in IE */
+			if (!event) {// This will happen in IE
 				event = <any>window.event;
 			}
 			var keyCode = event.keyCode;
@@ -155,21 +156,7 @@ export class AVMAwayStage extends Sprite{
 				MouseManager.getInstance().onKeyDown(event);
 				return false;
 			}
-			/*
-			window.location.href += "#";
-
-			var _hash = "";
-			window.setTimeout(function () {
-				window.location.href += "";
-			}, 50);
-
-			window.onhashchange = function () {
-				if (window.location.hash !== _hash) {
-					window.location.hash = _hash;
-				}
-			};
-			*/
-		}
+        }*/
 
 		if( this.SHOW_FRAME_RATE ) {
             this._fpsTextField = <HTMLDivElement> document.createElement( 'div' ); // disable in RC
