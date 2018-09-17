@@ -476,7 +476,8 @@ function as2SetProperty(context: AVM1Context, obj: any, name: any, value: any): 
 					avm1Obj.alPut(key, value.alGet(key));
 					as2SyncEvents(context, key);
 				}
-			}
+            }
+            avm1Obj.protoTypeChanged=true;
 		}
 	}
 	else{
