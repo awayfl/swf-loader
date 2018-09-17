@@ -80,7 +80,7 @@ export class AVM1Sound extends AVM1Object {
 			return;
 		}
 		this._linkageID=id;
-		this._sound = <WaveAudio>symbol;
+		this._sound = (<WaveAudio>symbol).clone();
 		if(!this._sound){
 			warning("AVM1Sound.attachSound no WaveAudio found "+ id);
 			return;
@@ -117,28 +117,28 @@ export class AVM1Sound extends AVM1Object {
 	}
 
 	public loadSound(url: string, isStreaming: boolean): void {
-		notImplemented("AVM1Sound.loadSound");
+		console.warn("AVM1Sound.loadSound");
 	}
 	public getBytesLoaded(): number { 
-		notImplemented("AVM1Sound.getBytesLoaded");
+		console.warn("AVM1Sound.getBytesLoaded");
 		return 0;
 	}
 	public getBytesTotal(): number { 
-		notImplemented("AVM1Sound.getBytesTotal");
+		console.warn("AVM1Sound.getBytesTotal");
 		return 0;
 	}
 	public getDuration(): number { 
-		notImplemented("AVM1Sound.getDuration");
+		console.warn("AVM1Sound.getDuration");
 		return 0;
 	}
 
 	public getPan(): number {
-		notImplemented("AVM1Sound.getPan");
+		console.warn("AVM1Sound.getPan");
 		// todo 80pro var transform: ASObject =(<ASObject> this._channel && this._channel.soundTransform);
 		return 0; //transform ? transform.axGetPublicProperty('pan') * 100 : 0;
 	}
 	public setPan(value: number): void {
-		notImplemented("AVM1Sound.setPan");
+		console.warn("AVM1Sound.setPan");
 		// todo 80pro
 		/*
 		var transform: ASObject = this._channel && this._channel.soundTransform;
@@ -150,21 +150,23 @@ export class AVM1Sound extends AVM1Object {
 	}
 
 	public getTransform(): any { 
-		notImplemented("AVM1Sound.getTransform");
+		console.warn("AVM1Sound.getTransform");
 		return null; 
 	}
 	public setTransform(transformObject: any): void {
-		notImplemented("AVM1Sound.setTransform");
+		console.warn("AVM1Sound.setTransform");
 	}
 
 	public getVolume(): number {
-		notImplemented("AVM1Sound.getVolume");
-		// todo 80pro var transform: ASObject = this._channel && this._channel.soundTransform;
-		return 0;//transform ? transform.axGetPublicProperty('volume') * 100 : 0;
+		if (!this._sound) {
+			console.warn("AVM1Sound.getVolume called, but no WaveAudio set");
+			return 100;
+		}
+		return this._sound.volume*100;
 	}
 	public setVolume(value: number): void {
 		if (!this._sound) {
-			warning("AVM1Sound.setVolume called, but no WaveAudio set");
+			console.warn("AVM1Sound.setVolume called, but no WaveAudio set");
 			return;
 		}
 		this._sound.volume=value/100;
