@@ -120,17 +120,17 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public static capStyleMapStringToInt:any={"none":0, "round":1, "square":2};
 	public static jointStyleMapStringToInt:any={"round":0, "bevel":1, "miter":2};
 	private initialDepth:number=0;
-
+    private avmPropsChildNames:any={};
+    
 	public clone(){
         var newClone=<AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
-        
-        if(this._avm1Context){
-            var symbolClass:AVM1InterpretedFunction=<AVM1InterpretedFunction>(<AVM1Context>this._avm1Context).getSymbolClass(parseInt(this.adaptee.name));
+        if(newClone.adaptee){
+            var symbolClass:AVM1InterpretedFunction=<AVM1InterpretedFunction>newClone.adaptee.avm1Symbol;
             if(symbolClass){
                 newClone.alPut("__proto__", symbolClass._ownProperties.prototype.value);
                (<MovieClip>newClone.adaptee).onCustomConstructor=function(){
                     symbolClass.alCall(newClone);
-               }
+               }                
             }
         }
 		return newClone;
@@ -251,7 +251,10 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
 			if(!this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
-				this.alPut(child.name, child.adapter);
+                if(this.avmPropsChildNames[child.name]){                    
+                    this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
+                }
+                this.alPut(child.name, child.adapter);
 				this._childrenByName[child.name]=child._adapter;
             }
             /*
@@ -764,7 +767,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public gotoAndPlay(frame) {
-		if (frame == null)
+		if (this.protoTypeChanged || frame == null)
 			return;
 
 		if (typeof frame === "string"){
@@ -782,7 +785,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public gotoAndStop(frame) {
-		if (frame == null)
+		if (this.protoTypeChanged || frame == null)
 			return;
 		this.adaptee.stop();
 		this._gotoFrame(frame);
