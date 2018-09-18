@@ -2,7 +2,7 @@ import {WaveAudioParser, Rectangle, WaveAudio, URLLoaderDataFormat, IAsset, Pars
 
 import {Image2DParser, BitmapImage2D} from "@awayjs/stage";
 
-import {MorphSprite, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign} from "@awayjs/scene";
+import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign} from "@awayjs/scene";
 
 import {Graphics} from "@awayjs/graphics";
 
@@ -465,9 +465,9 @@ export class SWFParser extends ParserBase
 						break;
 					case "label":
 						var awayText = this._factory.createTextField();
-						var font=null;
+                        var font=null;
+                        var invalid_font:boolean=false;
 						for(var r=0; r<symbol.records.length;r++){
-
 							var record:any=symbol.records[r];
 							if(record.fontId){
 								font=this.awaySymbols[record.fontId];
@@ -475,19 +475,23 @@ export class SWFParser extends ParserBase
 
 									//awayText.textFormat.font=font.away;
 									record.font_table=<TesselatedFontTable>font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType);
-
+                                    
 									//record.font_table=font.away.font_styles[0];
-								}
+                                }
 							}
+                            if(!record.font_table){
+                                invalid_font=true;
+                                console.log("no font_table set");
+                            }
 						}
 						awayText.staticMatrix=symbol.matrix;
 						awayText.textOffsetX=symbol.fillBounds.xMin/20;
 						awayText.textOffsetY=symbol.fillBounds.yMin/20;
 						awayText.width=(symbol.fillBounds.xMax/20 - symbol.fillBounds.xMin/20)-1;
-						awayText.height=(symbol.fillBounds.yMax/20 - symbol.fillBounds.yMin/20)-1;
-						awayText.setLabelData(symbol);
+                        awayText.height=(symbol.fillBounds.yMax/20 - symbol.fillBounds.yMin/20)-1;
+                        if(!invalid_font)
+						    awayText.setLabelData(symbol);
                         awayText.name="label_"+symbol.id.toString();
-                        awayText.assetNamespace;
                         assetsToFinalize[dictionary[i].id] = awayText;
 						this.awaySymbols[dictionary[i].id] = awayText;
 						awayText.selectable=symbol.tag.flags?!(symbol.tag.flags & TextFlags.NoSelect):false;
@@ -518,7 +522,7 @@ export class SWFParser extends ParserBase
             this._pFinalizeAsset(assetsToFinalize[key]);
         }
         this._pFinalizeAsset(awayMc, "scene");
-        
+        //DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this.sceneAndFrameLabelData);
 
@@ -614,16 +618,15 @@ export class SWFParser extends ParserBase
 					}
 					else{
 						if(awayAsset.isAsset){
+                            //  this is a awayjs asset. we just update its name. 
+                            //  all awayjs-assets will get registered on AssetLibrary by name at very end of parseSymbolsToAwayJS function
                             awayAsset.name=asset.className.toLowerCase();
-							//this.soundExports[asset.className.toLowerCase()]=awayAsset;
                         }
                         else if(awayAsset.away){
                             // this is a font. for now we do nothing (?)
                         }
 					}
 					noExportsDebug || console.log("			added export", swfFrames[i].exports[key], asset.className, asset.symbolId, awayAsset);
-					//(<any>this._factory).avm1Context.addAsset(asset.className, asset.symbolId, awayAsset);
-
 				}
 			}
 			// check if this is a empty frame
@@ -2069,7 +2072,7 @@ function defineSymbol(swfTag, symbols, parser) {
 		case SwfTagCode.CODE_DEFINE_FONT2:
 		case SwfTagCode.CODE_DEFINE_FONT3:
 		case SwfTagCode.CODE_DEFINE_FONT4:
-			return defineFont(swfTag);
+			return defineFont(swfTag, (<SWFParser>parser)._iFileName);
 		case SwfTagCode.CODE_DEFINE_MORPH_SHAPE:
 		case SwfTagCode.CODE_DEFINE_MORPH_SHAPE2:
 		case SwfTagCode.CODE_DEFINE_SHAPE:

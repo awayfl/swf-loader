@@ -97,12 +97,12 @@ function isScaledFont2(glyphs) {
 	return maxDimension > 5000;
 }
 
-export function defineFont(tag: FontTag):any {
+export function defineFont(tag: FontTag, ns:string):any {
 	var uniqueName = 'swf-font-' + tag.id;
 	var fontName = tag.name || uniqueName;
 
 	if(fontName=="Helvetica")fontName="arial";
-	var fontAJS:Font=DefaultFontManager.getFont(fontName);
+	var fontAJS:Font=DefaultFontManager.getFont(fontName, ns);
 	var font = {
 		type: 'font',
 		id: tag.id,
@@ -213,18 +213,16 @@ export function defineFont(tag: FontTag):any {
 		font.originalSize = true;
 	}
 	var ascent = Math.ceil(tag.ascent / resolution) || 1024;
-	var descent = -Math.ceil(tag.descent / resolution) || 0;
-	var newTable:boolean=true;
-	var mirrorYpos:number=1024;
+    var descent = -Math.ceil(tag.descent / resolution) || 0;
+    
 	if(tessFontTableAJS.ascent!=0){
 	}
 	else{
 		tessFontTableAJS.ascent=ascent;
 		tessFontTableAJS.descent=descent;
-	}
-	//offsetY=offsetY*-1;
+    }
+    
 	var offsetY=tessFontTableAJS.ascent;
-	mirrorYpos=ascent;
 	var leading = (tag.leading / resolution) || 0;
 	tables['OS/2'] = '';
 
@@ -807,10 +805,6 @@ export function defineFont(tag: FontTag):any {
 	tessFontTableAJS.set_font_em_size(1024);
 	if(tessFontTableAJS.get_whitespace_width()==0)
 		tessFontTableAJS.set_whitespace_width(whiteSpaceWidth);
-	//if(newTable){
-	//	tessFontTableAJS.ascent=1024;
-	//	tessFontTableAJS.descent=0;
-	//}
 
 	return font;
 }
