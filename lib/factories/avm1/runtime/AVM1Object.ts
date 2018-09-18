@@ -23,10 +23,19 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 	public _avm1Context: IAVM1Context;
 
     public adaptee: IAsset;
-    public eventObserver:any;
+    public avmType: string;
+    public _eventObserver:AVM1Object;
 	public _blockedByScript:boolean;
-	public _ctBlockedByScript:boolean;
-	protected _visibilityByScript:boolean;
+    public _ctBlockedByScript:boolean;
+    public protoTypeChanged:boolean;
+    protected _visibilityByScript:boolean;
+    
+	public get eventObserver():AVM1Object{
+        return this._eventObserver;
+	}
+	public set eventObserver(value:AVM1Object){
+        this._eventObserver=value;
+	}
 	public dispose(): any{
 
 	}
@@ -68,7 +77,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 		this._prototype = null;
 		this._blockedByScript=false;
 		this._ctBlockedByScript=false;
-		this._visibilityByScript=false;
+        this._visibilityByScript=false;
 		var self = this;
 		// Using IAVM1Callable here to avoid circular calls between AVM1Object and
 		// AVM1Function during constructions.
@@ -213,7 +222,6 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 	}
 
 	public alGet(p): any {
-		//80pro name = this.context.normalizeName(p);
 		var name = this.context.normalizeName(p);
 		var desc = this.alGetProperty(name);
 		if (!desc) {
@@ -250,10 +258,24 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 		// Perform all lookups with the canonicalized name, but keep the original name around to
 		// pass it to `alSetOwnProperty`, which stores it on the descriptor.
 		var originalName = p;
-		p = this.context.normalizeName(p);
+        p = this.context.normalizeName(p);
+        
+        //  stupid hack to make sure we can update references to objects in cases when the timeline changes the objects 
+        //  if a new object is registered for the same name, we can use the "avmPropsChildNames" to update all references to the old object with the new one
+        //  this only seem to work for objects that are not created dynamically
+        if(v && typeof v ==="object" && v.avmType==="symbol" && p!="this" && p!="_parent" && !v.dynamicallyCreated){
+            if(this.avmType!="symbol" || (v.adaptee.parent && v.adaptee.parent!=this.adaptee)){
+                if(v.adaptee.parent.adapter.avmPropsChildNames){
+                    v.adaptee.parent.adapter.avmPropsChildNames[v.adaptee.name]={obj:this, name:p};
+                    //console.log("stored ref to timeline-child on different object", this, p, v.adaptee.name, v);
+                }
+            }
+            //console.log("set symbol ", v.toString());
+        }
 		if (!this.alCanPut(p)) {
 			return;
-		}
+        }
+
 
 		var ownDesc = this.alGetOwnProperty(p);
 		if (ownDesc && (ownDesc.flags & AVM1PropertyFlags.DATA)) {
@@ -271,7 +293,8 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			return;
 		}
 		if(typeof v==="undefined" && (p=="_x" || p=="_y" || p=="_xscale" || p=="_yscale" || p=="_width" || p== "_height")){
-			// todo check which properties can be init with undefined
+            // certain props do not allow their value to be set to "undefined", so we exit here
+			// todo: there might be more props that do not allow "undefined"
 			return;
 		}
 		var desc = this.alGetProperty(p);

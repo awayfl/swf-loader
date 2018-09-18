@@ -121,7 +121,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public static jointStyleMapStringToInt:any={"round":0, "bevel":1, "miter":2};
 	private initialDepth:number=0;
     private avmPropsChildNames:any={};
-    
+
 	public clone(){
         var newClone=<AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
         if(newClone.adaptee){
@@ -251,7 +251,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
 			if(!this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
-                if(this.avmPropsChildNames[child.name]){                    
+                if(this.avmPropsChildNames[child.name]){     
+                    //console.log("updating child reference to ", child.name, this.avmPropsChildNames[child.name].obj, child.adapter)               
                     this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
                 }
                 this.alPut(child.name, child.adapter);
@@ -407,8 +408,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if(oldAVMMC && oldAVMMC.avmColor){
 			oldAVMMC.avmColor.changeTarget(avmMc);
 		}
-		this.registerScriptObject(mc);
 		avmMc.dynamicallyCreated=true;
+		this.registerScriptObject(mc);
 		return avmMc;
 	}
 
@@ -534,9 +535,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		getAVM1Object(mc,  <AVM1Context>this._avm1Context);
 		//console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
 		var avmMC:AVM1MovieClip=<AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
+		avmMC.dynamicallyCreated=true;
 		this.registerScriptObject(mc);
 		// dynamicallyCreated needs to be set after adding child, otherwise it gets reset
-		avmMC.dynamicallyCreated=true;
 		return avmMC;
 	}
 
@@ -646,17 +647,6 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		mc.blendMode = this.adaptee.blendMode;
 		mc.cacheAsBitmap = this.adaptee.cacheAsBitmap;
 		return avmMc;
-	}
-	public getEnabled() {
-		return this.enabled;
-	}
-
-	public setEnabled(value) {
-		if (value == this.enabled)
-			return;
-		this.enabled = value;
-		this.setEnabledListener(value);
-		
 	}
 
 	public endFill(): void {
