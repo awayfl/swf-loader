@@ -245,12 +245,12 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	private _unregisteredChilds:any={};
 
-	public registerScriptObject(child:DisplayObject):void
+	public registerScriptObject(child:DisplayObject, force:boolean=true):void
 	{
 		if(child.adapter!=child)
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
-			if(!this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
+			if(force || !this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
                 if(this.avmPropsChildNames[child.name]){     
                     //console.log("updating child reference to ", child.name, this.avmPropsChildNames[child.name].obj, child.adapter)               
                     this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
@@ -409,7 +409,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			oldAVMMC.avmColor.changeTarget(avmMc);
 		}
 		avmMc.dynamicallyCreated=true;
-		this.registerScriptObject(mc);
+		this.registerScriptObject(mc, false);
 		return avmMc;
 	}
 
@@ -536,7 +536,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		//console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
 		var avmMC:AVM1MovieClip=<AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
 		avmMC.dynamicallyCreated=true;
-		this.registerScriptObject(mc);
+		this.registerScriptObject(mc, false);
 		// dynamicallyCreated needs to be set after adding child, otherwise it gets reset
 		return avmMC;
 	}
@@ -552,7 +552,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		text.height = height;
 		getAVM1Object(text,  <AVM1Context>this._avm1Context);
 		var myTF=<AVM1TextField>this._insertChildAtDepth(text,  avm2AwayDepth(depth));
-		this.registerScriptObject(text);
+		this.registerScriptObject(text, false);
 		return myTF;
 	}
 
@@ -627,7 +627,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		// dynamicallyCreated needs to be set after adding child, otherwise it gets reset
 		avmMc.dynamicallyCreated=true;
 		avmMc._avm1Context=this._avm1Context;
-		parent.registerScriptObject(mc);
+		parent.registerScriptObject(mc, false);
 
 		if (initObject) {
 			avmMc._init(initObject);
