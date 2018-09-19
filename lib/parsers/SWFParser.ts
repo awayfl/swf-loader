@@ -475,14 +475,13 @@ export class SWFParser extends ParserBase
 
 									//awayText.textFormat.font=font.away;
 									record.font_table=<TesselatedFontTable>font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType);
-                                    
+                                    if(!record.font_table){
+                                        invalid_font=true;
+                                        console.log("no font_table set");
+                                    }
 									//record.font_table=font.away.font_styles[0];
                                 }
 							}
-                            if(!record.font_table){
-                                invalid_font=true;
-                                console.log("no font_table set");
-                            }
 						}
 						awayText.staticMatrix=symbol.matrix;
 						awayText.textOffsetX=symbol.fillBounds.xMin/20;

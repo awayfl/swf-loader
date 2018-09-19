@@ -21,7 +21,7 @@ import {AVM1Context} from "../context";
 import {getAVM1Object, wrapAVM1NativeClass, toTwipFloor, toTwipRound} from "./AVM1Utils";
 import {AVM1TextFormat} from "./AVM1TextFormat";
 import {Debug, notImplemented, warning} from "../../base/utilities/Debug";
-import {EventBase as Event, Point, Box} from "@awayjs/core";
+import {EventBase as Event, Point, Box, IgnoreConflictStrategy} from "@awayjs/core";
 import {TextField, TextFieldType, TextFormat, TextFieldAutoSize, DisplayObject, DisplayObjectContainer} from "@awayjs/scene";
 import {AVM1Key} from "./AVM1Key";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
@@ -581,7 +581,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	public updateVarFromText(): void {
 		//warning("AVM1Textfield.updateVarFromText - '"+this._textVarHolder.toString()+this._textVarPropName+"' / '"+this.adaptee.text+"'");
 			
-		if(this._textVarHolder){
+		if(this._textVarHolder){//} && !this.adaptee.html){
 			this.context.utils.setProperty(this._textVarHolder, this._textVarPropName, this.adaptee.html?this.adaptee.htmlText:this.adaptee.text);
 			this._prevTextVarContent=this.adaptee.text;
 		}
@@ -671,6 +671,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			return;
 		}
 
+        // if the variable does not exist, fill it from textfield-content
 		if (!avm1ContextUtils.hasProperty(this._textVarHolder, this._textVarPropName)) {
 			// the textvar does not exists yet. we create it and fill it with text-content
 			if(instance.html){	
@@ -685,14 +686,19 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			return;
 		}
 		
+        //  if no "_internal_TF" property exists next to the variable, we create it, and set its value to "this"
+        //  this is used to find textfields to focus, when setFocus is called on a textfield-variable
 		if (!avm1ContextUtils.hasProperty(this._textVarHolder, this._textVarPropName+"_internal_TF")) {
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
-		}
+        }
+        // get the value of the text-variable
 		var newTextVarContent:string=avm1ContextUtils.getProperty(this._textVarHolder, this._textVarPropName);
 		if(typeof newTextVarContent !== "string"){
 			newTextVarContent=alToString(this.context, newTextVarContent);		
-		}
+        }
+        
 		if(instance.html){	
+            // the value of the text-variable has changed
 			if(newTextVarContent!==this._prevTextVarContent){
 				// textvar has changed. update text from var
 				instance.htmlText = (typeof newTextVarContent === "undefined") ? "" : newTextVarContent;
@@ -729,7 +735,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		value = alToBoolean(this.context, value);
 		this.adaptee.wordWrap = value;
 	}
-
 
 	private _initEventsHandlers() {
 		this.bindEvents([
