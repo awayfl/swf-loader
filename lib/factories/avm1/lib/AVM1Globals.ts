@@ -728,15 +728,9 @@
 			AudioManager.stopAllSounds();
 		}
 		public stopDrag() {
-			notImplemented('AVM1NativeActions.stopDrag');
-			// Using current draggable instead of current target.
-			/*var as3CurrentDraggable = this.context.sec.flash.ui.Mouse.axClass.draggableObject;
-			if (as3CurrentDraggable) {
-				var nativeTarget = <AVM1MovieClip>getAVM1Object(as3CurrentDraggable, this.context);
-				nativeTarget.stopDrag();
-			}
-			*/
-	
+            if(AVM1MovieClip.currentDraggedMC){
+                AVM1MovieClip.currentDraggedMC.stopDrag();
+            }	
 		}
 		public substring(value, index, count) {
 			return this.mbsubstring(value, index, count); // ASCII Only?
