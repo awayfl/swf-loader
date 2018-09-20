@@ -592,6 +592,7 @@ export class SWFParser extends ParserBase
 		var i:number;
 		var framesLen:number=swfFrames.length;
 		var command_recipe_flag:number=0;
+		var audio_commands_cnt:number=0;
         //console.log("new mc ");
 		for (i = 0; i < framesLen; i++) {
 			noTimelineDebug || console.log("	process frame:", i+1, "/", framesLen);
@@ -696,16 +697,18 @@ export class SWFParser extends ParserBase
 							case SwfTagCode.CODE_START_SOUND:
 								//console.log("CODE_START_SOUND", tag)
 								awaySymbol = this.awaySymbols[tag.soundId];
-								awayTimeline.audioPool[tag.soundId]={sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+								awayTimeline.audioPool[audio_commands_cnt++]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
 								// todo: volume / pan / other properties
 								noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i+1);
-								cmds_startSounds.push(tag);
+								cmds_startSounds.push(audio_commands_cnt);
 								break;
 							case SwfTagCode.CODE_STOP_SOUND:
 								//console.log("CODE_STOP_SOUND", tag)
 								// todo
 								//console.log("stopsound", tag.soundId, tag.soundInfo);
+								awayTimeline.audioPool[audio_commands_cnt++]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
 								noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i+1);
+								cmds_startSounds.push(audio_commands_cnt);
 								break;
 
 							case SwfTagCode.CODE_REMOVE_OBJECT:
@@ -1171,7 +1174,7 @@ export class SWFParser extends ParserBase
 						start_index = add_sounds_stream.length;
 						//console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol);
 						for (var cmd = 0; cmd < command_cnt; cmd++){
-							add_sounds_stream.push(cmds_startSounds[cmd].soundId);
+							add_sounds_stream.push(cmds_startSounds[cmd]);
 							//console.log("add", cmds_add[cmd].childID , cmds_add[cmd].depth);
 						}
 						command_length_stream.push(command_cnt);
