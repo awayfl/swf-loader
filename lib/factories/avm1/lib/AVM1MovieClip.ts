@@ -94,6 +94,7 @@ function convertAS3RectangeToBounds(as3Rectange: any, context): AVM1Object {
 
 export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieClipAdapter {
     public static currentMCAssetNameSpace:string="";
+    public static currentDraggedMC:AVM1MovieClip=null;;
 	public static createAVM1Class(context: AVM1Context): AVM1Object {
 		return wrapAVM1NativeClass(context, true, AVM1MovieClip,
 			[],
@@ -951,6 +952,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public startDrag(lock?: boolean, left?: number, top?: number, right?: number, bottom?: number): void {
+        AVM1MovieClip.currentDraggedMC=this;
 		lock = alToBoolean(this.context, lock);
 		this._dragBounds=null;
 		if(left>right){
@@ -1028,7 +1030,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public stopDragDelegate:(e)=>void;
 	public stopDrag(e=null) {
 		this.isDragging=false;
-
+        AVM1MovieClip.currentDraggedMC=null;
 		(<AVMRaycastPicker>AVM1Stage.stage.view.mousePicker).dragEntity=null;
 		AVM1Stage.stage.removeEventListener("mouseMove3d", this.dragListenerDelegate);
 		window.removeEventListener("mouseup", this.stopDragDelegate);
