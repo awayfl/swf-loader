@@ -521,7 +521,7 @@ export class SWFParser extends ParserBase
             this._pFinalizeAsset(assetsToFinalize[key]);
         }
         this._pFinalizeAsset(awayMc, "scene");
-        //DefaultFontManager.applySharedFonts(this._iFileName);
+        DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this.sceneAndFrameLabelData);
 
