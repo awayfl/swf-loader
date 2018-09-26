@@ -299,7 +299,10 @@ export class AVMAwayStage extends Sprite{
 		this._view.renderer.renderableSorter = null;//new RenderableSort2D();
 		this._view.mousePicker=new AVMRaycastPicker(true, this);
 		this._view.forceMouseMove=true;
-		this._view.beforeRenderCallback=AVM1TextField.syncAllTextfields;
+		this._view.beforeRenderCallback=function(){
+            FrameScriptManager.execute_queue();
+            AVM1TextField.syncAllTextfields;
+        }
 
 		this._projection = new PerspectiveProjection();
 		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
