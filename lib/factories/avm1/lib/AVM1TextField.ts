@@ -355,7 +355,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getMaxChars(): number  {
-		return this.adaptee.maxChars;
+		return this.adaptee.maxChars==0?null:this.adaptee.maxChars;
 	}
 
 	public setMaxChars(value) {
@@ -454,6 +454,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
      * for new text we must use setNewTextFormat
      */
 	public setTextFormat() {
+		if(this._variable){
+			this.syncTextFieldValue();
+		}
 		var beginIndex: number = -1, endIndex: number = -1, tf;
 		switch (arguments.length) {
 			case 0:
@@ -516,6 +519,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getTextHeight(): number {
+		if(this._variable){
+			this.syncTextFieldValue();
+		}
 		return this.adaptee.textHeight;
 	}
 
@@ -524,6 +530,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getTextWidth(): number {
+		if(this._variable){
+			this.syncTextFieldValue();
+		}
 		return this.adaptee.textWidth;
 	}
 
@@ -581,7 +590,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	public updateVarFromText(): void {
 		//warning("AVM1Textfield.updateVarFromText - '"+this._textVarHolder.toString()+this._textVarPropName+"' / '"+this.adaptee.text+"'");
 			
-		if(this._textVarHolder){//} && !this.adaptee.html){
+		if(this._textVarHolder){// && !this.adaptee.html){
 			this.context.utils.setProperty(this._textVarHolder, this._textVarPropName, this.adaptee.html?this.adaptee.htmlText:this.adaptee.text);
 			this._prevTextVarContent=this.adaptee.text;
 		}
