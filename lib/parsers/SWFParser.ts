@@ -357,13 +357,13 @@ export class SWFParser extends ParserBase
 					case "morphshape":
 						console.warn("Warning: SWF contains shapetweening!!!");
                         symbol.shape.name=symbol.id;
-                        symbol.shape.name="morphshape_"+symbol.id.toString();
+                        symbol.shape.name="AwayJS_morphshape_"+symbol.id.toString();
                         this.awaySymbols[dictionary[i].id]=symbol.shape;
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
 					case "shape":
 						symbol.shape.endFill();
-                        symbol.shape.name="shape_"+symbol.id.toString();
+                        symbol.shape.name="AwayJS_shape_"+symbol.id.toString();
 						this.awaySymbols[dictionary[i].id]=symbol.shape;
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
@@ -381,7 +381,7 @@ export class SWFParser extends ParserBase
 						else{
 							this._mcIds[symbol.id]=true;
 						}
-                        awayMc.name="mc_"+symbol.id.toString();
+                        awayMc.name="AwayJS_mc_"+symbol.id.toString();
 						this.awaySymbols[dictionary[i].id] = awayMc;
                         assetsToFinalize[dictionary[i].id] = awayMc;
 						break;
@@ -443,14 +443,17 @@ export class SWFParser extends ParserBase
 						if(awaySound){
                             awaySound.name=symbol.id;
                             assetsToFinalize[dictionary[i].id]=awaySound;
-						}
-						//console.log("sound:", symbol);
-						//(<WaveAudio>this.awaySymbols[dictionary[i].id]).play(0,false);
+                            //awaySound.play(0,false);
+                        }
+                        else{
+                            console.warn("SWF-parser: no sound loaded for sound-id:", dictionary[i].id);
+
+                        }
 						break;
 					case "button":
 						var awayMc = this.framesToTimeline(null, symbol.states, symbol.buttonActions);
 						//awayMc._symbol=symbol;
-                        awayMc.name="button_"+symbol.id.toString();
+                        awayMc.name="AwayJS_button_"+symbol.id.toString();
                         assetsToFinalize[dictionary[i].id]=awayMc;
 						this.awaySymbols[dictionary[i].id] = awayMc;
 						this._buttonIds[symbol.id]=true;
@@ -490,7 +493,7 @@ export class SWFParser extends ParserBase
                         awayText.height=(symbol.fillBounds.yMax/20 - symbol.fillBounds.yMin/20)-1;
                         if(!invalid_font)
 						    awayText.setLabelData(symbol);
-                        awayText.name="label_"+symbol.id.toString();
+                        awayText.name="AwayJS_label_"+symbol.id.toString();
                         assetsToFinalize[dictionary[i].id] = awayText;
 						this.awaySymbols[dictionary[i].id] = awayText;
 						awayText.selectable=symbol.tag.flags?!(symbol.tag.flags & TextFlags.NoSelect):false;
@@ -697,18 +700,18 @@ export class SWFParser extends ParserBase
 							case SwfTagCode.CODE_START_SOUND:
 								//console.log("CODE_START_SOUND", tag)
 								awaySymbol = this.awaySymbols[tag.soundId];
-								awayTimeline.audioPool[audio_commands_cnt++]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+								awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
 								// todo: volume / pan / other properties
 								noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i+1);
-								cmds_startSounds.push(audio_commands_cnt);
+								cmds_startSounds.push(audio_commands_cnt++);
 								break;
 							case SwfTagCode.CODE_STOP_SOUND:
 								//console.log("CODE_STOP_SOUND", tag)
 								// todo
 								//console.log("stopsound", tag.soundId, tag.soundInfo);
-								awayTimeline.audioPool[audio_commands_cnt++]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+								awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
 								noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i+1);
-								cmds_startSounds.push(audio_commands_cnt);
+								cmds_startSounds.push(audio_commands_cnt++);
 								break;
 
 							case SwfTagCode.CODE_REMOVE_OBJECT:
