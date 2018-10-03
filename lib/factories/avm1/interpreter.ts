@@ -2004,8 +2004,13 @@ function avm1_0x52_ActionCallMethod(ectx: ExecutionContext) {
 	}
 	release || assert(stack.length === sp + 1);
 	frame.setCallee(target, superArg, fn, args);
-	if(methodName=="toString" && typeof obj == "number"){		
-		stack[sp]=alToString(ectx.context, obj);
+	if(methodName=="toString" && typeof obj == "number"){			
+        if(args.length==1 && args[0]==16){
+            stack[sp]=obj.toString(16).toString();
+        }
+        else{
+            stack[sp]=alToString(ectx.context, obj);
+        }
 	}
 	else{
 		stack[sp] = fn.alCall(target, args);
