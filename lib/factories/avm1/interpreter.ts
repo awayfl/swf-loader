@@ -1030,7 +1030,7 @@ function avm1IsTarget(target): boolean {
 	return target instanceof AVM1Object && hasAwayJSAdaptee(target);
 }
 
-function avm1ResolveSimpleVariable(scopeList: AVM1ScopeListItem, variableName: string, flags: AVM1ResolveVariableFlags): IAVM1ResolvedVariableResult {
+function avm1ResolveSimpleVariable(scopeList: AVM1ScopeListItem, variableName: string, flags: AVM1ResolveVariableFlags, additionalName:string=null): IAVM1ResolvedVariableResult {
 	release || Debug.assert(alIsName(scopeList.scope.context, variableName));
 	var currentTarget;
 	var resolved = cachedResolvedVariableResult;
@@ -1061,6 +1061,10 @@ function avm1ResolveSimpleVariable(scopeList: AVM1ScopeListItem, variableName: s
 
 		//console.log("scope :", p.scope.aCount);
 		if(p.scope.alHasProperty(variableName)) {
+            var value=p.scope.alGet(variableName);
+            if(additionalName && (typeof value!=="object" ||  !value.alHasProperty || !value.alHasProperty(additionalName))){
+                continue;
+            }
 			resolved.scope = p.scope;
 			resolved.propertyName = variableName;
 			resolved.value = (flags & AVM1ResolveVariableFlags.GET_VALUE) ? p.scope.alGet(variableName) : undefined;
@@ -1095,6 +1099,7 @@ function avm1ResolveVariable(ectx: ExecutionContext, variableName: string, flags
 	// it for property name paths.
 	var originalName = variableName;
 	variableName = ectx.context.normalizeName(variableName);
+	variableName=variableName.replace("_level0", "_root");
 	if (!avm1VariableNameHasPath(variableName)) {
 		//noVarGetDebug || console.log("simple variableName", variableName);
 		var resolvedVar=avm1ResolveSimpleVariable(ectx.scopeList, variableName, flags);
@@ -1107,7 +1112,6 @@ function avm1ResolveVariable(ectx: ExecutionContext, variableName: string, flags
 	if(variableName[variableName.length-1]=="."){
 		return null;
 	}
-	variableName=variableName.replace("_level0.core_mc.content", "_root");
 	var i = 0, j = variableName.length;
 	var markedAsTarget = true;
 	var resolved, ch, needsScopeResolution;
@@ -1174,7 +1178,32 @@ function avm1ResolveVariable(ectx: ExecutionContext, variableName: string, flags
 		}
 		if (!valueFound) {
 			if (needsScopeResolution) {
-				resolved = avm1ResolveSimpleVariable(ectx.scopeList, propertyName, flags);
+                //  80pro:
+                //  if we need to resolve the scope, we want to know the next property name
+                //  if a next property name exists, we pass it as extra argument to  avm1ResolveSimpleVariable
+                //  this will make sure that avm1ResolveSimpleVariable returns the scope that has the property name available
+                var q = i+1;
+                var k = i+1;
+                var nextPropName="";
+                if (variableName[k] === '.' && variableName[k + 1] === '.') {
+                    k += 2;
+                    nextPropName = '_parent';
+                } else {
+                    while (k < j && ((ch = variableName[k]) !== '/' && ch !== '.' && ch !== ':')) {
+                        k++;
+                    }
+                    nextPropName = variableName.substring(q, k);
+                }
+                if(nextPropName=="")
+                    nextPropName=null;
+                
+                resolved = avm1ResolveSimpleVariable(ectx.scopeList, propertyName, flags, nextPropName);
+				if (!resolved && nextPropName) {
+                    // if we tried to get with a nextPropName, and got nothing returned, we try again without any nextpropName
+                    resolved = avm1ResolveSimpleVariable(ectx.scopeList, propertyName, flags);
+                }
+                
+                
 				if (resolved) {
 					valueFound = true;
 					propertyName = resolved.propertyName;
@@ -1680,7 +1709,13 @@ function avm1_0x1C_ActionGetVariable(ectx: ExecutionContext) {
 		if(variableName=="TRUE")
 			stack[sp]=true;
 		else if (variableName=="FALSE")
-			stack[sp]=false;
+            stack[sp]=false;
+        else if (variableName && variableName.indexOf("this.")==0){			
+			variableName=variableName.replace("this.", "");	
+            resolved = avm1ResolveVariable(ectx, variableName,AVM1ResolveVariableFlags.READ | AVM1ResolveVariableFlags.GET_VALUE);
+            stack[sp] = resolved?resolved.value:undefined;
+        }
+            /*
 		else if (variableName && variableName.indexOf(".")>=0){				
 			var varnames=variableName.split(".");
 			if (varnames.length>1 && varnames[0]=="this"){				
@@ -1695,14 +1730,15 @@ function avm1_0x1C_ActionGetVariable(ectx: ExecutionContext) {
 					return;
 				}				
 			}
-		}
+        }
+        */
 		else if (avm1WarningsEnabled.value) {
 			avm1Warn("AVM1 warning: cannot look up variable '" + variableName + "'");
 		}
 		//console.log("avm1_0x1C_ActionGetVariable", ectx, resolved, variableName);
 		return;
 	}
-	stack[sp] = resolved?resolved.value:null;
+	stack[sp] = resolved?resolved.value:undefined;
 	//console.log("avm1_0x1C_ActionGetVariable", ectx, resolved, variableName);
 }
 
