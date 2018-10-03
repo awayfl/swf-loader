@@ -781,7 +781,7 @@ export class SWFParser extends ParserBase
 									if(awaySymbol.isAsset(Graphics)){
 
 										swapGraphicsID=placeObjectTag.symbolId;
-										awayTimeline.graphicsPool[placeObjectTag.symbolId]=awaySymbol;
+                                        awayTimeline.graphicsPool[placeObjectTag.symbolId]=awaySymbol;
 
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds
 										if(child && child.awayChild.isAsset(Sprite)){
@@ -974,12 +974,14 @@ export class SWFParser extends ParserBase
 					for (var key in virtualScenegraph) {
 						virtualScenegraph[key].oldMasks =  virtualScenegraph[key].masks;
 						virtualScenegraph[key].masks = [];
+                        virtualScenegraph[key].maskingChanged=false;
 					}
 					// for newly added objects, we translate the clipDepth to isMask
 					if (command_cnt) {
 						for (var cmd:number = 0; cmd < command_cnt; cmd++) {
 							placeObjectTag = cmds_update[cmd].placeObjectTag;
 							child = cmds_update[cmd].child;
+                            child.maskingChanged=true;
 							if (placeObjectTag.flags & 64 /* HasClipDepth */) {
 								virtualScenegraph[placeObjectTag.depth].isMask=true;
 								virtualScenegraph[placeObjectTag.depth].clipDepth=placeObjectTag.clipDepth - 1;
@@ -1007,9 +1009,10 @@ export class SWFParser extends ParserBase
 					for (var key in virtualScenegraph) {
 						var myChild=virtualScenegraph[key];
 						myChild.masks.sort();
-						myChild.oldMasks.sort();
+                        myChild.oldMasks.sort();
 						if(myChild.masks.length!=myChild.oldMasks.length){
 							childsWithMaskChanges.push(myChild);
+                            myChild.maskingChanged=true;
 						}
 						else{
 							m=0;
@@ -1017,6 +1020,7 @@ export class SWFParser extends ParserBase
 							for(m=0;m<mLen;m++){
 								if(myChild.masks[m]!=myChild.oldMasks[m]){
 									childsWithMaskChanges.push(myChild);
+                                    myChild.maskingChanged=true;
 									break;
 								}
 							}
@@ -1088,6 +1092,17 @@ export class SWFParser extends ParserBase
 								// todo: we can save memory by checking if only scale or position was changed,
 								// but it means we would need to check against the matrix of the current child, not against identy matrix
 
+                                //  in swf there seem to a some transforms coming in with scale=0 when it should be scale=1
+                                //  This is a flash-bug (?) todo with sharing graphics across multiple mc
+                                //  i checked and if we set a object to scale=0 on purpose in Flash, we still get a scale>0 in swf,
+                                //  so looks like we can fix this by making sure that scale=0 is converted to scale = 1
+                                if(placeObjectTag.matrix.a==0){
+                                    placeObjectTag.matrix.a=1;
+                                }
+                                else if(placeObjectTag.matrix.d==0){
+                                    placeObjectTag.matrix.d=1;
+                                }
+
 								properties_stream_f32_mtx_all[properties_stream_f32_mtx_all.length] = placeObjectTag.matrix.a;
 								properties_stream_f32_mtx_all[properties_stream_f32_mtx_all.length] = placeObjectTag.matrix.b;
 								properties_stream_f32_mtx_all[properties_stream_f32_mtx_all.length] = placeObjectTag.matrix.c;
@@ -1138,8 +1153,7 @@ export class SWFParser extends ParserBase
 								//console.log("PlaceObjectFlags.HasRatio", placeObjectTag, child);
 							}
 
-							if (child.masks.length>0) {
-
+							if (child.maskingChanged){
 								num_updated_props++;
 								property_type_stream.push(3);
 								property_index_stream.push(properties_stream_int.length);
@@ -1673,11 +1687,13 @@ export class SWFParser extends ParserBase
 				this.jumpToNextTag(tagLength);
 				break;
 			case SwfTagCode.CODE_SOUND_STREAM_HEAD:
-			case SwfTagCode.CODE_SOUND_STREAM_HEAD2:
+            case SwfTagCode.CODE_SOUND_STREAM_HEAD2:
+                console.warn("Timeline sound is set to streaming!");
 				var soundStreamTag = parseSoundStreamHeadTag(this._dataStream, byteOffset + tagLength);
 				this._currentSoundStreamHead = SoundStream.FromTag(soundStreamTag);
 				break;
 			case SwfTagCode.CODE_SOUND_STREAM_BLOCK:
+                console.warn("Timeline sound is set to streaming!");
 				this._currentSoundStreamBlock = this.swfData.subarray(stream.pos, stream.pos += tagLength);
 				break;
 			case SwfTagCode.CODE_FRAME_LABEL:
