@@ -445,7 +445,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			this.adaptee.textFormat=new TextFormat();
 		}
 		
-        away3TextFormat.font_table=this.adaptee.textFormat.font_table;
+        //away3TextFormat.font_table=this.adaptee.textFormat.font_table;
         this.adaptee.newTextFormat=away3TextFormat;
 	}
 
@@ -684,12 +684,22 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		if (!avm1ContextUtils.hasProperty(this._textVarHolder, this._textVarPropName)) {
 			// the textvar does not exists yet. we create it and fill it with text-content
 			if(instance.html){	
-				avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, instance.htmlText);
+                if(instance.htmlText!=""){
+                    avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, instance.htmlText);
+                }
+                else{
+                    avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, undefined);
+                }
 				avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
 				this._prevTextVarContent=instance.htmlText;
 				return;
 			}
-			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, instance.text);
+            if(instance.text!=""){
+                avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, instance.text);
+            }
+            else{
+                avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName, undefined);
+            }
 			avm1ContextUtils.setProperty(this._textVarHolder, this._textVarPropName+"_internal_TF", this);
 			this._prevTextVarContent=instance.text;
 			return;
