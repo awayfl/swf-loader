@@ -35,7 +35,7 @@ import {FlashNetScript_navigateToURL} from "../../AVM2Dummys";
 import {copyAS3PointTo, toAS3Point} from "./AVM1Point";
 import {MovieClipProperties} from "../interpreter/MovieClipProperties";
 import {
-	IMovieClipAdapter, DisplayObjectContainer, DisplayObject, MovieClip, TextField, Sprite, Billboard
+	IMovieClipAdapter, DisplayObjectContainer, DisplayObject, MovieClip, TextField, Sprite, Billboard, TextFormat
 } from "@awayjs/scene";
 import {AssetLibrary, Matrix3D, Rectangle, Box, Point, WaveAudio} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
@@ -245,18 +245,43 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 
 	private _unregisteredChilds:any={};
-
-	public registerScriptObject(child:DisplayObject, force:boolean=true):void
+    public registerScriptObject(child:DisplayObject, force:boolean=true):void
 	{
 		if(child.adapter!=child)
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
-			if(force || !this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null)){
-                if(this.avmPropsChildNames[child.name]){     
-                    //console.log("updating child reference to ", child.name, this.avmPropsChildNames[child.name].obj, child.adapter)               
-                    this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
+            /*if(this._childrenByName[child.name]){
+                console.log("try register ",child.name, this._childrenByName[child.name], this._childrenByName[child.name].adaptee._depthID, child._depthID);
+            }
+            else{
+                console.log("try register no child exists",child.name, child._depthID);
+            }*/
+            if( !this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null) ||
+                this._childrenByName[child.name].adaptee._depthID>child._depthID){
+                
+                // only replace value if no property exists yet, or if a existing prop was a Away-Object
+                var existingValue=this.alGet(child.name);
+                if(existingValue && existingValue.adaptee){
+                    this.alPut(child.name, child.adapter);
+                    if(this.avmPropsChildNames[child.name]){     
+                        // update indirectReferences to this prop
+                        this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
+                    }
                 }
-                this.alPut(child.name, child.adapter);
+                else if(existingValue){
+                }
+                else{
+                    this.alPut(child.name, child.adapter);
+                    if(this.avmPropsChildNames[child.name]){     
+                        // update indirectReferences to this prop
+                        this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
+                    }
+                }
+                if(this.unregisteredColors[child.name]){
+                    this.unregisteredColors[child.name].changeTarget(child.adapter);
+                    this.unregisteredColors[child.name]=null;
+                }
+                // always register the child by name on the parent, no matter what avm1prop existed previously
 				this._childrenByName[child.name]=child._adapter;
             }
             /*
@@ -268,11 +293,18 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 	}
 
+    private unregisteredColors:any={};
 	public unregisterScriptObject(child:DisplayObject):void
 	{
 		if(child && child.adapter != child)
 			(<any>child.adapter).alPut("onEnterFrame", null);
 		if(child.name){
+            /*if(this._childrenByName[child.name]){
+                console.log("try unregister ",child.name, this._childrenByName[child.name], this._childrenByName[child.name].adaptee.id, child.id);
+            }
+            else{
+                console.log("try unregister no child registered ",child.name, child.id);
+            }*/
 			if(this._childrenByName[child.name] && this._childrenByName[child.name].adaptee.id==child.id){
 				/*if(this._unregisteredChilds[child.name]){					
 					this.alPut(child.name, this._unregisteredChilds[child.name].adapter);
@@ -280,6 +312,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 					delete this._unregisteredChilds[child.name];
 				}
 				else{	*/				
+                    if(this._childrenByName[child.name] && this._childrenByName[child.name].avmColor){
+                        this.unregisteredColors[child.name]=this._childrenByName[child.name].avmColor;
+                    }
 					this.alDeleteProperty(child.name);
 					delete this._childrenByName[child.name];
 				/*}
@@ -547,13 +582,14 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		name = alToString(this.context, name);
 		var text: TextField = new this.context.sec.flash.text.TextField();
 		text.name = name;
+		text.textFormat = new TextFormat();
+		getAVM1Object(text,  <AVM1Context>this._avm1Context);
+		var myTF=<AVM1TextField>this._insertChildAtDepth(text,  avm2AwayDepth(depth));
+		this.registerScriptObject(text, false);
 		text.x = x;
 		text.y = y;
 		text.width = width;
 		text.height = height;
-		getAVM1Object(text,  <AVM1Context>this._avm1Context);
-		var myTF=<AVM1TextField>this._insertChildAtDepth(text,  avm2AwayDepth(depth));
-		this.registerScriptObject(text, false);
 		return myTF;
 	}
 
