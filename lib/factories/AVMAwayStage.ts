@@ -301,7 +301,7 @@ export class AVMAwayStage extends Sprite{
 		this._view.forceMouseMove=true;
 		this._view.beforeRenderCallback=function(){
             FrameScriptManager.execute_queue();
-            AVM1TextField.syncAllTextfields;
+            AVM1TextField.syncAllTextfields();
         }
 
 		this._projection = new PerspectiveProjection();
