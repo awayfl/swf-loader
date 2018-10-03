@@ -523,7 +523,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	}
 
 	public get_url(): string {
-		return this.adaptee["fileurl"]?this.adaptee["fileurl"]:"";
+		return this.adaptee.assetNamespace;
 	}
 
 	public get_width(): number
@@ -615,7 +615,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		var names:string[]=[];
 		while (mc){
 			if(mc.name=="scene"){
-				names.push("_level0.core_mc.content");
+				names.push("_level0");
 				mc=null;
 			}
 			else{
