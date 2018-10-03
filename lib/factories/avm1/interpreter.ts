@@ -354,7 +354,8 @@ function as2Equals(context: AVM1Context, x: any, y: any): boolean {
 	// Spec steps 14 and 15.
 	if (x == null && y == null) {
 		return true;
-	}
+    }
+    /*
 	if (typeof x === 'undefined' && typeof y === 'string' && y=="") {
 		// Unfolding the recursion for `as2Equals(context, x, alToNumber(y))`
 		return true; // in AVM1, ToNumber('') === NaN
@@ -363,6 +364,7 @@ function as2Equals(context: AVM1Context, x: any, y: any): boolean {
 		// Unfolding the recursion for `as2Equals(context, x, alToNumber(y))`
 		return true; // in AVM1, ToNumber('') === NaN
     }
+    */
     
 	// Spec steps 16 and 17.
 	if (typeof x === 'number' && typeof y === 'string') {
