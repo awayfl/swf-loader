@@ -48,7 +48,7 @@ export class AVM1Color extends AVM1Object {
 	}
 	public changeTarget(target_mc) {
 		if(target_mc && target_mc instanceof AVM1SymbolBase){
-			this._target = this.context.resolveTarget(target_mc);
+			this._target = target_mc;
 			(<any>this._target).avmColor=this;
 			(<any>this._target)._ctBlockedByScript=true;
 			this._targetAwayObject = <DisplayObject>getAwayJSAdaptee(this._target);
