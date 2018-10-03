@@ -1688,7 +1688,7 @@ export class SWFParser extends ParserBase
 				break;
 			case SwfTagCode.CODE_SOUND_STREAM_HEAD:
             case SwfTagCode.CODE_SOUND_STREAM_HEAD2:
-                console.warn("Timeline sound is set to streaming!");
+                //console.warn("Timeline sound is set to streaming!");
 				var soundStreamTag = parseSoundStreamHeadTag(this._dataStream, byteOffset + tagLength);
 				this._currentSoundStreamHead = SoundStream.FromTag(soundStreamTag);
 				break;
@@ -1871,6 +1871,7 @@ export class SWFParser extends ParserBase
 					//tagLength = 0;
 					break;
 				case SwfTagCode.CODE_SOUND_STREAM_BLOCK:
+                    console.warn("Timeline sound is set to streaming!");
 					break;
 				default:
 					//console.log("ignored timeline tag", tagCode);
