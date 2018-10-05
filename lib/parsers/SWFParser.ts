@@ -1096,10 +1096,10 @@ export class SWFParser extends ParserBase
                                 //  This is a flash-bug (?) todo with sharing graphics across multiple mc
                                 //  i checked and if we set a object to scale=0 on purpose in Flash, we still get a scale>0 in swf,
                                 //  so looks like we can fix this by making sure that scale=0 is converted to scale = 1
-                                if(placeObjectTag.matrix.a==0){
+                                if(placeObjectTag.matrix.a==0 && placeObjectTag.matrix.d!=0){
                                     placeObjectTag.matrix.a=1;
                                 }
-                                else if(placeObjectTag.matrix.d==0){
+                                else if(placeObjectTag.matrix.d==0 && placeObjectTag.matrix.a!=0){
                                     placeObjectTag.matrix.d=1;
                                 }
 
