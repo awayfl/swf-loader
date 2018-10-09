@@ -590,7 +590,7 @@ function parseStartSoundTag(stream: Stream, swfVersion: number,
   return tag;
 }
 
-function parseSoundInfo(stream: Stream): SoundInfo {
+export function parseSoundInfo(stream: Stream): SoundInfo {
   var info: SoundInfo = <any>{};
   var flags = info.flags = stream.readUi8();
   if (flags & SoundInfoFlags.HasInPoint) {

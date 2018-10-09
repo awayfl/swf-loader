@@ -28,7 +28,8 @@ import {
 	parseHeader,
 	parseRgb,
 	parseSoundStreamHeadTag,
-	parseDefineSceneTag,
+    parseDefineSceneTag,
+    parseSoundInfo,
 	tagHandlers} from "../utils/parser/SWFLowLevel";
 
 import {defineSound, SoundStream} from "../utils/parser/sound";
@@ -450,8 +451,8 @@ export class SWFParser extends ParserBase
 
                         }
 						break;
-					case "button":
-						var awayMc = this.framesToTimeline(null, symbol.states, symbol.buttonActions);
+                    case "button":
+						var awayMc = this.framesToTimeline(null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
 						//awayMc._symbol=symbol;
                         awayMc.name="AwayJS_button_"+symbol.id.toString();
                         assetsToFinalize[dictionary[i].id]=awayMc;
@@ -535,7 +536,7 @@ export class SWFParser extends ParserBase
 
 	public textFormatAlignMap:string[]=[TextFormatAlign.LEFT, TextFormatAlign.RIGHT, TextFormatAlign.CENTER, TextFormatAlign.JUSTIFY];
 
-	public framesToTimeline(swfFrames:SWFFrame[], states:any, buttonActions:any):MovieClip{
+	public framesToTimeline(swfFrames:SWFFrame[], states:any, buttonActions:any, buttonSound:any=null):MovieClip{
 		if(!states && !swfFrames)
 			throw("error when creating timeline - neither movieclip frames nor button-states present");
 		
@@ -549,7 +550,8 @@ export class SWFParser extends ParserBase
 				var newSWFFrame:SWFFrame=new SWFFrame();
 				newSWFFrame.controlTags=states[key];
 				newSWFFrame.buttonStateName=key;
-				swfFrames[swfFrames.length]=newSWFFrame;
+                swfFrames[swfFrames.length]=newSWFFrame;
+                //console.log("buttonSound ", buttonSound);
 			}
 		}
 		
@@ -685,7 +687,14 @@ export class SWFParser extends ParserBase
 				}
 				if(!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length>0){
 					awayTimeline._framescripts[keyFrameCount]=swfFrames[i].actionBlocks;
-				}
+                }
+                if(buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id!=0){
+                    awaySymbol = this.awaySymbols[buttonSound[keyFrameCount].id];
+                    if(awaySymbol){
+                        awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:buttonSound[keyFrameCount].id, sound:awaySymbol, props:buttonSound[keyFrameCount].info};
+                        cmds_startSounds.push(audio_commands_cnt++);
+                    }
+                }
 				keyFrameCount++;
 				if(!isEmpty && swfFrames[i].controlTags && swfFrames[i].controlTags.length>0){
 					noTimelineDebug || console.log("			Start parsing controltags", swfFrames[i].controlTags.length);
@@ -1096,11 +1105,12 @@ export class SWFParser extends ParserBase
                                 //  This is a flash-bug (?) todo with sharing graphics across multiple mc
                                 //  i checked and if we set a object to scale=0 on purpose in Flash, we still get a scale>0 in swf,
                                 //  so looks like we can fix this by making sure that scale=0 is converted to scale = 1
-                                if(placeObjectTag.matrix.a==0 && placeObjectTag.matrix.d!=0){
-                                    //placeObjectTag.matrix.a=1;
+                                
+                                if(placeObjectTag.matrix.a==0 && placeObjectTag.matrix.b==0 && placeObjectTag.matrix.c==0 && placeObjectTag.matrix.d!=0){
+                                    placeObjectTag.matrix.a=1;
                                 }
-                                else if(placeObjectTag.matrix.d==0 && placeObjectTag.matrix.a!=0){
-                                    //placeObjectTag.matrix.d=1;
+                                else if(placeObjectTag.matrix.d==0  && placeObjectTag.matrix.b==0 && placeObjectTag.matrix.c==0 && placeObjectTag.matrix.a!=0){
+                                    placeObjectTag.matrix.d=1;
                                 }
 
 								properties_stream_f32_mtx_all[properties_stream_f32_mtx_all.length] = placeObjectTag.matrix.a;
@@ -1291,6 +1301,7 @@ export class SWFParser extends ParserBase
 	}
 
 
+    private _buttonSounds:any={};
 	//--SWF stuff : ---------------------------------------------------------------------------
 
 	public initSWFLoading(initialBytes: Uint8Array, length: number) {
@@ -1722,8 +1733,22 @@ export class SWFParser extends ParserBase
 				}
 				stream.pos = tagEnd;
 				break;
+            case SwfTagCode.CODE_DEFINE_BUTTON_SOUND:
+                var tagEnd = stream.pos + tagLength;
+                var btn_id=stream.readUi16();
+
+                this._buttonSounds[btn_id]={};
+                for(var s=0; s<4; s++){
+                    this._buttonSounds[btn_id][s]={};
+                    this._buttonSounds[btn_id][s].id=stream.readUi16();
+                    if(this._buttonSounds[btn_id][s].id!=0){
+                        this._buttonSounds[btn_id][s].info=parseSoundInfo(stream);
+                    }
+                }
+                stream.pos = tagEnd;
+                
+                break;
 			case SwfTagCode.CODE_DEFINE_BUTTON_CXFORM:
-			case SwfTagCode.CODE_DEFINE_BUTTON_SOUND:
 			case SwfTagCode.CODE_DEFINE_FONT_INFO:
 			case SwfTagCode.CODE_DEFINE_FONT_INFO2:
 			case SwfTagCode.CODE_DEFINE_SCALING_GRID:
@@ -1872,7 +1897,8 @@ export class SWFParser extends ParserBase
 					break;
 				case SwfTagCode.CODE_SOUND_STREAM_BLOCK:
                     console.warn("Timeline sound is set to streaming!");
-					break;
+                    break;
+        
 				default:
 					//console.log("ignored timeline tag", tagCode);
 					break;//console.log("ignored timeline tag", tagCode);
