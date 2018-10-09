@@ -51,7 +51,7 @@ export class AVM1Sound extends AVM1Object {
 	private _onCompleteCallback:Function;
 
 	public avm1Constructor(target_mc) {
-		this._target = this.context.resolveTarget(target_mc);
+        this._target = this.context.resolveTarget(target_mc);
 		this._sound = null;
 		this._channel = null;
         this._linkageID = null;
@@ -169,6 +169,9 @@ export class AVM1Sound extends AVM1Object {
 			console.warn("AVM1Sound.setVolume called, but no WaveAudio set");
 			return;
 		}
+        if(this._target && this._target.adaptee){
+            this._target.adaptee.soundVolume=value/100;
+        }
 		this._sound.volume=value/100;
 	}
 
@@ -181,16 +184,19 @@ export class AVM1Sound extends AVM1Object {
 		secondOffset = isNaN(secondOffset) || secondOffset < 0 ? 0 : +secondOffset;
 		loops = isNaN(loops) || loops < 1 ? 1 : Math.floor(loops);
 		this.loopsToPlay=loops;
-		this._sound.play(secondOffset, false);
+        if(this._target && this._target.adaptee){
+            this._target.adaptee.startSound(this._linkageID, this._sound, this.loopsToPlay);
+        }
+		//this._sound.play(secondOffset, false);
 	}
 	public stop(linkageID?: string): void {
 		if (!this._sound) {
 			warning("AVM1Sound.stop called, but no WaveAudio set");
 			return;
 		}
-		if (!linkageID || linkageID === this._linkageID) {
-			this._sound.stop();
-		}
+        if(this._target && this._target.adaptee){
+            this._target.adaptee.stopSounds(this._linkageID);
+        }
 	}
 
 }
