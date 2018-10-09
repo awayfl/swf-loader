@@ -3,7 +3,7 @@ import {BuildMode, EventDispatcher, Transform, Point, ColorUtils, Vector3D, Rect
 
 import {AssetEvent, EventBase, LoaderEvent, ParserEvent, URLRequest, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
-import {HoverController, FrameScriptManager, TextField, Billboard, Camera, LoaderContainer, MovieClip} from "@awayjs/scene";
+import {HoverController, FrameScriptManager, TextField, Billboard, Camera, LoaderContainer, MovieClip, DisplayObjectContainer} from "@awayjs/scene";
 
 import {MethodMaterial,   MaterialBase}	from "@awayjs/materials";
 import {DefaultRenderer} from  "@awayjs/renderer";
@@ -358,6 +358,21 @@ export class AVMAwayStage extends Sprite{
 	public runAVM1Framescripts(){
 		FrameScriptManager.execute_queue();
 	}
+	private executeEnterFrame(child:DisplayObject, enterFramesChilds){
+        var child2:DisplayObject;
+        var c = (<any>child).numChildren;			
+        while (c>0) {
+            c--;
+            child2 = (<any>child).getChildAt(c);
+            // each child in here should be a swf-scene
+            this.executeEnterFrame(child2, enterFramesChilds);
+        }
+        if (child.isAsset(MovieClip)){
+            if(child.hasEventListener(this.enterEvent.type))
+                enterFramesChilds.push(child);
+            //(<MovieClip> child).dispatchEnterFrame(this.enterEvent);
+        }
+	}
 	protected onEnterFrame(dt: number)
 	{
 
@@ -388,6 +403,7 @@ export class AVMAwayStage extends Sprite{
         MovieClip._skipAdvance=false;
         FrameScriptManager.execute_queue();
         
+        var enterFramesChilds=[];
 		// now dispatch the onEnterFrame
 		for(i=0;i<len;i++) {
 			myLayer=this._layers[i];
@@ -395,17 +411,19 @@ export class AVMAwayStage extends Sprite{
 			for (c = 0; c < numChilds; ++c) {
 				child = myLayer.getChildAt(c);
 				// each child in here should be a swf-scene
-				if (child.isAsset(MovieClip)){
-					(<MovieClip> child).dispatchEnterFrame(this.enterEvent);
-				}
+				this.executeEnterFrame(child, enterFramesChilds);
 			}
 		}
+        len = enterFramesChilds.length;
+		for(i=0;i<len;i++) {
+            (<MovieClip> enterFramesChilds[i]).dispatchEvent(this.enterEvent);
+        }
 		FrameScriptManager.execute_queue();
 
 		FrameScriptManager.execute_intervals(dt);
 		FrameScriptManager.execute_queue();
 
-
+        len=this._layers.length;
 		//this.runAVM1Framescripts();
 		for(i=0;i<len;i++) {
 			myLayer=this._layers[i];
