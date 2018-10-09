@@ -449,7 +449,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		return avmMc;
 	}
 
-	public beginFill(color: number, alpha: number): void {
+	public beginFill(color: number, alpha: number=null): void {
 		color = alToInt32(this.context, color);
         if(typeof alpha=="undefined"){
             alpha=0;
