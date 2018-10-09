@@ -37,7 +37,7 @@ export class AVM1Color extends AVM1Object {
 	private _targetAwayObject: DisplayObject;
 
 	public avm1Constructor(target_mc) {
-		if(target_mc && target_mc instanceof AVM1SymbolBase){
+		if(target_mc){
 			this._target = this.context.resolveTarget(target_mc);
 			if(this._target ){
 				(<any>this._target).avmColor=this;
