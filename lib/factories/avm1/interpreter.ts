@@ -3149,7 +3149,10 @@ function interpretActionsData(ectx: ExecutionContext, actionsData: AVM1ActionsDa
 	var awayObject = (<any>scope).adaptee; // FIXME refactor
 	if (awayObject && awayObject._deferScriptExecution) {
 		currentContext.deferScriptExecution = true;
-	}
+    }
+    if(awayObject){
+        AVM1MovieClip.currentMCAssetNameSpace=awayObject.assetNamespace;
+    }
 
 	var compiled = actionsData.compiled;
 	if (compiled) {
