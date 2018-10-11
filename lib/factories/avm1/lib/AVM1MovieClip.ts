@@ -225,15 +225,14 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 	// called from adaptee whenever this is removed from scene.
 	public freeFromScript():void{
-		this.stopAllSounds();
-		this._blockedByScript=false;
-		this._ctBlockedByScript=false;
-		this._visibilityByScript=false;
+        this.stopAllSounds();
+        super.freeFromScript();
 	}
 	
 	public doInitEvents():void
 	{
-		this._dropTarget="";
+        this._dropTarget="";
+        AVM1MovieClip.currentMCAssetNameSpace=this.adaptee.assetNamespace;
 		for (var key in this.adaptee.timeline.avm1InitActions)
 			this.executeScript(this.addScript(this.adaptee.timeline.avm1InitActions[key], <any> ("initActionsData" + key)));
 
@@ -449,13 +448,17 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		return avmMc;
 	}
 
-	public beginFill(color: number, alpha: number=null): void {
+	public beginFill(color: number, alpha:number): void {
 		color = alToInt32(this.context, color);
         if(typeof alpha=="undefined"){
-            alpha=0;
-        }
-        if(alpha===null){
-            alpha=100;
+            if(arguments.length==2){                
+                // alpha was set with "undefined" variable - should be 0
+                alpha=0;
+            }
+            else if(arguments.length<=1){  
+                // alpha was not set at all - should be 100
+                alpha=100;
+            }
         }
 		alpha = alToNumber(this.context, alpha);
 		this.graphics.beginFill(color, alpha / 100.0);
@@ -795,7 +798,17 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public gotoAndPlay(frame) {
 		if (this.protoTypeChanged || frame == null)
-			return;
+            return;
+        if(Array.isArray(frame)){
+            if(frame.length==0)
+                return;
+            frame=frame[0];
+        }
+        if(frame instanceof AVM1ArrayNative){
+            if(!frame.value || frame.value.length==0)
+                return;
+            frame=frame.value[0];
+        }
 
 		if (typeof frame === "string"){
 			if(this.adaptee.timeline._labels[frame.toLowerCase()]==null){
@@ -814,6 +827,17 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public gotoAndStop(frame) {
 		if (this.protoTypeChanged || frame == null)
 			return;
+        if(Array.isArray(frame)){
+            if(frame.length==0)
+                return;
+            frame=frame[0];
+        }
+        if(frame instanceof AVM1ArrayNative){
+            if(!frame.value || frame.value.length==0)
+                return;
+            frame=frame.value[0];
+        }
+        
 		this.adaptee.stop();
 		this._gotoFrame(frame);
 	}
@@ -1074,6 +1098,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public swapDepths(target: any): void {
+        //return;
 		// if this is the scene, or if no parent exists, we do not want to do anything
 		if(this.adaptee.name=="scene" || !this.get_parent()){
 			return;
