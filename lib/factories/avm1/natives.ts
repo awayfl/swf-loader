@@ -1000,8 +1000,10 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	public sort(comparefn?: AVM1Function): AVM1Object {
 		var arr = alEnsureType<AVM1ArrayNative>(this, AVM1ArrayNative).value;
 		if (!alIsFunction(comparefn)) {
-			if(typeof comparefn==="number" && (comparefn==16 || comparefn==-1)){
-				arr.sort((a, b) => a - b)
+            var doNumeric=typeof comparefn==="number" && (comparefn & AVM1ArraySortOnOptions.NUMERIC || comparefn==-1);
+            var doDescending=typeof comparefn==="number" && (comparefn & AVM1ArraySortOnOptions.DESCENDING);
+			if(doNumeric){
+                arr.sort((a, b) => a - b)
 			}
 			else{
 				// ugly hack for moving undefined values to the beginning of the array
@@ -1033,6 +1035,8 @@ export class AVM1ArrayPrototype extends AVM1Object {
 					}
 				}
 			}
+            if(doDescending)
+                arr.reverse();
 		} else {
 			var args = [undefined, undefined];
 			arr.sort(function (a, b) {
@@ -1149,6 +1153,16 @@ export class AVM1ArrayFunction extends AVM1Function {
 		alDefineObjectProperties(this, {
 			prototype: {
 				value: proto
+			}
+		});
+		alDefineObjectProperties(this, {
+			NUMERIC: {
+				value: AVM1ArraySortOnOptions.NUMERIC
+			}
+		});
+		alDefineObjectProperties(this, {
+			DESCENDING: {
+				value: AVM1ArraySortOnOptions.DESCENDING
 			}
 		});
 	}
