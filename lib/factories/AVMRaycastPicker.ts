@@ -1,15 +1,12 @@
 import {Vector3D, Point} from "@awayjs/core";
 
-import {TraverserBase, INode, IEntity, PickingCollision} from "@awayjs/renderer";
+import {IPicker, TraverserBase, INode, IEntity, PickingCollision, IRenderable, PartitionBase} from "@awayjs/renderer";
 
 import {TriangleElements, LineElements, Shape} from "@awayjs/graphics";
 
 import {Billboard, DisplayObject, DisplayObjectContainer, Sprite, Scene, MorphSprite, MovieClip, TextField, TextFieldType} from "@awayjs/scene";
 
 import {View, MouseManager} from "@awayjs/view";
-
-import {IPickingCollider} from "@awayjs/view";
-import {IPicker} from "@awayjs/view";
 
 /**
  * Picks a 3d object from a view or scene by 3D raycast calculations.
@@ -20,12 +17,12 @@ import {IPicker} from "@awayjs/view";
  */
 export class AVMRaycastPicker extends TraverserBase implements IPicker
 {
+	private _partition:PartitionBase;
 	private _rayPosition:Vector3D;
 	private _rayDirection:Vector3D;
 	private _findClosestCollision:boolean;
 	private _bestCollision:PickingCollision;
 	private _testCollision:PickingCollision;
-	private _testCollider:IPickingCollider;
 	private _ignoredEntities:IEntity[];
 
 	private _dragEntity:IEntity;
@@ -51,10 +48,11 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 	 * @param findClosestCollision Determines whether the picker searches for the closest bounds collision along the ray,
 	 * or simply returns the first collision encountered. Defaults to false.
 	 */
-	constructor(findClosestCollision:boolean = false, avm1Stage:DisplayObject)
+	constructor(partition:PartitionBase, findClosestCollision:boolean = false, avm1Stage:DisplayObject)
 	{
 		super();
 		
+		this._partition = partition;
 		this._avm1Stage=avm1Stage;
 		this._findClosestCollision = findClosestCollision;
 	}
@@ -171,7 +169,7 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 	/**
 	 * @inheritDoc
 	 */
-	public getCollision(rayPosition:Vector3D, rayDirection:Vector3D, view:View):PickingCollision
+	public getCollision(rayPosition:Vector3D, rayDirection:Vector3D, shapeFlag:boolean = false):PickingCollision
 	{
 		this._rayPosition = rayPosition;
 		this._rayDirection = rayDirection;
@@ -180,14 +178,14 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		this._tabEntities.length = 0;
 		this._customTabEntities.length = 0;
 		// collect entities to test
-		view.traversePartitions(this);
+		this._partition.traverse(this);
 
 		//early out if no collisions detected
 		if (!this._entities.length)
 			return null;
 
 		//console.log("entities: ", this._entities)
-		var collision:PickingCollision = this.getPickingCollision(view);
+		var collision:PickingCollision = this._getPickingCollision(shapeFlag);
 
 
 
@@ -289,7 +287,7 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		console.log(objs);
 		return path;
 	}
-	private getPickingCollision(view:View):PickingCollision
+	private _getPickingCollision(shapeFlag:boolean):PickingCollision
 	{
 		// 	no sorting for entities is needed
 		// 	this is already taken care by the order the entitites are added
@@ -471,57 +469,9 @@ export class AVMRaycastPicker extends TraverserBase implements IPicker
 		}
 	}
 
-	public applyBillboard(billboard:Billboard):void
+	public applyRenderable(renderable:IRenderable):void
 	{
-		if (this._testCollider.testBillboardCollision(billboard, billboard.material, this._testCollision))
+		if (renderable.testCollision(this._testCollision, this._findClosestCollision))
 			this._bestCollision = this._testCollision;
-	}
-
-	public applyLineShape(shape:Shape):void
-	{
-		if (this._testCollider.testLineCollision(<LineElements> shape.elements, shape.material || this._entity.material, this._testCollision, shape.count || shape.elements.numVertices, shape.offset))
-			this._bestCollision = this._testCollision;
-	}
-
-	public applyTriangleShape(shape:Shape):void
-	{
-		if (this._testCollider.testTriangleCollision(<TriangleElements> shape.elements, shape.material || this._entity.material, this._testCollision, shape.count || shape.elements.numVertices, shape.offset))
-			this._bestCollision = this._testCollision;
-	}
-
-	/**
-	 *
-	 * @param entity
-	 */
-	public applyDirectionalLight(entity:IEntity):void
-	{
-		//don't do anything here
-	}
-
-	/**
-	 *
-	 * @param entity
-	 */
-	public applyLightProbe(entity:IEntity):void
-	{
-		//don't do anything here
-	}
-
-	/**
-	 *
-	 * @param entity
-	 */
-	public applyPointLight(entity:IEntity):void
-	{
-		//don't do anything here
-	}
-
-	/**
-	 *
-	 * @param entity
-	 */
-	public applySkybox(entity:IEntity):void
-	{
-		//don't do anything here
 	}
 }

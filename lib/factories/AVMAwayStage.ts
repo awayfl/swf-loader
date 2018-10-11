@@ -3,12 +3,12 @@ import {BuildMode, EventDispatcher, Transform, Point, ColorUtils, Vector3D, Rect
 
 import {AssetEvent, EventBase, LoaderEvent, ParserEvent, URLRequest, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
-import {HoverController, FrameScriptManager, TextField, Billboard, Camera, LoaderContainer, MovieClip, DisplayObjectContainer} from "@awayjs/scene";
+import {HoverController, FrameScriptManager, TextField, Billboard, Camera, LoaderContainer, MovieClip, DisplayObjectContainer, Scene} from "@awayjs/scene";
 
 import {MethodMaterial,   MaterialBase}	from "@awayjs/materials";
-import {DefaultRenderer} from  "@awayjs/renderer";
-import {View, MouseManager, SceneGraphPartition} from "@awayjs/view";
-import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D} from "@awayjs/stage";
+import {DefaultRenderer, SceneGraphPartition, BasicPartition} from  "@awayjs/renderer";
+import {View, MouseManager} from "@awayjs/view";
+import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D, Viewport} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 import {AVMRaycastPicker} from "./AVMRaycastPicker";
 
@@ -124,7 +124,7 @@ export class AVMAwayStage extends Sprite{
 		this.initEninge(htmlCanvas);
 
 
-		this._view.setPartition(this, new SceneGraphPartition(this, this._view));
+		new SceneGraphPartition(this, this._renderer.viewport, true);
 		this._view.scene.addChild(this);
 		this.mouseEnabled=true;
 		this._stageWidth = width;
@@ -290,14 +290,14 @@ export class AVMAwayStage extends Sprite{
 		//this._rendererStage = StageManager.getInstance().getStageAt(0);
 
 		StageManager.htmlCanvas=htmlCanvas;
-		this._renderer = new DefaultRenderer();
+		this._renderer = new DefaultRenderer(new BasicPartition(new Scene()));
 		this._renderer.stage.color = 0xFFFFFFFF;
 		StageManager.htmlCanvas=null;
 
 		this._view = new View(this._renderer);
 		this._renderer.antiAlias=0;
 		this._view.renderer.renderableSorter = null;//new RenderableSort2D();
-		this._view.mousePicker=new AVMRaycastPicker(true, this);
+		this._view.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
 		this._view.forceMouseMove=true;
 		this._view.beforeRenderCallback=function(){
             FrameScriptManager.execute_queue();
@@ -307,8 +307,8 @@ export class AVMAwayStage extends Sprite{
 		this._projection = new PerspectiveProjection();
 		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
 		this._projection.fieldOfView = 30;
-		this._projection.originX = 0;
-		this._projection.originY = 0;
+		this._projection.originX = -1;
+		this._projection.originY = 1;
 		var camera:Camera = new Camera();
 		camera.projection = this._projection;
 
