@@ -41,7 +41,6 @@ export class AVM1Color extends AVM1Object {
 			this._target = this.context.resolveTarget(target_mc);
 			if(this._target ){
 				(<any>this._target).avmColor=this;
-				(<any>this._target)._ctBlockedByScript=true;
 				this._targetAwayObject = <DisplayObject>getAwayJSAdaptee(this._target);
             }
 		}
@@ -78,6 +77,8 @@ export class AVM1Color extends AVM1Object {
 			transform.alPut('rgb', offset);
 			AVM1Color.prototype.setTransform.call(this, transform);
 		}
+        if(this._target )
+            (<any>this._target)._ctBlockedByScript=true;
 	}
 
 	public setTransform(transform: AVM1Object): void {
@@ -95,6 +96,8 @@ export class AVM1Color extends AVM1Object {
 			this._targetAwayObject.invalidate();
 			this._targetAwayObject._invalidateHierarchicalProperties(HierarchicalProperties.COLOR_TRANSFORM);
 		}
+        if(this._target )
+            (<any>this._target)._ctBlockedByScript=true;
 	}
 }
 
