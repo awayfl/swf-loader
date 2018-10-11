@@ -60,6 +60,7 @@
 	import {IAVMRandomProvider} from "../../IAVMRandomProvider";
 	import {ISoftKeyboardManager} from "../../ISoftKeyboardManager";
 	import { AVM1Function } from "../runtime/AVM1Function";
+	import { AVM1ArrayNative } from "../natives";
 	
 	
 	var _escape: (str: string) => string = jsGlobal.escape;
@@ -494,6 +495,16 @@
 	
 		private _gotoFrame(mc:MovieClip, frame:any, offset:number):void
 		{
+            if(Array.isArray(frame)){
+                if(frame.length==0)
+                    return;
+                frame=frame[0];
+            }
+            if(frame instanceof AVM1ArrayNative){
+                if(!frame.value || frame.value.length==0)
+                    return;
+                frame=frame.value[0];
+            }
 			if(typeof frame==="number"){
 				if(frame % 1!==0){
 					frame=frame.toString();
