@@ -54,6 +54,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 	}
 
 	public freeFromScript():void{
+        this.protoTypeChanged=false;
 		this._blockedByScript=false;
 		this._ctBlockedByScript=false;
 		this._visibilityByScript=false;
