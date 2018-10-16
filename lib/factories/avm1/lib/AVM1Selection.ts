@@ -1,6 +1,6 @@
 import {alDefineObjectProperties, AVM1PropertyFlags} from "../runtime";
 import {getAwayJSAdaptee, IAVM1SymbolBase, wrapAVM1NativeClass} from "./AVM1Utils";
-import {AVM1ColorTransform, toAS3ColorTransform} from "./AVM1ColorTransform";
+import {AVM1ColorTransform, toAwayColorTransform} from "./AVM1ColorTransform";
 import {DisplayObject, MovieClip, TextField} from "@awayjs/scene";
 import {AVM1Context} from "../context";
 import {AVM1SharedObjectPrototype} from "./AVM1SharedObject";

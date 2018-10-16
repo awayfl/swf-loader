@@ -23,7 +23,7 @@ import {isNullOrUndefined} from "../../base/utilities";
 import {AVM1ArrayNative} from "../natives";
 import {BlendModesMap, IHasAS3ObjectReference, wrapAVM1NativeClass} from "./AVM1Utils";
 import {convertToAS3Filter} from "./AVM1Filters";
-import {toAwayColorTransform} from "./AVM1ColorTransform";
+import {toAwayColorTransform, AVM1ColorTransform} from "./AVM1ColorTransform";
 import {toAS3Matrix} from "./AVM1Matrix";
 import {BitmapImage2D as BitmapData} from "@awayjs/stage";
 import {IAsset} from "@awayjs/core";
@@ -129,7 +129,7 @@ export class AVM1BitmapData extends AVM1Object implements IHasAS3ObjectReference
 
 	public colorTransform(rect: AVM1Object, colorTransform: AVM1Object): void {
 		var as3Rect = toAS3Rectangle(rect);
-		var as3ColorTransform = toAwayColorTransform(colorTransform);
+		var as3ColorTransform = toAwayColorTransform(<AVM1ColorTransform>colorTransform);
 		(<BitmapData>this.adaptee).colorTransform(as3Rect, as3ColorTransform);
 	}
 
@@ -172,7 +172,7 @@ export class AVM1BitmapData extends AVM1Object implements IHasAS3ObjectReference
 		 clipRect?: AVM1Object, smooth?: boolean): void {
 		var as3BitmapData = (<any>source).adaptee; // movies and bitmaps
 		var as3Matrix = matrix ? toAS3Matrix(matrix) : null;
-		var as3ColorTransform = colorTransform ? toAwayColorTransform(colorTransform) : null;
+		var as3ColorTransform = colorTransform ? toAwayColorTransform(<AVM1ColorTransform>colorTransform) : null;
 		var as3ClipRect = clipRect ? toAS3Rectangle(clipRect) : null;
 		blendMode = typeof blendMode === 'number' ? BlendModesMap[blendMode] : alCoerceString(this.context, blendMode);
 		blendMode  = blendMode || null;
