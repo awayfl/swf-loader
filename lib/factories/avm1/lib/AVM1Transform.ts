@@ -18,7 +18,7 @@ import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Context} from "../context";
 import {getAwayJSAdaptee, IAVM1SymbolBase, wrapAVM1NativeClass} from "./AVM1Utils";
 import {AVM1Matrix, toAS3Matrix} from "./AVM1Matrix";
-import {AVM1ColorTransform, toAS3ColorTransform} from "./AVM1ColorTransform";
+import {AVM1ColorTransform, toAwayColorTransform} from "./AVM1ColorTransform";
 import {AVM1Rectangle} from "./AVM1Rectangle";
 import {DisplayObject} from "@awayjs/scene";
 import {Matrix, Transform} from "@awayjs/core";
@@ -61,12 +61,12 @@ export class AVM1Transform extends AVM1Object {
 
 	public getColorTransform(): AVM1ColorTransform {
 		var transform = this._targetAwayObject.transform;
-		return AVM1ColorTransform.fromAS3ColorTransform(this.context, transform.colorTransform);
+		return AVM1ColorTransform.fromAwayColorTransform(this.context, transform.colorTransform);
 	}
 
 	public setColorTransform(value: AVM1ColorTransform) {
 		var transform = this._targetAwayObject.transform;
-		transform.colorTransform = toAS3ColorTransform(value);
+		transform.colorTransform = toAwayColorTransform(value);
 	}
 
 	public getPixelBounds(): AVM1Rectangle {

@@ -17,7 +17,7 @@
 //module Shumway.AVM1.Lib {
 	import {alCoerceNumber, alDefineObjectProperties, alToInt32} from "../runtime";
 	import {AVM1Context} from "../context";
-	import {ColorTransform} from "@awayjs/core";
+	import {ColorTransform, ColorUtils} from "@awayjs/core";
 	import {AVM1Object} from "../runtime/AVM1Object";
 	import { AVM1Function } from "../runtime/AVM1Function";
 	
@@ -26,10 +26,10 @@
 		return v === undefined ? defaultValue : v;
 	}
 	
-	export function toAS3ColorTransform(v: any): ColorTransform {
+	export function fromAVM1Object(v: AVM1Object): AVM1ColorTransform {
 		var context = v.context;
 		if (!(v instanceof AVM1Object)) {
-			return new context.sec.flash.geom.ColorTransform(1, 1, 1, 1, 0, 0, 0, 0);
+			return new AVM1ColorTransform(context, 1, 1, 1, 1, 0, 0, 0, 0);
 		}
 		var off_a:number=v.alGet('alphaOffset');
 		if(off_a==null) {
@@ -75,7 +75,7 @@
 				mul_b=mul_b/100;
 			}
 		}
-		return new context.sec.flash.geom.ColorTransform(
+		return new AVM1ColorTransform(context,
 			alCoerceNumber(context, defaultTo(mul_r, 1)),
 			alCoerceNumber(context, defaultTo(mul_g, 1)),
 			alCoerceNumber(context, defaultTo(mul_b, 1)),
@@ -86,27 +86,41 @@
 			alCoerceNumber(context, defaultTo(off_a, 0)));
 	}
 	
-	export function copyAS3ColorTransform(t: ColorTransform, v: AVM1Object) {
-		v.alPut('redMultiplier', t.redMultiplier);
-		v.alPut('greenMultiplier', t.greenMultiplier);
-		v.alPut('blueMultiplier', t.blueMultiplier);
-		v.alPut('alphaMultiplier', t.alphaMultiplier);
-		v.alPut('redOffset', t.redOffset);
-		v.alPut('greenOffset', t.greenOffset);
-		v.alPut('blueOffset', t.blueOffset);
-		v.alPut('alphaOffset', t.alphaOffset);
+	export function toAwayColorTransform(v: AVM1ColorTransform): ColorTransform {
+		var context = v.context;
+		if (!(v instanceof AVM1ColorTransform)) {
+			return new context.sec.flash.geom.ColorTransform(1, 1, 1, 1, 0, 0, 0, 0);
+		}
+		return new context.sec.flash.geom.ColorTransform(
+			alCoerceNumber(context, defaultTo(v._rawData[0], 1)),
+			alCoerceNumber(context, defaultTo(v._rawData[1], 1)),
+			alCoerceNumber(context, defaultTo(v._rawData[2], 1)),
+			alCoerceNumber(context, defaultTo(v._rawData[3], 1)),
+			alCoerceNumber(context, defaultTo(v._rawData[4], 0)),
+			alCoerceNumber(context, defaultTo(v._rawData[5], 0)),
+			alCoerceNumber(context, defaultTo(v._rawData[6], 0)),
+			alCoerceNumber(context, defaultTo(v._rawData[7], 0)));
+	}
+	
+	export function copyAS3ColorTransform(t: ColorTransform, v: AVM1ColorTransform) {
+		v._rawData[0]=t.redMultiplier;
+		v._rawData[1]=t.greenMultiplier;
+		v._rawData[2]=t.blueMultiplier;
+		v._rawData[3]=t.alphaMultiplier;
+		v._rawData[4]=t.redOffset;
+		v._rawData[5]=t.greenOffset;
+		v._rawData[6]=t.blueOffset;
+		v._rawData[7]=t.alphaOffset;
 	}
 	
 	export class AVM1ColorTransform extends AVM1Object {
-        public _ctAdaptee:ColorTransform;
+        public _rawData:number[];
 		constructor(context: AVM1Context,
 					redMultiplier: number = 1, greenMultiplier: number = 1, blueMultiplier: number = 1, alphaMultiplier: number = 1,
 					redOffset: number = 0, greenOffset: number = 0, blueOffset: number = 0, alphaOffset: number = 0) {
             super(context);
-            this._ctAdaptee=new ColorTransform(
-                redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier,
-                redOffset, greenOffset, blueOffset, alphaOffset
-            )
+            this._rawData=[redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier,
+                redOffset, greenOffset, blueOffset, alphaOffset];
 			this.alPrototype = context.globals.ColorTransform.alGetPrototypeProperty();
 			alDefineObjectProperties(this, {
 				rgb: {
@@ -114,36 +128,36 @@
 					set: this.setRgb
                 },
 				ra: {
-					get: this.getRedMultiplier,
-					set: this.setRedMultiplier
+					get: this.getRM,
+					set: this.setRM
 				},
 				ga: {
-					get: this.getGreenMultiplier,
-					set: this.setGreenMultiplier
+					get: this.getGM,
+					set: this.setGM
 				},
 				ba: {
-					get: this.getBlueMultiplier,
-					set: this.setBlueMultiplier
+					get: this.getBM,
+					set: this.setBM
 				},
 				aa: {
-					get: this.getAlphaMultiplier,
-					set: this.setAlphaMultiplier
+					get: this.getAM,
+					set: this.setAM
 				},
 				rb: {
-					get: this.getRedOffset,
-					set: this.setRedOffset
+					get: this.getRO,
+					set: this.setRO
 				},
 				gb: {
-					get: this.getGreenOffset,
-					set: this.setGreenOffset
+					get: this.getGO,
+					set: this.setGO
 				},
 				bb: {
-					get: this.getBlueOffset,
-					set: this.setBlueOffset
+					get: this.getBO,
+					set: this.setBO
 				},
 				ab: {
-					get: this.getAlphaOffset,
-					set: this.setAlphaOffset
+					get: this.getAO,
+					set: this.setAO
 				},
 				redMultiplier: {
 					get: this.getRedMultiplier,
@@ -189,82 +203,148 @@
 		}
 	
 		public getRedMultiplier(): number {
-			return this._ctAdaptee.redMultiplier;
+			return this._rawData[0];
 		}	
 		public setRedMultiplier(value: number) {
-            this._ctAdaptee.redMultiplier=value;
+            this._rawData[0]=value;
         }
 
 		public getGreenMultiplier(): number {
-			return this._ctAdaptee.greenMultiplier;
+			return this._rawData[1];
 		}	
 		public setGreenMultiplier(value: number) {
-            this._ctAdaptee.greenMultiplier=value;
+            this._rawData[1]=value;
         }
 
 		public getBlueMultiplier(): number {
-			return this._ctAdaptee.blueMultiplier;
+			return this._rawData[2];
 		}	
 		public setBlueMultiplier(value: number) {
-            this._ctAdaptee.blueMultiplier=value;
+            this._rawData[2]=value;
         }
 
         public getAlphaMultiplier(): number {
-			return this._ctAdaptee.alphaMultiplier;
+			return this._rawData[3];
 		}	
 		public setAlphaMultiplier(value: number) {
-            this._ctAdaptee.redOffset=value;
+            this._rawData[3]=value;
         }  
 
-		public getRedOffset(value: number) {
-            this._ctAdaptee.redOffset=value;
+		public getRedOffset():number {
+			return this._rawData[4];
         }
 		public setRedOffset(value: number) {
-            this._ctAdaptee.redOffset=value;
+            this._rawData[4]=value;
         }
 
 		public getGreenOffset(): number {
-			return this._ctAdaptee.greenOffset;
+			return this._rawData[5];
 		}	
 		public setGreenOffset(value: number) {
-            this._ctAdaptee.greenOffset=value;
+            this._rawData[5]=value;
         }
 
 		public getBlueOffset(): number {
-			return this._ctAdaptee.blueOffset;
+			return this._rawData[6];
 		}	
 		public setBlueOffset(value: number) {
-            this._ctAdaptee.blueOffset=value;
+            this._rawData[6]=value;
         }
 
 		public getAlphaOffset(): number {
-			return this._ctAdaptee.alphaOffset;
+			return this._rawData[7];
 		}	
 		public setAlphaOffset(value: number) {
-            this._ctAdaptee.alphaOffset=value;
+            this._rawData[7]=value;
+        }
+
+        
+		public getRM(): number {
+			return this._rawData[0]*100;
+		}	
+		public setRM(value: number) {
+            this._rawData[0]=value/100;
+        }
+
+		public getGM(): number {
+			return this._rawData[1]*100;
+		}	
+		public setGM(value: number) {
+            this._rawData[1]=value/100;
+        }
+
+		public getBM(): number {
+			return this._rawData[2]*100;
+		}	
+		public setBM(value: number) {
+            this._rawData[2]=value/100;
+        }
+
+        public getAM(): number {
+			return this._rawData[3]*100;
+		}	
+		public setAM(value: number) {
+            this._rawData[3]=value/100;
+        }  
+
+		public getRO():number {
+			return this._rawData[4];
+        }
+		public setRO(value: number) {
+            this._rawData[4]=value;
+        }
+
+		public getGO(): number {
+			return this._rawData[5];
+		}	
+		public setGO(value: number) {
+            this._rawData[5]=value;
+        }
+
+		public getBO(): number {
+			return this._rawData[6];
+		}	
+		public setBO(value: number) {
+            this._rawData[6]=value;
+        }
+
+		public getAO(): number {
+			return this._rawData[7];
+		}	
+		public setAO(value: number) {
+            this._rawData[7]=value;
         }
         
 		public getRgb(): number {
-            return this._ctAdaptee.color;
+            return((this._rawData[4] << 16) | ( this._rawData[5] << 8) | this._rawData[6]);
 		}
 	
 		public setRgb(rgb: number) {
-            this._ctAdaptee.color=alToInt32(this.context, rgb);
+            var argb:number[] = ColorUtils.float32ColorToARGB(rgb);
+    
+            this._rawData[4] = argb[1];  //(value >> 16) & 0xFF;
+            this._rawData[5] = argb[2];  //(value >> 8) & 0xFF;
+            this._rawData[6] = argb[3];  //value & 0xFF;
+    
+            this._rawData[0] = 0;
+            this._rawData[1] = 0;
+            this._rawData[2] = 0;
 		}
 	
 		public concat(second: AVM1ColorTransform): void {
-			this._ctAdaptee.concat(toAS3ColorTransform(second));
+            console.warn("AVM1ColorTransform concat is not implemented");
+			//this._ctAdaptee.concat(second._ctAdaptee);
 		}
 	
 		public _toString(): string {
-			return this._ctAdaptee.toString();
+			return "[object Object]";
 		}
 		
 	
-		static fromAS3ColorTransform(context: AVM1Context, t:ColorTransform): AVM1ColorTransform  {
-			return new AVM1ColorTransform(context,
+		static fromAwayColorTransform(context: AVM1Context, t:ColorTransform): AVM1ColorTransform  {
+            return new AVM1ColorTransform(context,
 				t.redMultiplier, t.greenMultiplier, t.blueMultiplier, t.alphaMultiplier,
-				t.redOffset, t.greenOffset, t.blueOffset, t.alphaOffset);
+                t.redOffset, t.greenOffset, t.blueOffset, t.alphaOffset);
 		}
 	}
 	
