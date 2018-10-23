@@ -42,6 +42,7 @@ import {defineImage} from "../utils/parser/image";
 import {defineLabel} from "../utils/parser/label";
 
 import {
+    SoundInfoFlags,
 	SwfTagCode,
 	DefinitionTags,
 	ImageDefinitionTags,
@@ -708,10 +709,16 @@ export class SWFParser extends ParserBase
 						switch (tag.code) {
 							case SwfTagCode.CODE_START_SOUND:
 								//console.log("CODE_START_SOUND", tag)
-								awaySymbol = this.awaySymbols[tag.soundId];
-								awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+                                awaySymbol = this.awaySymbols[tag.soundId];
+                                if(tag.soundInfo && (tag.soundInfo.flags & SoundInfoFlags.Stop)){
+                                    awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+                                    noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i+1);
+                                }
+                                else{
+                                    awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+                                    noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i+1);
+                                }
 								// todo: volume / pan / other properties
-								noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i+1);
 								cmds_startSounds.push(audio_commands_cnt++);
 								break;
 							case SwfTagCode.CODE_STOP_SOUND:
