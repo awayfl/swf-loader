@@ -226,7 +226,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	// called from adaptee whenever this is removed from scene.
 	public freeFromScript():void{
         this.stopAllSounds();
+        this.hasSwappedDepth=false;
         super.freeFromScript();
+
 	}
 	
 	public doInitEvents():void
@@ -249,13 +251,13 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if(child.adapter!=child)
 			(<any>child.adapter).setEnabled(true);
 		if (child.name){
-            /*if(this._childrenByName[child.name]){
+          /*  if(this._childrenByName[child.name]){
                 console.log("try register ",child.name, this._childrenByName[child.name], this._childrenByName[child.name].adaptee._depthID, child._depthID);
             }
             else{
                 console.log("try register no child exists",child.name, child._depthID);
             }*/
-            if( !this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null) ||
+            if(force || !this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null) ||
                 this._childrenByName[child.name].adaptee._depthID>child._depthID){
                 
                 // only replace value if no property exists yet, or if a existing prop was a Away-Object
@@ -298,7 +300,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if(child && child.adapter != child)
 			(<any>child.adapter).alPut("onEnterFrame", null);
 		if(child.name){
-            /*if(this._childrenByName[child.name]){
+          /*  if(this._childrenByName[child.name]){
                 console.log("try unregister ",child.name, this._childrenByName[child.name], this._childrenByName[child.name].adaptee.id, child.id);
             }
             else{
@@ -313,6 +315,11 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				else{	*/				
                     if(this._childrenByName[child.name] && this._childrenByName[child.name].avmColor){
                         this.unregisteredColors[child.name]=this._childrenByName[child.name].avmColor;
+                    }
+                    if(this.avmPropsChildNames[child.name]){     
+                        // update indirectReferences to this prop
+                        this.avmPropsChildNames[child.name].obj.alDeleteProperty(this.avmPropsChildNames[child.name].name);
+                        delete this.avmPropsChildNames[child.name];
                     }
 					this.alDeleteProperty(child.name);
 					delete this._childrenByName[child.name];
@@ -408,7 +415,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		*/
 		var mc:MovieClip;
 		mc = (<any>symbol.adaptee).clone();//constructClassFromSymbol(props, this.context.sec.flash.display.MovieClip.axClass);
-		mc.name=name;
+        mc.name=name;
 		getAVM1Object(mc,<any>this._avm1Context);
 		return mc;
 	}
@@ -443,6 +450,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if(oldAVMMC && oldAVMMC.avmColor){
 			oldAVMMC.avmColor.changeTarget(avmMc);
 		}
+        if(mc.timeline && mc.timeline.isButton){
+            mc.addButtonListeners();
+        }
 		avmMc.dynamicallyCreated=true;
 		this.registerScriptObject(mc, false);
 		return avmMc;
@@ -567,7 +577,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public createEmptyMovieClip(name, depth): AVM1MovieClip {
-		name = alToString(this.context, name);
+        name = alToString(this.context, name);
+        if(this.alHasProperty(name))
+            return;
 		var mc: MovieClip = new this.context.sec.flash.display.MovieClip();
         mc.name = name;
         mc.assetNamespace=this.adaptee.assetNamespace;
@@ -592,7 +604,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		text.x = x;
 		text.y = y;
 		text.width = width;
-		text.height = height;
+        text.height = height;
+        myTF.dynamicallyCreated=true;
 		return myTF;
 	}
 
@@ -819,7 +832,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				}
 				return;
 			}
-		}
+        }
+        if(typeof frame ==="number" && frame<=0)
+            return;
 		this.adaptee.play();
 		this._gotoFrame(frame);
 	}
@@ -838,6 +853,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
             frame=frame.value[0];
         }
         
+        if(typeof frame ==="number" && frame<=0)
+            return;
 		this.adaptee.stop();
 		this._gotoFrame(frame);
 	}
@@ -991,7 +1008,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public prevFrame() {
-		--this.adaptee.currentFrameIndex;
+        --this.adaptee.currentFrameIndex;
+        this.adaptee.stop();
 	}
 
 	public prevScene() {
@@ -1117,9 +1135,14 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			parent.swapDepths(this.adaptee, avm2AwayDepth(target));
 		}
 		else if(target.adaptee){
+            target._blockedByScript=true;
+            target._ctBlockedByScript=true;
 			//console.log("swap to children", this.adaptee.name, target.adaptee.name);
 			parent.swapChildren(this.adaptee, target.adaptee);
         }
+        this._blockedByScript=true;
+        this._ctBlockedByScript=true;
+
         if(this.adaptee._depthID==this.initialDepth){
             this.hasSwappedDepth=false;
         }
