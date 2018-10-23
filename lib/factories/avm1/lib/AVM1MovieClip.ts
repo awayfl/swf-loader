@@ -578,8 +578,13 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public createEmptyMovieClip(name, depth): AVM1MovieClip {
         name = alToString(this.context, name);
-        if(this.alHasProperty(name))
+        if(this.alHasProperty(name)){
+            var existingObj=this.alGet(name);
+            if(existingObj && existingObj instanceof AVM1MovieClip){
+                existingObj.adaptee.graphics.clear();
+            }
             return;
+        }
 		var mc: MovieClip = new this.context.sec.flash.display.MovieClip();
         mc.name = name;
         mc.assetNamespace=this.adaptee.assetNamespace;
