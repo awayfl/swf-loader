@@ -207,6 +207,7 @@
 			var context = this.context;
 			var fn:Function;
 			var time= alToInteger(context, arguments[1]);
+            var argsStartIdx:number=2;
 			if (alIsFunction(arguments[0])) {
 				fn = arguments[0].toJSFunction();
 			} else {
@@ -215,7 +216,8 @@
 				}
 				var obj: any = arguments[0];
 				var funName: string = arguments[1];
-				time= alToInteger(context, arguments[2]);
+                time= alToInteger(context, arguments[2]);
+                argsStartIdx=3;
 				if (!(obj instanceof AVM1Object) || typeof funName !== 'string') {
 					return undefined;
 				}
@@ -229,7 +231,7 @@
 				};
 			}
 			var args: any[] = [];
-			for (var i = 2; i < arguments.length; i++) {
+			for (var i = argsStartIdx; i < arguments.length; i++) {
 				args.push(arguments[i]);
 			}
 	
@@ -488,7 +490,10 @@
 			// see comments in gotoAndPlay
 			//console.log("AVM1Globals.gotoAndStop", label, frame);
 			//console.log("Scene navigation", arguments[0], scene);
-			var avmMC:AVM1MovieClip=(<AVM1MovieClip>this.context.resolveTarget(null));		
+            var avmMC:AVM1MovieClip=(<AVM1MovieClip>this.context.resolveTarget(null));	
+            
+            if(typeof frame ==="number" && frame<=0)
+                return;	
 			avmMC.adaptee.stop();
 			this._gotoFrame(avmMC.adaptee, label, frame);
 		}
@@ -683,7 +688,8 @@
 	
 		public prevFrame() {
 			var awayObject:MovieClip = <MovieClip>getAwayJSAdaptee(<AVM1MovieClip>this.context.resolveTarget(null));
-			--awayObject.currentFrameIndex;
+            --awayObject.currentFrameIndex;
+            awayObject.stop();
 		}
 	
 		public prevScene() {
