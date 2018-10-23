@@ -878,7 +878,12 @@ export class AVM1InterpretedFunction extends AVM1EvalFunction {
                             // for setInterval: if its still not has a parent found
                             if(!parentObj){
                                 if(this.scopeList && this.scopeList.previousScopeItem && this.scopeList.previousScopeItem.scope){
-                                    parentObj=this.scopeList.previousScopeItem.scope.alGet("this");
+                                    if(this.scopeList.previousScopeItem.scope instanceof AVM1MovieClip){
+                                        parentObj=this.scopeList.previousScopeItem.scope;
+                                    }
+                                    else{
+                                        parentObj=this.scopeList.previousScopeItem.scope.alGet("this");                                        
+                                    }
                                     if(parentObj){
                                         parentObj = parentObj.alGet("_parent");
                                     }
@@ -965,8 +970,13 @@ function avm1ReadFunctionArgs(stack: any[]) {
 }
 
 function avm1SetTarget(ectx: ExecutionContext, targetPath: string) {
-	var newTarget = null;
+    var newTarget = null;
 	if (targetPath) {
+        if(typeof targetPath==="string"){
+            while(targetPath.length && targetPath[targetPath.length-1]=="."){
+                targetPath = targetPath.substring(0, targetPath.length-1);
+            }
+        }
 		try {
 			newTarget = avm1ResolveTarget(ectx, targetPath, false);
 			if (!avm1IsTarget(newTarget)) {
@@ -1101,7 +1111,8 @@ function avm1ResolveVariable(ectx: ExecutionContext, variableName: string, flags
 	// it for property name paths.
 	var originalName = variableName;
 	variableName = ectx.context.normalizeName(variableName);
-	variableName=variableName.replace("_level0", "_root");
+    if(typeof variableName==="string")
+        variableName=variableName.replace("_level0", "_root");
 	if (!avm1VariableNameHasPath(variableName)) {
 		//noVarGetDebug || console.log("simple variableName", variableName);
 		var resolvedVar=avm1ResolveSimpleVariable(ectx.scopeList, variableName, flags);
