@@ -162,6 +162,17 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		}
 	}
 
+	public freeFromScript():void{
+        super.freeFromScript();
+        for (var key in this._eventsListeners) {
+            if(this._eventHandlers[key].stageEvent)
+                (<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+            else
+                this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+        }     
+        this._eventsListeners={};
+    }
+    
 	private _removeEventListener(event: AVM1EventHandler) {
 		var propertyName = this.context.normalizeName(event.propertyName);
 		var listener: any = this._eventsListeners[propertyName];
