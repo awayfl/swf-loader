@@ -263,14 +263,13 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
         
         //  stupid hack to make sure we can update references to objects in cases when the timeline changes the objects 
         //  if a new object is registered for the same name, we can use the "avmPropsChildNames" to update all references to the old object with the new one
-        //  this only seem to work for objects that are not created dynamically
-        if(v && typeof v ==="object" && v.avmType==="symbol" && p!="this" && p!="_parent" && !v.dynamicallyCreated){
-            if(this.avmType!="symbol" || (v.adaptee.parent && v.adaptee.parent!=this.adaptee)){
+        if(v && typeof v ==="object" && v==="symbol" && p!="this" && p!="_parent"){//} && !v.dynamicallyCreated){
+            //if(this.avmType!="symbol"){/} || (v.adaptee.parent && v.adaptee.parent!=this.adaptee)){
                 if(v.adaptee.parent.adapter.avmPropsChildNames){
                     v.adaptee.parent.adapter.avmPropsChildNames[v.adaptee.name]={obj:this, name:p};
                     //console.log("stored ref to timeline-child on different object", this, p, v.adaptee.name, v);
                 }
-            }
+            //}
             //console.log("set symbol ", v.toString());
         }
 		if (!this.alCanPut(p)) {
