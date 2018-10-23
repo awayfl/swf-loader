@@ -110,7 +110,11 @@ export function avm1HasEventProperty(context: AVM1Context, target: any, property
 	if (target.alHasProperty(propertyName) &&
 		(target.alGet(propertyName) instanceof AVM1Function)) {
 		return true;
-	}
+    }
+    if (target.alHasProperty(propertyName) &&
+    (target._ownProperties[propertyName] &&  target._ownProperties[propertyName].value)) {
+        return true;
+}
 	var listenersField = target.alGet('_listeners');
 	if (!(listenersField instanceof AVM1ArrayNative)) {
 		return false;
@@ -396,11 +400,12 @@ export function initializeAVM1Object(awayObject: any,
 			else if(eventName=="load"){
 				awayObject.onLoadedAction=handler;
 			}
-			else if(eventName=="frameConstructed"){
-				awayObject.addEventListener("enterFrame", handler);
-			}
 			else{
-				instanceAVM1._addEventListener(new AVM1EventHandler(eventName, eventName, null, eventMapping.isStageEvent), handler);
+                var propName=eventName;
+                if(eventName=="onEnterFrame")
+                    eventName="enterFrame"
+                instanceAVM1.alPut(propName.toLowerCase(), handler);
+				instanceAVM1._addEventListener(new AVM1EventHandler(propName, eventName, null, eventMapping.isStageEvent), handler);
 			}
 			//}
 		}
@@ -444,7 +449,7 @@ var ClipEventMappings: Map<number, {name: string; isStageEvent: boolean; isButto
 ClipEventMappings = Object.create(null);
 ClipEventMappings[AVM1ClipEvents.Load] = {name: 'load', isStageEvent: false, isButtonEvent: false};
 // AVM1's enterFrame happens at the same point in the cycle as AVM2's frameConstructed.
-ClipEventMappings[AVM1ClipEvents.EnterFrame] = {name: 'frameConstructed', isStageEvent: false, isButtonEvent: false};
+ClipEventMappings[AVM1ClipEvents.EnterFrame] = {name: 'onEnterFrame', isStageEvent: false, isButtonEvent: false};
 ClipEventMappings[AVM1ClipEvents.Unload] = {name: 'unload', isStageEvent: false, isButtonEvent: false};
 ClipEventMappings[AVM1ClipEvents.MouseMove] = {name: 'mouseMove3d', isStageEvent: true/*true*/, isButtonEvent: false};
 ClipEventMappings[AVM1ClipEvents.MouseDown] = {name: 'mouseDown3d', isStageEvent:  true/*true*/, isButtonEvent: false};
