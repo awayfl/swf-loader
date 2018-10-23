@@ -62,15 +62,15 @@ var buttonActionsMap:any={
 	4:['mouseDown3d'],		// press
 	8:['mouseUp3d'],		// release 
 	64:['mouseUpOutside3d'],// releaseOutside
-	160:[],					// dragOver
-	272:[],					// dragOut
+	//160:[],					// dragOver
+	//272:[],					// dragOut
 
 	// combinations of onClipActions:
 	//TODO: find a betetr way to handle this
-	72:['mouseUp3d', 'mouseUpOutside3d'], 	// release + releaseOutside
+	/*72:['mouseUp3d', 'mouseUpOutside3d'], 	// release + releaseOutside
 	161:['mouseOver3d'],					// rollover + dragOver
 	274:['mouseOut3d'], 					// rollOut + dragOut
-	434:['mouseOut3d'],						// rollout + dragOver + dragOut
+	434:['mouseOut3d'],						// rollout + dragOver + dragOut*/
 }
 
 export class AVM1Button extends AVM1MovieClip {
@@ -167,7 +167,8 @@ export class AVM1Button extends AVM1MovieClip {
 				default:
 					warning('Unknown AVM1 button action type: ' + action.stateTransitionFlags);
 					continue;
-			}*/
+            }*/
+            /*
 			if(action.stateTransitionFlags!=0){
 				var types:string[]=buttonActionsMap[action.stateTransitionFlags];
 				if(types){
@@ -181,12 +182,30 @@ export class AVM1Button extends AVM1MovieClip {
 				else{
 					console.warn("unknown button event flag", action.stateTransitionFlags);
 				}
-			}
+            }*/
+			if(action.stateTransitionFlags!=0){
+                var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags);
+                var foundValidAction:boolean=false;
+                for(var key in buttonActionsMap){
+                    if(action.stateTransitionFlags & parseInt(key)){
+                        foundValidAction=true;
+						requiredListeners[buttonActionsMap[key]] = boundListener;
+                    }
+                }
+				if(!foundValidAction){
+					console.warn("unknown button event flag", action.stateTransitionFlags);
+				}
+            }
 		}
 		this._initEventsHandlers();
 		this._addListeners();
 	}
 
+	public doInitEvents():void
+	{
+        super.doInitEvents();
+		this._addListeners();
+	}
 
 	public stop() {
 		return this.adaptee.stop();
