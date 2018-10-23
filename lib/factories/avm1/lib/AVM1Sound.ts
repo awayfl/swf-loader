@@ -74,6 +74,8 @@ export class AVM1Sound extends AVM1Object {
 	}
 	public attachSound(id: string): void {
 
+        if(typeof id!=="string" && typeof id!=="number")
+            return;
 		var symbol = AssetLibrary.getAsset(id, this._assetNameSpace);
 		if (!symbol) {
 			warning("AVM1Sound.attachSound no symbol found "+id);
