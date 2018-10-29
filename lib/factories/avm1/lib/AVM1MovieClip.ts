@@ -320,8 +320,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
                     }
                     if(this.avmPropsChildNames[child.name]){     
                         // update indirectReferences to this prop
-                        this.avmPropsChildNames[child.name].obj.alDeleteProperty(this.avmPropsChildNames[child.name].name);
-                        delete this.avmPropsChildNames[child.name];
+                        //this.avmPropsChildNames[child.name].obj.alDeleteProperty(this.avmPropsChildNames[child.name].name);
+                        //console.log("delete property: ", child.name, this.avmPropsChildNames[child.name].name, this.avmPropsChildNames[child.name].obj)
+                        //delete this.avmPropsChildNames[child.name];
                     }
 					this.alDeleteProperty(child.name);
 					delete this._childrenByName[child.name];
