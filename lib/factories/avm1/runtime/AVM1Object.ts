@@ -229,14 +229,21 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			return undefined;
 		}
 		if ((desc.flags & AVM1PropertyFlags.DATA)) {
+            if(desc.value && desc.value.adaptee && !desc.value.adaptee.parent){
+                return undefined;
+            }
 			return desc.value;
 		}
 		release || Debug.assert((desc.flags & AVM1PropertyFlags.ACCESSOR));
 		var getter = desc.get;
 		if (!getter) {
 			return undefined;
-		}
-		return getter.alCall(this);
+        }
+        var value=getter.alCall(this);
+        if(value && value.adaptee && !value.adaptee.parent){
+            return undefined;
+        }
+		return value;
 	}
 
 	public alCanPut(p): boolean {
