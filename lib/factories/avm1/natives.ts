@@ -712,6 +712,68 @@ enum AVM1ArraySortOnOptions {
 	NUMERIC = 16
 }
 
+var sortArray=function(arr_in:any, comparefn?: AVM1Function): AVM1Object {
+    var arr = alEnsureType<AVM1ArrayNative>(arr_in, AVM1ArrayNative).value;
+    if (!alIsFunction(comparefn)) {
+        var doNumeric=typeof comparefn==="number" && (comparefn & AVM1ArraySortOnOptions.NUMERIC || comparefn==-1);
+        var doDescending=typeof comparefn==="number" && (comparefn & AVM1ArraySortOnOptions.DESCENDING);
+        if(doNumeric){
+            arr.sort(function(a,b){
+                while(a instanceof AVM1ArrayNative){
+                    a=alEnsureType<AVM1ArrayNative>(a, AVM1ArrayNative).value;
+                    if(a && a.length>0)
+                        a=a[0];
+                }
+                while(b instanceof AVM1ArrayNative){
+                    b=alEnsureType<AVM1ArrayNative>(b, AVM1ArrayNative).value;
+                    if(b && b.length>0)
+                        b=b[0];
+                }
+                return a - b;
+            });
+        }
+        else{
+            // ugly hack for moving undefined values to the beginning of the array
+            var i=arr.length;
+            while(i>0){
+                i--;
+                if(!arr[i]){
+                    arr[i]="00000000000AwayInternal";
+                }
+            }
+            arr.sort(function(a,b){
+                while(a instanceof AVM1ArrayNative){
+                    a=alEnsureType<AVM1ArrayNative>(a, AVM1ArrayNative).value;
+                    if(a && a.length>0)
+                        a=a[0];
+                }
+                while(b instanceof AVM1ArrayNative){
+                    b=alEnsureType<AVM1ArrayNative>(b, AVM1ArrayNative).value;
+                    if(b && b.length>0)
+                        b=b[0];
+                }
+                return (a<b)?-1:1;
+            });
+            i=arr.length;
+            while(i>0){
+                i--;
+                if(arr[i]=="00000000000AwayInternal"){
+                    arr[i]=undefined;
+                }
+            }
+        }
+        if(doDescending)
+            arr.reverse();
+    } else {
+        var args = [undefined, undefined];
+        arr.sort(function (a, b) {
+            args[0] = a;
+            args[1] = b;
+            return comparefn.alCall(null, args);
+        });
+    }
+    return arr_in;
+}
 // TODO implement all the Array class and its prototype natives
 
 export class AVM1ArrayPrototype extends AVM1Object {
@@ -998,54 +1060,7 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	}
 
 	public sort(comparefn?: AVM1Function): AVM1Object {
-		var arr = alEnsureType<AVM1ArrayNative>(this, AVM1ArrayNative).value;
-		if (!alIsFunction(comparefn)) {
-            var doNumeric=typeof comparefn==="number" && (comparefn & AVM1ArraySortOnOptions.NUMERIC || comparefn==-1);
-            var doDescending=typeof comparefn==="number" && (comparefn & AVM1ArraySortOnOptions.DESCENDING);
-			if(doNumeric){
-                arr.sort((a, b) => a - b)
-			}
-			else{
-				// ugly hack for moving undefined values to the beginning of the array
-				var i=arr.length;
-				while(i>0){
-					i--;
-					if(!arr[i]){
-						arr[i]="00000000000AwayInternal";
-					}
-				}
-				arr.sort(function(a,b){
-                    while(a instanceof AVM1ArrayNative){
-                        a=alEnsureType<AVM1ArrayNative>(a, AVM1ArrayNative).value;
-                        if(a && a.length>0)
-                            a=a[0];
-                    }
-                    while(b instanceof AVM1ArrayNative){
-                        b=alEnsureType<AVM1ArrayNative>(b, AVM1ArrayNative).value;
-                        if(b && b.length>0)
-                            b=b[0];
-                    }
-                    return (a<b)?-1:1;
-                });
-				i=arr.length;
-				while(i>0){
-					i--;
-					if(arr[i]=="00000000000AwayInternal"){
-						arr[i]=undefined;
-					}
-				}
-			}
-            if(doDescending)
-                arr.reverse();
-		} else {
-			var args = [undefined, undefined];
-			arr.sort(function (a, b) {
-				args[0] = a;
-				args[1] = b;
-				return comparefn.alCall(null, args);
-			});
-		}
-		return this;
+        return sortArray(this, comparefn);
 	}
 
 	public sortOn(fieldNames: AVM1Object, options: any): AVM1Object {
@@ -1073,8 +1088,8 @@ export class AVM1ArrayPrototype extends AVM1Object {
 				optionsList.push(optionsArray ? alToInt32(context, optionsArray.alGet(i)) : 0);
 			}
 		} else {
-			// Field parameters are incorrect.
-			return undefined;
+            // Field parameters are incorrect.
+            return sortArray(this, options);		 
 		}
 
 		// TODO revisit this code
@@ -1083,11 +1098,18 @@ export class AVM1ArrayPrototype extends AVM1Object {
 		release || Debug.assertNotImplemented(!(optionsVal & AVM1ArraySortOnOptions.RETURNINDEXEDARRAY), "RETURNINDEXEDARRAY");
 
 		var comparer = (a, b) => {
+            while(a instanceof AVM1ArrayNative){
+                a=alEnsureType<AVM1ArrayNative>(a, AVM1ArrayNative).value;
+                if(a && a.length>0)
+                    a=a[0];
+            }
+            while(b instanceof AVM1ArrayNative){
+                b=alEnsureType<AVM1ArrayNative>(b, AVM1ArrayNative).value;
+                if(b && b.length>0)
+                    b=b[0];
+            }
 			var aObj = alToObject(context, a);
 			var bObj = alToObject(context, b);
-			if (!a || !b) {
-				return !a ? !b ? 0 : -1 : +1;
-			}
 			for (var i = 0; i < fieldNamesList.length; i++) {
 				var aField = aObj.alGet(fieldNamesList[i]);
 				var bField = bObj.alGet(fieldNamesList[i]);
