@@ -876,12 +876,9 @@ export class SWFParser extends ParserBase
 										}
 									}
 									else{
-										if (placeObjectTag!=null && ((placeObjectTag.name && placeObjectTag.name!="") ||(this._buttonIds[placeObjectTag.symbolId])||(this._mcIds[placeObjectTag.symbolId]))) {
-
-											if(!placeObjectTag.name || placeObjectTag.name=="")
-												placeObjectTag.name="instance"+placeObjectTag.symbolId+"_"+instanceCNT++;
-                                        }
-                                        
+                                        if(!placeObjectTag.name || placeObjectTag.name=="")
+                                            placeObjectTag.name="instance"+placeObjectTag.symbolId+"_"+instanceCNT++;
+										                                        
                                         // check if we can reuse a free instance for this symbol:
                                         if(freeChilds[placeObjectTag.symbolId]){
                                             name=placeObjectTag.name?placeObjectTag.name:"noname";
