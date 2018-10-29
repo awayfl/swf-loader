@@ -124,17 +124,19 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
     private avmPropsChildNames:any={};
 
 	public clone(){
-        var newClone=<AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
-        if(newClone.adaptee){
-            var symbolClass:AVM1InterpretedFunction=<AVM1InterpretedFunction>newClone.adaptee.avm1Symbol;
+        return <AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
+	}
+	private attachCustomConstructor(){
+        if(this.adaptee){
+            var symbolClass:AVM1InterpretedFunction=<AVM1InterpretedFunction>this.adaptee.avm1Symbol;
             if(symbolClass){
-                newClone.alPut("__proto__", symbolClass._ownProperties.prototype.value);
-               (<MovieClip>newClone.adaptee).onCustomConstructor=function(){
-                    symbolClass.alCall(newClone);
+                this.alPut("__proto__", symbolClass._ownProperties.prototype.value);
+                var myThis=this;
+               (<MovieClip>this.adaptee).onCustomConstructor=function(){
+                    symbolClass.alCall(myThis);
                }                
             }
         }
-		return newClone;
 	}
 
 	// this is used for ordering AVM1 Framescripts into correct order
@@ -225,7 +227,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 	// called from adaptee whenever this is removed from scene.
 	public freeFromScript():void{
-        this.stopAllSounds();
+        //this.stopAllSounds();
         this.hasSwappedDepth=false;
         super.freeFromScript();
 
@@ -241,11 +243,11 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if((<any>this).initEvents){
 			initializeAVM1Object(this.adaptee, <AVM1Context>this._avm1Context, (<any>this).initEvents);
         }
+        this.attachCustomConstructor();
         this.initialDepth=this.adaptee._depthID;
 	}
 
 
-	private _unregisteredChilds:any={};
     public registerScriptObject(child:DisplayObject, force:boolean=true):void
 	{
 		if(child.adapter!=child)
@@ -581,9 +583,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
         if(this.alHasProperty(name)){
             var existingObj=this.alGet(name);
             if(existingObj && existingObj instanceof AVM1MovieClip){
-                existingObj.adaptee.graphics.clear();
+                existingObj.adaptee.reset();//graphics.clear();
             }
-            return;
+            return existingObj;
         }
 		var mc: MovieClip = new this.context.sec.flash.display.MovieClip();
         mc.name = name;
