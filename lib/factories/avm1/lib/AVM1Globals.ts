@@ -270,7 +270,8 @@
 		}
 	
 		public trace(expression: any): any {
-			(<any>this.context).actions.trace(expression);
+            if(this)
+			    (<any>this.context).actions.trace(expression);
 		}
 	
 		public updateAfterEvent() {
