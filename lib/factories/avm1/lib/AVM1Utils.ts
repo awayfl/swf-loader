@@ -126,6 +126,7 @@ export function avm1HasEventProperty(context: AVM1Context, target: any, property
 }
 
 export function avm1BroadcastNativeEvent(context: AVM1Context, target: any, propertyName: string, args: any[] = null): void {
+    //console.log("avm1BroadcastNativeEvent", propertyName)
 	var handler: AVM1Function = target.alGet(propertyName);
 	if (handler instanceof AVM1Function) {
 		if(propertyName.toLowerCase()=="onenterframe")	handler.isOnEnter=true;
@@ -377,23 +378,6 @@ export function initializeAVM1Object(awayObject: any,
 				awayObject.buttonMode = true;
 			}
 
-			//console.log("initializeAVM1Object eventName", eventName);
-			// Some AVM1 MovieClip events (e.g. mouse and key events) are bound to
-			// the stage rather then object itself -- binding listeners there.
-			
-			/*if (eventMapping.isStageEvent) {
-				//console.log("event name:", eventName);
-				//console.log("initializeAVM1Object stage eventName", eventName);
-				if(eventName=="keyUp"){
-					stageListeners.push({eventName: eventName, handler: handler});
-					window.addEventListener("keyup", handler);
-				}
-				else{
-					stageListeners.push({eventName: eventName, handler: handler});
-					awayAVMStage.addAVM1EventListener(eventName, handler);
-				}
-			} else {*/
-			//console.log("initializeAVM1Object eventName", eventName);
 			if(eventName=="construct" || eventName=="initialize"){
 				handler();
 			}
@@ -405,17 +389,9 @@ export function initializeAVM1Object(awayObject: any,
                 if(eventName=="onEnterFrame")
                     eventName="enterFrame"
                 instanceAVM1.alPut(propName.toLowerCase(), handler);
-				instanceAVM1._addEventListener(new AVM1EventHandler(propName, eventName, null, eventMapping.isStageEvent), handler);
+				instanceAVM1._addOnClipEventListener(new AVM1EventHandler(propName, eventName, null, eventMapping.isStageEvent), handler);
 			}
-			//}
 		}
-	}
-	if (stageListeners.length > 0) {
-		awayObject.addEventListener('removedFromStage', function () {
-			for (var i = 0; i < stageListeners.length; i++) {
-				awayAVMStage.removeEventListener(stageListeners[i].eventName, stageListeners[i].fn, false);
-			}
-		}, false);
 	}
 }
 export function toTwipFloor(value: number): number {
