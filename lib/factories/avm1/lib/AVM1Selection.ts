@@ -60,12 +60,12 @@ export class AVM1Selection extends AVM1Object {
 				}
 			}
 			var i:number=names.length;
-			var mc_path:string="/";
+			var mc_path:string="";
 			while(i>0){
 				i--;
 				mc_path+=names[i];
 				if(i>0)
-					mc_path+="/";
+					mc_path+=".";
 			}
 			//console.log(mc_path);
 			return mc_path;
@@ -84,6 +84,8 @@ export class AVM1Selection extends AVM1Object {
 	//	either queue the getFocus, or maybe add it as a callback for MosueManager to execute before fireEvents?
 
 	setFocus(newFocus:any) : boolean{
+        if(newFocus==="")
+            return;
 		if(typeof newFocus === "string"){			
 			var focusObj = this.context.resolveTarget(newFocus);
 			if(focusObj && focusObj.adaptee){
