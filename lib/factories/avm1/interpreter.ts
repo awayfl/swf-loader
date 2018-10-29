@@ -456,7 +456,9 @@ function as2HasProperty(context: AVM1Context, obj: any, name: any): boolean {
 }
 
 function as2GetProperty(context: AVM1Context, obj: any, name: any): any {
-	var avm1Obj: AVM1Object = alToObject(context, obj);
+    var avm1Obj: AVM1Object = alToObject(context, obj);
+    if(!avm1Obj)
+        return undefined;
 	var value=avm1Obj.alGet(name);
 	//if(typeof name==="string" && name.toLowerCase()=="ox"){
 	//	console.log("get ox", avm1Obj.adaptee.id, avm1Obj.adaptee.name, value);
@@ -465,7 +467,9 @@ function as2GetProperty(context: AVM1Context, obj: any, name: any): any {
 }
 
 function as2SetProperty(context: AVM1Context, obj: any, name: any, value: any): void {
-	var avm1Obj: AVM1Object = alToObject(context, obj);
+    var avm1Obj: AVM1Object = alToObject(context, obj);
+    if(!avm1Obj)
+        return;
 	//if(typeof name==="string" && name.toLowerCase()=="ox"){
 	//	console.log("set ox", avm1Obj.adaptee.id, avm1Obj.adaptee.name, value);
 	//}
