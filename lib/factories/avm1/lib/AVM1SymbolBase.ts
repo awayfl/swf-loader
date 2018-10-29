@@ -39,6 +39,8 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		// AVM1Function during constructions.
 		// TODO do we need to support __proto__ for all SWF versions?
 
+        this._onClipEventsListeners = [];
+        
 		var getter = { alCall: function (thisArg: any, args?: any[]): any { return self.alPrototype; }};
 		var setter = { alCall: function (thisArg: any, args?: any[]): any { self.alPrototype = args[0]; }};
 		var desc = new AVM1PropertyDescriptor(AVM1PropertyFlags.ACCESSOR |
@@ -65,6 +67,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	private _eventsMap: MapObject<AVM1EventHandler>;
 	private _events: AVM1EventHandler[];
 	protected _eventsListeners: MapObject<Function>;
+	protected _onClipEventsListeners: any[];
 	protected _eventHandlers: MapObject<AVM1EventHandler>;
 	protected enabled:boolean=true;
 	
@@ -87,13 +90,6 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			observer._updateEvent(event);
 		});
 
-		if (autoUnbind) {
-            // todo: we do not dispatch removeFromStage in AwayJS yet
-			observer.adaptee.addEventListener('removedFromStage', function removedHandler() {
-				observer.adaptee.removeEventListener('removedFromStage', removedHandler);
-				observer.unbindEvents();
-			});
-		}
 	}
 
 	public addListener(listener:AVM1Object):void
@@ -132,7 +128,14 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			this._removeEventListener(event);
 		}
 	}
-
+    
+	public _addOnClipEventListener(event: AVM1EventHandler, callback:Function=null) {
+        this._onClipEventsListeners.push({event:event, callback:callback});
+        if(event.stageEvent)
+            (<any>this.context.globals.Stage)._awayAVMStage.addAVM1EventListener(event.eventName, <any>callback);
+        else
+            this.adaptee.addEventListener(event.eventName, <any>callback);
+    }
 
 	public _addEventListener(event: AVM1EventHandler, callback:Function=null) {
 		var propertyName = this.context.normalizeName(event.propertyName);
@@ -169,8 +172,18 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
                 (<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
             else
                 this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-        }     
-        this._eventsListeners={};
+        }   
+        this._eventsListeners={}; 
+        var cnt= this._onClipEventsListeners.length;
+        while(cnt>0){
+            cnt--;
+            if(this._onClipEventsListeners[cnt].event.stageEvent)
+                (<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._onClipEventsListeners[cnt].event.eventName, <any>this._onClipEventsListeners[cnt].callback);
+            else
+                this.adaptee.removeEventListener(this._onClipEventsListeners[cnt].event.eventName, <any>this._onClipEventsListeners[cnt].callback);
+        }   
+        this._onClipEventsListeners=[];
+        
     }
     
 	private _removeEventListener(event: AVM1EventHandler) {
