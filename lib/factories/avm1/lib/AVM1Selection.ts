@@ -24,7 +24,7 @@ export class AVM1Selection extends AVM1Object {
 
 	public static createAVM1Class(context: AVM1Context): AVM1Object {
 		var wrapped = wrapAVM1NativeClass(context, true, AVM1Selection, [],
-			['addListener', 'getFocus', 'removeListener', 'setFocus', 'setSelection'],
+			['addListener', 'getFocus', 'getBeginIndex', 'getEndIndex', 'removeListener', 'setFocus', 'setSelection', 'getCaretIndex'],
 			null, AVM1Selection.prototype.avm1Constructor);
 		return wrapped;
 	}
@@ -44,9 +44,29 @@ export class AVM1Selection extends AVM1Object {
 		notImplemented("AVM1Selection.removeListener");
 		return true;
 	}
-
+    getBeginIndex():number{
+        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance().getFocus();
+        if(objectinFocus && objectinFocus.isAsset(TextField)){
+            return (<TextField>objectinFocus).selectionBeginIndex;
+        }
+        return -1;
+    }
+    getEndIndex():number{
+        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance().getFocus();
+        if(objectinFocus && objectinFocus.isAsset(TextField)){
+            return (<TextField>objectinFocus).selectionEndIndex;
+        }
+        return -1;
+    }
+    getCaretIndex():number{
+        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance().getFocus();
+        if(objectinFocus && objectinFocus.isAsset(TextField)){
+            return (<TextField>objectinFocus).selectionBeginIndex;
+        }
+        return -1;
+    }
 	// 	Returns a string specifying the target path of the object that has focus.
-	getFocus() : string{
+	getFocus():string{
 		var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance().getFocus();
 		if(objectinFocus){
 			var names:string[]=[];
