@@ -10,7 +10,7 @@ import {
 import {AVM1Context, IAVM1EventPropertyObserver} from "../context";
 import {isNullOrUndefined, MapObject} from "../../base/utilities";
 import {notImplemented, somewhatImplemented, warning, release, assert} from "../../base/utilities/Debug";
-import {DisplayObject, Sprite} from "@awayjs/scene";
+import {DisplayObject, Sprite, MovieClip, TextField} from "@awayjs/scene";
 import {AVM1MovieClip} from "./AVM1MovieClip";
 import {AVM1Rectangle, toAS3Rectangle} from "./AVM1Rectangle";
 import {AVM1Transform} from "./AVM1Transform";
@@ -30,6 +30,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	public initAVM1SymbolInstance(context: AVM1Context, awayObject: T) {
 		//AVM1Object.call(this, context);
         this.avmType="symbol";
+        this.avmPropsChildNames={};
 		this._avm1Context = context;
 		this._ownProperties = Object.create(null);
 		this._prototype = null;
@@ -552,6 +553,17 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 
 	public get_width(): number
 	{
+        if(this.adaptee.isAsset(MovieClip)){
+            var mc:MovieClip=<MovieClip><any>this.adaptee;
+            var len=mc.numChildren;
+            while(len>0){
+                len--;
+                var child:DisplayObject=mc.getChildAt(len);
+                if(child.isAsset(TextField)){
+                    var test=child.width;
+                }
+            }
+        }
 		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
 		
 		return (box == null)? 0 : toTwipRound(box.width);
