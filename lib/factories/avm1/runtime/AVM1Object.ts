@@ -1,4 +1,4 @@
-import { IDisplayObjectAdapter } from "@awayjs/scene";
+import { IDisplayObjectAdapter, DisplayObject } from "@awayjs/scene";
 import { IAVM1Context, AVM1PropertyFlags, alToString, alIsName, IAVM1Callable, AVM1DefaultValueHint, alIsFunction } from "../runtime";
 import { IAsset } from "@awayjs/core";
 import { AVM1Context } from "../context";
@@ -24,6 +24,8 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 
     public adaptee: IAsset;
     public avmType: string;
+	protected initialDepth:number=0;
+    protected avmPropsChildNames:any={};
     public _eventObserver:AVM1Object;
 	public _blockedByScript:boolean;
     public _ctBlockedByScript:boolean;
@@ -74,7 +76,8 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 	public constructor(avm1Context: IAVM1Context) {
 		super();
 		this._avm1Context = avm1Context;
-		this._ownProperties = Object.create(null);
+        this._ownProperties = Object.create(null);
+        this.avmPropsChildNames={};
 		this._prototype = null;
 		this._blockedByScript=false;
 		this._ctBlockedByScript=false;
@@ -229,7 +232,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			return undefined;
 		}
 		if ((desc.flags & AVM1PropertyFlags.DATA)) {
-            if(desc.value && desc.value.adaptee && !desc.value.adaptee.parent){
+            if(desc.value && desc.value.adaptee && desc.value.adaptee instanceof DisplayObject && !desc.value.adaptee.parent){
                 return undefined;
             }
 			return desc.value;
@@ -240,8 +243,8 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			return undefined;
         }
         var value=getter.alCall(this);
-        if(value && value.adaptee && !value.adaptee.parent){
-            return undefined;
+        if(value && value.adaptee && value.adaptee instanceof DisplayObject && !value.adaptee.parent){
+           return undefined;
         }
 		return value;
 	}
@@ -271,15 +274,9 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
         //  stupid hack to make sure we can update references to objects in cases when the timeline changes the objects 
         //  if a new object is registered for the same name, we can use the "avmPropsChildNames" to update all references to the old object with the new one
         if(v && typeof v ==="object" && v.avmType==="symbol" && p!="this" && p!="_parent" && !v.dynamicallyCreated){
-            //if(this.avmType!="symbol" || (v.adaptee.parent && v.adaptee.parent!=this.adaptee)){
-                if(v.adaptee.parent.adapter.avmPropsChildNames){
-                    v.adaptee.parent.adapter.avmPropsChildNames[v.adaptee.name]={obj:this, name:p};
-                    //2console.log("create property: ", v.adaptee.name, p, this);
-                        
-                    //console.log("stored ref to timeline-child on different object", this, p, v.adaptee.name, v);
-                }
-            //}
-            //console.log("set symbol ", v.toString());
+            if(v.adaptee && v.adaptee.parent && v.adaptee.parent.adapter && v.adaptee.parent.adapter.avmPropsChildNames){
+                v.adaptee.parent.adapter.avmPropsChildNames[v.adaptee.name]={obj:this, name:p};
+            }
         }
 		if (!this.alCanPut(p)) {
 			return;
