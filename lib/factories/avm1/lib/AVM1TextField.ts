@@ -263,8 +263,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getBottomScroll(): number {
-		notImplemented("AVM1Textfield.getBottomScroll");
-		return this.adaptee.bottomScrollV;
+		return this.adaptee.bottomScrollV+1;
 	}
 
 	public getCondenseWhite(): boolean {
@@ -313,14 +312,13 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getHscroll(): number {
-		notImplemented("AVM1Textfield.getHscroll");
-		return this.adaptee.scrollH;
+		return this.adaptee.scrollH+1;
 	}
 
 	public setHscroll(value: number) {
-		notImplemented("AVM1Textfield.setHscroll");
-		value = alCoerceNumber(this.context, value);
-		this.adaptee.scrollH = value;
+        value = alCoerceNumber(this.context, value);
+        if(value<=0) value=1;
+		this.adaptee.scrollH = value-1;
 	}
 
 	public getHtml() {
@@ -373,13 +371,11 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getMaxhscroll(): number {
-		notImplemented("AVM1Textfield.getMaxhscroll");
-		return 0; // todo 80pro this.adaptee.maxScrollH;
+		return this.adaptee.maxScrollH+1;
 	}
 
 	public getMaxscroll(): number {
-		notImplemented("AVM1Textfield.getMaxscroll");
-		return 0; // todo 80pro this.adaptee.maxScrollV;
+		return this.adaptee.maxScrollV+1;
 	}
 
 	public getMultiline(): boolean {
@@ -403,14 +399,13 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	public getScroll(): number {
-		notImplemented("AVM1Textfield.getScroll");
-		return this.adaptee.scrollV;
+		return this.adaptee.scrollV+1;
 	}
 
 	public setScroll(value: number) {
-		notImplemented("AVM1Textfield.setScroll");
 		value = alCoerceNumber(this.context, value);
-		this.adaptee.scrollV = value;
+        if(value<=0) value=1;
+		this.adaptee.scrollV = value-1;
 	}
 
 	public getSelectable(): boolean {
