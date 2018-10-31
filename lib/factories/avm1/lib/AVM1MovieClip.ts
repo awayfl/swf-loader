@@ -120,8 +120,6 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public static capStyleMapStringToInt:any={"none":0, "round":1, "square":2};
 	public static jointStyleMapStringToInt:any={"round":0, "bevel":1, "miter":2};
-	private initialDepth:number=0;
-    private avmPropsChildNames:any={};
 
 	public clone(){
         return <AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
@@ -908,7 +906,10 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public hitTest(x: number, y: number, shapeFlag: boolean): boolean {
 		if (arguments.length <= 1) {
 			// Alternative method signature: hitTest(target: AVM1Object): boolean
-			var target = arguments[0];
+            var target = arguments[0];
+            if(typeof target ==="string"){
+                target=this.context.resolveTarget(target);
+            }
 			if (isNullOrUndefined(target) || !hasAwayJSAdaptee(target)) {
 				return false; // target is undefined or not a AVM1 display object, returning false.
 			}
@@ -1066,6 +1067,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
                 this.adaptee.x=this.startDragPoint.x;
                 this.adaptee.y=this.startDragPoint.y;
             }
+            if(this._dragBounds)
+                this.checkBounds();
 			this.startDragMCPosition.x=this.adaptee.x;
 			this.startDragMCPosition.y=this.adaptee.y;
 			AVM1Stage.stage.addEventListener("mouseMove3d", this.dragListenerDelegate);
@@ -1092,24 +1095,26 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		this.adaptee.x=this.startDragMCPosition.x+(tmpPoint.x-this.startDragPoint.x);
 		this.adaptee.y=this.startDragMCPosition.y+(tmpPoint.y-this.startDragPoint.y);
 
-		if(this._dragBounds){
+		if(this._dragBounds)
+			this.checkBounds();
 			
-			if(this.adaptee.x<(this._dragBounds.left)){
-				this.adaptee. x=this._dragBounds.left;
-			}
-			if(this.adaptee.x>(this._dragBounds.right)){
-				this.adaptee.x=(this._dragBounds.right);
-			}
-			if(this.adaptee.y<this._dragBounds.top){
-				this.adaptee.y=this._dragBounds.top;
-			}
-			if(this.adaptee.y>(this._dragBounds.bottom)){
-				this.adaptee.y=this._dragBounds.bottom;
-			}
-			
-		}
+		
 	}
-
+	public checkBounds(){
+    
+        if(this.adaptee.x<(this._dragBounds.left)){
+            this.adaptee. x=this._dragBounds.left;
+        }
+        if(this.adaptee.x>(this._dragBounds.right)){
+            this.adaptee.x=(this._dragBounds.right);
+        }
+        if(this.adaptee.y<this._dragBounds.top){
+            this.adaptee.y=this._dragBounds.top;
+        }
+        if(this.adaptee.y>(this._dragBounds.bottom)){
+            this.adaptee.y=this._dragBounds.bottom;
+        }
+    }
 	public stop() {
 		return this.adaptee.stop();
 	}
