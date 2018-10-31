@@ -1078,7 +1078,7 @@ function avm1ResolveSimpleVariable(scopeList: AVM1ScopeListItem, variableName: s
 		//console.log("scope :", p.scope.aCount);
 		if(p.scope.alHasProperty(variableName)) {
             var value=p.scope.alGet(variableName);
-            if(additionalName && (typeof value!=="object" ||  !value.alHasProperty || !value.alHasProperty(additionalName))){
+            if(additionalName && (!value || typeof value!=="object" ||  !value.alHasProperty || !value.alHasProperty(additionalName))){
                 continue;
             }
 			resolved.scope = p.scope;
@@ -1225,7 +1225,10 @@ function avm1ResolveVariable(ectx: ExecutionContext, variableName: string, flags
 					valueFound = true;
 					propertyName = resolved.propertyName;
 					scope = resolved.scope;
-					obj = resolved.value;
+                    obj = resolved.value;
+                    if(i<j && !obj && scope){
+                        obj=scope;
+                    }
 				}
 				needsScopeResolution = false;
 			} else if (obj.alHasProperty(propertyName)) {
