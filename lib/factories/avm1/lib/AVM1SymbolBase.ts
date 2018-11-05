@@ -553,17 +553,6 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 
 	public get_width(): number
 	{
-        if(this.adaptee.isAsset(MovieClip)){
-            var mc:MovieClip=<MovieClip><any>this.adaptee;
-            var len=mc.numChildren;
-            while(len>0){
-                len--;
-                var child:DisplayObject=mc.getChildAt(len);
-                if(child.isAsset(TextField)){
-                    var test=child.width;
-                }
-            }
-        }
 		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
 		
 		return (box == null)? 0 : toTwipRound(box.width);
