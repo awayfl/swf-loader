@@ -880,16 +880,24 @@ export class AVM1InterpretedFunction extends AVM1EvalFunction {
                                 parentObj = parentObj.alGet("_parent");
                             }
                             // for setInterval: if its still not has a parent found
+                            //  we look back at the previous-scopes until we find a scope that can provide a _parent
                             if(!parentObj){
                                 if(this.scopeList && this.scopeList.previousScopeItem && this.scopeList.previousScopeItem.scope){
-                                    if(this.scopeList.previousScopeItem.scope instanceof AVM1MovieClip){
-                                        parentObj=this.scopeList.previousScopeItem.scope;
+                                    var currentScope=this.scopeList.previousScopeItem;
+                                    while(currentScope){
+
+                                        if(currentScope.scope && currentScope.scope instanceof AVM1MovieClip){
+                                            parentObj=currentScope.scope;
                                     }
-                                    else{
-                                        parentObj=this.scopeList.previousScopeItem.scope.alGet("this");                                        
+                                        else if(currentScope.scope){
+                                            parentObj=currentScope.scope.alGet("this");                                        
                                     }
                                     if(parentObj){
                                         parentObj = parentObj.alGet("_parent");
+                                    }
+                                        if(currentScope.previousScopeItem)
+                                            currentScope=currentScope.previousScopeItem;
+                                        else currentScope=null;
                                     }
                                 }
                             }
