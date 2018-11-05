@@ -579,17 +579,23 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public createEmptyMovieClip(name, depth): AVM1MovieClip {
         name = alToString(this.context, name);
+        var mc: MovieClip;
         if(this.alHasProperty(name)){
             var existingObj=this.alGet(name);
             if(existingObj && existingObj instanceof AVM1MovieClip){
-                existingObj.adaptee.reset();//graphics.clear();
+                //existingObj.adaptee.reset();
+                //existingObj.adaptee.graphics.clear();
+                //this.adaptee.invalidate();
+                mc=existingObj.adaptee;
             }
-            return existingObj;
+            //return existingObj;
         }
-		var mc: MovieClip = new this.context.sec.flash.display.MovieClip();
-        mc.name = name;
-        mc.assetNamespace=this.adaptee.assetNamespace;
-		getAVM1Object(mc,  <AVM1Context>this._avm1Context);
+        if(!mc){
+            mc = new this.context.sec.flash.display.MovieClip();
+            mc.name = name;
+            mc.assetNamespace=this.adaptee.assetNamespace;
+            getAVM1Object(mc,  <AVM1Context>this._avm1Context);
+        }
 		//console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
 		var avmMC:AVM1MovieClip=<AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
 		avmMC.dynamicallyCreated=true;
