@@ -1013,8 +1013,13 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	}
 
 	public splice(start: number, deleteCount: number, ...items: any[]): AVM1Object {
-		start = alToInteger(this.context, start);
-		deleteCount = alToInteger(this.context, deleteCount);
+        start = alToInteger(this.context, start);
+		var length = alToInt32(this.context, this.alGet('length')) >>> 0;
+		start = start < 0 ? Math.max(length + start, 0) : Math.min(length, start);
+        if(deleteCount)
+            deleteCount = alToInteger(this.context, deleteCount);
+        else
+		    deleteCount = length - start;
 		if (this instanceof AVM1ArrayNative) {
 			// Faster case for native array implementation
 			var arr = alEnsureType<AVM1ArrayNative>(this, AVM1ArrayNative).value;
@@ -1022,9 +1027,6 @@ export class AVM1ArrayPrototype extends AVM1Object {
 				Array.prototype.splice.apply(arr, [start, deleteCount].concat(items)));
 		}
 		var a = [];
-		var length = alToInt32(this.context, this.alGet('length')) >>> 0;
-		start = start < 0 ? Math.max(length + start, 0) : Math.min(length, start);
-		deleteCount = Math.min(Math.max(deleteCount, 0), length - start);
 		for (var i = 0; i < deleteCount; i++) {
 			if (this.alHasProperty(start + i)) {
 				a[i] = this.alGet(start + i);
