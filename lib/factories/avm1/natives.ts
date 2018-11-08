@@ -737,7 +737,7 @@ var sortArray=function(arr_in:any, comparefn?: AVM1Function): AVM1Object {
             var i=arr.length;
             while(i>0){
                 i--;
-                if(!arr[i]){
+                if(typeof arr[i]==="undefined" || arr[i]===null){
                     arr[i]="00000000000AwayInternal";
                 }
             }
@@ -841,8 +841,21 @@ export class AVM1ArrayPrototype extends AVM1Object {
 	}
 
 	public _toString() {
-		var join = this.context.builtins.Array.alGetPrototypeProperty().alGet('join');
-		return join.alCall(this);
+		var len:number=this.alGet("length");
+        var _i:number=0;
+        var outputStr:string="";
+        var tmpitem;
+		for (_i = 0; _i < len; _i++) {
+            tmpitem = this.alGet(_i);
+            if(tmpitem){
+                outputStr+=tmpitem.toString()+((_i==len-1)?"":",");
+            }
+            else{
+                outputStr+=((_i==len-1)?"":",");
+            }
+            
+		}
+		return outputStr;
 	}
 
 	public getLength(): number {
