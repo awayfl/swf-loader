@@ -510,7 +510,8 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			return; // let's not remove root symbol
 		}
 		if(this.adaptee.parent){
-			if(this.dynamicallyCreated || this.hasSwappedDepth){
+            // todo: checking for positive depth is enough ?
+			if((this.dynamicallyCreated || this.hasSwappedDepth) && away2avmDepth(this.adaptee._depthID)>=0){
 			    this.adaptee.parent.removeChild(this.adaptee);
 				var avmParent = this.get_parent();
 				if(avmParent){
