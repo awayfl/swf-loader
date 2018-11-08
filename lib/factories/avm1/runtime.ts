@@ -230,6 +230,14 @@ export function alToString(context: IAVM1Context, v): string {
 			if (v === null) {
 				return 'null';
 			}
+            if (v && v instanceof Array) {
+                var outputStr:string="";
+                for(var i:number=0; i< v.length; i++){
+                    outputStr+=alToString(context, v[i]);
+                    outputStr+=i==v.length-1?"":",";
+                }
+                return outputStr;
+            }
 			return '[type ' + alGetObjectClass(v) + ']';
 		case 'boolean':
 			return v ? 'true' : 'false';
