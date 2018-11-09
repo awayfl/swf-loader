@@ -30,6 +30,8 @@ import { AVM1EventHandler } from "./AVM1EventHandler";
 import { AVM1Globals } from './AVM1Globals';
 import {MouseManager} from "@awayjs/view";
 import {alCallProperty,} from "../runtime";
+import { AVM1Stage } from './AVM1Stage';
+import { PickGroup } from '@awayjs/renderer';
 
 interface mapNumberToString{
 	[key: number]: string;
@@ -63,7 +65,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	public dispatchKeyEvent(keyCode, isShift, isCTRL, isAlt){
 		
 		// this is called from the adaptee whenever a text-input occurs
-		if(MouseManager.getInstance().useSoftkeyboard){
+		if(MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).useSoftkeyboard){
 			var staticState: typeof AVM1Key = this.context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = keyCode;
 			staticState._keyStates[keyCode] = 1;
@@ -174,8 +176,17 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	{
 		this.syncTextFieldValue();
 		//this.replicateWeirdFlashBehavior();
-		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
-		return (box == null)? 0 : toTwipRound(box.width);
+		//var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee)
+		return toTwipRound(this.adaptee.width);
+		//return this._prevWidth;
+	}
+
+	public get_height(): number
+	{
+		this.syncTextFieldValue();
+		//this.replicateWeirdFlashBehavior();
+		//var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee)
+		return toTwipRound(this.adaptee.height);
 		//return this._prevWidth;
 	}
 
@@ -419,8 +430,8 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 
 	public setSelectable(value: boolean) {
 		value = alToBoolean(this.context, value);
-		if(!value && MouseManager.getInstance().getFocus()==this.adaptee){
-			MouseManager.getInstance().setFocus(null);
+		if(!value && MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).getFocus()==this.adaptee){
+			MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).setFocus(null);
 		}
 		this.adaptee.selectable = value;
 	}

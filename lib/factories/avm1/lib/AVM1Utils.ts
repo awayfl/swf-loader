@@ -27,7 +27,7 @@ import {AVM1MovieClip} from "./AVM1MovieClip";
 import {AVM1ArrayNative} from "../natives";
 import {AVM1ClipEvents} from "../../base/SWFTags";
 
-import {DisplayObject, TextField, MovieClip } from "@awayjs/scene";
+import {DisplayObject, TextField, MovieClip, DisplayObjectContainer } from "@awayjs/scene";
 
 import {AVM1TextField} from "./AVM1TextField";
 import {AVM1Button} from "./AVM1Button";
@@ -80,7 +80,7 @@ export function getAwayJSAdaptee(obj: IHasAS3ObjectReference):any{//80pro} ASObj
  * attachMovie, initial values for properties such as tabEnabled
  * can be initialized from values set on the template object.
  */
-export function getAwayObjectOrTemplate<T extends DisplayObject>(obj: AVM1SymbolBase<T>): T {
+export function getAwayObjectOrTemplate<T extends DisplayObjectContainer>(obj: AVM1SymbolBase<T>): T {
 	if (obj.adaptee) {
 		return <T>obj.adaptee;
 	}
@@ -328,7 +328,7 @@ export function wrapAVM1NativeClass(context: AVM1Context, wrapAsFunction: boolea
 export function initializeAVM1Object(awayObject: any,
 									 context: AVM1Context,
 									 placeObjectTag: any) {
-	var instanceAVM1 = <AVM1SymbolBase<DisplayObject>>getAVM1Object(awayObject, context);
+	var instanceAVM1 = <AVM1SymbolBase<DisplayObjectContainer>>getAVM1Object(awayObject, context);
 	release || Debug.assert(instanceAVM1);
 
 	if (placeObjectTag.variableName) {

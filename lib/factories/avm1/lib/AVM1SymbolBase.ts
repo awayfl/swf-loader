@@ -10,7 +10,7 @@ import {
 import {AVM1Context, IAVM1EventPropertyObserver} from "../context";
 import {isNullOrUndefined, MapObject} from "../../base/utilities";
 import {notImplemented, somewhatImplemented, warning, release, assert} from "../../base/utilities/Debug";
-import {DisplayObject, Sprite} from "@awayjs/scene";
+import {DisplayObjectContainer, Sprite} from "@awayjs/scene";
 import {AVM1MovieClip} from "./AVM1MovieClip";
 import {AVM1Rectangle, toAS3Rectangle} from "./AVM1Rectangle";
 import {AVM1Transform} from "./AVM1Transform";
@@ -20,8 +20,10 @@ import { AVM1Function } from "../runtime/AVM1Function";
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
 import { AVM1EventHandler } from "./AVM1EventHandler";
 import { AVM1Color } from './AVM1Color';
+import { PickGroup } from '@awayjs/renderer';
+import { AVM1Stage } from './AVM1Stage';
 
-export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implements IAVM1SymbolBase, IAVM1EventPropertyObserver {
+export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object implements IAVM1SymbolBase, IAVM1EventPropertyObserver {
 	adaptee: T;
 	_as3ObjectTemplate: any;
 
@@ -62,6 +64,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 
 	// event handling:
 
+	private _mouseListenerCount:number;
 	private _eventsMap: MapObject<AVM1EventHandler>;
 	private _events: AVM1EventHandler[];
 	protected _eventsListeners: MapObject<Function>;
@@ -158,6 +161,24 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			}
 			else{
 				this.adaptee.addEventListener(event.eventName, listener);
+
+				if (this.adaptee.name != "scene") {
+					switch (event.propertyName) {
+						case 'onMouseMove':
+						case 'onMouseDown':
+						case 'onMouseUp':
+						case 'onRollOver':
+						case 'onRollOut':
+						case 'onPress':
+						case 'onRelease':
+						case 'onReleaseOutside':
+							this._mouseListenerCount++;
+							break;
+					}
+	
+					//TODO: this seems to break more than it fixes
+					//this.adaptee.mouseChildren = false;
+				}
 			}
 		}
 	}
@@ -173,6 +194,24 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 			}
 			else{
 				this.adaptee.removeEventListener(event.eventName, listener);
+
+				if (this.adaptee.name != "scene") {
+					switch (event.propertyName) {
+						case 'onMouseMove':
+						case 'onMouseDown':
+						case 'onMouseUp':
+						case 'onRollOver':
+						case 'onRollOut':
+						case 'onPress':
+						case 'onRelease':
+						case 'onReleaseOutside':
+							this._mouseListenerCount--;
+							break;
+					}
+					
+					if (this._mouseListenerCount == 0)
+						this.adaptee.mouseChildren = true;
+				}
 			}
 			delete this._eventsListeners[propertyName];
 		}
@@ -281,7 +320,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 
 	public get_height()
 	{
-		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
+		var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
 		
 		return (box == null)? 0 : toTwipFloor(box.height);
 	}
@@ -295,7 +334,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		if (isNaN(value))
 			return;
 		
-		this.adaptee.height = value;
+		PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).height = value;
 	}
 
 	public get_highquality(): number {
@@ -386,7 +425,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		notImplemented('AVM1SymbolBase.set_root');
 	}
 	public get_root(): AVM1MovieClip {
-		var awayObject: DisplayObject = this.adaptee;
+		var awayObject: DisplayObjectContainer = this.adaptee;
 		while (awayObject && awayObject.name!="scene") {
 			var avmObject = <AVM1MovieClip>getAVM1Object(awayObject, this.context);
 			if (avmObject && avmObject.get_lockroot()) {
@@ -464,7 +503,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 	}
 
 	public get_target(): string {
-		var awayObject:DisplayObject = this.adaptee;
+		var awayObject:DisplayObjectContainer = this.adaptee;
 		if (awayObject === awayObject.root) {
 			return '/';
 		}
@@ -528,7 +567,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 
 	public get_width(): number
 	{
-		var box:Box = this.adaptee.getBoxBounds(this.adaptee);
+		var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
 		
 		return (box == null)? 0 : toTwipRound(box.width);
 	}
@@ -542,7 +581,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		if (isNaN(value))
 			return;
 		
-		this.adaptee.width = value;
+			PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).width = value;
 	}
 
 	public get_x(): number {
@@ -611,7 +650,7 @@ export class AVM1SymbolBase<T extends DisplayObject> extends AVM1Object implemen
 		return away2avmDepth(this.adaptee._depthID);
 	}
 	public toString() {
-		var mc:DisplayObject=this.adaptee;
+		var mc:DisplayObjectContainer=this.adaptee;
 		var names:string[]=[];
 		while (mc){
 			if(mc.name=="scene"){

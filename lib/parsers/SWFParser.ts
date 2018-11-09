@@ -824,6 +824,7 @@ export class SWFParser extends ParserBase
 											}
 											// register a new instance for this object
 											var graphicsSprite:Sprite=new Sprite();
+											graphicsSprite.mouseEnabled = false;
 											(<Graphics>awaySymbol).endFill();
                                             graphicsSprite.graphics.copyFrom(<Graphics>awaySymbol);
                                         

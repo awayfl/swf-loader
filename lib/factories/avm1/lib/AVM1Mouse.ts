@@ -21,6 +21,8 @@ import {MouseEvent} from "@awayjs/scene";
 import {MouseManager} from "@awayjs/view";
 import {AVMAwayStage} from "../../AVMAwayStage";
 import {AVM1Object} from "../runtime/AVM1Object";
+import { AVM1Stage } from './AVM1Stage';
+import { AVM1Globals } from './AVM1Globals';
 
 
 export class AVM1Mouse extends AVM1Object {
@@ -45,11 +47,11 @@ export class AVM1Mouse extends AVM1Object {
 	}
 
 	public static hide() {
-		MouseManager.getInstance().showCursor=false;
+		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.view.renderer.pickGroup).showCursor=false;
 	}
 
 	public static show() {
-		MouseManager.getInstance().showCursor=true;
+		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.view.renderer.pickGroup).showCursor=true;
 	}
 }
 
