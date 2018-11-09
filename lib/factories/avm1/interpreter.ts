@@ -2282,7 +2282,29 @@ function avm1_0x4F_ActionSetMember(ectx: ExecutionContext) {
 	if (obj instanceof AVM1SuperWrapper) {
 		avm1Warn("AVM1 warning: cannot set member '" + name + "' on super");
 		return;
-	}
+    }
+    if(typeof name ==="undefined")
+        return;
+    
+    if(typeof name ==="string"){
+        var name_array=name.split(".");
+        if(name_array.length>1){
+            while(name_array.length>1){
+                var propName=name_array.shift();
+                var propObj=obj.alGet(propName);
+                if(propObj instanceof AVM1Object){
+                    obj=propObj;
+                }
+                else{
+                    avm1Warn("AVM1 warning: cannot set member '" + name + "' on super");
+                    return;
+                }
+            }
+            if(name_array.length==1){
+                name=name_array[0];
+            }
+        }
+    }
 
 	as2SetProperty(ectx.context, obj, name, value);
 }
