@@ -704,9 +704,6 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		avmMc._avm1Context=this._avm1Context;
 		parent.registerScriptObject(mc, false);
 
-		if (initObject) {
-			avmMc._init(initObject);
-		}
 
 		var new_matrix:Matrix3D = mc.transform.matrix3D;
 		var originalMatrix:Float32Array = this.adaptee.transform.matrix3D._rawData;
@@ -721,6 +718,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		mc.alpha = this.adaptee.alpha;
 		mc.blendMode = this.adaptee.blendMode;
 		mc.cacheAsBitmap = this.adaptee.cacheAsBitmap;
+		if (initObject) {
+			avmMc._init(initObject);
+		}
 		return avmMc;
 	}
 

@@ -2285,7 +2285,7 @@ function avm1_0x4F_ActionSetMember(ectx: ExecutionContext) {
     }
     if(typeof name ==="undefined")
         return;
-    
+   
     if(typeof name ==="string"){
         var name_array=name.split(".");
         if(name_array.length>1){
