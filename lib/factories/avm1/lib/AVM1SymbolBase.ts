@@ -179,9 +179,8 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 							this._mouseListenerCount++;
 							break;
 					}
-	
-					//TODO: this seems to break more than it fixes
-					//this.adaptee.mouseChildren = false;
+
+					this.adaptee.mouseChildren = false;
 				}
 			}
 		}
