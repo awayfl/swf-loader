@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Graphics, CapsStyle, JointStyle, BitmapFillStyle, GraphicsPath, GraphicsFillStyle, GradientFillStyle, GraphicsStrokeStyle, GradientType as GradientTypeAway} from "@awayjs/graphics"
+import {Graphics, CapsStyle, JointStyle, BitmapFillStyle, GraphicsPath, GraphicsFillStyle, GradientFillStyle, GraphicsStrokeStyle, GradientType as GradientTypeAway, LineScaleMode} from "@awayjs/graphics"
 import {MappingMode} from "@awayjs/renderer";
 
 import {ColorUtils, Matrix as AwayMatrix} from "@awayjs/core"
@@ -1168,12 +1168,12 @@ class SegmentedPath {
 					var thickness = (clamp(style.width, 0, 0xff * 20)|0)/20;
 					style.alpha=this.getAlpha(style.color)/255;
 					style.color=this.rgbaToArgb(style.color);
-					var scaleModeAWJ="NORMAL";
+					var scaleModeAWJ=LineScaleMode.NORMAL;
 					//if(style.noVscale==null && style.noHscale==null){
 					//	scaleModeAWJ="HAIRLINE";
 					//}
 					if(thickness==0.05){
-						scaleModeAWJ="HAIRLINE";
+						scaleModeAWJ=LineScaleMode.HAIRLINE;
 					}
 					if(style.startCapsStyle!=style.endCapsStyle){
 						throw("different end vs start capstyöe");

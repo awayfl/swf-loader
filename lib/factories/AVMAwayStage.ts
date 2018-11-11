@@ -6,11 +6,10 @@ import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
 import {HoverController, FrameScriptManager, TextField, Billboard, Camera, LoaderContainer, MovieClip, DisplayObjectContainer, Scene} from "@awayjs/scene";
 
 import {MethodMaterial,   MaterialBase}	from "@awayjs/materials";
-import {DefaultRenderer, SceneGraphPartition, BasicPartition} from  "@awayjs/renderer";
+import {DefaultRenderer, SceneGraphPartition, BasicPartition, PickGroup} from  "@awayjs/renderer";
 import {View, MouseManager} from "@awayjs/view";
 import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D, Viewport} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
-import {AVMRaycastPicker} from "./AVMRaycastPicker";
 
 import { AVM1TextField } from './avm1/lib/AVM1TextField';
 
@@ -124,7 +123,7 @@ export class AVMAwayStage extends Sprite{
 		this.initEninge(htmlCanvas);
 
 
-		new SceneGraphPartition(this, this._renderer.viewport, true);
+		this.partition = new SceneGraphPartition(this, true);
 		this._view.scene.addChild(this);
 		this.mouseEnabled=true;
 		this._stageWidth = width;
@@ -133,7 +132,7 @@ export class AVMAwayStage extends Sprite{
 		this._view.backgroundColor = (isNaN(backgroundColor))? 0xFF00FF : backgroundColor;
 		this._frameRate = frameRate;
 
-		MouseManager.getInstance()._stage=this;
+		MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport))._stage=this;
 
 		// prevent backspace and other default shortcutz for our document:
         // todo: make this optional (?)
@@ -202,7 +201,7 @@ export class AVMAwayStage extends Sprite{
 	}
 
 	public set onlyMouseEnabled(value:boolean) {
-		this._view.mousePicker.onlyMouseEnabled = value;
+		//this._view.mousePicker.onlyMouseEnabled = value;
 	}
 
 	// ---------- event mapping functions Event.RESIZE
@@ -297,7 +296,7 @@ export class AVMAwayStage extends Sprite{
 		this._view = new View(this._renderer);
 		this._renderer.antiAlias=0;
 		this._view.renderer.renderableSorter = null;//new RenderableSort2D();
-		this._view.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
+		//this._view.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
 		this._view.forceMouseMove=true;
 		this._view.beforeRenderCallback=function(){
             FrameScriptManager.execute_queue();
