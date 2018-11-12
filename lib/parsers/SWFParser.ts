@@ -1280,6 +1280,8 @@ export class SWFParser extends ParserBase
 				awayTimeline.avm1ButtonActions=buttonActions;
 			}
 			awayTimeline.extractHitArea(awayMc);
+		} else {
+			awayMc.mouseEnabled = false; //a movieclip that isn't a button automatically defaults to mouesEnabled = false
 		}
 		return awayMc;
 

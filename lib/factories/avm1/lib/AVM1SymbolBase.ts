@@ -177,6 +177,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 						case 'onRelease':
 						case 'onReleaseOutside':
 							this._mouseListenerCount++;
+							this.adaptee.mouseEnabled = true;
 							this.adaptee.mouseChildren = false;
 							break;
 					}
