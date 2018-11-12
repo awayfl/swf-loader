@@ -177,10 +177,9 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 						case 'onRelease':
 						case 'onReleaseOutside':
 							this._mouseListenerCount++;
+							this.adaptee.mouseChildren = false;
 							break;
 					}
-
-					this.adaptee.mouseChildren = false;
 				}
 			}
 		}
@@ -230,11 +229,10 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 						case 'onRelease':
 						case 'onReleaseOutside':
 							this._mouseListenerCount--;
+							if (this._mouseListenerCount == 0)
+								this.adaptee.mouseChildren = true;
 							break;
 					}
-					
-					if (this._mouseListenerCount == 0)
-						this.adaptee.mouseChildren = true;
 				}
 			}
 			delete this._eventsListeners[propertyName];
