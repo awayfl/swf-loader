@@ -135,10 +135,12 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
     
 	public _addOnClipEventListener(event: AVM1EventHandler, callback:Function=null) {
         this._onClipEventsListeners.push({event:event, callback:callback});
-        if(event.stageEvent)
+        if(event.stageEvent) {
             (<any>this.context.globals.Stage)._awayAVMStage.addAVM1EventListener(event.eventName, <any>callback);
-        else
-            this.adaptee.addEventListener(event.eventName, <any>callback);
+		} else {
+			this.adaptee.addEventListener(event.eventName, <any>callback);
+			//this._updateMouseEnabled(event, true);
+		}
     }
 
 	public _addEventListener(event: AVM1EventHandler, callback:Function=null) {
@@ -166,42 +168,58 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 			else{
 				this.adaptee.addEventListener(event.eventName, listener);
 
-				if (this.adaptee.name != "scene") {
-					switch (event.propertyName) {
-						case 'onMouseMove':
-						case 'onMouseDown':
-						case 'onMouseUp':
-						case 'onRollOver':
-						case 'onRollOut':
-						case 'onPress':
-						case 'onRelease':
-						case 'onReleaseOutside':
-							this._mouseListenerCount++;
-							this.adaptee.mouseEnabled = true;
-							this.adaptee.mouseChildren = false;
-							break;
-					}
-				}
+				this._updateMouseEnabled(event, true);
 			}
 		}
+	}
+
+	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
+	{
+		if (this.adaptee.name != "scene") {
+			switch (event.propertyName) {
+				case 'onmousemove':
+				case 'onmousedown':
+				case 'onmouseup':
+				case 'onrollover':
+				case 'onrollout':
+				case 'onpress':
+				case 'onrelease':
+				case 'onreleaseoutside':
+					if (enabled) {
+						this._mouseListenerCount++;
+						this.adaptee.mouseEnabled = true;
+						this.adaptee.mouseChildren = false;
+					} else {
+						this._mouseListenerCount--;
+						if (this._mouseListenerCount == 0)
+							this.adaptee.mouseChildren = true;
+					}
+					
+					break;
+			}
+		}	
 	}
 
 	public freeFromScript():void{
         super.freeFromScript();
         for (var key in this._eventsListeners) {
-            if(this._eventHandlers[key].stageEvent)
+            if(this._eventHandlers[key].stageEvent) {
                 (<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-            else
-                this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+			} else {
+				this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+				//this._updateMouseEnabled(this._eventHandlers[key], false);
+			}
         }   
         this._eventsListeners={}; 
         var cnt= this._onClipEventsListeners.length;
         while(cnt>0){
             cnt--;
-            if(this._onClipEventsListeners[cnt].event.stageEvent)
+            if(this._onClipEventsListeners[cnt].event.stageEvent) {
                 (<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._onClipEventsListeners[cnt].event.eventName, <any>this._onClipEventsListeners[cnt].callback);
-            else
-                this.adaptee.removeEventListener(this._onClipEventsListeners[cnt].event.eventName, <any>this._onClipEventsListeners[cnt].callback);
+			} else {
+				this.adaptee.removeEventListener(this._onClipEventsListeners[cnt].event.eventName, <any>this._onClipEventsListeners[cnt].callback);
+				//this._updateMouseEnabled(this._onClipEventsListeners[cnt].event, false);
+			}
         }   
         this._onClipEventsListeners=[];
         
@@ -219,22 +237,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 			else{
 				this.adaptee.removeEventListener(event.eventName, listener);
 
-				if (this.adaptee.name != "scene") {
-					switch (event.propertyName) {
-						case 'onMouseMove':
-						case 'onMouseDown':
-						case 'onMouseUp':
-						case 'onRollOver':
-						case 'onRollOut':
-						case 'onPress':
-						case 'onRelease':
-						case 'onReleaseOutside':
-							this._mouseListenerCount--;
-							if (this._mouseListenerCount == 0)
-								this.adaptee.mouseChildren = true;
-							break;
-					}
-				}
+				this._updateMouseEnabled(event, false);
 			}
 			delete this._eventsListeners[propertyName];
 		}
@@ -265,20 +268,24 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 
 			for (var key in this._eventsListeners) {
 				if(key!="onenterframe"){
-					if(this._eventHandlers[key].stageEvent)
+					if(this._eventHandlers[key].stageEvent) {
 						(<any>this.context.globals.Stage)._awayAVMStage.addAVM1EventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-					else
+					} else {
 						this.adaptee.addEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+						//this._updateMouseEnabled(this._eventHandlers[key], true);
+					}
 				}
 			}
 		}
 		else {
 			for (var key in this._eventsListeners) {
 				if(key!="onenterframe"){
-					if(this._eventHandlers[key].stageEvent)
+					if(this._eventHandlers[key].stageEvent) {
 						(<any>this.context.globals.Stage)._awayAVMStage.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
-					else
+					} else {
 						this.adaptee.removeEventListener(this._eventHandlers[key].eventName, <any>this._eventsListeners[key]);
+						//this._updateMouseEnabled(this._eventHandlers[key], false);
+					}
 				}
 			}
 		}
