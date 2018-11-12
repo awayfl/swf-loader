@@ -652,7 +652,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 					dropTarget=null;
 				}
 				else{
-					names.push(dropTarget.name);
+					if (dropTarget.name != null)
+						names.push(dropTarget.name);
 					dropTarget=dropTarget.parent;
 				}
 			}
