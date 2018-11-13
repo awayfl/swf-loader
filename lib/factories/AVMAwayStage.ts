@@ -185,7 +185,9 @@ export class AVMAwayStage extends Sprite{
 	}
 	public getLayer(idx:number): Sprite{
 		while(this._layers.length<=idx){
-			this._layers[this._layers.length]=new Sprite();
+            this._layers[this._layers.length]=new Sprite();
+            this._layers[this._layers.length-1].mouseChildren=true;
+            this._layers[this._layers.length-1].mouseEnabled=false;
 			this.addChild(this._layers[this._layers.length-1]);
 		}
 
