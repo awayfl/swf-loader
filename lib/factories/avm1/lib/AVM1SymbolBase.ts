@@ -260,7 +260,8 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 	public setEnabled(value) {
 		if (value == this.enabled)
 			return;
-		this.enabled = value;
+        this.enabled = value;
+        this.adaptee.mouseEnabled=value;
 		this.setEnabledListener(value);
 	}
 	public setEnabledListener(value:any) {
