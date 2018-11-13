@@ -826,6 +826,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public globalToLocal(pt) {
+        if(!pt)
+            return;
 		var tmp = toAS3Point(pt);
 		this.adaptee.globalToLocal(tmp, tmp);
 		copyAS3PointTo(tmp, pt);
@@ -1000,6 +1002,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public localToGlobal(pt) {
+        if(!pt){
+            return;
+        }
 		var tmp = toAS3Point(pt);
 		this.adaptee.localToGlobal(tmp, tmp);
 		copyAS3PointTo(tmp, pt);
