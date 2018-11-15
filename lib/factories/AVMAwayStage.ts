@@ -1,5 +1,5 @@
 
-import {BuildMode, EventDispatcher, Transform, Point, ColorUtils, Vector3D, Rectangle} from "@awayjs/core";
+import {BuildMode, IAsset, EventDispatcher, Transform, Point, ColorUtils, Vector3D, Rectangle} from "@awayjs/core";
 
 import {AssetEvent, EventBase, LoaderEvent, ParserEvent, URLRequest, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
@@ -12,6 +12,7 @@ import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D, Viewport} f
 import {MouseEvent as MouseEventAway, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
 import { AVM1TextField } from './avm1/lib/AVM1TextField';
+import { Mouse } from './ISecurityDomain';
 
 
 export interface FrameScript {
@@ -186,8 +187,8 @@ export class AVMAwayStage extends Sprite{
 	public getLayer(idx:number): Sprite{
 		while(this._layers.length<=idx){
             this._layers[this._layers.length]=new Sprite();
-            this._layers[this._layers.length-1].mouseChildren=true;
-            this._layers[this._layers.length-1].mouseEnabled=false;
+            //this._layers[this._layers.length-1].mouseChildren=true;
+            //this._layers[this._layers.length-1].mouseEnabled=false;
 			this.addChild(this._layers[this._layers.length-1]);
 		}
 
@@ -332,28 +333,70 @@ export class AVMAwayStage extends Sprite{
 		this._timer.start();
 		var mouseEvents:string[]=[MouseEventAway.MOUSE_DOWN, MouseEventAway.MOUSE_MOVE, MouseEventAway.MOUSE_OUT, MouseEventAway.MOUSE_OVER, MouseEventAway.MOUSE_UP, MouseEventAway.MOUSE_UP_OUTSIDE, MouseEventAway.MOUSE_WHEEL];
 
+        this.clearAllAVM1Listener();
+		this.addEventListener(MouseEventAway.MOUSE_DOWN, (evt)=>this.onMouseEvent(evt));
+		this.addEventListener(MouseEventAway.MOUSE_UP, (evt)=>this.onMouseEvent(evt));
+		this.addEventListener(MouseEventAway.MOUSE_MOVE, (evt)=>this.onMouseEvent(evt));
 		//this._resizeCallbackDelegate(null);
 	}
-	private onMouseEvent(e:MouseEvent){
-	}
-	
 	private _debugtimer:number=0;
-	private avm1Listener:any[]=[];
-	public addAVM1EventListener(type:string, callback:(event:EventBase)=>void){
-		this.avm1Listener[this.avm1Listener.length]={type:type, callback:callback};
-		this.addEventListener(type, callback);
+	private avm1Listener:any={};
+	public addAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
+        this.avm1Listener[type][asset.id]={type:type, callback:callback};
+	}
+	public removeAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
+		delete this.avm1Listener[type][asset.id+type];
 	}
 	public clearAllAVM1Listener(){
-		var len:number=this.avm1Listener.length;
-		for(var i:number=0;i <len; i++){
-			if(this.hasEventListener(this.avm1Listener[i].type, this.avm1Listener[i].callback))
-				this.removeEventListener(this.avm1Listener[i].type, this.avm1Listener[i].callback);
-		}
-		this.avm1Listener.length=0;
+        this.avm1Listener={};
+        this.avm1Listener[MouseEventAway.MOUSE_DOWN]={};
+        this.avm1Listener[MouseEventAway.MOUSE_UP]={};
+        this.avm1Listener[MouseEventAway.MOUSE_MOVE]={};
 	}
+    
+    private _collectedDispatcher:DisplayObject[]=[];
+	public collectMousEvents(child:DisplayObject){
+        var child2:DisplayObject;
+        var c = (<any>child).numChildren;			
+        while (c>0) {
+            c--;
+            child2 = (<any>child).getChildAt(c);
+            this.collectMousEvents(child2);
+        }
+        if (child.isAsset(MovieClip)){
+            this._collectedDispatcher[this._collectedDispatcher.length]=child;
+        }
+
+    }
 	
-	
-	public onMouseDown(){
+	public onMouseEvent(mouseEvent:EventBase){
+
+        // the correct order for stage-event on childs is children first, highest depth first
+        this._collectedDispatcher.length=0;
+		var i:number=0;
+		var myLayer:Sprite;
+		var numChilds:number;
+		var c:number;
+		var child:DisplayObject;
+        var len:number=this._layers.length;
+        
+		for(i=0;i<len;i++) {
+			myLayer=this._layers[i];
+			numChilds = myLayer.numChildren;			
+			for (c = 0; c < numChilds; ++c) {
+				child = myLayer.getChildAt(c);
+				if (child.isAsset(MovieClip)){
+					this.collectMousEvents(child);
+				}
+			}
+        }
+        
+        len=this._collectedDispatcher.length;
+		for(i=0;i<len;i++) {
+            if(this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id]){
+                this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id].callback();
+            }
+        }
 		FrameScriptManager.execute_queue();
 	}
 	public runAVM1Framescripts(){
@@ -365,13 +408,11 @@ export class AVMAwayStage extends Sprite{
         while (c>0) {
             c--;
             child2 = (<any>child).getChildAt(c);
-            // each child in here should be a swf-scene
             this.executeEnterFrame(child2, enterFramesChilds);
         }
         if (child.isAsset(MovieClip)){
             if(child.hasEventListener(this.enterEvent.type))
                 enterFramesChilds.push(child);
-            //(<MovieClip> child).dispatchEnterFrame(this.enterEvent);
         }
 	}
 	protected onEnterFrame(dt: number)
