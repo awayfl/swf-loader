@@ -299,7 +299,8 @@ export class AVMAwayStage extends Sprite{
 		this._view = new View(this._renderer);
 		this._renderer.antiAlias=0;
 		this._view.renderer.renderableSorter = null;//new RenderableSort2D();
-		//this._view.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
+        //this._view.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
+        this._view.mousePicker.shapeFlag=true;
 		this._view.forceMouseMove=true;
 		this._view.beforeRenderCallback=function(){
             FrameScriptManager.execute_queue();
