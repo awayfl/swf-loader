@@ -35,7 +35,7 @@ import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Function } from "../runtime/AVM1Function";
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
-import { AVM1EventHandler } from "./AVM1EventHandler";
+import { ClipEventMappings } from "./AVM1EventHandler";
 
 export var DEPTH_OFFSET = 16384;
 
@@ -344,8 +344,6 @@ export function initializeAVM1Object(awayObject: any,
 	if (!events) {
 		return;
 	}
-	var stageListeners = [];
-	var awayAVMStage = (<any>context.globals.Stage)._awayAVMStage;
 	for (var j = 0; j < events.length; j++) {
 		var swfEvent = events[j];
 		var actionsData;
@@ -364,36 +362,28 @@ export function initializeAVM1Object(awayObject: any,
 			eventFlag |= 0;
 			if (!(flags & (eventFlag | 0))) {
 				continue;
-			}
+            }
+            if(eventFlag==AVM1ClipEvents.Construct || eventFlag==AVM1ClipEvents.Initialize){
+                handler();
+                continue;
+            }
+            if(eventFlag==AVM1ClipEvents.Load){
+				awayObject.onLoadedAction=handler;
+                continue;
+            }
+
 			var eventMapping = ClipEventMappings[eventFlag];
-			var eventName = eventMapping.name;
+			var eventName = eventMapping.eventName;
+            console.log("eventName", eventName)
 			if (!eventName) {
 				Debug.warning("ClipEvent: " + eventFlag + ' not implemented');
 				continue;
-			}
-
-			// AVM1 MovieClips are set to button mode if one of the button-related event listeners is
-			// set. This behaviour is triggered regardless of the actual value they are set to.
-			if (eventMapping.isButtonEvent) {
-				awayObject.buttonMode = true;
-			}
-
-			if(eventName=="construct" || eventName=="initialize"){
-				handler();
-			}
-			else if(eventName=="load"){
-				awayObject.onLoadedAction=handler;
-			}
-			else{
-                var propName=eventName;
-                if(eventName=="onEnterFrame")
-                    eventName="enterFrame"
-                instanceAVM1.alPut(propName.toLowerCase(), handler);
-				instanceAVM1._addOnClipEventListener(new AVM1EventHandler(propName, eventName, null, eventMapping.isStageEvent), handler);
-			}
+            }
+			instanceAVM1._addOnClipEventListener(eventMapping, handler);			
 		}
 	}
 }
+
 export function toTwipFloor(value: number): number {
 	// in theory this should do:
 	//return Math.round(value*20)/20;
@@ -421,27 +411,8 @@ function clipEventHandler(actionsData: AVM1ActionsData,
 	return receiver.context.executeActions(actionsData, receiver);
 }
 
-var ClipEventMappings: Map<number, {name: string; isStageEvent: boolean; isButtonEvent: boolean}>;
-ClipEventMappings = Object.create(null);
-ClipEventMappings[AVM1ClipEvents.Load] = {name: 'load', isStageEvent: false, isButtonEvent: false};
-// AVM1's enterFrame happens at the same point in the cycle as AVM2's frameConstructed.
-ClipEventMappings[AVM1ClipEvents.EnterFrame] = {name: 'onEnterFrame', isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.Unload] = {name: 'unload', isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.MouseMove] = {name: 'mouseMove3d', isStageEvent: true/*true*/, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.MouseDown] = {name: 'mouseDown3d', isStageEvent:  true/*true*/, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.MouseUp] = {name: 'mouseUp3d', isStageEvent:  true/*true*/, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.KeyDown] = {name: 'keydown', isStageEvent: true, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.KeyUp] = {name: 'keyup', isStageEvent: true, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.Data] = {name: null, isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.Initialize] = {name: 'initialize', isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.Press] = {name: 'mouseDown3d', isStageEvent:  false/*true*/, isButtonEvent: true};
-ClipEventMappings[AVM1ClipEvents.Release] = {name: 'mouseUp3d', isStageEvent: false, isButtonEvent: true};
-ClipEventMappings[AVM1ClipEvents.ReleaseOutside] = {name: 'mouseUpOutside3d', isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.RollOver] = {name: 'mouseOver3d', isStageEvent:  false/*true*/, isButtonEvent: true};
-ClipEventMappings[AVM1ClipEvents.RollOut] = {name: 'mouseOut3d', isStageEvent:  false/*true*/, isButtonEvent: true};
-ClipEventMappings[AVM1ClipEvents.DragOver] = {name: null, isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.DragOut] =  {name: null, isStageEvent: false, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.KeyPress] =  {name: null, isStageEvent: true, isButtonEvent: false};
-ClipEventMappings[AVM1ClipEvents.Construct] =  {name: 'construct', isStageEvent: false, isButtonEvent: false};
+
+
+
 
 

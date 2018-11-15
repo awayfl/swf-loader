@@ -34,6 +34,7 @@ import { AVM1PropertyDescriptor } from "./runtime/AVM1PropertyDescriptor";
 import {MovieClipProperties} from "./interpreter/MovieClipProperties";
 
 import Big from "big.js";
+import { AVM1SymbolBase } from './lib/AVM1SymbolBase';
 var noVarGetDebug:boolean=true;
 
 declare var Proxy;
@@ -480,7 +481,7 @@ function as2SetProperty(context: AVM1Context, obj: any, name: any, value: any): 
 				var key=allKeys[i];
 				if(key!=""){
 					avm1Obj.alPut(key, value.alGet(key));
-					as2SyncEvents(context, key);
+					as2SyncEvents(context, key, avm1Obj);
 				}
             }
             avm1Obj.protoTypeChanged=true;
@@ -488,27 +489,31 @@ function as2SetProperty(context: AVM1Context, obj: any, name: any, value: any): 
 	}
 	else{
 		avm1Obj.alPut(name, value);
-		as2SyncEvents(context, name);
+		as2SyncEvents(context, name, avm1Obj);
 	}
 }
 
 function as2DeleteProperty(context: AVM1Context, obj: any, name: any): any {
 	var avm1Obj: AVM1Object = alToObject(context, obj);
 	name = context.normalizeName(name);
-	var result = avm1Obj.alDeleteProperty(name);
-	as2SyncEvents(context, name);
+    var result = avm1Obj.alDeleteProperty(name);
+	as2SyncEvents(context, name, avm1Obj);
 	return result;
 }
 
-function as2SyncEvents(context: AVM1Context, name): void {
+function as2SyncEvents(context: AVM1Context, name, avm1Obj): void {
 	if(typeof name==="undefined")
 		return;
 	name = alCoerceString(context, name);
+	name = context.normalizeName(name);
 	if (name[0] !== 'o' || name[1] !== 'n') { // TODO check case?
 		return;
-	}
+    }
+    
+    if(avm1Obj && avm1Obj.updateEventByPropName)
+        avm1Obj.updateEventByPropName(name);
 	// Maybe an event property, trying to broadcast change.
-	(<AVM1ContextImpl>context).broadcastEventPropertyChange(name);
+	//(<AVM1ContextImpl>context).broadcastEventPropertyChange(name);
 }
 
 function as2CastError(ex) {
@@ -1785,7 +1790,7 @@ function avm1_0x1D_ActionSetVariable(ectx: ExecutionContext) {
 	}
 	release || assert(resolved.propertyName);
 	resolved.scope.alPut(resolved.propertyName, value);
-	as2SyncEvents(ectx.context, resolved.propertyName);
+	as2SyncEvents(ectx.context, resolved.propertyName, resolved.scope);
 	//console.log("avm1_0x1D_ActionSetVariable", resolved, variableName, value);
 }
 
@@ -2061,7 +2066,7 @@ function avm1_0x9B_ActionDefineFunction(ectx: ExecutionContext, args: any[]) {
 	if (functionName) {
 		var scope = ectx.scopeList.scope;
 		scope.alPut(functionName, fn);
-		as2SyncEvents(ectx.context, functionName);
+		as2SyncEvents(ectx.context, functionName, scope);
 	} else {
 		stack.push(fn);
 	}
@@ -2102,7 +2107,6 @@ function avm1_0x3A_ActionDelete(ectx: ExecutionContext) {
 		return;
 	}
 	stack.push(as2DeleteProperty(ectx.context, obj, name));
-	as2SyncEvents(ectx.context, name);
 }
 
 function avm1_0x3B_ActionDelete2(ectx: ExecutionContext) {
@@ -2121,7 +2125,6 @@ function avm1_0x3B_ActionDelete2(ectx: ExecutionContext) {
 		
 	}
 	stack.push(as2DeleteProperty(ectx.context, resolved.scope, name));
-	as2SyncEvents(ectx.context, name);
 
 	
 	
@@ -2557,7 +2560,7 @@ function avm1_0x8E_ActionDefineFunction2(ectx: ExecutionContext, args: any[]) {
 		functionParams, registerCount, registerAllocation, suppressArguments);
 	if (functionName) {
 		scope.alPut(functionName, fn);
-		as2SyncEvents(ectx.context, functionName);
+		as2SyncEvents(ectx.context, functionName, scope);
 	} else {
 		stack.push(fn);
 	}
