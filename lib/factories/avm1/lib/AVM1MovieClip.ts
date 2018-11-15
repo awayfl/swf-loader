@@ -48,8 +48,9 @@ import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Stage} from "./AVM1Stage";
 
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
-import { AVM1EventHandler, AVM1MovieClipButtonModeEvent } from "./AVM1EventHandler";
+import { AVM1EventHandler } from "./AVM1EventHandler";
 import {AVM1LoaderHelper} from "./AVM1LoaderHelper";
+import {EventsListForMC} from "./AVM1EventHandler";
 import { AVM1InterpretedFunction } from '../interpreter';
 import { MouseManager } from '@awayjs/view';
 import { PickGroup } from '@awayjs/renderer';
@@ -129,6 +130,37 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		'horizontal': LineScaleMode.HORIZONTAL
 	}
 
+	private _mouseButtonListenerCount:number;
+	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
+	{
+		if (this.adaptee.name != "scene") {
+            if(event.isMouse){
+                if (enabled) {
+                    this._mouseListenerCount++;
+                    this.adaptee.mouseEnabled = true;
+                    this.adaptee.mouseChildren = false;
+                    if(event.isButton){
+                        this._mouseButtonListenerCount++;
+                        (<any>this.adaptee).buttonMode = true;
+                    }
+                } else {
+                    this._mouseListenerCount--;
+                    if (this._mouseListenerCount <= 0){   
+                        this._mouseListenerCount = 0;
+                        this.adaptee.mouseEnabled = false;
+                        this.adaptee.mouseChildren = true;
+                    }
+                    if(event.isButton){
+                        this._mouseButtonListenerCount--;
+                        if (this._mouseButtonListenerCount <= 0){  
+                            this._mouseButtonListenerCount = 0;
+                            (<any>this.adaptee).buttonMode = false;
+                        }  
+                    }
+                }		
+            }			
+		}	
+	}
 
 	public clone(){
         return <AVM1MovieClip>getAVM1Object(this.adaptee.clone(), <AVM1Context>this._avm1Context);
@@ -232,21 +264,27 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			}
 		}
 	}
-	// called from adaptee whenever this is removed from scene.
+	// called from adaptee whenever the mc gets reset
 	public freeFromScript():void{
         //this.stopAllSounds();
         this.hasSwappedDepth=false;
         super.freeFromScript();
+        this._mouseButtonListenerCount=0;
 
 	}
 	
+	// called from adaptee whenever the mc gets added to a parent
 	public doInitEvents():void
 	{
         this._dropTarget="";
+        this._mouseButtonListenerCount=0;
         AVM1MovieClip.currentMCAssetNameSpace=this.adaptee.assetNamespace;
+
+        // execute the init-actionscript that is stored on timeline
 		for (var key in this.adaptee.timeline.avm1InitActions)
 			this.executeScript(this.addScript(this.adaptee.timeline.avm1InitActions[key], <any> ("initActionsData" + key)));
 
+        // execute the init-actionscript that is stored on timeline
 		if((<any>this).initEvents){
 			initializeAVM1Object(this.adaptee, <AVM1Context>this._avm1Context, (<any>this).initEvents);
         }
@@ -273,18 +311,18 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
                 var existingValue=this.alGet(child.name);
                 if(existingValue && existingValue.adaptee){
                     this.alPut(child.name, child.adapter);
-                    if(this.avmPropsChildNames[child.name]){     
+                    if(this.scriptRefsToChilds[child.name]){     
                         // update indirectReferences to this prop
-                        this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
+                        this.scriptRefsToChilds[child.name].obj.alPut(this.scriptRefsToChilds[child.name].name, child.adapter);
                     }
                 }
                 else if(existingValue){
                 }
                 else{
                     this.alPut(child.name, child.adapter);
-                    if(this.avmPropsChildNames[child.name]){     
+                    if(this.scriptRefsToChilds[child.name]){     
                         // update indirectReferences to this prop
-                        this.avmPropsChildNames[child.name].obj.alPut(this.avmPropsChildNames[child.name].name, child.adapter);
+                        this.scriptRefsToChilds[child.name].obj.alPut(this.scriptRefsToChilds[child.name].name, child.adapter);
                     }
                 }
                 if(this.unregisteredColors[child.name]){
@@ -325,11 +363,11 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
                     if(this._childrenByName[child.name] && this._childrenByName[child.name].avmColor){
                         this.unregisteredColors[child.name]=this._childrenByName[child.name].avmColor;
                     }
-                    if(this.avmPropsChildNames[child.name]){     
+                    if(this.scriptRefsToChilds[child.name]){     
                         // update indirectReferences to this prop
-                        //this.avmPropsChildNames[child.name].obj.alDeleteProperty(this.avmPropsChildNames[child.name].name);
-                        //console.log("delete property: ", child.name, this.avmPropsChildNames[child.name].name, this.avmPropsChildNames[child.name].obj)
-                        //delete this.avmPropsChildNames[child.name];
+                        //this.scriptRefsToChilds[child.name].obj.alDeleteProperty(this.scriptRefsToChilds[child.name].name);
+                        //console.log("delete property: ", child.name, this.scriptRefsToChilds[child.name].name, this.scriptRefsToChilds[child.name].obj)
+                        //delete this.scriptRefsToChilds[child.name];
                     }
 					this.alDeleteProperty(child.name);
 					delete this._childrenByName[child.name];
@@ -347,7 +385,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	private get graphics() : Graphics {
 		return this.adaptee.graphics;
-	}
+    }
+    
 	public initAVM1SymbolInstance(context: AVM1Context, awayObject: any) {//MovieClip
 		this._childrenByName = Object.create(null);
 		super.initAVM1SymbolInstance(context, awayObject);
@@ -555,7 +594,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public _updateChildName(child: AVM1MovieClip, oldName: string, newName: string) {
 		oldName && this._removeChildName(child, oldName);
 		newName && this._addChildName(child, newName);
-	}
+    }
+    
 	_removeChildName(child: IAVM1SymbolBase, name: string) {
 		release || assert(name);
 		if (!this.context.isPropertyCaseSensitive) {
@@ -1328,30 +1368,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	protected _initEventsHandlers() {
-		this.bindEvents([
-			new AVM1EventHandler('onData', 'data'),
-			new AVM1EventHandler('onDragOut', 'dragOut'),
-			new AVM1EventHandler('onDragOver', 'dragOver'),
-			new AVM1EventHandler('onEnterFrame', 'enterFrame'),
-			new AVM1EventHandler('onKeyDown', 'keyDown'),
-			new AVM1EventHandler('onKeyUp', 'keyUp'),
-			new AVM1EventHandler('onKillFocus', 'focusOut', function (e) {
-				return [e.relatedObject];
-			}),
-			new AVM1EventHandler('onLoad', 'load'),
-			new AVM1EventHandler('onMouseDown', 'mouseDown3d', null, true),
-			new AVM1EventHandler('onMouseUp', 'mouseUp3d', null, true),
-			new AVM1EventHandler('onMouseMove', 'mouseMove3d', null, true),
-			new AVM1MovieClipButtonModeEvent('onPress', 'mouseDown3d'),
-			new AVM1MovieClipButtonModeEvent('onRelease', 'mouseUp3d'),
-			new AVM1MovieClipButtonModeEvent('onReleaseOutside', 'mouseUpOutside3d'),
-			new AVM1MovieClipButtonModeEvent('onRollOut', 'mouseOut3d'),
-			new AVM1MovieClipButtonModeEvent('onRollOver', 'mouseOver3d'),
-			new AVM1EventHandler('onSetFocus', 'focusIn', function (e) {
-				return [e.relatedObject];
-			}),
-			new AVM1EventHandler( 'onUnload', 'unload')
-		]);
+		this.bindEvents(EventsListForMC);
 	}
 }
 

@@ -22,11 +22,11 @@ import {getAVM1Object, wrapAVM1NativeClass, toTwipFloor, toTwipRound} from "./AV
 import {AVM1TextFormat} from "./AVM1TextFormat";
 import {Debug, notImplemented, warning} from "../../base/utilities/Debug";
 import {EventBase as Event, Point, Box, IgnoreConflictStrategy} from "@awayjs/core";
-import {TextField, TextFieldType, TextFormat, TextFieldAutoSize, DisplayObject, DisplayObjectContainer} from "@awayjs/scene";
+import {TextField, TextFieldType, TextFormat, TextfieldEvent, TextFieldAutoSize, DisplayObject, DisplayObjectContainer} from "@awayjs/scene";
 import {AVM1Key} from "./AVM1Key";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
-import { AVM1EventHandler } from "./AVM1EventHandler";
+import { EventsListForMC } from "./AVM1EventHandler";
 import { AVM1Globals } from './AVM1Globals';
 import {MouseManager} from "@awayjs/view";
 import {alCallProperty,} from "../runtime";
@@ -55,7 +55,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 				'_soundbuftime#', 'tabEnabled#', 'tabIndex#', '_target#', 'toString',
 				'text#', 'textColor#', 'textHeight#', 'textWidth#', 'type#',
 				'_url#', 'variable#', '_visible#', '_width#', 'wordWrap#',
-				'_x#', '_xmouse#', '_xscale#', '_y#', '_ymouse#', '_yscale#', 'onChanged']);
+				'_x#', '_xmouse#', '_xscale#', '_y#', '_ymouse#', '_yscale#']);
 	}
 
 	private _variable: string;
@@ -116,28 +116,20 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 	public alPut(p, v) {
 		super.alPut(p,v);
-		if(p=="onChanged"){
-			this.onChanged(v);
-		}
 	}
 
-	public onChanged(callback:any): void {
-		var myThis=this;
-		this.adaptee.onChanged=function(){
-			// make sure text-var is synced before onChanged is called:
-			myThis.updateVarFromText();
-			myThis.syncTextFieldValue();
-			if(callback)
-				callback.alCall(myThis, [myThis]);
-		};
-	}
 
 	public doInitEvents():void
 	{
 		if (this.adaptee._symbol) {
 			//console.log("do init", this.adaptee._symbol.variableName, this);
 			this.setVariable(this.adaptee._symbol.variableName || '');
-		}
+        }
+		this.adaptee.addEventListener(TextfieldEvent.CHANGED,()=>{
+			// make sure text-var is synced before onChanged is called:
+			this.updateVarFromText();
+			this.syncTextFieldValue();
+		});
 		//this._initEventsHandlers();
 	}
 
@@ -151,7 +143,6 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		this._variable = '';
 		this._exitFrameHandler = null;
 		this.adaptee=awayObject;
-		this.onChanged(null);
 
 	}
 
@@ -423,7 +414,10 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		return this.adaptee.selectable;
 	}
 
-	public setSelectable(value: boolean) {
+	public setSelectable(value: any) {
+        if(value=="false"){
+            value=false;
+        }
 		value = alToBoolean(this.context, value);
 		if(!value && MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).getFocus()==this.adaptee){
 			MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).setFocus(null);
@@ -762,26 +756,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 	private _initEventsHandlers() {
-		this.bindEvents([
-			new AVM1EventHandler('onDragOut', 'dragOut'),
-			new AVM1EventHandler('onDragOver', 'dragOver'),
-			new AVM1EventHandler('onKeyDown', 'keyDown'),
-			new AVM1EventHandler('onKeyUp', 'keyUp'),
-			new AVM1EventHandler('onKillFocus', 'focusOut', function (e) {
-				return [e.relatedObject];
-			}),
-			new AVM1EventHandler('onLoad', 'load'),
-			new AVM1EventHandler('onMouseDown', 'mouseDown3d'),
-			new AVM1EventHandler('onMouseUp', 'mouseUp3d'),
-			new AVM1EventHandler('onPress', 'mouseDown3d'),
-			new AVM1EventHandler('onRelease', 'mouseUp3d'),
-			new AVM1EventHandler('onReleaseOutside', 'releaseOutside'),
-			new AVM1EventHandler('onRollOut', 'mouseOut3d'),
-			new AVM1EventHandler('onRollOver', 'mouseOver3d'),
-			new AVM1EventHandler('onSetFocus', 'focusIn', function (e) {
-				return [e.relatedObject];
-			})
-		]);
+		this.bindEvents(EventsListForMC);
 	}
 }
 

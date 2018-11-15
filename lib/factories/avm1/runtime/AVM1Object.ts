@@ -25,7 +25,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
     public adaptee: IAsset;
     public avmType: string;
 	protected initialDepth:number=0;
-    protected avmPropsChildNames:any={};
+    protected scriptRefsToChilds:any={};
     public _eventObserver:AVM1Object;
 	public _blockedByScript:boolean;
     public _ctBlockedByScript:boolean;
@@ -77,7 +77,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 		super();
 		this._avm1Context = avm1Context;
         this._ownProperties = Object.create(null);
-        this.avmPropsChildNames={};
+        this.scriptRefsToChilds={};
 		this._prototype = null;
 		this._blockedByScript=false;
 		this._ctBlockedByScript=false;
@@ -272,10 +272,10 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
         p = this.context.normalizeName(p);
         
         //  stupid hack to make sure we can update references to objects in cases when the timeline changes the objects 
-        //  if a new object is registered for the same name, we can use the "avmPropsChildNames" to update all references to the old object with the new one
+        //  if a new object is registered for the same name, we can use the "scriptRefsToChilds" to update all references to the old object with the new one
         if(v && typeof v ==="object" && v.avmType==="symbol" && p!="this" && p!="_parent" && !v.dynamicallyCreated){
-            if(v.adaptee && v.adaptee.parent && v.adaptee.parent.adapter && v.adaptee.parent.adapter.avmPropsChildNames){
-                v.adaptee.parent.adapter.avmPropsChildNames[v.adaptee.name]={obj:this, name:p};
+            if(v.adaptee && v.adaptee.parent && v.adaptee.parent.adapter && v.adaptee.parent.adapter.scriptRefsToChilds){
+                v.adaptee.parent.adapter.scriptRefsToChilds[v.adaptee.name]={obj:this, name:p};
             }
         }
 		if (!this.alCanPut(p)) {
