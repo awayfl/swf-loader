@@ -25,9 +25,13 @@ import {DisplayObject, MovieClip} from "@awayjs/scene";
 import {AVM1ButtonAction} from "../../link";
 import {LoaderInfo} from "../../customAway/LoaderInfo";
 import {AVM1Object} from "../runtime/AVM1Object";
-import { AVM1EventHandler, AVM1MovieClipButtonModeEvent } from "./AVM1EventHandler";
+import { AVM1EventHandler } from "./AVM1EventHandler";
 import {notImplemented, somewhatImplemented, warning, release, assert} from "../../base/utilities/Debug";
 import { AVM1MovieClip } from './AVM1MovieClip';
+import {ClipEventMappings,EventsListForButton} from "./AVM1EventHandler";
+import {AVM1ClipEvents} from "../../base/SWFTags";
+
+
 
 
 enum StateTransitions {
@@ -56,21 +60,13 @@ export interface IFrameScript {
 }
 
 var buttonActionsMap:any={
-	// single onClipActions:
-	1:['mouseOver3d'],		// rollOver
-	2:['mouseOut3d'],		// rollOut
-	4:['mouseDown3d'],		// press
-	8:['mouseUp3d'],		// release 
-	64:['mouseUpOutside3d'],// releaseOutside
-	//160:[],					// dragOver
-	//272:[],					// dragOut
-
-	// combinations of onClipActions:
-	//TODO: find a betetr way to handle this
-	/*72:['mouseUp3d', 'mouseUpOutside3d'], 	// release + releaseOutside
-	161:['mouseOver3d'],					// rollover + dragOver
-	274:['mouseOut3d'], 					// rollOut + dragOut
-	434:['mouseOut3d'],						// rollout + dragOver + dragOut*/
+    1:ClipEventMappings[AVM1ClipEvents.RollOver],
+    2:ClipEventMappings[AVM1ClipEvents.RollOut],
+    4:ClipEventMappings[AVM1ClipEvents.Press],
+    8:ClipEventMappings[AVM1ClipEvents.Release],
+    64:ClipEventMappings[AVM1ClipEvents.ReleaseOutside],
+    160:ClipEventMappings[AVM1ClipEvents.DragOver],
+    272:ClipEventMappings[AVM1ClipEvents.DragOut]
 }
 
 export class AVM1Button extends AVM1MovieClip {
@@ -104,13 +100,6 @@ export class AVM1Button extends AVM1MovieClip {
 		super.initAVM1SymbolInstance(context, awayObject);
 
 		var nativeButton = this.adaptee;
-		//this._initEventsHandlers();
-		/*if (!nativeButton.timeline.avm1ButtonActions) {
-			return;
-		}*/
-		nativeButton.buttonMode = true;
-		nativeButton.addEventListener('addedToStage', this._addListeners.bind(this));
-		nativeButton.addEventListener('removedFromStage', this._removeListeners.bind(this));
 		var requiredListeners = this._requiredListeners = Object.create(null);
 		var actions = this._actions = nativeButton.timeline.avm1ButtonActions;
 		for (var i = 0; i < actions.length; i++) {
@@ -122,74 +111,14 @@ export class AVM1Button extends AVM1MovieClip {
 				//requiredListeners['keyDown'] = this._keyDownHandler.bind(this);
 				//continue;
 			}
-			//console.log('action.stateTransitionFlags: ' + action.stateTransitionFlags);
-			// todo : find better solution for cases when we have multiple StateTransitions in one flag
-			/*switch (action.stateTransitionFlags) {
-				case 274:
-				case StateTransitions.OutDownToIdle:
-					types[0] = 'mouseOut3d';
-					break;
-				case StateTransitions.IdleToOverUp:
-					types[0]  = 'mouseOver3d';
-					break;
-				case StateTransitions.OverUpToIdle:// rollout
-					types[0]  = 'mouseOut3d';
-					break;
-				case StateTransitions.OverUpToOverDown:
-					types[0]  = 'mouseDown3d';
-					break;
-				case StateTransitions.OverDownToOverUp:
-					types[0]  = 'mouseUp3d';
-					break;
-				case 72:
-					types[0]  = 'mouseUp3d';
-					types[1]  = 'mouseUpOutside3d';
-					break;
-				case 160:// dragOver
-					notImplemented('AVM1 drag over button actions');
-					break;
-				case 272:// dragOut
-					notImplemented('AVM1 drag out button actions');
-					break;
-				case 434:// rollout dragOver dragOut
-					types[0]  = 'mouseOut3d';
-					notImplemented('AVM1 drag over button actions');
-					notImplemented('AVM1 drag out button actions');
-					break;
-				case StateTransitions.OverDownToOutDown:
-				case StateTransitions.OutDownToOverDown:
-					notImplemented('AVM1 drag over/out button actions');
-					break;
-				case StateTransitions.IdleToOverDown:
-				case StateTransitions.OverDownToIdle:
-					notImplemented('AVM1 drag trackAsMenu over/out button actions');
-					break;
-				default:
-					warning('Unknown AVM1 button action type: ' + action.stateTransitionFlags);
-					continue;
-            }*/
-            /*
-			if(action.stateTransitionFlags!=0){
-				var types:string[]=buttonActionsMap[action.stateTransitionFlags];
-				if(types){
-					var cnt=types.length;
-					var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags)
-					while (cnt>0){
-						cnt--;
-						requiredListeners[types[cnt]] = boundListener;
-					}
-				}
-				else{
-					console.warn("unknown button event flag", action.stateTransitionFlags);
-				}
-            }*/
 			if(action.stateTransitionFlags!=0){
                 var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags);
                 var foundValidAction:boolean=false;
                 for(var key in buttonActionsMap){
                     if(action.stateTransitionFlags & parseInt(key)){
                         foundValidAction=true;
-						requiredListeners[buttonActionsMap[key]] = boundListener;
+                        console.log("added event for name:",buttonActionsMap[key].eventName)
+						requiredListeners[buttonActionsMap[key].eventName] = {handler:buttonActionsMap[key], boundListener:boundListener};
                     }
                 }
 				if(!foundValidAction){
@@ -197,6 +126,7 @@ export class AVM1Button extends AVM1MovieClip {
 				}
             }
 		}
+        this.adaptee.addButtonListeners();
 		this._initEventsHandlers();
 		this._addListeners();
 	}
@@ -218,13 +148,10 @@ export class AVM1Button extends AVM1MovieClip {
 		if (value == this.enabled)
 			return;
 		this.enabled = value;		
-		this.adaptee.buttonEnabled=value;
 		
-		this.adaptee.removeButtonListeners();
-		if(value){
-			this.adaptee.addButtonListeners();
-		}
-		this.setEnabledListener(value);
+        this.setEnabledListener(value);
+		this.adaptee.buttonEnabled=value;
+        this.adaptee.mouseEnabled=true;
 	}
 
 	public getTrackAsMenu(): boolean {
@@ -237,20 +164,18 @@ export class AVM1Button extends AVM1MovieClip {
 		//getAwayObjectOrTemplate(this).trackAsMenu = alToBoolean(this.context, value);
 	}
 
-
-
 	public _addListeners() {
 		for (var type in this._requiredListeners) {
-			this._eventHandlers[type]=(<any>{stageEvent:false, eventName:type});
-			this._eventsListeners[type]=this._requiredListeners[type];
+			this._eventHandlers[type]=this._requiredListeners[type].handler;
+			this._eventsListeners[type]=this._requiredListeners[type].boundListener;
 		}
-		this.setEnabledListener(this.enabled);
+        this.setEnabledListener(this.enabled);
 	}
 	public _removeListeners() {
 		for (var type in this._requiredListeners) {
 			//var target: EventDispatcher = type === 'keyDown' ?	(<any>this.adaptee).stage :	this.adaptee;
 			var target: EventDispatcher=this.adaptee;
-			target.removeEventListener(type, this._requiredListeners[type]);
+			target.removeEventListener(type, this._requiredListeners[type].boundListener);
 		}
 	}
 
@@ -286,32 +211,9 @@ export class AVM1Button extends AVM1MovieClip {
 			(<AVM1Context>avm1Context).executeActions(action.actionsBlock,	getAVM1Object(this.adaptee.parent, this.context));
 		}
 	}
-
+	
 	protected _initEventsHandlers() {
-		this.bindEvents([
-			new AVM1EventHandler('onData', 'data'),
-			new AVM1EventHandler('onDragOut', 'dragOut'),
-			new AVM1EventHandler('onDragOver', 'dragOver'),
-			new AVM1EventHandler('onEnterFrame', 'enterFrame'),
-			new AVM1EventHandler('onKeyDown', 'keyDown'),
-			new AVM1EventHandler('onKeyUp', 'keyUp'),
-			new AVM1EventHandler('onKillFocus', 'focusOut', function (e) {
-				return [e.relatedObject];
-			}),
-			new AVM1EventHandler('onLoad', 'load'),
-			new AVM1EventHandler('onMouseDown', 'mouseDown3d', null, true),
-			new AVM1EventHandler('onMouseUp', 'mouseUp3d', null, true),
-			new AVM1EventHandler('onMouseMove', 'mouseMove3d', null, true),
-			new AVM1MovieClipButtonModeEvent('onPress', 'mouseDown3d'),
-			new AVM1MovieClipButtonModeEvent('onRelease', 'mouseUp3d'),
-			new AVM1MovieClipButtonModeEvent('onReleaseOutside', 'mouseUpOutside3d'),
-			new AVM1MovieClipButtonModeEvent('onRollOut', 'mouseOut3d'),
-			new AVM1MovieClipButtonModeEvent('onRollOver', 'mouseOver3d'),
-			new AVM1EventHandler('onSetFocus', 'focusIn', function (e) {
-				return [e.relatedObject];
-			}),
-			new AVM1EventHandler( 'onUnload', 'unload')
-		]);
+		this.bindEvents(EventsListForButton);
 	}
 }
 
