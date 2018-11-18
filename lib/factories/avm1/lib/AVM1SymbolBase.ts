@@ -111,7 +111,10 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 		this._eventHandlers = null;
 	}
 	public updateEventByPropName(eventName) {
-        if(this._eventsMap[eventName]){
+        if(!this._eventsMap){
+            console.log("no eventsmap set", this)
+        }
+        else if(this._eventsMap[eventName]){
             this._updateEvent(this._eventsMap[eventName]);
         }
     }
