@@ -332,7 +332,7 @@ export class AVMAwayStage extends Sprite{
 
 		this._timer = new RequestAnimationFrame(this.internalOnEnterFrame, this);
 		this._timer.start();
-		var mouseEvents:string[]=[MouseEventAway.MOUSE_DOWN, MouseEventAway.MOUSE_MOVE, MouseEventAway.MOUSE_OUT, MouseEventAway.MOUSE_OVER, MouseEventAway.MOUSE_UP, MouseEventAway.MOUSE_UP_OUTSIDE, MouseEventAway.MOUSE_WHEEL];
+		var mouseEvents:any={};
 
         this.clearAllAVM1Listener();
 		this.addEventListener(MouseEventAway.MOUSE_DOWN, (evt)=>this.onMouseEvent(evt));
@@ -343,16 +343,17 @@ export class AVMAwayStage extends Sprite{
 	private _debugtimer:number=0;
 	private avm1Listener:any={};
 	public addAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
+        if(!this.avm1Listener[type])
+            this.avm1Listener[type]={};
         this.avm1Listener[type][asset.id]={type:type, callback:callback};
 	}
 	public removeAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
+        if(!this.avm1Listener[type])
+            return;
 		delete this.avm1Listener[type][asset.id+type];
 	}
 	public clearAllAVM1Listener(){
         this.avm1Listener={};
-        this.avm1Listener[MouseEventAway.MOUSE_DOWN]={};
-        this.avm1Listener[MouseEventAway.MOUSE_UP]={};
-        this.avm1Listener[MouseEventAway.MOUSE_MOVE]={};
 	}
     
     private _collectedDispatcher:DisplayObject[]=[];
@@ -372,6 +373,8 @@ export class AVMAwayStage extends Sprite{
 	
 	public onMouseEvent(mouseEvent:EventBase){
 
+        if(!this.avm1Listener[mouseEvent.type])
+            return;
         // the correct order for stage-event on childs is children first, highest depth first
         this._collectedDispatcher.length=0;
 		var i:number=0;
@@ -394,7 +397,7 @@ export class AVMAwayStage extends Sprite{
         
         len=this._collectedDispatcher.length;
 		for(i=0;i<len;i++) {
-            if(this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id]){
+            if(this.avm1Listener[mouseEvent.type] && this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id]){
                 this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id].callback();
             }
         }
