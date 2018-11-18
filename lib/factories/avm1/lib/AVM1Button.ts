@@ -96,6 +96,36 @@ export class AVM1Button extends AVM1MovieClip {
             '_x#', '_xmouse#', '_xscale#', '_y#', '_ymouse#', '_yscale#']);
 	}
 
+	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
+	{
+		if (this.adaptee.name != "scene") {
+            if(event.isMouse){
+                if (enabled) {
+                    this._mouseListenerCount++;
+                    this.adaptee.mouseEnabled = true;
+                    this.adaptee.mouseChildren = false;
+                    if(event.isButton){
+                        this._mouseButtonListenerCount++;
+                        (<any>this.adaptee).buttonMode = true;
+                    }
+                } else {
+                    this._mouseListenerCount--;
+                    if (this._mouseListenerCount <= 0){   
+                        this._mouseListenerCount = 0;
+                        this.adaptee.mouseEnabled = false;
+                        this.adaptee.mouseChildren = false;
+                    }
+                    if(event.isButton){
+                        this._mouseButtonListenerCount--;
+                        if (this._mouseButtonListenerCount <= 0){  
+                            this._mouseButtonListenerCount = 0;
+                            (<any>this.adaptee).buttonMode = false;
+                        }  
+                    }
+                }		
+            }			
+		}	
+	}
 	public initAVM1SymbolInstance(context: AVM1Context, awayObject: MovieClip) {
 		super.initAVM1SymbolInstance(context, awayObject);
 
@@ -145,12 +175,12 @@ export class AVM1Button extends AVM1MovieClip {
 	}
 
 	public setEnabled(value) {
+		this.adaptee.buttonEnabled=value;
 		if (value == this.enabled)
 			return;
 		this.enabled = value;		
 		
         this.setEnabledListener(value);
-		this.adaptee.buttonEnabled=value;
         this.adaptee.mouseEnabled=true;
 	}
 
