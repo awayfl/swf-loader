@@ -159,7 +159,10 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
                     }
                 }		
             }			
-		}	
+        }	
+        if(!this.enabled){
+            this.adaptee.mouseChildren = false;
+        }
 	}
 
 	public clone(){
