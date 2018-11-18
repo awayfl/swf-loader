@@ -32,6 +32,7 @@ import { AVM1Object } from "./runtime/AVM1Object";
 import { AVM1Function } from "./runtime/AVM1Function";
 import { AVM1PropertyDescriptor } from "./runtime/AVM1PropertyDescriptor";
 import {MovieClipProperties} from "./interpreter/MovieClipProperties";
+import {TextField} from "@awayjs/scene";
 
 import Big from "big.js";
 import { AVM1SymbolBase } from './lib/AVM1SymbolBase';
@@ -549,13 +550,19 @@ function as2Enumerate(obj, fn: (name) => void, thisArg): void {
 			return;
 		if (processed[name]) {
 			return; // skipping already reported properties
-		}
+        }
+       // if(obj.adaptee && obj.adaptee.isAsset(TextField) && obj.adaptee.isStatic)
+       //     return;
 		props[props.length]=name;
 		processed[name] = true;
 	}, thisArg);
-	var i=props.length;
+    var i=props.length;
+    var avmObj=null;
 	while(i>0){
-		i--;
+        i--;
+        avmObj=obj.alGet(props[i]);
+        if(!avmObj || (avmObj.adaptee && avmObj.adaptee.isAsset(TextField) && avmObj.adaptee.isStatic))
+            continue;
 		fn.call(thisArg, props[i]);
 	}
 }
