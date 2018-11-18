@@ -130,7 +130,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		'horizontal': LineScaleMode.HORIZONTAL
 	}
 
-	private _mouseButtonListenerCount:number;
+	protected _mouseButtonListenerCount:number;
 	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
 	{
 		if (this.adaptee.name != "scene") {
