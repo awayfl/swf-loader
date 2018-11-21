@@ -51,13 +51,14 @@ export function loadAVM1DataObject(context: AVM1Context, url: string,
 	}
 	var loader = new context.sec.flash.net.URLLoader(request);
 	loader.dataFormat = 'text'; // flash.net.URLLoaderDataFormat.TEXT;
-	var completeHandler = context.sec.boxFunction(function (event: Event): void {
+	var completeHandler = function (event: Event): void {
 		loader.removeEventListener(Event.LOAD_COMPLETE, completeHandler);
 		release || Debug.assert(typeof loader.data === 'string');
 		avm1BroadcastEvent(context, target, 'onData', [loader.data]);
-	});
+	};
 	loader.addEventListener(Event.LOAD_COMPLETE, completeHandler);
-	target._as3Loader = loader;
+    target._as3Loader = loader;
+    loader.load(request);
 }
 
 export class AVM1LoadVarsFunction extends AVM1Function {

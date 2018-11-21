@@ -203,6 +203,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 
 	public freeFromScript():void{
         super.freeFromScript();
+        this.enabled=true;
         for (var key in this._eventsListeners) {
             this.removeEventListenerOnAdapter(this._eventHandlers[key], <any>this._eventsListeners[key]);
         }   
