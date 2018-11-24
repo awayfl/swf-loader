@@ -847,8 +847,8 @@ export class AVM1ArrayPrototype extends AVM1Object {
         var tmpitem;
 		for (_i = 0; _i < len; _i++) {
             tmpitem = this.alGet(_i);
-            if(tmpitem){
-                outputStr+=tmpitem.toString()+((_i==len-1)?"":",");
+            if(typeof tmpitem !== "undefined"){
+                outputStr+=alToString(this.context, tmpitem)+((_i==len-1)?"":",");
             }
             else{
                 outputStr+=((_i==len-1)?"":",");
