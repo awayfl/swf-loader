@@ -147,7 +147,7 @@ export class AVM1Button extends AVM1MovieClip {
                 for(var key in buttonActionsMap){
                     if(action.stateTransitionFlags & parseInt(key)){
                         foundValidAction=true;
-                        console.log("added event for name:",buttonActionsMap[key].eventName)
+                        //console.log("added event for name:",buttonActionsMap[key].eventName)
 						requiredListeners[buttonActionsMap[key].eventName] = {handler:buttonActionsMap[key], boundListener:boundListener};
                     }
                 }
