@@ -9,7 +9,7 @@ import {MethodMaterial,   MaterialBase}	from "@awayjs/materials";
 import {DefaultRenderer, SceneGraphPartition, BasicPartition, PickGroup} from  "@awayjs/renderer";
 import {View, MouseManager} from "@awayjs/view";
 import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D, Viewport} from "@awayjs/stage";
-import {MouseEvent as MouseEventAway, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
+import {MouseEvent as MouseEventAway, KeyboardEvent, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
 import { AVM1TextField } from './avm1/lib/AVM1TextField';
 import { Mouse } from './ISecurityDomain';
@@ -338,10 +338,45 @@ export class AVMAwayStage extends Sprite{
 		this.addEventListener(MouseEventAway.MOUSE_DOWN, (evt)=>this.onMouseEvent(evt));
 		this.addEventListener(MouseEventAway.MOUSE_UP, (evt)=>this.onMouseEvent(evt));
 		this.addEventListener(MouseEventAway.MOUSE_MOVE, (evt)=>this.onMouseEvent(evt));
+		this.addEventListener(KeyboardEvent.KEYDOWN, (evt)=>this.onKeyEvent(evt));
+		this.addEventListener(KeyboardEvent.KEYUP, (evt)=>this.onKeyEvent(evt));
 		//this._resizeCallbackDelegate(null);
 	}
 	private _debugtimer:number=0;
-	private avm1Listener:any={};
+    private avm1Listener:any={};
+    
+    private onKeyEvent(event): void {
+        
+        if(!this.avm1Listener[event.type])
+            return;
+        // the correct order for stage-event on childs is children first, highest depth first
+        this._collectedDispatcher.length=0;
+		var i:number=0;
+		var myLayer:Sprite;
+		var numChilds:number;
+		var c:number;
+		var child:DisplayObject;
+        var len:number=this._layers.length;
+        
+		for(i=0;i<len;i++) {
+			myLayer=this._layers[i];
+			numChilds = myLayer.numChildren;			
+			for (c = 0; c < numChilds; ++c) {
+				child = myLayer.getChildAt(c);
+				if (child.isAsset(MovieClip)){
+					this.collectMousEvents(child);
+				}
+			}
+        }
+        
+        len=this._collectedDispatcher.length;
+		for(i=0;i<len;i++) {
+            if(this.avm1Listener[event.type] && this.avm1Listener[event.type][this._collectedDispatcher[i].id]){
+                this.avm1Listener[event.type][this._collectedDispatcher[i].id].callback();
+            }
+        }
+		FrameScriptManager.execute_queue();
+    }
 	public addAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
         if(!this.avm1Listener[type])
             this.avm1Listener[type]={};
