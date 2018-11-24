@@ -374,7 +374,7 @@ export function initializeAVM1Object(awayObject: any,
 
 			var eventMapping = ClipEventMappings[eventFlag];
 			var eventName = eventMapping.eventName;
-            console.log("eventName", eventName)
+            //console.log("eventName", eventName, eventMapping);
 			if (!eventName) {
 				Debug.warning("ClipEvent: " + eventFlag + ' not implemented');
 				continue;
