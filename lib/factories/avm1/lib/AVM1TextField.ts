@@ -194,6 +194,19 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		//var box:Box = this.adaptee.getBoxBounds(this.adaptee);
 		//this._prevWidth=(box == null)? 0 : toTwipRound(box.width);
 	}
+	public set_height(value: number)
+	{
+		value =  toTwipRound(alToNumber(this.context, value));
+
+		this._blockedByScript = true;
+
+		if (isNaN(value))
+			return;
+		
+		this.adaptee.height = value;
+		//var box:Box = this.adaptee.getBoxBounds(this.adaptee);
+		//this._prevWidth=(box == null)? 0 : toTwipRound(box.width);
+	}
 
 	public get_x(): number {
 		this.syncTextFieldValue();
