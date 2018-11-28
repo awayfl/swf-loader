@@ -734,8 +734,9 @@
 		}
 	
 		public startDrag(target?, ...args: any[]): void {
-			var mc = <AVM1MovieClip>this.context.resolveTarget(target);
-			mc.startDrag.apply(mc, args);
+            var mc = <AVM1MovieClip>this.context.resolveTarget(target);
+            if(mc)
+			    mc.startDrag.apply(mc, args);
 		}
 	
 		public stop() {
