@@ -142,12 +142,17 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 
 	public _addEventListener(event: AVM1EventHandler, callback:Function=null) {
 		var propertyName = this.context.normalizeName(event.propertyName);
-		var listener: any = this._eventsListeners[propertyName];
+        var listener: any = this._eventsListeners[propertyName];
+        var myThis=this;
 		if (!listener) {
 			if(!callback){
 				listener = function avm1EventHandler() {
+                    var args=null;
+                    if(propertyName.toLowerCase()=="onchanged"){
+                        args=[myThis];
+                    }
 					//var args = event.argsConverter ? event.argsConverter.apply(null, arguments) : null;
-					avm1BroadcastNativeEvent(this.context, this, propertyName, null);//args);
+					avm1BroadcastNativeEvent(this.context, this, propertyName, args);//args);
 				}.bind(this);
 			}
 			else{
@@ -204,6 +209,8 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 	public freeFromScript():void{
         super.freeFromScript();
         this.enabled=true;
+        this.adaptee.mouseEnabled = false;
+        this.adaptee.mouseChildren = true;
         for (var key in this._eventsListeners) {
             this.removeEventListenerOnAdapter(this._eventHandlers[key], <any>this._eventsListeners[key]);
         }   
