@@ -504,7 +504,7 @@ export class SWFParser extends ParserBase
 						var awayBitmap:BitmapImage2D=(<BitmapImage2D>this.awaySymbols[dictionary[i].id]);
 						if(!awayBitmap && symbol.definition){
                             awayBitmap=new BitmapImage2D(symbol.definition.width, symbol.definition.height, true, 0xff0000, false);
-                            awayBitmap.setArray(new Rectangle(0,0,symbol.definition.width, symbol.definition.height), symbol.definition.data);
+                            awayBitmap.setPixels(new Rectangle(0,0,symbol.definition.width, symbol.definition.height), symbol.definition.data);
                         }
 						if(awayBitmap){
                             this.awaySymbols[dictionary[i].id] = awayBitmap;

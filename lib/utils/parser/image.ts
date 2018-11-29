@@ -116,7 +116,7 @@ export interface ImageDefinition {
   width: number;
   height: number;
   mimeType: string;
-  data: Uint8Array;
+  data: Uint8ClampedArray;
   dataType?: ImageType;
   image: any; // For some reason, tsc doesn't like us using the DOM Image definition here.
 }

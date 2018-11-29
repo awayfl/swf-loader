@@ -44,7 +44,7 @@ export const enum BitmapFormat {
 /** @const */ var FACTOR_5BBP = 255 / 31;
 
 /*
- * Returns a Uint8Array of ARGB values. The source image is color mapped meaning
+ * Returns a Uint8ClampedArray of RGBA values. The source image is color mapped meaning
  * that the buffer is first prefixed with a color table:
  *
  * +--------------|--------------------------------------------------+
@@ -59,7 +59,7 @@ export const enum BitmapFormat {
  * well as the end of each row may be padded so that the next row of pixels
  * is aligned.
  */
-function parseColorMapped(tag: BitmapTag): Uint8Array {
+function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
   var width = tag.width, height = tag.height;
   var hasAlpha = tag.hasAlpha;
 
@@ -72,7 +72,7 @@ function parseColorMapped(tag: BitmapTag): Uint8Array {
 
   var bytes: Uint8Array = Inflate.inflate(tag.bmpData, dataSize, true);
 
-  var view = new Uint32Array(width * height);
+  var view:Uint8ClampedArray = new Uint8ClampedArray(dataSize);
 
   // TODO: Figure out why this fails.
   // Make sure we've deflated enough bytes.
@@ -83,11 +83,10 @@ function parseColorMapped(tag: BitmapTag): Uint8Array {
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         offset = bytes[p++] << 2;
-        var a = bytes[offset + 3]; // A
-        var r = bytes[offset + 0]; // R
-        var g = bytes[offset + 1]; // G
-        var b = bytes[offset + 2]; // B
-        view[i++] = b << 24 | g << 16 | r << 8 | a;
+        view[i++] = bytes[offset + 0]; // R
+        view[i++] = bytes[offset + 1]; // G
+        view[i++] = bytes[offset + 2]; // B
+        view[i++] = bytes[offset + 3]; // A
       }
       p += padding;
     }
@@ -95,25 +94,23 @@ function parseColorMapped(tag: BitmapTag): Uint8Array {
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         offset = bytes[p++] * colorTableEntrySize;
-        var a = 0xff; // A
-        var r = bytes[offset + 0]; // R
-        var g = bytes[offset + 1]; // G
-        var b = bytes[offset + 2]; // B
-        view[i++] = b << 24 | g << 16 | r << 8 | a;
+        view[i++] = bytes[offset + 0]; // R
+        view[i++] = bytes[offset + 1]; // G
+        view[i++] = bytes[offset + 2]; // B
+        view[i++] = 0xff; // A
       }
       p += padding;
     }
   }
   assert (p === dataSize, "We should be at the end of the data buffer now.");
   assert (i === width * height, "Should have filled the entire image.");
-  return new Uint8Array(view.buffer);
+  return view;
 }
 
 /**
- * Returns a Uint8Array of ARGB values. The data is already stored in premultiplied ARGB
- * so there's not much to do unless there's no alpha in which case we expand it here.
+ * Returns a Uint8ClampedArray of RGBA values.
  */
-function parse24BPP(tag: BitmapTag): Uint8Array {
+function parse24BPP(tag: BitmapTag): Uint8ClampedArray {
   var width = tag.width, height = tag.height;
   var hasAlpha = tag.hasAlpha;
 
@@ -121,25 +118,22 @@ function parse24BPP(tag: BitmapTag): Uint8Array {
   var dataSize = height * width * 4;
 
   var bytes: Uint8Array = Inflate.inflate(tag.bmpData, dataSize, true);
-  if (hasAlpha) {
-    return bytes;
-  }
-  var view = new Uint32Array(width * height);
-  var length = width * height, p = 0;
-  // TODO: Looks like we can probably get away with just setting alpha to 0xff instead of
-  // reading the entire buffer.
-  for (var i = 0; i < length; i++) {
-    p ++; // Reserved, always zero.
-    var r = bytes[p ++];
-    var g = bytes[p ++];
-    var b = bytes[p ++];
-    view[i] = b << 24 | g << 16 | r << 8 | 0xff;
+
+  //bytes are in ARGB format, so we need to convert to RGBA
+  var view:Uint8ClampedArray = new Uint8ClampedArray(dataSize);
+  var p:number = 0;
+
+  for (var i = 0; i < dataSize; i+=4) {
+    view[p++] = bytes[i + 1]; // R
+    view[p++] = bytes[i + 2]; // G
+    view[p++] = bytes[i + 3]; // B
+    view[p++] = bytes[i]; // A
   }
   assert (p === dataSize, "We should be at the end of the data buffer now.");
-  return new Uint8Array(view.buffer);
+  return view;
 }
 
-function parse15BPP(tag: BitmapTag): Uint8Array {
+function parse15BPP(tag: BitmapTag): Uint8ClampedArray {
   console.log("parse15BPP");
   //notImplemented("parse15BPP");
   /*
@@ -168,7 +162,7 @@ function parse15BPP(tag: BitmapTag): Uint8Array {
 
 export function defineBitmap(tag: BitmapTag): {definition: ImageDefinition; type: string} {
  // enterTimeline("defineBitmap");
-  var data: Uint8Array;
+  var data: Uint8ClampedArray;
   var type = ImageType.None;
   switch (tag.format) {
     case BitmapFormat.FORMAT_COLORMAPPED:
