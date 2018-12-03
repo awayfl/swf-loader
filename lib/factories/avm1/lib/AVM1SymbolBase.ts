@@ -400,8 +400,11 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 		var oldName = this.adaptee.name;
 		this.adaptee.name = value;
 
-		this.get_parent().registerScriptObject(<any>this.adaptee);
-		this.get_parent()._updateChildName(<AVM1MovieClip><any>this, oldName, value);
+		var avmParent = this.get_parent();
+		if(avmParent){
+			avmParent.registerScriptObject(<any>this.adaptee);
+			avmParent._updateChildName(<AVM1MovieClip><any>this, oldName, value);
+		}
 	}
 
 	public get_parent(): AVM1MovieClip {
