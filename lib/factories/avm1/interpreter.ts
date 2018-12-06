@@ -546,7 +546,7 @@ function as2Enumerate(obj, fn: (name) => void, thisArg): void {
 	var processed = Object.create(null); // TODO remove/refactor
 	var props:any[]=[];
 	alForEachProperty(obj, function (name) {
-		if(name.indexOf("_internal_TF")!=-1)
+		if(typeof name=="string" && name.indexOf("_internal_TF")!=-1)
 			return;
 		if (processed[name]) {
 			return; // skipping already reported properties
