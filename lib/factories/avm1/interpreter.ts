@@ -485,8 +485,7 @@ function as2SetProperty(context: AVM1Context, obj: any, name: any, value: any): 
 					as2SyncEvents(context, key, avm1Obj);
 				}
             }
-            if(!(value instanceof AVM1MovieClip))
-                avm1Obj.protoTypeChanged=true;
+            avm1Obj.protoTypeChanged=!(value instanceof AVM1MovieClip);
 		}
 	}
 	else{
