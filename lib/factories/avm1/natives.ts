@@ -1029,7 +1029,9 @@ export class AVM1ArrayPrototype extends AVM1Object {
         start = alToInteger(this.context, start);
 		var length = alToInt32(this.context, this.alGet('length')) >>> 0;
 		start = start < 0 ? Math.max(length + start, 0) : Math.min(length, start);
-        if(deleteCount)
+        //if(deleteCount || typeof deleteCount==="number")
+        //    deleteCount = alToInteger(this.context, deleteCount);
+        if(deleteCount || typeof deleteCount==="number")
             deleteCount = alToInteger(this.context, deleteCount);
         else
 		    deleteCount = length - start;
