@@ -103,7 +103,6 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
     }
   }
   assert (p === dataSize, "We should be at the end of the data buffer now.");
-  assert (i === width * height, "Should have filled the entire image.");
   return view;
 }
 
