@@ -2401,7 +2401,7 @@ function avm1_0x3F_ActionModulo(ectx: ExecutionContext) {
 			b = 0;
 	}
 
-	if (isNaN(a) || isNaN(b)) {
+	if (isNaN(a) || isNaN(b) || a == 0) {
 		stack.push(NaN);
 	} else {
 		stack.push(Number(Big(Number(b)).mod(Big(Number(a)))));
