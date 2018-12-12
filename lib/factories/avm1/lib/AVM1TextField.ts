@@ -105,7 +105,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	public selectTextField(fromMouseDown:boolean=false){
 		// this is called from the adaptee whenever it is selected in MouseManager
 		if(AVM1Globals.softKeyboardManager){
-			if(this.adaptee.name=="dummy_txt")
+			if(this.adaptee.name=="dummy_txt" || this.adaptee.name.indexOf("temp")==0)
 				fromMouseDown=true;
 			AVM1Globals.softKeyboardManager.openKeyboard(this.adaptee, fromMouseDown);
 		}
