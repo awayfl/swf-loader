@@ -22,7 +22,7 @@ import {getAVM1Object, wrapAVM1NativeClass, toTwipFloor, toTwipRound} from "./AV
 import {AVM1TextFormat} from "./AVM1TextFormat";
 import {Debug, notImplemented, warning} from "../../base/utilities/Debug";
 import {EventBase as Event, Point, Box, IgnoreConflictStrategy} from "@awayjs/core";
-import {TextField, TextFieldType, TextFormat, TextfieldEvent, TextFieldAutoSize, DisplayObject, DisplayObjectContainer} from "@awayjs/scene";
+import {TextField, KeyboardEvent, TextFieldType, TextFormat, TextfieldEvent, TextFieldAutoSize, DisplayObject, DisplayObjectContainer} from "@awayjs/scene";
 import {AVM1Key} from "./AVM1Key";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
@@ -63,16 +63,28 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	private _exitFrameHandler: (event: Event) => void;
 
 	public dispatchKeyEvent(keyCode, isShift, isCTRL, isAlt){
-		
-		// this is called from the adaptee whenever a text-input occurs
+        // this is called from the adaptee whenever a text-input occurs
+        console.log("dispatch keyEvent", MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).useSoftkeyboard)
 		if(MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).useSoftkeyboard){
-			var staticState: typeof AVM1Key = this.context.getStaticState(AVM1Key);
+            console.log("dispatch keyEvent")
+            var staticState: typeof AVM1Key = this.context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = keyCode;
 			staticState._keyStates[keyCode] = 1;
 			alCallProperty(AVM1Globals.instance.Key, 'broadcastMessage', ['onKeyDown']);
 			
+            var newEvent: KeyboardEvent = new KeyboardEvent(KeyboardEvent.KEYDOWN, "", keyCode);
+            newEvent.isShift = isShift;
+            newEvent.isCTRL = isCTRL;
+            newEvent.isAlt = isAlt;
+            (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.dispatchEvent(newEvent);
 			delete staticState._keyStates[keyCode];
-			alCallProperty(AVM1Globals.instance.Key, 'broadcastMessage', ['onKeyUp']);
+            alCallProperty(AVM1Globals.instance.Key, 'broadcastMessage', ['onKeyUp']);
+            
+            var newEvent: KeyboardEvent = new KeyboardEvent(KeyboardEvent.KEYUP, "", keyCode);
+            newEvent.isShift = isShift;
+            newEvent.isCTRL = isCTRL;
+            newEvent.isAlt = isAlt;
+            (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.dispatchEvent(newEvent);
 		}
 	}
 
