@@ -619,7 +619,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 	}
 
 	public get_xmouse(): number {		
-		return toTwipFloor(this.adaptee.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, 0)).x);
+		return toTwipFloor((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.getLocalMouseX(this.adaptee));
 	}
 
 	public get_xscale(): number {
@@ -649,7 +649,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 	}
 
 	public get_ymouse(): number {
-		return toTwipFloor(this.adaptee.globalToLocal(new Point(0, (<any>this.context.globals.Stage)._awayAVMStage.mouseY)).y);
+		return toTwipFloor((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.getLocalMouseY(this.adaptee));
 	}
 
 	public get_yscale(): number {
