@@ -17,7 +17,8 @@
 import {alCallProperty} from "../runtime";
 import {AVM1Context} from "../context";
 import {wrapAVM1NativeClass} from "./AVM1Utils";
-import {MouseEvent, MouseManager} from "@awayjs/scene";
+import {MouseEvent} from "@awayjs/scene";
+import {MouseManager} from "@awayjs/view";
 import {AVMAwayStage} from "../../AVMAwayStage";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Stage } from './AVM1Stage';
@@ -46,11 +47,11 @@ export class AVM1Mouse extends AVM1Object {
 	}
 
 	public static hide() {
-		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.scene.renderer.pickGroup).showCursor=false;
+		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.view.renderer.pickGroup).showCursor=false;
 	}
 
 	public static show() {
-		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.scene.renderer.pickGroup).showCursor=true;
+		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.view.renderer.pickGroup).showCursor=true;
 	}
 }
 

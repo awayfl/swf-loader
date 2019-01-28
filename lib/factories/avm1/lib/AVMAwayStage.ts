@@ -49,7 +49,7 @@ export class AVMAwayStage extends Sprite{
 	private exitEvent:any=new EventBase("exitFrame");
 	// no need to create new events on each frame. we can reuse them
 
-	private SHOW_FRAME_RATE:boolean = false;
+	private SHOW_FRAME_RATE:boolean = true;
 
 	constructor(width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, htmlCanvas:HTMLCanvasElement=null) {
 		super();
