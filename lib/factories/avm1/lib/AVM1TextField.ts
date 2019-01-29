@@ -20,18 +20,16 @@ import {
 import {AVM1Context} from "../context";
 import {getAVM1Object, wrapAVM1NativeClass, toTwipFloor, toTwipRound} from "./AVM1Utils";
 import {AVM1TextFormat} from "./AVM1TextFormat";
-import {Debug, notImplemented, warning} from "../../base/utilities/Debug";
-import {EventBase as Event, Point, Box, IgnoreConflictStrategy} from "@awayjs/core";
-import {TextField, KeyboardEvent, TextFieldType, TextFormat, TextfieldEvent, TextFieldAutoSize, DisplayObject, DisplayObjectContainer} from "@awayjs/scene";
+import {notImplemented} from "../../base/utilities/Debug";
+import {EventBase as Event} from "@awayjs/core";
+import {TextField, KeyboardEvent, TextFormat, TextfieldEvent, DisplayObject, DisplayObjectContainer, MouseManager} from "@awayjs/scene";
 import {AVM1Key} from "./AVM1Key";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { EventsListForMC } from "./AVM1EventHandler";
 import { AVM1Globals } from './AVM1Globals';
-import {MouseManager} from "@awayjs/view";
 import {alCallProperty,} from "../runtime";
 import { AVM1Stage } from './AVM1Stage';
-import { PickGroup } from '@awayjs/renderer';
 
 interface mapNumberToString{
 	[key: number]: string;
@@ -64,8 +62,8 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 
 	public dispatchKeyEvent(keyCode, isShift, isCTRL, isAlt){
         // this is called from the adaptee whenever a text-input occurs
-        console.log("dispatch keyEvent", MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).useSoftkeyboard)
-		if(MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).useSoftkeyboard){
+        console.log("dispatch keyEvent", MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).useSoftkeyboard)
+		if(MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).useSoftkeyboard){
             console.log("dispatch keyEvent")
             var staticState: typeof AVM1Key = this.context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = keyCode;
@@ -179,7 +177,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	{
 		this.syncTextFieldValue();
 		//this.replicateWeirdFlashBehavior();
-		//var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee)
+		//var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee)
 		return toTwipRound(this.adaptee.width);
 		//return this._prevWidth;
 	}
@@ -188,7 +186,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	{
 		this.syncTextFieldValue();
 		//this.replicateWeirdFlashBehavior();
-		//var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee)
+		//var box:Box = PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee)
 		return toTwipRound(this.adaptee.height);
 		//return this._prevWidth;
 	}
@@ -444,8 +442,8 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
             value=false;
         }
 		value = alToBoolean(this.context, value);
-		if(!value && MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).getFocus()==this.adaptee){
-			MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.pickGroup).setFocus(null);
+		if(!value && MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).getFocus()==this.adaptee){
+			MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).setFocus(null);
 		}
 		this.adaptee.selectable = value;
 	}
