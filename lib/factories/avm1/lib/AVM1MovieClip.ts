@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import {getAwayJSAdaptee, getAwayObjectOrTemplate,
+import {DEPTH_OFFSET, getAwayJSAdaptee, getAwayObjectOrTemplate,
 	getAVM1Object,
 	hasAwayJSAdaptee,
 	IAVM1SymbolBase, initializeAVM1Object,
 	wrapAVM1NativeClass, toTwipFloor, avm2AwayDepth, away2avmDepth
 } from "./AVM1Utils";
 import {
-	alCoerceString, alForEachProperty, alInstanceOf, alIsName, alNewObject, alToBoolean, alToInt32,
+	alCoerceNumber, alCoerceString, alForEachProperty, alInstanceOf, alIsName, alNewObject, alToBoolean, alToInt32,
 	alToNumber,
 	alToString, AVM1PropertyFlags
 } from "../runtime";
@@ -34,9 +34,12 @@ import {AVM1ArrayNative} from "../natives";
 import {FlashNetScript_navigateToURL} from "../../AVM2Dummys";
 import {copyAS3PointTo, toAS3Point} from "./AVM1Point";
 import {MovieClipProperties} from "../interpreter/MovieClipProperties";
-import {IMovieClipAdapter, DisplayObject, MovieClip, TextField, Billboard, TextFormat, MouseManager} from "@awayjs/scene";
-import {AssetLibrary, Matrix3D, Point, WaveAudio} from "@awayjs/core";
+import {
+	IMovieClipAdapter, DisplayObjectContainer, DisplayObject, MovieClip, TextField, Sprite, Billboard, TextFormat
+} from "@awayjs/scene";
+import {AssetLibrary, Matrix3D, Rectangle, Box, Point, WaveAudio} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
+import {constructClassFromSymbol} from "../../link";
 import {Graphics, LineScaleMode} from "@awayjs/graphics";
 import {BitmapImage2D as Bitmap} from "@awayjs/stage";
 import {LoaderInfo} from "../../customAway/LoaderInfo";
@@ -49,7 +52,8 @@ import { AVM1EventHandler } from "./AVM1EventHandler";
 import {AVM1LoaderHelper} from "./AVM1LoaderHelper";
 import {EventsListForMC} from "./AVM1EventHandler";
 import { AVM1InterpretedFunction } from '../interpreter';
-import { PickGroup } from '@awayjs/view';
+import { MouseManager } from '@awayjs/view';
+import { PickGroup } from '@awayjs/renderer';
 
 class SpriteSymbol{
 	avm1Name:string;
@@ -787,7 +791,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if (!obj) {
 			return undefined;
 		}
-		return convertAS3RectangeToBounds(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(obj, true), this.context);
+		return convertAS3RectangeToBounds(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(obj, true), this.context);
 	}
 
 	public getBytesLoaded(): number {
@@ -844,7 +848,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		if (!obj) {
 			return undefined;
 		}
-		return convertAS3RectangeToBounds(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(obj), this.context);
+		return convertAS3RectangeToBounds(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).getBoxBounds(obj), this.context);
 	}
 
 	public getSWFVersion(): number {
@@ -868,7 +872,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
         if(!pt)
             return;
 		var tmp = toAS3Point(pt);
-		this.adaptee.transform.globalToLocal(tmp, tmp);
+		this.adaptee.globalToLocal(tmp, tmp);
 		copyAS3PointTo(tmp, pt);
 	}
 
@@ -970,12 +974,12 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			if (isNullOrUndefined(target) || !hasAwayJSAdaptee(target)) {
 				return false; // target is undefined or not a AVM1 display object, returning false.
 			}
-			return PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker(this.adaptee.partition).hitTestObject(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker((<DisplayObject>getAwayJSAdaptee(target)).partition));
+			return PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).hitTestObject(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker((<DisplayObject>getAwayJSAdaptee(target)).partition));
 		}
 		x = alToNumber(this.context, x);
 		y = alToNumber(this.context, y);
 		shapeFlag = alToBoolean(this.context, shapeFlag);
-		return PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker(this.adaptee.partition).hitTestPoint(x, y, shapeFlag);
+		return PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport).getBoundsPicker(this.adaptee.partition).hitTestPoint(x, y, shapeFlag);
 	}
 
 	public lineGradientStyle(fillType: string, colors: AVM1Object, alphas: AVM1Object,
@@ -1045,7 +1049,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
             return;
         }
 		var tmp = toAS3Point(pt);
-		this.adaptee.transform.localToGlobal(tmp, tmp);
+		this.adaptee.localToGlobal(tmp, tmp);
 		copyAS3PointTo(tmp, pt);
 	}
 
@@ -1122,7 +1126,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}//todo: listen on stage
 		if(!this.isDragging){
 			this.isDragging=true;
-			this.startDragPoint=this.adaptee.parent.transform.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
+			this.startDragPoint=this.adaptee.parent.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
             if(lock){
                 this.adaptee.x=this.startDragPoint.x;
                 this.adaptee.y=this.startDragPoint.y;
@@ -1134,8 +1138,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			AVM1Stage.stage.addEventListener("mouseMove3d", this.dragListenerDelegate);
 			window.addEventListener("mouseup", this.stopDragDelegate);
 			window.addEventListener("touchend", this.stopDragDelegate);
-			AVM1Stage.stage.scene.mousePicker.dragEntity=this.adaptee;
-			MouseManager.getInstance(AVM1Stage.stage.scene.renderer.pickGroup).isAVM1Dragging=true;
+			AVM1Stage.stage.view.mousePicker.dragEntity=this.adaptee;
+			MouseManager.getInstance(AVM1Stage.stage.view.renderer.pickGroup).isAVM1Dragging=true;
 
 		}
 	}
@@ -1151,7 +1155,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		//console.log("mouseX", (<any>this.context.globals.Stage)._awayAVMStage.mouseX);
 		//console.log("mouseY", (<any>this.context.globals.Stage)._awayAVMStage.mouseY);
 
-		var tmpPoint=this.adaptee.parent.transform.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
+		var tmpPoint=this.adaptee.parent.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
 
 		this.adaptee.x=this.startDragMCPosition.x+(tmpPoint.x-this.startDragPoint.x);
 		this.adaptee.y=this.startDragMCPosition.y+(tmpPoint.y-this.startDragPoint.y);
@@ -1183,8 +1187,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public stopDrag(e=null) {
 		this.isDragging=false;
         AVM1MovieClip.currentDraggedMC=null;
-		AVM1Stage.stage.scene.mousePicker.dragEntity=null;
-		MouseManager.getInstance(AVM1Stage.stage.scene.renderer.pickGroup).isAVM1Dragging=true;
+		AVM1Stage.stage.view.mousePicker.dragEntity=null;
+		MouseManager.getInstance(AVM1Stage.stage.view.renderer.pickGroup).isAVM1Dragging=true;
 		AVM1Stage.stage.removeEventListener("mouseMove3d", this.dragListenerDelegate);
 		window.removeEventListener("mouseup", this.stopDragDelegate);
 		window.removeEventListener("touchend", this.stopDragDelegate);

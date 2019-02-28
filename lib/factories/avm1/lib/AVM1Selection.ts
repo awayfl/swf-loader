@@ -1,9 +1,15 @@
-import {wrapAVM1NativeClass} from "./AVM1Utils";
-import {DisplayObject, TextField, MouseManager} from "@awayjs/scene";
+import {alDefineObjectProperties, AVM1PropertyFlags} from "../runtime";
+import {getAwayJSAdaptee, IAVM1SymbolBase, wrapAVM1NativeClass} from "./AVM1Utils";
+import {AVM1ColorTransform, toAwayColorTransform} from "./AVM1ColorTransform";
+import {DisplayObject, MovieClip, TextField} from "@awayjs/scene";
 import {AVM1Context} from "../context";
-import {notImplemented, warning} from "../../base/utilities/Debug";
-import {PickGroup} from "@awayjs/view";
+import {AVM1SharedObjectPrototype} from "./AVM1SharedObject";
+import {AVM1InterpretedFunction} from "../interpreter";
+import {Debug, notImplemented, release, warning} from "../../base/utilities/Debug";
+import {AVM1MovieClip} from "./AVM1MovieClip";
+import {MouseManager} from "@awayjs/view";
 import { AVM1Object } from "../runtime/AVM1Object";
+import { PickGroup } from '@awayjs/renderer';
 import { AVM1Stage } from './AVM1Stage';
 
 var noManagerDebug:boolean=false;
@@ -41,21 +47,21 @@ export class AVM1Selection extends AVM1Object {
 		return true;
 	}
     getBeginIndex():number{
-        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view)).getFocus();
+        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).getFocus();
         if(objectinFocus && objectinFocus.isAsset(TextField)){
             return (<TextField>objectinFocus).selectionBeginIndex;
         }
         return -1;
     }
     getEndIndex():number{
-        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).getFocus();
+        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).getFocus();
         if(objectinFocus && objectinFocus.isAsset(TextField)){
             return (<TextField>objectinFocus).selectionEndIndex;
         }
         return -1;
     }
     getCaretIndex():number{
-        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).getFocus();
+        var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).getFocus();
         if(objectinFocus && objectinFocus.isAsset(TextField)){
             return (<TextField>objectinFocus).selectionBeginIndex;
         }
@@ -63,7 +69,7 @@ export class AVM1Selection extends AVM1Object {
     }
 	// 	Returns a string specifying the target path of the object that has focus.
 	getFocus():string{
-		var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).getFocus();
+		var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).getFocus();
 		if(objectinFocus){
 			var names:string[]=[];
 			while (objectinFocus){
@@ -105,12 +111,12 @@ export class AVM1Selection extends AVM1Object {
 		if(typeof newFocus === "string"){			
 			var focusObj = this.context.resolveTarget(newFocus);
 			if(focusObj && focusObj.adaptee){
-				MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).setFocus(focusObj.adaptee);
+				MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).setFocus(focusObj.adaptee);
 				return;
 			}
 			var focusObj = this.context.resolveTarget(newFocus+"_internal_TF");
 			if(focusObj && focusObj.adaptee){
-				MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).setFocus(focusObj.adaptee);
+				MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).setFocus(focusObj.adaptee);
 				return;
 			}
 			var myThis=this;
@@ -121,7 +127,7 @@ export class AVM1Selection extends AVM1Object {
 		}
 		var focusObj = this.context.resolveTarget(newFocus);
 		if(focusObj && focusObj.adaptee)
-			MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).setFocus(focusObj.adaptee);
+			MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).setFocus(focusObj.adaptee);
 		else{
 			//MouseManager.getInstance().setFocusCallback(function(){myThis.setFocus(newFocus);});
 			warning("AVM1Selection.setFocus - no object found '"+newFocus.toString()+"'");
@@ -134,7 +140,7 @@ export class AVM1Selection extends AVM1Object {
 	// Sets the selection span of the currently focused text field.
 
 	setSelection(beginIndex:number, endIndex:number){
-		var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.view)).getFocus();
+		var objectinFocus:DisplayObject=<DisplayObject>MouseManager.getInstance(PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.view.renderer.viewport)).getFocus();
 		if(objectinFocus && objectinFocus.isAsset(TextField)){
 			(<TextField>objectinFocus).setSelection(beginIndex, endIndex);
 		}

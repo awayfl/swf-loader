@@ -1,17 +1,18 @@
 
-import {BuildMode, IAsset, ColorUtils, Rectangle} from "@awayjs/core";
+import {BuildMode, IAsset, EventDispatcher, Transform, Point, ColorUtils, Vector3D, Rectangle} from "@awayjs/core";
 
-import {EventBase, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
+import {AssetEvent, EventBase, LoaderEvent, ParserEvent, URLRequest, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
-import {HoverController, FrameScriptManager, Camera, MovieClip, Scene, MouseManager, SceneGraphPartition, DisplayObjectContainer} from "@awayjs/scene";
+import {HoverController, FrameScriptManager, TextField, Billboard, Camera, LoaderContainer, MovieClip, DisplayObjectContainer, Scene} from "@awayjs/scene";
 
-import {MethodMaterial}	from "@awayjs/materials";
-import {DefaultRenderer} from  "@awayjs/renderer";
-import {View, BasicPartition, PickGroup} from "@awayjs/view";
-import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D} from "@awayjs/stage";
+import {MethodMaterial,   MaterialBase}	from "@awayjs/materials";
+import {DefaultRenderer, SceneGraphPartition, BasicPartition, PickGroup} from  "@awayjs/renderer";
+import {View, MouseManager} from "@awayjs/view";
+import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D, Viewport} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, KeyboardEvent, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
 import { AVM1TextField } from './avm1/lib/AVM1TextField';
+import { Mouse } from './ISecurityDomain';
 
 
 export interface FrameScript {
@@ -30,7 +31,7 @@ export class AVMAwayStage extends Sprite{
 
 	private _frameRate:number = 30;
 	private _currentFps:number = 0;
-	private _scene: Scene;
+	private _view: View;
 	private _rendererStage:AwayStage;
 	protected _renderer: DefaultRenderer;
 	private _timer: RequestAnimationFrame;
@@ -48,7 +49,7 @@ export class AVMAwayStage extends Sprite{
 	private exitEvent:any=new EventBase("exitFrame");
 	// no need to create new events on each frame. we can reuse them
 
-	private SHOW_FRAME_RATE:boolean = true;
+	private SHOW_FRAME_RATE:boolean = false;
 
 	constructor(width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, htmlCanvas:HTMLCanvasElement=null) {
 		super();
@@ -124,16 +125,15 @@ export class AVMAwayStage extends Sprite{
 
 
 		this.partition = new SceneGraphPartition(this, true);
-		this._scene.root.addChild(this);
+		this._view.scene.addChild(this);
 		this.mouseEnabled=true;
 		this._stageWidth = width;
 		this._stageHeight = height;
 		//backgroundColor=0xcccccc;
-		this._scene.view.backgroundColor = (isNaN(backgroundColor))? 0xFF00FF : backgroundColor;
+		this._view.backgroundColor = (isNaN(backgroundColor))? 0xFF00FF : backgroundColor;
 		this._frameRate = frameRate;
 
-		MouseManager.getInstance(PickGroup.getInstance(this._scene.renderer.view))._stage=this;
-		MouseManager.getInstance(PickGroup.getInstance(this._scene.renderer.view)).eventBubbling=false;
+		MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport))._stage=this;
 
 		// prevent backspace and other default shortcutz for our document:
         // todo: make this optional (?)
@@ -181,9 +181,8 @@ export class AVMAwayStage extends Sprite{
 		this.htmlElement=this._renderer.stage.container;
 		this.htmlElement.tabIndex = 1000;
 	}
-	public get scene():Scene
-	{
-		return this._scene;
+	public get view():View{
+		return this._view;
 	}
 	public getLayer(idx:number): Sprite{
 		while(this._layers.length<=idx){
@@ -205,7 +204,7 @@ export class AVMAwayStage extends Sprite{
 	}
 
 	public set onlyMouseEnabled(value:boolean) {
-		//this._scene.mousePicker.onlyMouseEnabled = value;
+		//this._view.mousePicker.onlyMouseEnabled = value;
 	}
 
 	// ---------- event mapping functions Event.RESIZE
@@ -223,22 +222,22 @@ export class AVMAwayStage extends Sprite{
 	public updateSize(x:number, y:number, w:number, h:number){
 		this._stageWidth=w;
 		this._stageHeight=h;
-		this._scene.view.x         = x;
-		this._scene.view.y         = y;
+		this._view.x         = x;
+		this._view.y         = y;
 
 		this._renderer.stage.x     = x;
 		this._renderer.stage.y    = y;
 	//	this._renderer.stage.container.style.zIndex="-100";
 		this._renderer.stage.width     = w;
 		this._renderer.stage.height    = h;
-		this._scene.view.width     = w;
-		this._scene.view.height    = h;
+		this._view.width     = w;
+		this._view.height    = h;
 		if(this._fpsTextField)
 			this._fpsTextField.style.left  =  window.innerWidth * 0.5 - 100 + 'px';
 	};
 
 	public show (){
-		//this._scene.renderer.stage.container.style.display="initial";
+		//this._view.renderer.stage.container.style.display="initial";
 	}
 	// ---------- event mapping functions Event.MOUSE_LEAVE
 
@@ -250,10 +249,10 @@ export class AVMAwayStage extends Sprite{
 
 		var myBitmap:BitmapImage2D=new BitmapImage2D(550, 400, true, 0xffffffff, false);
 
-		(<DefaultRenderer>this._scene.renderer).queueSnapshot(myBitmap);
+		(<DefaultRenderer>this._view.renderer).queueSnapshot(myBitmap);
 
 
-		this._scene.render();
+		this._view.render();
 
 		myBitmap.invalidate();
 
@@ -293,17 +292,17 @@ export class AVMAwayStage extends Sprite{
 		//this._rendererStage = StageManager.getInstance().getStageAt(0);
 
 		StageManager.htmlCanvas=htmlCanvas;
-		this._renderer = new DefaultRenderer(new BasicPartition(new DisplayObjectContainer()));
+		this._renderer = new DefaultRenderer(new BasicPartition(new Scene()));
 		this._renderer.stage.color = 0xFFFFFFFF;
 		StageManager.htmlCanvas=null;
 
-		this._scene = new Scene(this._renderer);
+		this._view = new View(this._renderer);
 		this._renderer.antiAlias=0;
-		this._scene.renderer.renderableSorter = null;//new RenderableSort2D();
-        //this._scene.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
-        this._scene.mousePicker.shapeFlag=true;
-		this._scene.forceMouseMove=true;
-		this._scene.beforeRenderCallback=function(){
+		this._view.renderer.renderableSorter = null;//new RenderableSort2D();
+        //this._view.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
+        this._view.mousePicker.shapeFlag=true;
+		this._view.forceMouseMove=true;
+		this._view.beforeRenderCallback=function(){
             FrameScriptManager.execute_queue();
             AVM1TextField.syncAllTextfields();
         }
@@ -317,7 +316,7 @@ export class AVMAwayStage extends Sprite{
 		camera.projection = this._projection;
 
 		this._hoverControl = new HoverController(camera, null, 180, 0, 1000);
-		this._scene.camera = camera;
+		this._view.camera = camera;
 		//this._projection.preserveFocalLength=true;
 		this._projection.fieldOfView = Math.atan(400/1000/2)*360/Math.PI;
 	//	this._renderer.stage.container.style.zIndex="-100";
@@ -544,7 +543,7 @@ export class AVMAwayStage extends Sprite{
 
 
 			this._currentFps++;
-			this._scene.render();
+			this._view.render();
 
 
 
@@ -572,7 +571,7 @@ export class AVMAwayStage extends Sprite{
 
 	public get mouseX () : number{
 		//console.log("mouseX not implemented yet in flash/DisplayObject");
-		return this._scene.getLocalMouseX(this);
+		return this._view.getLocalMouseX(this);
 	}
 
 	/**
@@ -583,7 +582,7 @@ export class AVMAwayStage extends Sprite{
 	 */
 	public get mouseY () : number{
 		//console.log("mouseY not implemented yet in flash/DisplayObject");
-		return this._scene.getLocalMouseY(this);
+		return this._view.getLocalMouseY(this);
 	}
 
 	public set accessibilityImplementation (value:any){
@@ -640,10 +639,10 @@ export class AVMAwayStage extends Sprite{
 
 
 	public get color():number{
-		return this._scene.view.backgroundColor;
+		return this._view.backgroundColor;
 	}
 	public set color(color:number){
-		this._scene.view.backgroundColor = color;
+		this._view.backgroundColor = color;
 	}
 
 
