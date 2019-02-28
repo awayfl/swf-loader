@@ -526,6 +526,10 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
+		if(!this._renderer.stage){
+			this._timer.stop();
+			return;
+		}
 		var frameMarker:number = 1000/this._frameRate;
 		this._stageTime += Math.min(dt, frameMarker);
 
