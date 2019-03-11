@@ -241,6 +241,11 @@ export class AVMAwayStage extends Sprite{
 	}
 	// ---------- event mapping functions Event.MOUSE_LEAVE
 
+	public dispose(){
+		MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport)).unregisterContainer(this._renderer.stage.container);
+		this._view.dispose();
+		this._renderer=null;
+	}
 
 
 	//---------------------------stuff added to make it work:
@@ -526,10 +531,10 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
-		if(!this._renderer.stage){
+		if(!this._renderer || !this._renderer.stage){
 			this._timer.stop();
 			return;
-		}
+		} 
 		var frameMarker:number = 1000/this._frameRate;
 		this._stageTime += Math.min(dt, frameMarker);
 
@@ -547,6 +552,10 @@ export class AVMAwayStage extends Sprite{
 
 
 			this._currentFps++;
+			if(!this._renderer || !this._renderer.stage){
+				this._timer.stop();
+				return;
+			} 
 			this._view.render();
 
 
