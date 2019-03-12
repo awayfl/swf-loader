@@ -50,7 +50,7 @@ export class AVMAwayStage extends Sprite{
 
 	private SHOW_FRAME_RATE:boolean = true;
 
-	constructor(width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, htmlCanvas:HTMLCanvasElement=null) {
+	constructor(width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, htmlCanvas:HTMLCanvasElement=null, stageWidth:number=550, stageHeight:number=400) {
 		super();
 		BuildMode.mode=BuildMode.AVM1;
 
@@ -120,14 +120,14 @@ export class AVMAwayStage extends Sprite{
 		};
 
 		// init awayengine
+		this._stageWidth = stageWidth;
+		this._stageHeight = stageHeight;
 		this.initEninge(htmlCanvas);
 
 
 		this.partition = new SceneGraphPartition(this, true);
 		this._scene.root.addChild(this);
 		this.mouseEnabled=true;
-		this._stageWidth = width;
-		this._stageHeight = height;
 		//backgroundColor=0xcccccc;
 		this._scene.view.backgroundColor = (isNaN(backgroundColor))? 0xFF00FF : backgroundColor;
 		this._frameRate = frameRate;
@@ -221,8 +221,8 @@ export class AVMAwayStage extends Sprite{
 
 
 	public updateSize(x:number, y:number, w:number, h:number){
-		this._stageWidth=w;
-		this._stageHeight=h;
+		//this._stageWidth=w;
+		//this._stageHeight=h;
 		this._scene.view.x         = x;
 		this._scene.view.y         = y;
 
@@ -319,7 +319,7 @@ export class AVMAwayStage extends Sprite{
 		this._hoverControl = new HoverController(camera, null, 180, 0, 1000);
 		this._scene.camera = camera;
 		//this._projection.preserveFocalLength=true;
-		this._projection.fieldOfView = Math.atan(400/1000/2)*360/Math.PI;
+		this._projection.fieldOfView = Math.atan(this._stageHeight/1000/2)*360/Math.PI;
 	//	this._renderer.stage.container.style.zIndex="-100";
 
 	}
@@ -1062,7 +1062,7 @@ export class AVMAwayStage extends Sprite{
 	 *   For more information, see the "Security" chapter in the ActionScript 3.0 Developer's Guide.
 	 */
 	public get stageHeight () : number{
-		return 400;//this._stageHeight;
+		return this._stageHeight;
 	}
 	public set stageHeight (value:number){
 		this._stageHeight=value;
@@ -1114,7 +1114,7 @@ export class AVMAwayStage extends Sprite{
 	 *   For more information, see the "Security" chapter in the ActionScript 3.0 Developer's Guide.
 	 */
 	public get stageWidth () : number{
-		return 550;//this._stageWidth;
+		return this._stageWidth;
 	}
 	public set stageWidth (value:number){
 		this._stageWidth=value;
