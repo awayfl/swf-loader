@@ -50,12 +50,13 @@ export class AVMAwayStage extends Sprite{
 
 	private SHOW_FRAME_RATE:boolean = true;
 
-	constructor(width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, htmlCanvas:HTMLCanvasElement=null, stageWidth:number=550, stageHeight:number=400) {
+	constructor(width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, htmlCanvas:HTMLCanvasElement=null, stageWidth:number=550, stageHeight:number=400, show_fps:boolean=false) {
 		super();
 		BuildMode.mode=BuildMode.AVM1;
 
 		this._stage3Ds=[];
 		this._layers=[];
+		this.SHOW_FRAME_RATE=show_fps;
 
 
 		//todo: better implement this in graphics (this function provides the drawing api with materials for a color / alpha)
