@@ -974,6 +974,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 		x = alToNumber(this.context, x);
 		y = alToNumber(this.context, y);
+		x+=this.get_root().get_x();
+		y+=this.get_root().get_y();
 		shapeFlag = alToBoolean(this.context, shapeFlag);
 		return PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker(this.adaptee.partition).hitTestPoint(x, y, shapeFlag);
 	}
