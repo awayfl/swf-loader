@@ -25,10 +25,12 @@ import {BlendModesMap, IHasAS3ObjectReference, wrapAVM1NativeClass} from "./AVM1
 import {convertToAS3Filter} from "./AVM1Filters";
 import {toAwayColorTransform, AVM1ColorTransform} from "./AVM1ColorTransform";
 import {toAS3Matrix} from "./AVM1Matrix";
-import {BitmapImage2D as BitmapData} from "@awayjs/stage";
+//import {BitmapImage2D as BitmapData} from "@awayjs/stage";
+import {SceneImage2D as BitmapData} from "@awayjs/scene";
 import {IAsset} from "@awayjs/core";
 import {constructClassFromSymbol} from "../../link";
 import {AVM1Object} from "../runtime/AVM1Object";
+import {AVM1Stage} from "./AVM1Stage";
 
 
 export function toAS3BitmapData(as2Object: AVM1BitmapData): BitmapData {
@@ -63,7 +65,7 @@ export class AVM1BitmapData extends AVM1Object implements IHasAS3ObjectReference
 		height = alToNumber(this.context, height);
 		transparent = arguments.length < 3 ? true : alToBoolean(this.context, transparent);
 		fillColor = arguments.length < 4 ? 0xFFFFFFFF : alToInt32(this.context, fillColor);
-		var awayObject = new this.context.sec.flash.display.BitmapData(width, height, transparent, fillColor);
+		var awayObject = new this.context.sec.flash.display.BitmapData(width, height, transparent, fillColor, false, AVM1Stage.stage.rendererStage);
 		this.adaptee = awayObject;
 	}
 

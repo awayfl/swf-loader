@@ -110,7 +110,7 @@
 		public static createGlobalsObject(context: AVM1Context): AVM1Globals {
 			var globals = new AVM1Globals(context);
 			wrapAVM1NativeMembers(context, globals, globals,
-				['flash', 'ASSetPropFlags', 'clearInterval', 'clearTimeout',
+				['flash', 'ASSetPropFlags', 'BitmapData' ,'clearInterval', 'clearTimeout',
 					'escape', 'unescape', 'setInterval', 'setTimeout', 'showRedrawRegions',
 					'trace', 'updateAfterEvent','myName',
 					'NaN', 'Infinity', 'isFinite', 'isNaN', 'parseFloat', 'parseInt', 'undefined',
