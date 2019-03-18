@@ -242,9 +242,32 @@ export class AVMAwayStage extends Sprite{
 	// ---------- event mapping functions Event.MOUSE_LEAVE
 
 	public dispose(){
-		MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport)).unregisterContainer(this._renderer.stage.container);
-		this._view.dispose();
+		if(this._view && this._view.renderer && this._view.renderer.viewport && this._renderer && this._renderer.stage && this._renderer.stage.container)
+			MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport)).unregisterContainer(this._renderer.stage.container);
+		if(this._view)
+			this._view.dispose();
+		
+		PickGroup.clearAllInstances();
+
+		this._view=null;
+		//this._renderer.dispose();
 		this._renderer=null;
+		this._timer.stop();
+		
+        var len=this._layers.length;
+		//this.runAVM1Framescripts();
+		for(var i=0;i<len;i++) {
+			var myLayer=this._layers[i];
+			var numChilds = myLayer.numChildren;
+			for (var c = 0; c < numChilds; ++c) {
+				var child = myLayer.getChildAt(c);
+				child.dispose();
+			}
+		}
+		this._layers.length=0;
+		MovieClip._movieClips=[];
+		TextField._textFields=[];
+		Sprite._sprites=[];
 	}
 
 
