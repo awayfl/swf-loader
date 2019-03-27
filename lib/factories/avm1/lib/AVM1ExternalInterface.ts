@@ -30,7 +30,7 @@ export class AVM1ExternalInterface extends AVM1Object {
 	}
 
 	public static getAvailable(context: AVM1Context): boolean {
-		return context.sec.flash.external.ExternalInterface.axClass.available;
+		return true;//context.sec.flash.external.ExternalInterface.axClass.available;
 	}
 
 	public static addCallback(context: AVM1Context, methodName: string, instance: any, method: AVM1Function): boolean {
@@ -39,11 +39,24 @@ export class AVM1ExternalInterface extends AVM1Object {
 			return false;
 		}
 		try {
-			context.sec.flash.external.ExternalInterface.axClass.addCallback(methodName, function () {
+			if(!window["flashObject"]){
+				window["flashObject"]={};
+			}
+			window["flashObject"][methodName]=function(...args){
+				
+				var desc=instance.alGet(methodName.toLowerCase());
+				if(desc && alIsFunction(desc))
+					desc.alCall(instance, args);
+				else if (desc && desc.value)
+					desc.value.alCall(instance, args);
+				//_this.mwAdaptee.runScripts();
+
+			}
+			/*context.sec.flash.external.ExternalInterface.axClass.addCallback(methodName, function () {
 				var args = Array.prototype.slice.call(arguments, 0);
 				var result = context.executeFunction(method, instance, args);
 				return result;
-			});
+			});*/
 			return true;
 		} catch (e) {
 		}
@@ -51,14 +64,27 @@ export class AVM1ExternalInterface extends AVM1Object {
 	}
 
 	public static call(context: AVM1Context, methodName: string, ...parameters: any[]): any {
-		var args = [alCoerceString(context, methodName)];
+		var args = [];// [alCoerceString(context, methodName)];
 		for (var i = 0; i < parameters.length; i++) {
 			// TODO convert AVM1 objects to AVM2
 			args.push(parameters[i]);
 		}
+		if(args.length==1){
+			args=args[0];
+		}
 		try {
-			var result = context.sec.flash.external.ExternalInterface.axClass.call.apply(
+			var methodnames=methodName.split(".");
+			var method:any=window;
+			for(var i=0; i<methodnames.length; i++){
+				method=method[methodnames[i]];
+			}
+
+			method(args);
+			/*var result = context.sec.flash.external.ExternalInterface.axClass.call.apply(
 				context.sec.flash.external.ExternalInterface.axClass, args);
+				*/
+			
+			var result="";
 			// TODO convert AVM2 result to AVM1
 			return result;
 		} catch (e) {

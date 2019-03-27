@@ -39,7 +39,7 @@
 	import {AVM1MovieClipLoader} from "./AVM1MovieClipLoader";
 	import {AVM1LoadVarsFunction} from "./AVM1LoadVars";
 	import {AVM1Sound} from "./AVM1Sound";
-	import {AVM1SharedObjectFunction} from "./AVM1SharedObject";
+	import {AVM1SharedObject} from "./AVM1SharedObject";
 	import {AVM1TextFormat} from "./AVM1TextFormat";
 	import {AVM1XMLFunction, AVM1XMLNodeFunction} from "./AVM1XML";
 	import {AVM1BitmapData} from "./AVM1BitmapData";
@@ -110,7 +110,7 @@
 		public static createGlobalsObject(context: AVM1Context): AVM1Globals {
 			var globals = new AVM1Globals(context);
 			wrapAVM1NativeMembers(context, globals, globals,
-				['flash', 'ASSetPropFlags', 'BitmapData' ,'clearInterval', 'clearTimeout',
+				['flash', 'ASSetPropFlags', 'BitmapData' ,'clearInterval', 'clearTimeout',"ExternalInterface",
 					'escape', 'unescape', 'setInterval', 'setTimeout', 'showRedrawRegions',
 					'trace', 'updateAfterEvent','myName',
 					'NaN', 'Infinity', 'isFinite', 'isNaN', 'parseFloat', 'parseInt', 'undefined',
@@ -132,9 +132,9 @@
 			this._initBuiltins(context);
 	
 			var swfVersion = context.loaderInfo.swfVersion;
-			if (swfVersion >= 8) {
+			//if (swfVersion >= 8) {
 				this._initializeFlashObject(context);
-			}
+			//}
 		}
 	
 		public flash: AVM1Object;
@@ -311,6 +311,8 @@
 		public String: AVM1Object;
 		public Error: AVM1Object;
 	
+		public ExternalInterface:AVM1Object;
+
 		public MovieClip: AVM1Object;
 		public AsBroadcaster: AVM1Object;
 		public System: AVM1Object;
@@ -357,6 +359,8 @@
 	
 			this.Selection = <AVM1Selection>AVM1Selection.createAVM1Class(context)._ownProperties["prototype"].value;
 	
+			this.ExternalInterface=AVM1ExternalInterface.createAVM1Class(context);
+
 			this.MovieClip = AVM1MovieClip.createAVM1Class(context);
 			this.AsBroadcaster = AVM1Broadcaster.createAVM1Class(context);
 			this.System = AVM1System.createAVM1Class(context);
@@ -370,7 +374,7 @@
 			this.LoadVars = new AVM1LoadVarsFunction(context);
 	
 			this.Sound = AVM1Sound.createAVM1Class(context);
-			this.SharedObject = new AVM1SharedObjectFunction(context);
+			this.SharedObject = AVM1SharedObject.createAVM1Class(context);
 			this.ContextMenu = undefined; // wrapAVM1Builtin(sec.flash.ui.ContextMenu.axClass);
 			this.ContextMenuItem = undefined; // wrapAVM1Builtin(sec.flash.ui.ContextMenuItem.axClass);
 			this.TextFormat = AVM1TextFormat.createAVM1Class(context);
