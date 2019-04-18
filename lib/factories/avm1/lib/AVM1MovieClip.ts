@@ -51,6 +51,8 @@ import {EventsListForMC} from "./AVM1EventHandler";
 import { AVM1InterpretedFunction } from '../interpreter';
 import { PickGroup } from '@awayjs/view';
 
+import {BasicMaterial, ImageTexture2D, MethodMaterial} from "@awayjs/materials";
+
 class SpriteSymbol{
 	avm1Name:string;
 }
@@ -442,10 +444,12 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public attachBitmap(bmp:AVM1BitmapData, depth:number, pixelSnapping:string = 'auto', smoothing:boolean = false): void {
 		pixelSnapping = alCoerceString(this.context, pixelSnapping);
 		smoothing = alToBoolean(this.context, smoothing);
-		var as3BitmapData = bmp.as3BitmapData;
-		var bitmap: Bitmap = this.context.sec.flash.display.Bitmap.axClass.axConstruct([as3BitmapData, pixelSnapping, smoothing]);
-		notImplemented('AVM1MovieClip.attachBitmap');
-		//this._insertChildAtDepth(bitmap, depth);
+		var awayBitmapImage2D = bmp.as3BitmapData;
+		awayBitmapImage2D.transparent=true;
+		var billboardMaterial:MethodMaterial = new MethodMaterial(awayBitmapImage2D);
+		billboardMaterial.alphaBlending=true;
+		var billboard: Billboard = new Billboard(billboardMaterial, pixelSnapping, smoothing);// this.context.sec.flash.display.Bitmap.axClass.axConstruct([as3BitmapData, pixelSnapping, smoothing]);
+		this._insertChildAtDepth(billboard, depth);
 	}
 
 	public _constructMovieClipSymbol(symbolId:string, name:string): MovieClip {

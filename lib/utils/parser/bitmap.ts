@@ -68,15 +68,13 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
   var colorTableEntrySize = hasAlpha ? 4 : 3;
   var colorTableSize = roundToMultipleOfFour(colorTableLength * colorTableEntrySize);
 
-  var dataSize = colorTableSize + ((width + padding) * height);
 
-  var bytes: Uint8Array = Inflate.inflate(tag.bmpData, dataSize, true);
+  var outputDataSize = colorTableEntrySize * ((width + padding) * height);
 
-  var view:Uint8ClampedArray = new Uint8ClampedArray(dataSize);
+  var bytes: Uint8Array = Inflate.inflate(tag.bmpData, outputDataSize, true);
 
-  // TODO: Figure out why this fails.
-  // Make sure we've deflated enough bytes.
-  // stream.ensure(dataSize);
+  var view:Uint8ClampedArray = new Uint8ClampedArray(outputDataSize);
+
 
   var p = colorTableSize, i = 0, offset = 0;
   if (hasAlpha) {
@@ -102,7 +100,6 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
       p += padding;
     }
   }
-  assert (p === dataSize, "We should be at the end of the data buffer now.");
   return view;
 }
 

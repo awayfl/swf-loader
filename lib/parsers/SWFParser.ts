@@ -304,7 +304,7 @@ export class SWFParser extends ParserBase
 						switch(eagerlySymbol.type) {
 							case "image":
 								//console.log("init image parsing", eagerlySymbol);
-								this._pAddDependency(eagerlySymbol.id.toString(), null, new Image2DParser(this._factory), new Blob([eagerlySymbol.definition.data],{type: eagerlySymbol.definition.mimeType}), false, true);
+								this._pAddDependency(eagerlySymbol.id.toString(), null, new Image2DParser(this._factory, eagerlySymbol.definition.alphaData), new Blob([eagerlySymbol.definition.data],{type: eagerlySymbol.definition.mimeType}), false, true);
 								this.externalDependenciesCount++;
 								break;
 							case "sound":

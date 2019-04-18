@@ -27,11 +27,11 @@ import {toAwayColorTransform, AVM1ColorTransform} from "./AVM1ColorTransform";
 import {toAS3Matrix} from "./AVM1Matrix";
 //import {BitmapImage2D as BitmapData} from "@awayjs/stage";
 import {SceneImage2D as BitmapData} from "@awayjs/scene";
-import {IAsset} from "@awayjs/core";
+import {AssetLibrary, IAsset} from "@awayjs/core";
 import {constructClassFromSymbol} from "../../link";
 import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Stage} from "./AVM1Stage";
-
+import { BitmapImage2D } from '@awayjs/stage';
 
 export function toAS3BitmapData(as2Object: AVM1BitmapData): BitmapData {
 	if (!(as2Object instanceof AVM1BitmapData)) {
@@ -78,18 +78,25 @@ export class AVM1BitmapData extends AVM1Object implements IHasAS3ObjectReference
 
 	static loadBitmap(context: AVM1Context, symbolId: string): AVM1BitmapData {
 		symbolId = alToString(context, symbolId);
-		var symbol = context.getAsset(symbolId);
+		//var symbol = context.getAsset(symbolId);
+		var symbol = AssetLibrary.getAsset(symbolId);
 		// REDUX verify
+		if(symbol && (<IAsset><any>symbol).isAsset(BitmapImage2D)){
+			var bitmapData = new AVM1BitmapData(context);
+			bitmapData.adaptee = <IAsset><any>symbol;
+			return bitmapData;
+
+		}
+		/*
 		var symbolClass = symbol.symbolProps.symbolClass;
 		var bitmapClass = context.sec.flash.display.BitmapData.axClass;
 		if (symbol && (bitmapClass === symbolClass ||
 				bitmapClass.dPrototype.isPrototypeOf((<any>symbolClass).dPrototype))) {
 			var awayObject = constructClassFromSymbol(symbol.symbolProps, bitmapClass);
-			var bitmap = new AVM1BitmapData(context);
 			bitmap.alPrototype = context.globals.BitmapData.alGetPrototypeProperty();
 			bitmap.adaptee = awayObject;
 			return bitmap;
-		}
+		}*/
 		return null;
 	}
 

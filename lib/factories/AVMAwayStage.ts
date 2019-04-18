@@ -317,7 +317,7 @@ export class AVMAwayStage extends Sprite{
 		var camera:Camera = new Camera();
 		camera.projection = this._projection;
 
-		this._hoverControl = new HoverController(camera, null, 180, 0, 1000);
+		//this._hoverControl = new HoverController(camera, null, 180, 0, 1000);
 		this._scene.camera = camera;
 		//this._projection.preserveFocalLength=true;
 		this._projection.fieldOfView = Math.atan(this._stageHeight/1000/2)*360/Math.PI;
