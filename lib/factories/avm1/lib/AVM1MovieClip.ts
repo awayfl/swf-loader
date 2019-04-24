@@ -448,6 +448,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		awayBitmapImage2D.transparent=true;
 		var billboardMaterial:MethodMaterial = new MethodMaterial(awayBitmapImage2D);
 		billboardMaterial.alphaBlending=true;
+		billboardMaterial.useColorTransform=true;
+		
 		var billboard: Billboard = new Billboard(billboardMaterial, pixelSnapping, smoothing);// this.context.sec.flash.display.Bitmap.axClass.axConstruct([as3BitmapData, pixelSnapping, smoothing]);
 		this._insertChildAtDepth(billboard, depth);
 	}
