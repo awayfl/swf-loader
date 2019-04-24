@@ -512,7 +512,8 @@ export class AVMAwayStage extends Sprite{
         MovieClip._skipAdvance=false;
         FrameScriptManager.execute_queue();
         
-        var enterFramesChilds=[];
+		var enterFramesChilds=[];
+		len=this._layers.length;
 		// now dispatch the onEnterFrame
 		for(i=0;i<len;i++) {
 			myLayer=this._layers[i];
