@@ -246,9 +246,13 @@ export class AVMAwayStage extends Sprite{
 			MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport)).unregisterContainer(this._renderer.stage.container);
 		if(this._view)
 			this._view.dispose();
-		
+	
+		AVMAwayStage._colorMaterials={};
+		AVMAwayStage._textureMaterials={};
+
 		PickGroup.clearAllInstances();
 
+		TextureAtlas.clearAllMaterials();
 		this._view=null;
 		//this._renderer.dispose();
 		this._renderer=null;
@@ -265,6 +269,7 @@ export class AVMAwayStage extends Sprite{
 			}
 		}
 		this._layers.length=0;
+		AVM1TextField.allTextfields={};
 		MovieClip._movieClips=[];
 		TextField._textFields=[];
 		Sprite._sprites=[];

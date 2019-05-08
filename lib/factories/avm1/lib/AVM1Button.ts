@@ -135,7 +135,7 @@ export class AVM1Button extends AVM1MovieClip {
 		for (var i = 0; i < actions.length; i++) {
 			var action = actions[i];
 			if (!action.actionsBlock) {
-				action.actionsBlock = context.actionsDataFactory.createActionsData(action.actionsData, 's' + nativeButton.id + 'e' + i);
+				action.actionsBlock = context.actionsDataFactory.createActionsData(action.actionsData, 'awjs_s' + nativeButton.id + 'e' + i);
 			}
 			if (action.keyCode) {
 				//requiredListeners['keyDown'] = this._keyDownHandler.bind(this);

@@ -240,7 +240,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				mcName=mcName.toString();
 			}
 			actionsBlock.data=(<AVM1Context>this._avm1Context).actionsDataFactory.createActionsData(
-				actionsBlock.actionsData, 'script_'+mcName.replace(/[^\w]/g,'')+"_"+this.adaptee.id+'_frame_' + frameIdx + '_idx_' + i);
+				actionsBlock.actionsData, 'awjs_script_'+mcName.replace(/[^\w]/g,'')+"_"+this.adaptee.id+'_frame_' + frameIdx + '_idx_' + i);
 			translatedScripts[translatedScripts.length]=actionsBlock;			
 		}
 		return translatedScripts;

@@ -42,6 +42,7 @@ function getActionsCalls() {
  *  Bare-minimum JavaScript code generator to make debugging better.
  */
 export class ActionsDataCompiler {
+	public static allScripts:any[]=[];
 	private convertArgs(args: any[], id: number, res, ir: AnalyzerResults): string {
 		var parts: string[] = [];
 		for (var i: number = 0; i < args.length; i++) {
@@ -144,7 +145,7 @@ export class ActionsDataCompiler {
 		});
 		fn += ' default: ectx.isEndOfActions = true; break;\n}\n}\n' +
 			'return stack.pop();};';
-		fn += '//# sourceURL=' + debugName;
+		//fn += '//# sourceURL=' + debugName;
 		return (new Function('calls', 'res', fn))(getActionsCalls(), res);
 	}
 }

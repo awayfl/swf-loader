@@ -348,7 +348,7 @@ export function initializeAVM1Object(awayObject: any,
 		var swfEvent = events[j];
 		var actionsData;
 		if (swfEvent.actionsBlock) {
-			actionsData = context.actionsDataFactory.createActionsData(swfEvent.actionsBlock,'s' + placeObjectTag.symbolId + 'd' + placeObjectTag.depth + 'e' + j);
+			actionsData = context.actionsDataFactory.createActionsData(swfEvent.actionsBlock,'awjs_s' + placeObjectTag.symbolId + 'd' + placeObjectTag.depth + 'e' + j);
 			swfEvent.actionsBlock = null;
 			swfEvent.compiled = actionsData;
 		} else {

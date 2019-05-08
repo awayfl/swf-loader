@@ -1297,8 +1297,12 @@ export class SWFParser extends ParserBase
 
 	}
 
-	private dispose():void
+	public dispose():void
 	{
+		
+		var test=0;
+		this.swfData=null;
+		this._dataStream=null;
 	}
 
 
