@@ -359,24 +359,28 @@ export class SWFParser extends ParserBase
 					case "morphshape":
 						console.warn("Warning: SWF contains shapetweening!!!");
                         symbol.shape.name=symbol.id;
-                        symbol.shape.name="AwayJS_morphshape_"+symbol.id.toString();
+						symbol.shape.name="AwayJS_morphshape_"+symbol.id.toString();
+						symbol.shape.className=symbol.className;
                         this.awaySymbols[dictionary[i].id]=symbol.shape;
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
 					case "shape":
 						symbol.shape.endFill();
                         symbol.shape.name="AwayJS_shape_"+symbol.id.toString();
+						symbol.shape.className=symbol.className;
 						this.awaySymbols[dictionary[i].id]=symbol.shape;
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
 					case "font":
 						//symbol.away._smybol=symbol;
+						symbol.away.className=symbol.className;
 						this.awaySymbols[dictionary[i].id]=symbol;
                         assetsToFinalize[symbol.name]=symbol.away;
 						break;
 					case "sprite":
 						noTimelineDebug || console.log("start parsing timeline: ", symbol);
 						var awayMc = this.framesToTimeline(symbol.frames, null, null);
+						(<any>awayMc).className=symbol.className;
 						if(awayMc.buttonMode){							
 							this._buttonIds[symbol.id]=true;
 						}
@@ -391,6 +395,7 @@ export class SWFParser extends ParserBase
 						var awayText = this._factory.createTextField();
 						awayText._symbol=symbol;
 						awayText.textFormat=new TextFormat();
+						(<any>awayText).className=symbol.className;
 						var flashFont=this.awaySymbols[symbol.tag.fontId];
 						if(flashFont){
 							awayText.textFormat.font=flashFont.away;
@@ -443,6 +448,7 @@ export class SWFParser extends ParserBase
 					case "sound":
 						var awaySound:WaveAudio=(<WaveAudio>this.awaySymbols[dictionary[i].id]);
 						if(awaySound){
+							(<any>awaySound).className=this.symbolClassesList[symbol.id]?this.symbolClassesList[symbol.id].className:null;
                             awaySound.name=symbol.id;
                             assetsToFinalize[dictionary[i].id]=awaySound;
                             //awaySound.play(0,false);
@@ -456,6 +462,7 @@ export class SWFParser extends ParserBase
 						var awayMc = this.framesToTimeline(null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
 						//awayMc._symbol=symbol;
                         awayMc.name="AwayJS_button_"+symbol.id.toString();
+						(<any>awayMc).className=symbol.className;
                         assetsToFinalize[dictionary[i].id]=awayMc;
 						this.awaySymbols[dictionary[i].id] = awayMc;
 						this._buttonIds[symbol.id]=true;
@@ -472,6 +479,7 @@ export class SWFParser extends ParserBase
 						var awayText = this._factory.createTextField();
                         var font=null;
                         var invalid_font:boolean=false;
+						(<any>awayText).className=symbol.className;
 						for(var r=0; r<symbol.records.length;r++){
 							var record:any=symbol.records[r];
 							if(record.fontId){
@@ -503,13 +511,19 @@ export class SWFParser extends ParserBase
 					case "image":
 						var awayBitmap:BitmapImage2D=(<BitmapImage2D>this.awaySymbols[dictionary[i].id]);
 						if(!awayBitmap && symbol.definition){
-                            awayBitmap=new BitmapImage2D(symbol.definition.width, symbol.definition.height, true, 0xff0000, false);
+							awayBitmap=new BitmapImage2D(symbol.definition.width, symbol.definition.height, true, 0xff0000, false);
+							if(symbol.definition.data.length!=(4*symbol.definition.width* symbol.definition.height)
+							&& symbol.definition.data.length!=(3*symbol.definition.width* symbol.definition.height)){
+								symbol.definition.data=new Uint8ClampedArray(4*symbol.definition.width* symbol.definition.height);
+								//symbol.definition.data.fill
+							}
                             awayBitmap.setPixels(new Rectangle(0,0,symbol.definition.width, symbol.definition.height), symbol.definition.data);
                         }
 						if(awayBitmap){
                             this.awaySymbols[dictionary[i].id] = awayBitmap;
                             awayBitmap.name="awayBitmap_"+dictionary[i].id.toString();
                             assetsToFinalize[dictionary[i].id]=awayBitmap;
+							(<any>awayBitmap).className=symbol.className;
                         }
 						break;
 					default:
@@ -615,7 +629,7 @@ export class SWFParser extends ParserBase
 			if(swfFrames[i].exports){
 				awayTimeline.avm1Exports[i]=swfFrames[i].exports;
 				for(key in swfFrames[i].exports) {
-					//console.log("\n\nfound export\n\n", frames[i].exports[key]);
+					console.log("\n\nfound export\n\n", frames[i].exports[key]);
 					let asset = swfFrames[i].exports[key];
 					let awayAsset=this.awaySymbols[asset.symbolId];
 					if(!awayAsset){
