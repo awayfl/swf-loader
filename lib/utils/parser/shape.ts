@@ -102,10 +102,12 @@ function applySegmentToStyles(segment1: PathSegment, styles,
  * See http://blogs.msdn.com/b/mswanson/archive/2006/02/27/539749.aspx and
  * http://wahlers.com.br/claus/blog/hacking-swf-1-shapes-in-flash/ for details.
  */
-function convertRecordsToShapeData(records: ShapeRecord[], fillPaths: SegmentedPath[],
-								   linePaths: SegmentedPath[], dependencies: number[],
+function convertRecordsToShapeData(records: ShapeRecord[], fillStyles: any[],
+	lineStyles: any[], dependencies: number[],
 								   recordsMorph: ShapeRecord[], parser:any): any
 {
+	var fillPaths = createPathsList(fillStyles, false, !!recordsMorph, dependencies, parser);
+	var linePaths = createPathsList(lineStyles, true, !!recordsMorph, dependencies, parser);
 	var isMorph = recordsMorph !== null;
 	var styles = {fill0: 0, fill1: 0, line: 0};
 	var segment1: PathSegment = null;
@@ -131,7 +133,7 @@ function convertRecordsToShapeData(records: ShapeRecord[], fillPaths: SegmentedP
 	var pathL: SegmentedPath;
 	//console.log("numRecords", numRecords);
 	for (var i = 0, j = 0; i < numRecords; i++) {
-		var record = records[i];
+		var record: ShapeRecord = records[i];
 		//console.log("record", i, record.type);
 		var morphRecord: ShapeRecord;
 		if (isMorph) {
@@ -668,11 +670,9 @@ function createPathsList(styles: any[], isLineStyle: boolean, isMorph: boolean,
 
 export function defineShape(tag: ShapeTag, parser:any):any {
 	var dependencies = [];
-	var fillPaths = createPathsList(tag.fillStyles, false, !!tag.recordsMorph, dependencies, parser);
-	var linePaths = createPathsList(tag.lineStyles, true, !!tag.recordsMorph, dependencies, parser);
 	//console.log(fillPaths, linePaths);
 
-	var shape = convertRecordsToShapeData(tag.records, fillPaths, linePaths, dependencies, tag.recordsMorph || null, parser);
+	var shape = convertRecordsToShapeData(tag.records, tag.fillStyles, tag.lineStyles, dependencies, tag.recordsMorph || null, parser);
 
 	return {
 		type: tag.flags & ShapeFlags.IsMorph ? 'morphshape' : 'shape',
