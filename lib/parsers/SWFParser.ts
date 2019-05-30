@@ -365,7 +365,7 @@ export class SWFParser extends ParserBase
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
 					case "shape":
-						symbol.shape.endFill();
+						//symbol.shape.endFill();
                         symbol.shape.name="AwayJS_shape_"+symbol.id.toString();
 						symbol.shape.className=symbol.className;
 						this.awaySymbols[dictionary[i].id]=symbol.shape;
@@ -629,7 +629,7 @@ export class SWFParser extends ParserBase
 			if(swfFrames[i].exports){
 				awayTimeline.avm1Exports[i]=swfFrames[i].exports;
 				for(key in swfFrames[i].exports) {
-					console.log("\n\nfound export\n\n", frames[i].exports[key]);
+					console.log("\n\nfound export\n\n", swfFrames[i].exports[key]);
 					let asset = swfFrames[i].exports[key];
 					let awayAsset=this.awaySymbols[asset.symbolId];
 					if(!awayAsset){
