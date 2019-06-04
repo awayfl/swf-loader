@@ -694,10 +694,24 @@ export class SWFParser extends ParserBase
 				keyframe_durations[keyframe_durations.length]=1;
 				if(!isEmpty && (swfFrames[i].labelNames && swfFrames[i].labelNames.length>0)){
 					var fl_len:number=swfFrames[i].labelNames.length;
+					var scriptsFN=[];
 					for(var fl:number=0;fl<fl_len; fl++){
+						var scriptLabels=swfFrames[i].labelNames[fl].split("_AWS_");
+						for(var sl:number=1; sl<scriptLabels.length; sl++){
+							var scriptID=scriptLabels[sl].replace("_", "");
+							if(window["frameScripts_"+this._iFileName] && window["frameScripts_"+this._iFileName]["script_id_"+scriptID]){
+								//console.log("found function", window["frameScripts_"+this._iFileName]["script_id_"+scriptID]);
+								scriptsFN.push(window["frameScripts_"+this._iFileName]["script_id_"+scriptID]);
+							}
+						}
+						swfFrames[i].labelNames[fl]=scriptLabels.length>0?scriptLabels[0]:"";
                         var labelName=swfFrames[i].labelNames[fl].toLowerCase();
                         if(!awayTimeline._labels[labelName])
 						    awayTimeline._labels[labelName]=keyFrameCount;
+					}
+					if(scriptsFN.length>0){
+						awayTimeline._framescripts[keyFrameCount]=scriptsFN;
+
 					}
 				}
 				if(!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length>0){
@@ -1572,6 +1586,39 @@ export class SWFParser extends ParserBase
 		return true;
 	}
 
+	private Utf8ArrayToStr(array) {
+		var out, i, len, c;
+		var char2, char3;
+	
+		out = "";
+		len = array.length;
+		i = 0;
+		while(i < len) {
+		c = array[i++];
+		switch(c >> 4)
+		{ 
+		  case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+			// 0xxxxxxx
+			out += String.fromCharCode(c);
+			break;
+		  case 12: case 13:
+			// 110x xxxx   10xx xxxx
+			char2 = array[i++];
+			out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+			break;
+		  case 14:
+			// 1110 xxxx  10xx xxxx  10xx xxxx
+			char2 = array[i++];
+			char3 = array[i++];
+			out += String.fromCharCode(((c & 0x0F) << 12) |
+						   ((char2 & 0x3F) << 6) |
+						   ((char3 & 0x3F) << 0));
+			break;
+		}
+		}
+	
+		return out;
+	}
 	private scanTag(tag: UnparsedTag, rootTimelineMode: boolean): void {
 		var stream: Stream = this._dataStream;
 		var byteOffset = stream.pos;
@@ -1678,6 +1725,7 @@ export class SWFParser extends ParserBase
 						abcBlock.name = "";
 					}
 					abcBlock.data = this.swfData.subarray(stream.pos, tagEnd);
+					//console.log(this.Utf8ArrayToStr(abcBlock.data));
 					this.abcBlocks.push(abcBlock);
 					stream.pos = tagEnd;
 				} else {
