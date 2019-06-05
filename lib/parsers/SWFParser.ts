@@ -556,7 +556,8 @@ export class SWFParser extends ParserBase
 		}
 		var awayMc:MovieClip=this.framesToTimeline(this.frames, null, null);
 
-        for(var key in assetsToFinalize){            
+        for(var key in assetsToFinalize){     
+			assetsToFinalize[key]["fileurl"]=this._iFileName;
             this._pFinalizeAsset(assetsToFinalize[key]);
         }
         this._pFinalizeAsset(awayMc, "scene");
@@ -845,7 +846,9 @@ export class SWFParser extends ParserBase
 									if(awaySymbol.isAsset(Graphics)){
 
 										swapGraphicsID=placeObjectTag.symbolId;
-                                        awayTimeline.graphicsPool[placeObjectTag.symbolId]=awaySymbol;
+										if(!awayTimeline.graphicsPool[placeObjectTag.symbolId]){
+											awayTimeline.graphicsPool[placeObjectTag.symbolId]=awaySymbol;
+										}
 
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds
 										if(child && child.awayChild.isAsset(Sprite)){
