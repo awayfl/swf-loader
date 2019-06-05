@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
+import {assert, ImageType, roundToMultipleOfFour, Inflate} from "@awayjs/graphics";
 import {ImageDefinition} from "./image";
-import {assert, ImageType, roundToMultipleOfFour} from "../utilities";
 //import notImplemented = Shumway.Debug.notImplemented;
 //import assertUnreachable = Shumway.Debug.assertUnreachable;
 //import roundToMultipleOfFour = Shumway.IntegerUtilities.roundToMultipleOfFour;
 
-import {BitmapTag, SwfTagCode} from "../SWFTags"
-
-import {Inflate} from "../deflate";
+import {BitmapTag, SwfTagCode} from "../SWFTags";
 
 export const enum BitmapFormat {
   /**

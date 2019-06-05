@@ -37,7 +37,7 @@ import {MovieClipProperties} from "../interpreter/MovieClipProperties";
 import {IMovieClipAdapter, DisplayObject, MovieClip, TextField, Billboard, TextFormat, MouseManager} from "@awayjs/scene";
 import {AssetLibrary, Matrix3D, Point, WaveAudio} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
-import {Graphics, LineScaleMode} from "@awayjs/graphics";
+import {Graphics, LineScaleMode, GradientType} from "@awayjs/graphics";
 import {BitmapImage2D as Bitmap} from "@awayjs/stage";
 import {LoaderInfo} from "../../customAway/LoaderInfo";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
@@ -542,12 +542,12 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		//this.graphics.beginBitmapFill(bmpNative.adaptee, matrixNative, repeat, smoothing);
 	}
 
-	public beginGradientFill(fillType: string, colors: AVM1Object, alphas: AVM1Object,
+	public beginGradientFill(fillType: GradientType, colors: AVM1Object, alphas: AVM1Object,
 							 ratios: AVM1Object, matrix: AVM1Object,
 							 spreadMethod: string = 'pad', interpolationMethod: string = 'rgb',
 							 focalPointRatio: number = 0.0): void {
 		var context = this.context, sec = context.sec;
-		fillType = alToString(this.context, fillType);
+		// fillType = alToString(this.context, fillType);
 		var colorsNative = sec.createArray(
 			AVM1ArrayNative.mapToJSArray(colors, (item) => alToInt32(this.context, item)));
 		var alphasNative = sec.createArray(
@@ -986,12 +986,12 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		return PickGroup.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.view).getBoundsPicker(this.adaptee.partition).hitTestPoint(x, y, shapeFlag);
 	}
 
-	public lineGradientStyle(fillType: string, colors: AVM1Object, alphas: AVM1Object,
+	public lineGradientStyle(fillType: GradientType, colors: AVM1Object, alphas: AVM1Object,
 							 ratios: AVM1Object, matrix: AVM1Object,
 							 spreadMethod: string = 'pad', interpolationMethod: string = 'rgb',
 							 focalPointRatio: number = 0.0): void {
 		var context = this.context, sec = context.sec;
-		fillType = alToString(this.context, fillType);
+		// fillType = alToString(this.context, fillType);
 		var colorsNative = sec.createArray(
 			AVM1ArrayNative.mapToJSArray(colors, (item) => alToInt32(this.context, item)));
 		var alphasNative = sec.createArray(

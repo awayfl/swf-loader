@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import {assert} from "../utilities";
-
 import {ButtonTag, PlaceObjectFlags, ButtonCharacterFlags, SwfTagCode} from "../SWFTags"
 
 export function defineButton(tag: ButtonTag, dictionary: any): any {

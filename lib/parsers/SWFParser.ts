@@ -6,6 +6,8 @@ import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultScen
 
 import {Graphics} from "@awayjs/graphics";
 
+import {MethodMaterial, ImageTexture2D} from "@awayjs/materials";
+
 import {
 	assert,
 	Bounds,
@@ -18,11 +20,10 @@ import {
 	utf8encode,
 	DictionaryEntry,
 	EagerlyParsedDictionaryEntry,
-	memCopy} from "../utils/utilities";
+	memCopy} from "@awayjs/graphics";
 
 import {Stream} from "../utils/stream";
-import {Inflate} from "../utils/deflate";
-import {LzmaDecoder} from "../utils/lzma";
+import {Inflate, LzmaDecoder} from "@awayjs/graphics";
 
 import {
 	parseHeader,
@@ -204,7 +205,7 @@ export class SWFParser extends ParserBase
 						var myBitmap:BitmapImage2D=(<BitmapImage2D>resourceDependency.assets[0]);
 						//myBitmap.width=awaitedObject.definition.width;
 						//myBitmap.height=awaitedObject.definition.height;
-						this.awaySymbols[resourceDependency.id]=myBitmap;
+						this._awaySymbols[resourceDependency.id]=myBitmap;
 						break;
 					case "font":
 						//console.log("finished font parsing", resourceDependency);
@@ -214,7 +215,7 @@ export class SWFParser extends ParserBase
 						var waveAudio:WaveAudio=(<WaveAudio>resourceDependency.assets[0]);
 						//myBitmap.width=awaitedObject.definition.width;
 						//myBitmap.height=awaitedObject.definition.height;
-						this.awaySymbols[resourceDependency.id]=waveAudio;
+						this._awaySymbols[resourceDependency.id]=waveAudio;
 						break;
 					default:
 						console.log("finished unknown parsing", resourceDependency);
@@ -289,8 +290,8 @@ export class SWFParser extends ParserBase
 
 			// now we have a list of symbols that we want to convert to awayjs-symbols
 
-			this.awaySymbols={};
-			this.mapMatsForBitmaps={};
+			this._awaySymbols={};
+			this._mapMatsForBitmaps={};
 
 			// this.eagerlyParsedSymbolsList can contain image/font data,
 			// that must be resolved externally before we can start creating assets for symbols
@@ -340,12 +341,32 @@ export class SWFParser extends ParserBase
 		return  ParserBase.PARSING_DONE;
 	}
 
-	public awaySymbols:any;
+	private _awaySymbols:any;
 
 
+
+	public getMaterial(bitmapIndex:number):MethodMaterial
+	{
+		var material:MethodMaterial = this._mapMatsForBitmaps[bitmapIndex];
+		if(!material){
+			material=new MethodMaterial();
+			var myImage=this._awaySymbols[bitmapIndex];
+			if(!myImage || !myImage.isAsset(BitmapImage2D)){
+				console.log("error: can not find image for bitmapfill", myImage)
+			}
+			material.ambientMethod.texture=new ImageTexture2D(myImage);
+			
+			material.alphaBlending=true;
+			material.useColorTransform = true;
+			material.bothSides = true;
+			this._mapMatsForBitmaps[bitmapIndex]=material;
+		}
+
+		return material;
+	}
 
 	private myTestSprite:Sprite;
-	public mapMatsForBitmaps:any;
+	private _mapMatsForBitmaps:any;
 	public parseSymbolsToAwayJS(){
 		var parser = new DOMParser();
         var dictionary = this.dictionary;
@@ -361,20 +382,19 @@ export class SWFParser extends ParserBase
                         symbol.shape.name=symbol.id;
 						symbol.shape.name="AwayJS_morphshape_"+symbol.id.toString();
 						symbol.shape.className=symbol.className;
-                        this.awaySymbols[dictionary[i].id]=symbol.shape;
+                        this._awaySymbols[dictionary[i].id]=symbol.shape;
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
 					case "shape":
-						//symbol.shape.endFill();
                         symbol.shape.name="AwayJS_shape_"+symbol.id.toString();
 						symbol.shape.className=symbol.className;
-						this.awaySymbols[dictionary[i].id]=symbol.shape;
+						this._awaySymbols[dictionary[i].id]=symbol.shape;
                         assetsToFinalize[dictionary[i].id]=symbol.shape;
 						break;
 					case "font":
 						//symbol.away._smybol=symbol;
 						symbol.away.className=symbol.className;
-						this.awaySymbols[dictionary[i].id]=symbol;
+						this._awaySymbols[dictionary[i].id]=symbol;
                         assetsToFinalize[symbol.name]=symbol.away;
 						break;
 					case "sprite":
@@ -388,7 +408,7 @@ export class SWFParser extends ParserBase
 							this._mcIds[symbol.id]=true;
 						}
                         awayMc.name="AwayJS_mc_"+symbol.id.toString();
-						this.awaySymbols[dictionary[i].id] = awayMc;
+						this._awaySymbols[dictionary[i].id] = awayMc;
                         assetsToFinalize[dictionary[i].id] = awayMc;
 						break;
 					case "text":
@@ -396,7 +416,7 @@ export class SWFParser extends ParserBase
 						awayText._symbol=symbol;
 						awayText.textFormat=new TextFormat();
 						(<any>awayText).className=symbol.className;
-						var flashFont=this.awaySymbols[symbol.tag.fontId];
+						var flashFont=this._awaySymbols[symbol.tag.fontId];
 						if(flashFont){
 							awayText.textFormat.font=flashFont.away;
 							awayText.textFormat.font_table=<TesselatedFontTable>flashFont.away.get_font_table(flashFont.fontStyleName, TesselatedFontTable.assetType);
@@ -443,10 +463,10 @@ export class SWFParser extends ParserBase
 						}
                         awayText.name="tf_"+symbol.id.toString();
                         assetsToFinalize[dictionary[i].id] = awayText;
-						this.awaySymbols[dictionary[i].id] = awayText;
+						this._awaySymbols[dictionary[i].id] = awayText;
 						break;
 					case "sound":
-						var awaySound:WaveAudio=(<WaveAudio>this.awaySymbols[dictionary[i].id]);
+						var awaySound:WaveAudio=(<WaveAudio>this._awaySymbols[dictionary[i].id]);
 						if(awaySound){
 							(<any>awaySound).className=this.symbolClassesList[symbol.id]?this.symbolClassesList[symbol.id].className:null;
                             awaySound.name=symbol.id;
@@ -464,7 +484,7 @@ export class SWFParser extends ParserBase
                         awayMc.name="AwayJS_button_"+symbol.id.toString();
 						(<any>awayMc).className=symbol.className;
                         assetsToFinalize[dictionary[i].id]=awayMc;
-						this.awaySymbols[dictionary[i].id] = awayMc;
+						this._awaySymbols[dictionary[i].id] = awayMc;
 						this._buttonIds[symbol.id]=true;
 						/*
 						var mySprite:SimpleButton=new SimpleButton();
@@ -472,7 +492,7 @@ export class SWFParser extends ParserBase
 						//var awayMc = this.framesToAwayTimeline(symbol.frames);
 						//mySprite._symbol=symbol;
 						this._pFinalizeAsset(mySprite, symbol.id);
-						this.awaySymbols[dictionary[i].id] = mySprite;
+						this._awaySymbols[dictionary[i].id] = mySprite;
 						*/
 						break;
 					case "label":
@@ -483,7 +503,7 @@ export class SWFParser extends ParserBase
 						for(var r=0; r<symbol.records.length;r++){
 							var record:any=symbol.records[r];
 							if(record.fontId){
-								font=this.awaySymbols[record.fontId];
+								font=this._awaySymbols[record.fontId];
 								if(font){
 
 									//awayText.textFormat.font=font.away;
@@ -505,11 +525,11 @@ export class SWFParser extends ParserBase
 						    awayText.setLabelData(symbol);
                         awayText.name="AwayJS_label_"+symbol.id.toString();
                         assetsToFinalize[dictionary[i].id] = awayText;
-						this.awaySymbols[dictionary[i].id] = awayText;
+						this._awaySymbols[dictionary[i].id] = awayText;
 						awayText.selectable=symbol.tag.flags?!(symbol.tag.flags & TextFlags.NoSelect):false;
 						break;
 					case "image":
-						var awayBitmap:BitmapImage2D=(<BitmapImage2D>this.awaySymbols[dictionary[i].id]);
+						var awayBitmap:BitmapImage2D=(<BitmapImage2D>this._awaySymbols[dictionary[i].id]);
 						if(!awayBitmap && symbol.definition){
 							awayBitmap=new BitmapImage2D(symbol.definition.width, symbol.definition.height, true, 0xff0000, false);
 							if(symbol.definition.data.length!=(4*symbol.definition.width* symbol.definition.height)
@@ -520,7 +540,7 @@ export class SWFParser extends ParserBase
                             awayBitmap.setPixels(new Rectangle(0,0,symbol.definition.width, symbol.definition.height), symbol.definition.data);
                         }
 						if(awayBitmap){
-                            this.awaySymbols[dictionary[i].id] = awayBitmap;
+                            this._awaySymbols[dictionary[i].id] = awayBitmap;
                             awayBitmap.name="awayBitmap_"+dictionary[i].id.toString();
                             assetsToFinalize[dictionary[i].id]=awayBitmap;
 							(<any>awayBitmap).className=symbol.className;
@@ -631,7 +651,7 @@ export class SWFParser extends ParserBase
 				for(key in swfFrames[i].exports) {
 					console.log("\n\nfound export\n\n", swfFrames[i].exports[key]);
 					let asset = swfFrames[i].exports[key];
-					let awayAsset=this.awaySymbols[asset.symbolId];
+					let awayAsset=this._awaySymbols[asset.symbolId];
 					if(!awayAsset){
 						console.log("\n\nerror: no away-asset for export\n\n", swfFrames[i].exports[key]);
 
@@ -718,7 +738,7 @@ export class SWFParser extends ParserBase
 					awayTimeline._framescripts[keyFrameCount]=swfFrames[i].actionBlocks;
                 }
                 if(buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id!=0){
-                    awaySymbol = this.awaySymbols[buttonSound[keyFrameCount].id];
+                    awaySymbol = this._awaySymbols[buttonSound[keyFrameCount].id];
                     if(awaySymbol){
                         awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:buttonSound[keyFrameCount].id, sound:awaySymbol, props:buttonSound[keyFrameCount].info};
                         cmds_startSounds.push(audio_commands_cnt++);
@@ -737,13 +757,13 @@ export class SWFParser extends ParserBase
 						switch (tag.code) {
 							case SwfTagCode.CODE_START_SOUND:
 								//console.log("CODE_START_SOUND", tag)
-                                awaySymbol = this.awaySymbols[tag.soundId];
+                                awaySymbol = this._awaySymbols[tag.soundId];
                                 if(tag.soundInfo && (tag.soundInfo.flags & SoundInfoFlags.Stop)){
-                                    awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+                                    awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this._awaySymbols[tag.soundId], props:tag.soundInfo};
                                     noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i+1);
                                 }
                                 else{
-                                    awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+                                    awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_START_SOUND, id:tag.soundId, sound:this._awaySymbols[tag.soundId], props:tag.soundInfo};
                                     noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i+1);
                                 }
 								// todo: volume / pan / other properties
@@ -753,7 +773,7 @@ export class SWFParser extends ParserBase
 								//console.log("CODE_STOP_SOUND", tag)
 								// todo
 								//console.log("stopsound", tag.soundId, tag.soundInfo);
-								awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this.awaySymbols[tag.soundId], props:tag.soundInfo};
+								awayTimeline.audioPool[audio_commands_cnt]={cmd:SwfTagCode.CODE_STOP_SOUND, id:tag.soundId, sound:this._awaySymbols[tag.soundId], props:tag.soundInfo};
 								noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i+1);
 								cmds_startSounds.push(audio_commands_cnt++);
 								break;
@@ -820,7 +840,7 @@ export class SWFParser extends ParserBase
 
 								if(hasCharacter) {
 									//console.log("placeTag symbol id",placeObjectTag.symbolId )
-									awaySymbol = this.awaySymbols[placeObjectTag.symbolId];
+									awaySymbol = this._awaySymbols[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if(awaySymbol.isAsset(Graphics)){
 
@@ -860,7 +880,6 @@ export class SWFParser extends ParserBase
 											// register a new instance for this object
 											var graphicsSprite:Sprite=new Sprite();
 											graphicsSprite.mouseEnabled = false;
-											(<Graphics>awaySymbol).endFill();
                                             graphicsSprite.graphics.copyFrom(<Graphics>awaySymbol);
                                         
                                             // check if we can reuse a free instance for this symbol:
@@ -953,7 +972,7 @@ export class SWFParser extends ParserBase
 
 								if (placeObjectTag.flags & PlaceObjectFlags.HasRatio) {
 									if(!awaySymbol)
-										awaySymbol = this.awaySymbols[child.id];
+										awaySymbol = this._awaySymbols[child.id];
 									if(awaySymbol.isAsset(MorphSprite))
 										ratio=placeObjectTag.ratio;
 								}

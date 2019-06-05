@@ -14,43 +14,15 @@
  * limitations under the License.
  */
 
-import {Graphics, CapsStyle, JointStyle, BitmapFillStyle, GraphicsPath, GraphicsFillStyle, GradientFillStyle, GraphicsStrokeStyle, GradientType as GradientTypeAway, LineScaleMode} from "@awayjs/graphics"
-import {MappingMode} from "@awayjs/renderer";
-
-import {ColorUtils, Matrix as AwayMatrix} from "@awayjs/core"
-
-import {BitmapImage2D} from "@awayjs/stage"
+import {Graphics, GraphicsPath, SegmentedPath, FillType, PathSegment} from "@awayjs/graphics"
 import {MorphSprite} from "@awayjs/scene"
-import {ImageTexture2D, MethodMaterial} from "@awayjs/materials"
-import {PathCommand, GradientType, GradientSpreadMethod,
-	GradientInterpolationMethod, ShapeData,	ShapeMatrix} from "./ShapeData";
-import {assert,	Bounds,	clamp} from "../utilities";
-import {DataBuffer} from "./dataBuffer";
+import {assert, clamp, ShapeData, ShapeMatrix} from "@awayjs/graphics";
 
 import {ShapeFlags, ShapeRecord,
 	ShapeTag, ShapeRecordFlags} from "../SWFTags"
+import { FillStyle, LineStyle } from '../../factories/base/SWFTags';
 var push = Array.prototype.push;
 
-enum FillType {
-	Solid = 0,
-	LinearGradient = 0x10,
-	RadialGradient = 0x12,
-	FocalRadialGradient = 0x13,
-	RepeatingBitmap = 0x40,
-	ClippedBitmap = 0x41,
-	NonsmoothedRepeatingBitmap = 0x42,
-	NonsmoothedClippedBitmap = 0x43,
-}
-
-var gradients_map_swf_to_away:any;
-gradients_map_swf_to_away={};
-gradients_map_swf_to_away[GradientType.Linear]=GradientTypeAway.LINEAR;
-gradients_map_swf_to_away[GradientType.Radial]=GradientTypeAway.RADIAL;
-var capStyle_map_to_away:any;
-capStyle_map_to_away={};
-capStyle_map_to_away[0]=CapsStyle.ROUND;
-capStyle_map_to_away[1]=CapsStyle.NONE;
-capStyle_map_to_away[2]=CapsStyle.SQUARE;
 /*
  * Applies the current segment1 to the paths of all styles specified in the last
  * style-change record.
@@ -102,13 +74,13 @@ function applySegmentToStyles(segment1: PathSegment, styles,
  * See http://blogs.msdn.com/b/mswanson/archive/2006/02/27/539749.aspx and
  * http://wahlers.com.br/claus/blog/hacking-swf-1-shapes-in-flash/ for details.
  */
-function convertRecordsToShapeData(records: ShapeRecord[], fillStyles: any[],
-	lineStyles: any[], dependencies: number[],
+function convertRecordsToShapeData(records: ShapeRecord[], fillStyles: FillStyle[],
+	lineStyles: LineStyle[], dependencies: number[],
 								   recordsMorph: ShapeRecord[], parser:any): any
 {
-	var fillPaths = createPathsList(fillStyles, false, !!recordsMorph, dependencies, parser);
-	var linePaths = createPathsList(lineStyles, true, !!recordsMorph, dependencies, parser);
-	var isMorph = recordsMorph !== null;
+	var fillPaths:SegmentedPath[] = createPathsList(fillStyles, false, !!recordsMorph, dependencies, parser);
+	var linePaths:SegmentedPath[] = createPathsList(lineStyles, true, !!recordsMorph, dependencies, parser);
+	var isMorph:boolean = recordsMorph !== null;
 	var styles = {fill0: 0, fill1: 0, line: 0};
 	var segment1: PathSegment = null;
 	var segment2: PathSegment = null;
@@ -442,7 +414,8 @@ function convertRecordsToShapeData(records: ShapeRecord[], fillStyles: any[],
 			//allPaths[i].serialize(shape);
 			shapeAJS = new GraphicsPath();
 			morphShapeAJS = new GraphicsPath();
-			allPaths[i].serializeAJS(shapeAJS, morphShapeAJS);
+			shapeAJS.queuePath(allPaths[i], morphShapeAJS)
+			//allPaths[i].serializeAJS(shapeAJS, morphShapeAJS);
 			morphSprite.start.push(shapeAJS);
 			morphSprite.end.push(morphShapeAJS);
 		}
@@ -453,7 +426,8 @@ function convertRecordsToShapeData(records: ShapeRecord[], fillStyles: any[],
 		//console.log("allPaths", i, allPaths[i]);
 		//allPaths[i].serialize(shape);
 		shapeAJS = new GraphicsPath();
-		allPaths[i].serializeAJS(shapeAJS, null);
+		shapeAJS.queuePath(allPaths[i], null);
+		//allPaths[i].serializeAJS(shapeAJS, null);
 		//console.log("shapeAJS", shapeAJS);
 		graphics.add_queued_path(shapeAJS);
 	}
@@ -688,591 +662,6 @@ export function defineShape(tag: ShapeTag, parser:any):any {
 	};
 }
 
-class PathSegment {
-
-	private static _counter = 0;
-	public id;
-	private startPoint: string;
-	private endPoint: string;
-	public isValidFill: boolean=true;
-
-	constructor(public commands: DataBuffer, public data: DataBuffer, public morphData: DataBuffer,
-				public prev: PathSegment, public next: PathSegment, public isReversed: boolean)
-	{
-		this.id = PathSegment._counter++;
-	}
-
-	static FromDefaults(isMorph: boolean) {
-		var commands = new DataBuffer();
-		var data = new DataBuffer();
-		commands.endian = data.endian = 'auto';
-		var morphData: any = null;
-		if (isMorph) {
-			morphData = new DataBuffer();
-			morphData.endian = 'auto';
-		}
-		return new PathSegment(commands, data, morphData, null, null, false);
-	}
-
-	moveTo(x: number, y: number) {
-		this.commands.writeUnsignedByte(PathCommand.MoveTo);
-		this.data.write2Ints(x, y);
-	}
-
-	morphMoveTo(x: number, y: number, mx: number, my: number) {
-		this.moveTo(x, y);
-		this.morphData.write2Ints(mx, my);
-	}
-
-	lineTo(x: number, y: number) {
-		this.commands.writeUnsignedByte(PathCommand.LineTo);
-		this.data.write2Ints(x, y);
-	}
-
-	morphLineTo(x: number, y: number, mx: number, my: number) {
-		this.lineTo(x, y);
-		this.morphData.write2Ints(mx, my);
-	}
-
-	curveTo(cpx: number, cpy: number, x: number, y: number) {
-		this.commands.writeUnsignedByte(PathCommand.CurveTo);
-		this.data.write4Ints(cpx, cpy, x, y);
-	}
-
-	morphCurveTo(cpx: number, cpy: number, x: number, y: number,
-				 mcpx: number, mcpy: number, mx: number, my: number)
-	{
-		this.curveTo(cpx, cpy, x, y);
-		this.morphData.write4Ints(mcpx, mcpy, mx, my);
-	}
-
-	/**
-	 * Returns a shallow copy of the segment1 with the "isReversed" flag set.
-	 * Reversed segments play themselves back in reverse when they're merged into the final
-	 * non-segmented path1.
-	 * Note: Don't modify the original, or the reversed copy, after this operation!
-	 */
-	toReversed(): PathSegment {
-		assert(!this.isReversed);
-		return new PathSegment(this.commands, this.data, this.morphData, null, null, true);
-	}
-
-	clone(): PathSegment {
-		return new PathSegment(this.commands, this.data, this.morphData, null, null, this.isReversed);
-	}
-
-	storeStartAndEnd() {
-		var data = this.data.ints;
-		var endPoint1 = data[0] + ',' + data[1];
-		var endPoint2Offset = (this.data.length >> 2) - 2;
-		var endPoint2 = data[endPoint2Offset] + ',' + data[endPoint2Offset + 1];
-		if (!this.isReversed) {
-			this.startPoint = endPoint1;
-			this.endPoint = endPoint2;
-		} else {
-			this.startPoint = endPoint2;
-			this.endPoint = endPoint1;
-		}
-	}
-
-	connectsTo(other: PathSegment): boolean {
-		//assert(other !== this);
-		if(other===this)
-			return false;
-		assert(this.endPoint);
-		assert(other.startPoint);
-		return this.endPoint === other.startPoint;
-	}
-
-	startConnectsTo(other: PathSegment): boolean {
-		if(other===this)
-			return false;
-	//	assert(other !== this);
-		return this.startPoint === other.startPoint;
-	}
-
-	flipDirection() {
-		var tempPoint = "";
-		tempPoint = this.startPoint;
-		this.startPoint = this.endPoint;
-		this.endPoint = tempPoint;
-		this.isReversed = !this.isReversed;
-	}
-
-	serializeAJS(shape: GraphicsPath, morphShape: GraphicsPath, lastPosition: {x: number; y: number}) {
-		//console.log("serializeAJS segment1");
-		if (this.isReversed) {
-			this._serializeReversedAJS(shape, morphShape, lastPosition);
-			return;
-		}
-		var commands = this.commands.bytes;
-		// Note: this *must* use `this.data.length`, because buffers will have padding.
-		var dataLength = this.data.length >> 2;
-		var morphData = this.morphData ? this.morphData.ints : null;
-		var data = this.data.ints;
-		assert(commands[0] === PathCommand.MoveTo);
-		// If the segment1's first moveTo goes to the current coordinates, we have to skip it.
-		var offset = 0;
-		if (data[0] === lastPosition.x && data[1] === lastPosition.y) {
-			offset++;
-		}
-		var commandsCount = this.commands.length;
-		var dataPosition = offset * 2;
-		for (var i = offset; i < commandsCount; i++) {
-			switch (commands[i]){
-				case PathCommand.MoveTo:
-					//console.log("moveTo",data[dataPosition]/20, data[dataPosition+1]/20);
-					shape.moveTo(data[dataPosition]/20, data[dataPosition+1]/20);
-					if(morphShape){
-						morphShape.moveTo(morphData[dataPosition]/20, morphData[dataPosition+1]/20);
-					}
-					break;
-				case PathCommand.LineTo:
-					//console.log("lineTo",data[dataPosition]/20, data[dataPosition+1]/20);
-					shape.lineTo(data[dataPosition]/20, data[dataPosition+1]/20);
-					if(morphShape){
-						morphShape.lineTo(morphData[dataPosition]/20, morphData[dataPosition+1]/20);
-					}
-					break;
-				case PathCommand.CurveTo:
-					//console.log("curveTo",data[dataPosition]/20, data[dataPosition+1]/20,data[dataPosition+2]/20, data[dataPosition+3]/20);
-					shape.curveTo(data[dataPosition]/20, data[dataPosition+1]/20,data[dataPosition+2]/20, data[dataPosition+3]/20 );
-					if(morphShape){
-						morphShape.curveTo(morphData[dataPosition]/20, morphData[dataPosition+1]/20,morphData[dataPosition+2]/20, morphData[dataPosition+3]/20 );
-					}
-					//shape.curveTo(data[dataPosition]/20, data[dataPosition+1]/20, data[dataPosition+2]/20, data[dataPosition+3]/20 );
-					dataPosition+=2;
-					break;
-
-			}
-			dataPosition+=2;
-		}
-		//assert(dataPosition === dataLength);
-		lastPosition.x = data[dataLength - 2];
-		lastPosition.y = data[dataLength - 1];
-	}
-	private _serializeReversedAJS(shape: GraphicsPath, morphShape: GraphicsPath, lastPosition: {x: number; y: number}) {
-		//console.log("_serializeReversedAJS segment1");
-		// For reversing the fill0 segments, we rely on the fact that each segment1
-		// starts with a moveTo. We first write a new moveTo with the final drawing command's
-		// target coordinates (if we don't skip it, see below). For each of the following
-		// commands, we take the coordinates of the command originally *preceding*
-		// it as the new target coordinates. The final coordinates we target will be
-		// the ones from the original first moveTo.
-		// Note: these *must* use `this.{data,commands}.length`, because buffers will have padding.
-		var commandsCount = this.commands.length;
-		var dataPosition = (this.data.length >> 2) - 2;
-		var commands = this.commands.bytes;
-		assert(commands[0] === PathCommand.MoveTo);
-		var data = this.data.ints;
-		var morphData = this.morphData ? this.morphData.ints : null;
-
-		// Only write the first moveTo if it doesn't go to the current coordinates.
-		if (data[dataPosition] !== lastPosition.x || data[dataPosition + 1] !== lastPosition.y) {
-			shape.moveTo(data[dataPosition]/20, data[dataPosition+1]/20);
-			if(morphShape){
-				morphShape.moveTo(morphData[dataPosition]/20, morphData[dataPosition+1]/20);
-			}
-		}
-		if (commandsCount === 1) {
-			lastPosition.x = data[0];
-			lastPosition.y = data[1];
-			return;
-		}
-		for (var i = commandsCount; i-- > 1;) {
-			dataPosition -= 2;
-			var command: PathCommand = commands[i];
-			switch (commands[i]){
-				case PathCommand.MoveTo:
-					//console.log("moveTo",data[dataPosition]/20, data[dataPosition+1]/20);
-					shape.moveTo(data[dataPosition]/20, data[dataPosition+1]/20);
-					if(morphShape){
-						morphShape.moveTo(morphData[dataPosition]/20, morphData[dataPosition+1]/20);
-					}
-					break;
-				case PathCommand.LineTo:
-					//console.log("lineTo",data[dataPosition]/20, data[dataPosition+1]/20);
-					shape.lineTo(data[dataPosition]/20, data[dataPosition+1]/20);
-					if(morphShape){
-						morphShape.lineTo(morphData[dataPosition]/20, morphData[dataPosition+1]/20);
-					}
-					break;
-				case PathCommand.CurveTo:
-					dataPosition -= 2;
-					//console.log("curveTo",data[dataPosition+2]/20, data[dataPosition+3]/20,data[dataPosition]/20, data[dataPosition+1]/20);
-					shape.curveTo(data[dataPosition+2]/20, data[dataPosition+3]/20,data[dataPosition]/20, data[dataPosition+1]/20 );
-					if(morphShape){
-						morphShape.curveTo(morphData[dataPosition+2]/20, morphData[dataPosition+3]/20,morphData[dataPosition]/20, morphData[dataPosition+1]/20 );
-					}
-					break;
-
-			}
-		}
-		//assert(dataPosition === 0);
-		lastPosition.x = data[0];
-		lastPosition.y = data[1];
-	}
-}
-
-class SegmentedPath {
-	private _head: PathSegment;
-	constructor(public fillStyle, public lineStyle, public parser) {
-		this._head = null;
-	}
-
-	addSegment(segment1: PathSegment) {
-		assert(segment1);
-		assert(segment1.next === null);
-		assert(segment1.prev === null);
-		var currentHead = this._head;
-		if (currentHead) {
-			assert(segment1 !== currentHead);
-			currentHead.next = segment1;
-			segment1.prev = currentHead;
-		}
-		this._head = segment1;
-	}
-
-	// Does *not* reset the segment1's prev and next pointers!
-	removeSegment(segment1: PathSegment) {
-		if (segment1.prev) {
-			segment1.prev.next = segment1.next;
-		}
-		if (segment1.next) {
-			segment1.next.prev = segment1.prev;
-		}
-	}
-
-	insertSegment(segment1: PathSegment, next: PathSegment) {
-		var prev = next.prev;
-		segment1.prev = prev;
-		segment1.next = next;
-		if (prev) {
-			prev.next = segment1;
-		}
-		next.prev = segment1;
-	}
-
-	head(): PathSegment {
-		return this._head;
-	}
-
-
-	rgbaToArgb(float32Color:number):number
-	{
-		var r:number = ( float32Color & 0xff000000 ) >>> 24;
-		var g:number = ( float32Color & 0xff0000 ) >>> 16;
-		var b:number = ( float32Color & 0xff00 ) >>> 8;
-		var a:number = float32Color & 0xff;
-		return (a << 24) | (r << 16) |
-		(g << 8) | b;
-	}
-
-	getAlpha(float32Color:number):number
-	{
-		//var r:number = ( float32Color & 0xff000000 ) >>> 24;
-		//var g:number = ( float32Color & 0xff0000 ) >>> 16;
-		//var b:number = ( float32Color & 0xff00 ) >>> 8;
-		var a:number = float32Color & 0xff;
-		return a;
-	}
-
-	rgbToArgb(float32Color:number):number
-	{
-		var a:number = ( float32Color & 0xff000000 ) >>> 24;
-		var b:number = ( float32Color & 0xff0000 ) >>> 16;
-		var g:number = ( float32Color & 0xff00 ) >>> 8;
-		var r:number = float32Color & 0xff;
-		return (a << 24) | (r << 16) |
-			(g << 8) | b;
-	}
-
-	serializeAJS(shape: GraphicsPath, morphShape: GraphicsPath) {
-		//console.log("serializeAJS");
-		var segment1 = this.head();
-		if (!segment1) {
-			// Path is empty.
-			return;
-		}
-
-		while (segment1) {
-			segment1.storeStartAndEnd();
-			segment1 = segment1.prev;
-		}
-
-		var start = this.head();
-		var end = start;
-
-		var finalRoot: PathSegment = null;
-		var finalHead: PathSegment = null;
-
-		// Path segments for one style can appear in arbitrary order in the tag's list
-		// of edge records.
-		// Before we linearize them, we have to identify all pairs of segments where
-		// one ends at a coordinate the other starts at.
-		// The following loop does that, by creating ever-growing runs of matching
-		// segments. If no more segments are found that match the current run (either
-		// at the beginning, or at the end), the current run is complete, and a new
-		// one is started. Rinse, repeat, until no solitary segments remain.
-		var current = start.prev;
-		while (start) {
-			while (current) {
-
-				// if this segment1 has the same startpoint as the start-startpoint it needs to be reversed.
-				if (current.startConnectsTo(start)) {
-					current.flipDirection();
-				}
-
-				// if this segment1 connects to another, we remove it and add it at the end.
-				if (current.connectsTo(start)) {
-					if (current.next !== start) {
-						this.removeSegment(current);
-						this.insertSegment(current, start);
-					}
-					start = current;
-					current = start.prev;
-					continue;
-				}
-
-
-				if(current.startConnectsTo(end)) {
-					current.flipDirection();
-				}
-				if (end.connectsTo(current)) {
-					this.removeSegment(current);
-					end.next = current;
-					current = current.prev;
-					end.next.prev = end;
-					end.next.next = null;
-					end = end.next;
-					continue;
-				}
-				current = current.prev;
-			}
-			// This run of segments is finished. Store and forget it (for this loop).
-			current = start.prev;
-			if (!finalRoot) {
-				finalRoot = start;
-				finalHead = end;
-			} else {
-				finalHead.next = start;
-				start.prev = finalHead;
-				finalHead = end;
-				finalHead.next = null;
-			}
-			if (!current) {
-				break;
-			}
-			start = end = current;
-			current = start.prev;
-		} 
-
-		if (this.fillStyle) {
-			var style = this.fillStyle;
-			var morph = style.morph;
-			switch (style.type) {
-				case FillType.Solid:
-					style.alpha=this.getAlpha(style.color)/255;
-					style.color=this.rgbaToArgb(style.color);
-					shape.style=new GraphicsFillStyle(style.color, style.alpha);
-
-					var r=Math.random()*255;
-					var g=Math.random()*255;
-					var b=Math.random()*255;
-				//	style.color=ColorUtils.ARGBtoFloat32(255, r, g, b);
-				//	shape.style=new GraphicsStrokeStyle(style.color, 5, 1);
-
-					if (morph) {
-						morph.alpha=this.getAlpha(morph.color)/255;
-						morph.color=this.rgbaToArgb(morph.color);
-						morphShape.style=new GraphicsFillStyle(morph.color, morph.alpha);
-					}
-
-
-					break;
-				case FillType.LinearGradient:
-				case FillType.RadialGradient:
-				case FillType.FocalRadialGradient:
-					var gradientType = style.type === FillType.LinearGradient ?
-						GradientType.Linear :
-						GradientType.Radial;
-					var alphas:number[]=[];
-					for(var i:number=0; i<style.colors.length; i++) {
-						alphas[i]=this.getAlpha(style.colors[i])/255;
-						style.colors[i]=this.rgbaToArgb(style.colors[i]);
-					}
-					var awayMatrix:AwayMatrix=new AwayMatrix(style.transform.a, style.transform.b, style.transform.c, style.transform.d, style.transform.tx, style.transform.ty);
-					shape.style=new GradientFillStyle(gradients_map_swf_to_away[gradientType], style.colors, alphas, style.ratios,  awayMatrix, style.spreadMethod, style.interpolationMode, style.focalPoint / 2 | 0);
-
-					//console.log("style.spreadMethod, style.interpolationMode", style.spreadMethod, style.interpolationMode);
-					if (morph) {
-						var gradientType = morph.type === FillType.LinearGradient ?
-							GradientType.Linear :
-							GradientType.Radial;
-						var alphas:number[]=[];
-						for(var i:number=0; i<morph.colors.length; i++) {
-							alphas[i]=this.getAlpha(morph.colors[i])/255;
-							morph.colors[i]=this.rgbaToArgb(morph.colors[i]);
-						}
-						var awayMatrix:AwayMatrix=new AwayMatrix(morph.transform.a, morph.transform.b, morph.transform.c, morph.transform.d, morph.transform.tx, morph.transform.ty);
-						morphShape.style=new GradientFillStyle(gradients_map_swf_to_away[gradientType], morph.colors, alphas, morph.ratios,  awayMatrix, morph.spreadMethod, morph.interpolationMode, morph.focalPoint / 2 | 0);
-
-						//console.log("writeMorphGradient not handled yet");
-						//writeMorphGradient(morph, shape);
-					}
-					break;
-				case FillType.ClippedBitmap:
-				case FillType.RepeatingBitmap:
-				case FillType.NonsmoothedClippedBitmap:
-				case FillType.NonsmoothedRepeatingBitmap:
-
-					var material:MethodMaterial = this.parser.mapMatsForBitmaps[style.bitmapIndex];
-					if(!material){
-                        material=new MethodMaterial();
-                        var myImage=this.parser.awaySymbols[style.bitmapIndex]
-                        if(!myImage || !myImage.isAsset(BitmapImage2D)){
-                            console.log("error: can not find image for bitmapfill", myImage)
-                        }
-                        material.ambientMethod.texture=new ImageTexture2D(myImage);
-                        
-                        material.alphaBlending=true;
-                        material.useColorTransform = true;
-                        material.bothSides = true;
-						this.parser.mapMatsForBitmaps[style.bitmapIndex]=material;
-					}
-
-					//console.log("bitmapIndex", style.bitmapIndex, "transform", style.transform,  "repeat", style.repeat,  "smooth", style.smooth);
-					var awayMatrix:AwayMatrix=new AwayMatrix(style.transform.a, style.transform.b, style.transform.c, style.transform.d, style.transform.tx, style.transform.ty);
-
-					shape.style=new BitmapFillStyle(material, awayMatrix, style.repeat, style.smooth);
-					//shape.beginBitmap(command, style.bitmapIndex, style.transform, style.repeat, style.smooth);
-					if (morph) {
-						console.log("writeMorphBitmap not handled yet");
-						//writeMorphBitmap(morph, shape);
-					}
-
-					break;
-				default:
-					console.log('Invalid fill style type: ' + style.type);
-			}
-		} else {
-			var style = this.lineStyle;
-			var morph = style.morph;
-			assert(style);
-			switch (style.type) {
-				case FillType.Solid:
-					var scaleMode = style.noHscale ?
-						(style.noVscale ? 0 : 2) :
-						style.noVscale ? 3 : 1;
-					// TODO: Figure out how to handle startCapsStyle
-					var thickness = (clamp(style.width, 0, 0xff * 20)|0)/20;
-					style.alpha=this.getAlpha(style.color)/255;
-					style.color=this.rgbaToArgb(style.color);
-					var scaleModeAWJ=LineScaleMode.NORMAL;
-					//if(style.noVscale==null && style.noHscale==null){
-					//	scaleModeAWJ="HAIRLINE";
-					//}
-					if(thickness==0.05){
-						scaleModeAWJ=LineScaleMode.HAIRLINE;
-					}
-					if(style.startCapsStyle!=style.endCapsStyle){
-						throw("different end vs start capstyöe");
-					}
-					style.startCapsStyle=0;
-					style.jointStyle=0;
-					//console.log("style.startCapsStyle", style.startCapsStyle, style.endCapsStyle, style );
-					shape.style=new GraphicsStrokeStyle(style.color, style.alpha, thickness, style.jointStyle, capStyle_map_to_away[style.startCapsStyle], style.miterLimit, scaleModeAWJ);
-
-					//console.log("scaleMode", scaleModeAWJ, style.noHscale, style.noVscale, scaleMode, thickness, style.jointStyle, style.startCapsStyle, style.endCapsStyle, style.miterLimit);
-					if (morph) {
-						var thickness = (clamp(morph.width, 0, 0xff * 20)|0)/20;
-						morph.alpha=this.getAlpha(morph.color)/255;
-						morph.color=this.rgbaToArgb(morph.color);
-						morphShape.style=new GraphicsStrokeStyle(morph.color, morph.alpha, thickness, style.jointStyle, capStyle_map_to_away[style.startCapsStyle], style.miterLimit, scaleModeAWJ);
-						//console.log("writeMorphLineStyle not handled yet");
-						//writeMorphLineStyle(morph, shape);
-					}
-					break;
-				case FillType.LinearGradient:
-				case FillType.RadialGradient:
-				case FillType.FocalRadialGradient:
-					var scaleMode = style.noHscale ?
-						(style.noVscale ? 0 : 2) :
-						style.noVscale ? 3 : 1;
-					// TODO: Figure out how to handle startCapsStyle
-					//console.log("style.startCapsStyle", style.startCapsStyle, style.endCapsStyle, style );
-					var thickness = (clamp(style.width, 0, 0xff * 20)|0)/20;
-					style.alpha=this.getAlpha(style.color)/255;
-					style.color=this.rgbaToArgb(style.color)
-					shape.style=new GraphicsStrokeStyle(style.color, style.alpha, thickness, style.jointStyle, style.endCapsStyle, style.miterLimit);
-					var gradientType = style.type === FillType.LinearGradient ?
-						GradientType.Linear :
-						GradientType.Radial;
-					for(var i:number=0; i<style.colors.length; i++) {
-						style.colors[i]=this.rgbaToArgb(style.colors[i]);
-						alphas[i]=1;
-					}
-					for(var i:number=0; i<style.colors.length; i++) alphas[i]=1;
-					shape.style=new GradientFillStyle(gradients_map_swf_to_away[gradientType], style.colors, alphas, style.ratios,  style.transform, style.spreadMethod,style.interpolationMode, style.focalPoint / 2 | 0);
-
-					//console.log("scaleMode", style.noHscale, style.noVscale, scaleMode, thickness, style.jointStyle, style.endCapsStyle, style.miterLimit);
-					if (morph) {
-						//console.log("writeMorphLineStyle not handled yet");
-						//console.log("writeMorphGradient not handled yet");
-						//writeMorphLineStyle(morph, shape);
-						//writeMorphGradient(morph, shape);
-					}
-					break;
-				case FillType.ClippedBitmap:
-				case FillType.RepeatingBitmap:
-				case FillType.NonsmoothedClippedBitmap:
-				case FillType.NonsmoothedRepeatingBitmap:
-					var scaleMode = style.noHscale ?
-						(style.noVscale ? 0 : 2) :
-						style.noVscale ? 3 : 1;
-					// TODO: Figure out how to handle startCapsStyle
-					//console.log("style.startCapsStyle", style.startCapsStyle, style.endCapsStyle, style );
-					var thickness = clamp(style.width, 0, 0xff * 20)|0;
-					shape.style=new GraphicsStrokeStyle(style.color, 1, thickness, style.jointStyle, style.endCapsStyle, style.miterLimit);
-					//console.log("scaleMode", scaleMode, thickness, style.jointStyle, style.endCapsStyle, style.miterLimit);
-
-
-
-					//console.log("writeBitmap not handled yet");
-					//writeBitmap(PathCommand.LineStyleBitmap, style, shape);
-					if (morph) {
-						//console.log("writeMorphLineStyle not handled yet");
-						//console.log("writeMorphBitmap not handled yet");
-						//writeMorphLineStyle(morph, shape);
-						//writeMorphBitmap(morph, shape);
-					}
-					break;
-				default:
-				//console.error('Line style type not yet supported: ' + style.type);
-			}
-		
-		}
-
-		var lastPosition = {x: 0, y: 0};
-		current = finalRoot;
-		while (current) {
-			if(current.isValidFill){
-				current.serializeAJS(shape, morphShape, lastPosition);
-			}
-			current = current.next;
-		}
-		/*
-		if (this.fillStyle) {
-			shape.endFill();
-		} else {
-			shape.endLine();
-		}*/
-		return shape;
-	}
-
-
-}
-
 function writeLineStyle(style: ShapeStyle, shape: ShapeData): void {
 	// No scaling == 0, normal == 1, vertical only == 2, horizontal only == 3.
 	var scaleMode = style.noHscale ?
@@ -1285,28 +674,28 @@ function writeLineStyle(style: ShapeStyle, shape: ShapeData): void {
 		style.jointStyle, style.miterLimit);
 }
 
-function writeMorphLineStyle(style: ShapeStyle, shape: ShapeData): void {
-	// TODO: Figure out how to handle startCapsStyle
-	var thickness = clamp(style.width, 0, 0xff * 20)|0;
-	shape.writeMorphLineStyle(thickness, style.color);
-}
+// function writeMorphLineStyle(style: ShapeStyle, shape: ShapeData): void {
+// 	// TODO: Figure out how to handle startCapsStyle
+// 	var thickness = clamp(style.width, 0, 0xff * 20)|0;
+// 	shape.writeMorphLineStyle(thickness, style.color);
+// }
 
-function writeGradient(command: PathCommand, style: ShapeStyle, shape: ShapeData): void {
-	var gradientType = style.type === FillType.LinearGradient ?
-		GradientType.Linear :
-		GradientType.Radial;
-	shape.beginGradient(command, style.colors, style.ratios,
-		gradientType, style.transform, style.spreadMethod,
-		style.interpolationMode, style.focalPoint / 2 | 0);
-}
+// function writeGradient(command: PathCommand, style: ShapeStyle, shape: ShapeData): void {
+// 	var gradientType = style.type === FillType.LinearGradient ?
+// 		GradientType.Linear :
+// 		GradientType.Radial;
+// 	shape.beginGradient(command, style.colors, style.ratios,
+// 		gradientType, style.transform, style.spreadMethod,
+// 		style.interpolationMode, style.focalPoint / 2 | 0);
+// }
 
-function writeMorphGradient(style: ShapeStyle, shape: ShapeData) {
-	shape.writeMorphGradient(style.colors, style.ratios, style.transform);
-}
+// function writeMorphGradient(style: ShapeStyle, shape: ShapeData) {
+// 	shape.writeMorphGradient(style.colors, style.ratios, style.transform);
+// }
 
-function writeBitmap(command: PathCommand, style: ShapeStyle, shape: ShapeData): void {
-	shape.beginBitmap(command, style.bitmapIndex, style.transform, style.repeat, style.smooth);
-}
+// function writeBitmap(command: PathCommand, style: ShapeStyle, shape: ShapeData): void {
+// 	shape.beginBitmap(command, style.bitmapIndex, style.transform, style.repeat, style.smooth);
+// }
 
 function writeMorphBitmap(style: ShapeStyle, shape: ShapeData) {
 	shape.writeMorphBitmap(style.transform);

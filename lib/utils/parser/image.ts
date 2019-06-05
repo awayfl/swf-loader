@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import {assert, ImageType} from "../utilities";
-import {Inflate} from "../deflate";
+import {assert, ImageType, Inflate} from "@awayjs/graphics";
 import {ImageTag} from "../SWFTags"
 
 /**

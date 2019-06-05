@@ -15,7 +15,7 @@
  */
 import {ShumwayCom} from "./external";
 import {ImageType} from "./utilities";
-import {DataBuffer} from "./dataBuffer";
+import {DataBuffer} from "@awayjs/graphics";
 
 export interface IRemotable {
 	_id: number;

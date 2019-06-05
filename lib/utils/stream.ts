@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {utf8encode} from "./utilities";
+import {utf8encode} from "@awayjs/graphics";
 
 export var StreamNoDataError = {};
 

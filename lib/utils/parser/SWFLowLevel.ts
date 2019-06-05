@@ -71,7 +71,7 @@ import {
 
 import {Stream} from "../stream";
 
-import {Bounds} from "../utilities";
+import {Bounds} from "@awayjs/graphics";
 
 function parseBbox(stream): Bbox {
   stream.align();
