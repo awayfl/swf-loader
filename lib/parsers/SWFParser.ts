@@ -2,7 +2,7 @@ import {WaveAudioParser, Rectangle, WaveAudio, URLLoaderDataFormat, IAsset, Pars
 
 import {Image2DParser, BitmapImage2D} from "@awayjs/stage";
 
-import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign} from "@awayjs/scene";
+import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign, SceneImage2D} from "@awayjs/scene";
 
 import {Graphics} from "@awayjs/graphics";
 
@@ -351,7 +351,7 @@ export class SWFParser extends ParserBase
 		if(!material){
 			material=new MethodMaterial();
 			var myImage=this._awaySymbols[bitmapIndex];
-			if(!myImage || !myImage.isAsset(BitmapImage2D)){
+			if(!myImage || (!myImage.isAsset(BitmapImage2D) && !myImage.isAsset(SceneImage2D))){
 				console.log("error: can not find image for bitmapfill", myImage)
 			}
 			material.ambientMethod.texture=new ImageTexture2D(myImage);
