@@ -881,9 +881,8 @@ export class SWFParser extends ParserBase
 
 											}
 											// register a new instance for this object
-											var graphicsSprite:Sprite=new Sprite();
+											var graphicsSprite:Sprite=new Sprite(<Graphics> awaySymbol);
 											graphicsSprite.mouseEnabled = false;
-                                            graphicsSprite.graphics.copyFrom(<Graphics>awaySymbol);
                                         
                                             // check if we can reuse a free instance for this symbol:
                                             if(freeChilds[placeObjectTag.symbolId]){
