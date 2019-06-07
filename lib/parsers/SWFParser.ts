@@ -849,6 +849,10 @@ export class SWFParser extends ParserBase
 										if(!awayTimeline.graphicsPool[placeObjectTag.symbolId]){
 											awayTimeline.graphicsPool[placeObjectTag.symbolId]=awaySymbol;
 										}
+										
+										// register a new instance for this object
+										var graphicsSprite:Sprite=new Sprite(<Graphics> awaySymbol);
+										graphicsSprite.mouseEnabled = false;
 
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds
 										if(child && child.awayChild.isAsset(Sprite)){
@@ -880,9 +884,6 @@ export class SWFParser extends ParserBase
 												noTimelineDebug || console.log("				remove because we want to add a shape at this depth", "depth", tag.depth);
 
 											}
-											// register a new instance for this object
-											var graphicsSprite:Sprite=new Sprite(<Graphics> awaySymbol);
-											graphicsSprite.mouseEnabled = false;
                                         
                                             // check if we can reuse a free instance for this symbol:
                                             if(freeChilds[placeObjectTag.symbolId]){
