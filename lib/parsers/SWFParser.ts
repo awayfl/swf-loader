@@ -468,7 +468,7 @@ export class SWFParser extends ParserBase
 					case "sound":
 						var awaySound:WaveAudio=(<WaveAudio>this._awaySymbols[dictionary[i].id]);
 						if(awaySound){
-							(<any>awaySound).className=this.symbolClassesList[symbol.id]?this.symbolClassesList[symbol.id].className:null;
+							(<any>awaySound).className=this.symbolClassesMap[symbol.id]?this.symbolClassesMap[symbol.id]:null;
                             awaySound.name=symbol.id;
                             assetsToFinalize[dictionary[i].id]=awaySound;
                             //awaySound.play(0,false);
