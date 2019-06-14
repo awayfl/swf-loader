@@ -378,7 +378,7 @@ export class SWFParser extends ParserBase
 				noSceneGraphDebug || console.log("symbol: ", dictionary[i].id, symbol.type, symbol);
 				switch(symbol.type){
 					case "morphshape":
-						console.warn("Warning: SWF contains shapetweening!!!");
+						//console.warn("Warning: SWF contains shapetweening!!!");
                         symbol.shape.name=symbol.id;
 						symbol.shape.name="AwayJS_morphshape_"+symbol.id.toString();
 						symbol.shape.className=symbol.className;
@@ -1471,7 +1471,7 @@ export class SWFParser extends ParserBase
 		}
 		this.swfVersion = initialBytes[3];
 		if(this.swfVersion != 6){
-			console.log("WARNING: SWF VERSION IS NOT 6", this.swfVersion)
+			//console.log("WARNING: SWF VERSION IS NOT 6", this.swfVersion)
 		}
 		this._loadStarted = Date.now();
 		this._uncompressedLength = readSWFLength(initialBytes);
@@ -1717,7 +1717,7 @@ export class SWFParser extends ParserBase
 				this.setFileAttributes(tagLength);
 				break;
 			case SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA:
-				console.log('CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA ');
+				//console.log('CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA ');
 				this.setSceneAndFrameLabelData(tagLength);
 				break;
 			case SwfTagCode.CODE_SET_BACKGROUND_COLOR:
