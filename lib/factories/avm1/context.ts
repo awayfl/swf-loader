@@ -265,6 +265,35 @@ export class AVM1Context implements IAVM1Context {
 		};
 	}
 
+	public reset(): void {
+		
+		this.eventObservers = Object.create(null);
+		this.assets = {};
+		this.assetsSymbols = [];
+		this.assetsClasses = [];
+		this.awayAssets={};
+		this.staticStates = new WeakMap<typeof AVM1Object, any>();
+		/*
+		function removescripts(){
+			var allsuspects=document.getElementsByTagName("script")
+			for (var i=allsuspects.length; i>=0; i--){ //search backwards within nodelist for matching elements to remove
+				if (allsuspects[i] && allsuspects[i].getAttribute("src")!=null){
+					console.log(allsuspects[i].getAttribute("src"));
+					//allsuspects[i].parentNode.removeChild(allsuspects[i]) //remove element by calling parentNode.removeChild()
+				}
+			}
+		}
+		 
+		removescripts();
+		var len=ActionsDataCompiler.allScripts.length;
+		for(var i=0; i<len; i++){
+			delete ActionsDataCompiler.allScripts[i];
+		}
+		ActionsDataCompiler.allScripts.length=0;*/
+		AVM1Stage.bindStage(this, this.globals.Stage, null, null);
+
+	}
+	private htmlElement:any;
 	public setStage(stage: AVMAwayStage, htmlElement:any): void {
 		AVM1Key.bindStage(this, this.globals.Key, stage, htmlElement);
 		AVM1Mouse.bindStage(this, this.globals.Mouse, stage, htmlElement);
