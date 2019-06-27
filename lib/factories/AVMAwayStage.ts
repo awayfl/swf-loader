@@ -224,18 +224,20 @@ export class AVMAwayStage extends Sprite{
 	public updateSize(x:number, y:number, w:number, h:number){
 		//this._stageWidth=w;
 		//this._stageHeight=h;
-		this._scene.view.x         = x;
-		this._scene.view.y         = y;
+		if(this._scene && this._scene.view && this._renderer){
+			this._scene.view.x         = x;
+			this._scene.view.y         = y;
 
-		this._renderer.stage.x     = x;
-		this._renderer.stage.y    = y;
-	//	this._renderer.stage.container.style.zIndex="-100";
-		this._renderer.stage.width     = w;
-		this._renderer.stage.height    = h;
-		this._scene.view.width     = w;
-		this._scene.view.height    = h;
-		if(this._fpsTextField)
-			this._fpsTextField.style.left  =  window.innerWidth * 0.5 - 100 + 'px';
+			this._renderer.stage.x     = x;
+			this._renderer.stage.y    = y;
+		//	this._renderer.stage.container.style.zIndex="-100";
+			this._renderer.stage.width     = w;
+			this._renderer.stage.height    = h;
+			this._scene.view.width     = w;
+			this._scene.view.height    = h;
+			if(this._fpsTextField)
+				this._fpsTextField.style.left  =  window.innerWidth * 0.5 - 100 + 'px';
+		}
 	};
 
 	public show (){
