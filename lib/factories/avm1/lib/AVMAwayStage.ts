@@ -241,6 +241,39 @@ export class AVMAwayStage extends Sprite{
 	}
 	// ---------- event mapping functions Event.MOUSE_LEAVE
 
+	public dispose(){
+		if(this._view && this._view.renderer && this._view.renderer.viewport && this._renderer && this._renderer.stage && this._renderer.stage.container)
+			MouseManager.getInstance(PickGroup.getInstance(this._view.renderer.viewport)).unregisterContainer(this._renderer.stage.container);
+		if(this._view)
+			this._view.dispose();
+	
+		AVMAwayStage._colorMaterials={};
+		AVMAwayStage._textureMaterials={};
+
+		PickGroup.clearAllInstances();
+
+		TextureAtlas.clearAllMaterials();
+		this._view=null;
+		//this._renderer.dispose();
+		this._renderer=null;
+		this._timer.stop();
+		
+        var len=this._layers.length;
+		//this.runAVM1Framescripts();
+		for(var i=0;i<len;i++) {
+			var myLayer=this._layers[i];
+			var numChilds = myLayer.numChildren;
+			for (var c = 0; c < numChilds; ++c) {
+				var child = myLayer.getChildAt(c);
+				child.dispose();
+			}
+		}
+		this._layers.length=0;
+		AVM1TextField.allTextfields={};
+		MovieClip._movieClips=[];
+		TextField._textFields=[];
+		Sprite._sprites=[];
+	}
 
 
 	//---------------------------stuff added to make it work:
@@ -484,7 +517,9 @@ export class AVMAwayStage extends Sprite{
         MovieClip._skipAdvance=false;
         FrameScriptManager.execute_queue();
         
-        var enterFramesChilds=[];
+		var enterFramesChilds=[];
+		len=this._layers.length;
+		
 		// now dispatch the onEnterFrame
 		for(i=0;i<len;i++) {
 			myLayer=this._layers[i];
@@ -526,6 +561,10 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
+		if(!this._renderer.stage){
+			this._timer.stop();
+			return;
+		}
 		var frameMarker:number = 1000/this._frameRate;
 		this._stageTime += Math.min(dt, frameMarker);
 
