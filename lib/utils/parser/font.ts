@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {ShapeRecordFlags, FontTag, FontFlags, SwfTagCode} from "../SWFTags"
+import {FontTag, FontFlags, SwfTagCode} from "../SWFTags"
 import {Font, TesselatedFontTable, DefaultFontManager, FontStyleName} from "@awayjs/scene"
-import {GraphicsPath, GraphicsFactoryFills} from "@awayjs/graphics"
+import {GraphicsPath, ShapeRecordFlags} from "@awayjs/graphics"
 import {AttributesBuffer} from "@awayjs/stage"
 
 var pow = Math.pow;

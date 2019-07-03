@@ -16,7 +16,6 @@
 
 import {
 	AVM1ClipEvents,
-    Bbox,
 	BinaryDataTag,
 	BitmapFill,
 	BitmapTag,
@@ -32,7 +31,6 @@ import {
 	Filter,
 	FontFlags,
 	FontTag,
-	FillStyle,
 	GlowFilter,
 	Glyph,
 	GradientFill,
@@ -40,7 +38,6 @@ import {
 	ImageTag,
 	Kerning,
 	Label,
-	LineStyle,
     Matrix,
 	PlaceObjectFlags,
 	PlaceObjectTag,
@@ -48,10 +45,7 @@ import {
 	ScalingGridTag,
 	Scene,
 	SceneTag,
-	ShapeTag,
 	ShapeFlags,
-	ShapeRecord,
-	ShapeRecordFlags,
 	SolidFill,
 	SoundEnvelope,
     SoundInfo,
@@ -71,7 +65,7 @@ import {
 
 import {Stream} from "../stream";
 
-import {Bounds} from "@awayjs/graphics";
+import {Bounds, Bbox, LineStyle, ShapeTag, ShapeRecord, ShapeRecordFlags, FillStyle} from "@awayjs/graphics";
 
 function parseBbox(stream): Bbox {
   stream.align();

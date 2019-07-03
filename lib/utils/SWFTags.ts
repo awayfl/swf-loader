@@ -1,3 +1,5 @@
+import {SwfTag, DefinitionTag, Bbox, ShapeRecord, FillStyle} from "@awayjs/graphics";
+
 /*
  * Copyright 2013 Mozilla Foundation
  *
@@ -169,12 +171,6 @@ export enum ControlTags {
   CODE_VIDEO_FRAME                       = 61
 }
 
-export interface Bbox {
-  xMin: number;
-  xMax: number;
-  yMin: number;
-  yMax: number;
-}
 
 export interface Matrix {
   a: number;
@@ -194,14 +190,6 @@ export interface ColorTransform {
   greenOffset: number;
   blueOffset: number;
   alphaOffset: number;
-}
-
-export interface SwfTag {
-  code: number;
-}
-
-export interface DefinitionTag extends SwfTag {
-  id: number;
 }
 
 export interface DisplayListTag extends SwfTag {
@@ -547,27 +535,11 @@ export interface Label {
   name: string;
 }
 
-export interface ShapeTag extends DefinitionTag {
-  lineBounds: Bbox;
-  lineBoundsMorph?: Bbox;
-  fillBounds?: Bbox;
-  fillBoundsMorph?: Bbox;
-  flags: number;
-  fillStyles: FillStyle[];
-  lineStyles: LineStyle[];
-  records: ShapeRecord[];
-  recordsMorph?: ShapeRecord[];
-}
-
 export const enum ShapeFlags {
   UsesScalingStrokes    = 0x01,
   UsesNonScalingStrokes = 0x02,
   UsesFillWindingRule   = 0x04,
   IsMorph               = 0x08
-}
-
-export interface FillStyle {
-  type: number;
 }
 
 export interface SolidFill extends FillStyle {
@@ -597,54 +569,6 @@ export interface BitmapFill extends FillStyle {
   condition: boolean;
   matrix: Matrix;
   matrixMorph?: Matrix;
-}
-
-export interface LineStyle {
-  width: number;
-  widthMorph?: number;
-  startCapsStyle?: number;
-  jointStyle?: number;
-  hasFill?: number;
-  noHscale?: boolean;
-  noVscale?: boolean;
-  pixelHinting?: boolean;
-  noClose?: boolean;
-  endCapsStyle?: number;
-  miterLimitFactor?: number;
-  fillStyle?: FillStyle;
-  color?: number;
-  colorMorph?: number;
-}
-
-export interface ShapeRecord {
-  type: number;
-  flags: number;
-  deltaX?: number;
-  deltaY?: number;
-  controlDeltaX?: number;
-  controlDeltaY?: number;
-  anchorDeltaX?: number;
-  anchorDeltaY?: number;
-  moveX?: number;
-  moveY?: number;
-  fillStyle0?: number;
-  fillStyle1?: number;
-  lineStyle?: number;
-  fillStyles?: FillStyle[];
-  lineStyles?: LineStyle[];
-  lineBits?: number;
-  fillBits?: number;
-}
-
-export const enum ShapeRecordFlags {
-  Move = 0x01,
-  HasFillStyle0 = 0x02,
-  HasFillStyle1 = 0x04,
-  HasLineStyle = 0x08,
-  HasNewStyles = 0x10,
-  IsStraight = 0x20,
-  IsGeneral = 0x40,
-  IsVertical = 0x80
 }
 
 export interface VideoStreamTag extends DefinitionTag {
