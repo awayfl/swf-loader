@@ -61,7 +61,12 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	private _exitFrameHandler: (event: Event) => void;
 
 	public dispatchKeyEvent(keyCode, isShift, isCTRL, isAlt){
-        // this is called from the adaptee whenever a text-input occurs
+		// this is called from the adaptee whenever a text-input occurs
+		if(!(<AVM1Stage>this.context.globals.Stage) 
+		|| (<AVM1Stage>this.context.globals.Stage)._awayAVMStage
+		|| (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene){
+			return;
+		}
         console.log("dispatch keyEvent", MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).useSoftkeyboard)
 		if(MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).useSoftkeyboard){
             console.log("dispatch keyEvent")
