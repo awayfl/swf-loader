@@ -46,11 +46,11 @@ export class AVM1Mouse extends AVM1Object {
 	}
 
 	public static hide() {
-		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.scene.renderer.pickGroup).showCursor=false;
+		(<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.scene.mouseManager.showCursor=false;
 	}
 
 	public static show() {
-		MouseManager.getInstance((<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.scene.renderer.pickGroup).showCursor=true;
+		(<AVM1Stage>AVM1Globals.instance.Stage)._awayAVMStage.scene.mouseManager.showCursor=true;
 	}
 }
 

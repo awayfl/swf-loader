@@ -8,7 +8,7 @@ import {HoverController, FrameScriptManager, Camera, MovieClip, Scene, MouseMana
 import {MethodMaterial}	from "@awayjs/materials";
 import {DefaultRenderer} from  "@awayjs/renderer";
 import {View, BasicPartition, PickGroup} from "@awayjs/view";
-import {StageManager, Stage as AwayStage, ImageUtils, BitmapImage2D} from "@awayjs/stage";
+import {StageManager, Stage, ImageUtils, BitmapImage2D} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, KeyboardEvent, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
 import { AVM1TextField } from './avm1/lib/AVM1TextField';
@@ -26,13 +26,12 @@ export class AVMAwayStage extends Sprite{
 	private static _colorMaterials:any={};
 	private static _textureMaterials:any={};
 	private static _useTextureAtlasForColors:boolean=true;
-	private _stage3Ds:AwayStage[];
+	private _stage3Ds:Stage[];
 
 	private _frameRate:number = 30;
 	private _currentFps:number = 0;
 	private _scene: Scene;
-	private _rendererStage:AwayStage;
-	protected _renderer: DefaultRenderer;
+	private _stage:Stage;
 	private _timer: RequestAnimationFrame;
 	private _stageTime: number = 0;
 	private _projection: PerspectiveProjection;
@@ -179,7 +178,7 @@ export class AVMAwayStage extends Sprite{
 		this.initListeners();
 
 		//console.log("constructed AVMAwayStage and create the entranceclass");
-		this.htmlElement=this._renderer.stage.container;
+		this.htmlElement=this._stage.container;
 		this.htmlElement.tabIndex = 1000;
 	}
 	public get scene():Scene
@@ -197,7 +196,7 @@ export class AVMAwayStage extends Sprite{
 		return this._layers[idx];
 	}
 	public get rendererStageContainer(): HTMLElement {
-		return this._renderer.stage.container;
+		return this._stage.container;
 	}
 	private updateFPS(): void {
 		if(this._fpsTextField)
@@ -224,15 +223,15 @@ export class AVMAwayStage extends Sprite{
 	public updateSize(x:number, y:number, w:number, h:number){
 		//this._stageWidth=w;
 		//this._stageHeight=h;
-		if(this._scene && this._scene.view && this._renderer){
+		if(this._scene && this._scene.view && this._stage){
 			this._scene.view.x         = x;
 			this._scene.view.y         = y;
 
-			this._renderer.stage.x     = x;
-			this._renderer.stage.y    = y;
+			this._stage.x     = x;
+			this._stage.y    = y;
 		//	this._renderer.stage.container.style.zIndex="-100";
-			this._renderer.stage.width     = w;
-			this._renderer.stage.height    = h;
+			this._stage.width     = w;
+			this._stage.height    = h;
 			this._scene.view.width     = w;
 			this._scene.view.height    = h;
 			if(this._fpsTextField)
@@ -296,13 +295,13 @@ export class AVMAwayStage extends Sprite{
 		//this._rendererStage = StageManager.getInstance().getStageAt(0);
 
 		StageManager.htmlCanvas=htmlCanvas;
-		this._renderer = new DefaultRenderer(new BasicPartition(new DisplayObjectContainer()));
-		this._renderer.stage.color = 0xFFFFFFFF;
+		this._scene = new Scene(new BasicPartition(new DisplayObjectContainer()));
+		this._scene.renderer.renderableSorter = null;//new RenderableSort2D();
 		StageManager.htmlCanvas=null;
 
-		this._scene = new Scene(this._renderer);
-		this._renderer.antiAlias=0;
-		this._scene.renderer.renderableSorter = null;//new RenderableSort2D();
+		this._stage = this._scene.view.stage;
+		this._stage.antiAlias=0;
+		this._stage.color = 0xFFFFFFFF;
         //this._scene.mousePicker=new AVMRaycastPicker(this._renderer.partition, true, this);
         this._scene.mousePicker.shapeFlag=true;
 		this._scene.forceMouseMove=true;
@@ -534,7 +533,7 @@ export class AVMAwayStage extends Sprite{
 		this._stageTime += Math.min(dt, frameMarker);
 
 		if (this._stageTime >= frameMarker) {
-			this._renderer.stage.clear();
+			this._stage.clear();
 			this.onEnterFrame(this._stageTime);
 			this._stageTime -= frameMarker;
 
@@ -565,9 +564,9 @@ export class AVMAwayStage extends Sprite{
 		}
 	}
 
-	public get rendererStage():AwayStage
+	public get rendererStage():Stage
 	{
-		return this._renderer.stage;
+		return this._stage;
 	}
 
 
@@ -1014,7 +1013,7 @@ export class AVMAwayStage extends Sprite{
 
 	}
 
-	public get stage3Ds () : AwayStage[]{
+	public get stage3Ds () : Stage[]{
 		// todo: any is stage3d
 		console.log("stage3Ds not implemented yet in flash/AVMAwayStage");
 		return this._stage3Ds;

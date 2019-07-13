@@ -1143,7 +1143,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			window.addEventListener("mouseup", this.stopDragDelegate);
 			window.addEventListener("touchend", this.stopDragDelegate);
 			AVM1Stage.stage.scene.mousePicker.dragEntity=this.adaptee;
-			MouseManager.getInstance(AVM1Stage.stage.scene.renderer.pickGroup).isAVM1Dragging=true;
+			AVM1Stage.stage.scene.mouseManager.isAVM1Dragging=true;
 
 		}
 	}
@@ -1192,7 +1192,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		this.isDragging=false;
         AVM1MovieClip.currentDraggedMC=null;
 		AVM1Stage.stage.scene.mousePicker.dragEntity=null;
-		MouseManager.getInstance(AVM1Stage.stage.scene.renderer.pickGroup).isAVM1Dragging=true;
+		AVM1Stage.stage.scene.mouseManager.isAVM1Dragging=true;
 		AVM1Stage.stage.removeEventListener("mouseMove3d", this.dragListenerDelegate);
 		window.removeEventListener("mouseup", this.stopDragDelegate);
 		window.removeEventListener("touchend", this.stopDragDelegate);

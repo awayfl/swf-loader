@@ -67,8 +67,8 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		|| (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene){
 			return;
 		}
-        console.log("dispatch keyEvent", MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).useSoftkeyboard)
-		if(MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).useSoftkeyboard){
+        console.log("dispatch keyEvent", (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.useSoftkeyboard)
+		if((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.useSoftkeyboard){
             console.log("dispatch keyEvent")
             var staticState: typeof AVM1Key = this.context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = keyCode;
@@ -447,8 +447,8 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
             value=false;
         }
 		value = alToBoolean(this.context, value);
-		if(!value && MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).getFocus()==this.adaptee){
-			MouseManager.getInstance((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.renderer.pickGroup).setFocus(null);
+		if(!value && (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.getFocus()==this.adaptee){
+			(<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.setFocus(null);
 		}
 		this.adaptee.selectable = value;
 	}
