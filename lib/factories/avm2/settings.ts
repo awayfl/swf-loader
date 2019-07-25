@@ -1,5 +1,5 @@
 import { shumwayOptions } from "../base/settings";
-import { OptionSet } from "../base/options";
+import { OptionSet, Option } from "../base/options";
 
 var avm2Options = shumwayOptions.register(new OptionSet("AVM2"));
 
