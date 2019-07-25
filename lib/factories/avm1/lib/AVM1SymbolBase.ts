@@ -175,8 +175,9 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
     }
     public removeEventListenerOnAdapter(event:AVM1EventHandler, callback:()=>void){
         if(event.stageEvent){
-            var awayAVMStage = (<any>this.context.globals.Stage)._awayAVMStage;
-            awayAVMStage.removeAVM1EventListener(this.adaptee, event.eventName, callback);
+			var awayAVMStage = (<any>this.context.globals.Stage)._awayAVMStage;
+			if(awayAVMStage)
+            	awayAVMStage.removeAVM1EventListener(this.adaptee, event.eventName, callback);
         }
         else{
             this.adaptee.removeEventListener(event.eventName, callback);
@@ -541,17 +542,9 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 		if (this.adaptee.name=="scene") {
 			return; // let's not remove root symbol
 		}
-		if(this.adaptee.parent){
-            // todo: checking for positive depth is enough ?
-			if((this.dynamicallyCreated || this.hasSwappedDepth) && away2avmDepth(this.adaptee._depthID)>=0){
-			    this.adaptee.parent.removeChild(this.adaptee);
-				var avmParent = this.get_parent();
-				if(avmParent){
-					avmParent._removeChildName(this, this.adaptee.name);
-					avmParent.adaptee.removeChild(this.adaptee);
-				}
-		    }
-		}
+		if(this.adaptee.parent && away2avmDepth(this.adaptee._depthID)>=0)
+			this.adaptee.parent.removeChild(this.adaptee);		    
+		
     }
 	/*
 	// transform is only available in FP8, and cause problems in FP6
