@@ -253,7 +253,7 @@ export function escapeString(str: string) {
 /**
  * Workaround for max stack size limit.
  */
-export function fromCharCodeArray(buffer: Uint8Array): string {
+export function fromCharCodeArray(buffer: Uint32Array): string {
 	var str = "", SLICE = 1024 * 16;
 	for (var i = 0; i < buffer.length; i += SLICE) {
 		var chunk = Math.min(buffer.length - i, SLICE);
