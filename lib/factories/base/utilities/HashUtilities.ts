@@ -85,7 +85,7 @@ export function mixHash(a: number, b: number) {
 }
 
 
-export let HashUtilities={
+export var HashUtilities = {
 	_md5R:_md5R,
 	_md5K:_md5K,
 	hashBytesTo32BitsMD5:hashBytesTo32BitsMD5,

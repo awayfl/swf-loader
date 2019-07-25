@@ -14,144 +14,144 @@
  * limitations under the License.
  */
 
-module Shumway.AVMX.AS {
+import { ASXML } from "./xml";
+import { release, warning, somewhatImplemented } from "../../base/utilities/Debug";
+import { axCoerceString } from "../run";
+import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
+import { ASObject, initializeBuiltins } from "../nat";
+import { ClipboardService } from "../../base/utilities/ClipboardService";
 
-  import somewhatImplemented = Shumway.Debug.somewhatImplemented;
-  import defineNonEnumerableProperty = Shumway.ObjectUtilities.defineNonEnumerableProperty;
-
-  export module flash.system {
-    export class IME extends ASObject /* flash.events.EventDispatcher */ {
-      constructor () {
-        super();
-      }
-      static get enabled(): boolean {
-        release || release || somewhatImplemented("public flash.system.IME::static get enabled");
-        return false;
-      }
-      static set enabled(enabled: boolean) {
-        release || release || somewhatImplemented("public flash.system.IME::static set enabled");
-        enabled = !!enabled;
-      }
-      static get conversionMode(): string {
-        release || somewhatImplemented("public flash.system.IME::static get conversionMode");
-        return 'UNKNOWN';
-      }
-      static set conversionMode(mode: string) {
-        mode = axCoerceString(mode);
-        release || somewhatImplemented("public flash.system.IME::static set conversionMode");
-      }
-      static setCompositionString(composition: string): void {
-        composition = axCoerceString(composition);
-        release || somewhatImplemented("public flash.system.IME::static setCompositionString");
-      }
-      static doConversion(): void {
-        release || somewhatImplemented("public flash.system.IME::static doConversion");
-      }
-      static compositionSelectionChanged(start: number /*int*/, end: number /*int*/): void {
-        start = start | 0; end = end | 0;
-        release || somewhatImplemented("public flash.system.IME::static compositionSelectionChanged");
-      }
-      static compositionAbandoned(): void {
-        release || somewhatImplemented("public flash.system.IME::static compositionAbandoned");
-      }
-      static get isSupported(): boolean {
-        release || somewhatImplemented("public flash.system.IME::static get isSupported");
-        return false;
-      }
-    }
-
-    export class System extends ASObject {
-      private static _useCodePage: boolean = false;
-
-      static classInitializer() {
-        defineNonEnumerableProperty(this, '$Bgargv', this.sec.createArray([]));
-      }
-
-      static get ime(): flash.system.IME {
-        release || somewhatImplemented("public flash.system.System::get ime");
-        return null;
-      }
-
-      static setClipboard(string: string): void {
-        string = axCoerceString(string);
-        if (ClipboardService.instance === null) {
-          Debug.warning('setClipboard is only available in the Firefox extension');
-          return;
-        }
-        ClipboardService.instance.setClipboard(string);
-      }
-
-      static get totalMemoryNumber(): number {
-        release || somewhatImplemented("public flash.system.System::get totalMemoryNumber");
-        return 1024 * 1024 * 2;
-      }
-
-      static get freeMemory(): number {
-        release || somewhatImplemented("public flash.system.System::get freeMemory");
-        return 1024 * 1024;
-      }
-
-      static get privateMemory(): number {
-        release || somewhatImplemented("public flash.system.System::get privateMemory");
-        return 1024*1024;
-      }
-
-      static get useCodePage(): boolean {
-        return this._useCodePage;
-      }
-
-      static set useCodePage(value: boolean) {
-        release || somewhatImplemented("public flash.system.System::set useCodePage");
-        this._useCodePage = !!value;
-      }
-
-      static get vmVersion(): string {
-        return "1.0 Shumway - Mozilla Research";
-      }
-
-      static pause(): void {
-        // Debugging-only function we can just ignore.
-      }
-
-      static resume(): void {
-        // Debugging-only function we can just ignore.
-      }
-
-      static exit(code: number /*uint*/): void {
-        // Debugging-only function we can just ignore.
-      }
-
-      static gc(): void {
-        // Debugging-only function we can just ignore.
-      }
-
-      static pauseForGCIfCollectionImminent(imminence: number = 0.75): void {
-        // Not gonna happen, probably ever.
-      }
-
-      static disposeXML(node: ASXML): void {
-        // We have a cycle collector, so we can ignore this. \o/
-      }
-
-      static get swfVersion(): number {
-        return 19;
-      }
-
-      static get apiVersion(): number {
-        return 26;
-      }
-
-      static getArgv(): any [] {
-        return [];
-      }
-
-      static getRunmode(): string {
-        return "mixed";
-      }
-    }
-    export var OriginalSystem = System;
+export class IME extends ASObject /* flash.events.EventDispatcher */ {
+  constructor () {
+    super();
+  }
+  static get enabled(): boolean {
+    release || release || somewhatImplemented("public flash.system.IME::static get enabled");
+    return false;
+  }
+  static set enabled(enabled: boolean) {
+    release || release || somewhatImplemented("public flash.system.IME::static set enabled");
+    enabled = !!enabled;
+  }
+  static get conversionMode(): string {
+    release || somewhatImplemented("public flash.system.IME::static get conversionMode");
+    return 'UNKNOWN';
+  }
+  static set conversionMode(mode: string) {
+    mode = axCoerceString(mode);
+    release || somewhatImplemented("public flash.system.IME::static set conversionMode");
+  }
+  static setCompositionString(composition: string): void {
+    composition = axCoerceString(composition);
+    release || somewhatImplemented("public flash.system.IME::static setCompositionString");
+  }
+  static doConversion(): void {
+    release || somewhatImplemented("public flash.system.IME::static doConversion");
+  }
+  static compositionSelectionChanged(start: number /*int*/, end: number /*int*/): void {
+    start = start | 0; end = end | 0;
+    release || somewhatImplemented("public flash.system.IME::static compositionSelectionChanged");
+  }
+  static compositionAbandoned(): void {
+    release || somewhatImplemented("public flash.system.IME::static compositionAbandoned");
+  }
+  static get isSupported(): boolean {
+    release || somewhatImplemented("public flash.system.IME::static get isSupported");
+    return false;
   }
 }
 
+export class System extends ASObject {
+  private static _useCodePage: boolean = false;
+
+  static classInitializer() {
+    defineNonEnumerableProperty(this, '$Bgargv', this.sec.createArray([]));
+  }
+
+  static get ime(): flash.system.IME {
+    release || somewhatImplemented("public flash.system.System::get ime");
+    return null;
+  }
+
+  static setClipboard(string: string): void {
+    string = axCoerceString(string);
+    if (ClipboardService === null) {
+      warning('setClipboard is only available in the Firefox extension');
+      return;
+    }
+    ClipboardService.setClipboard(string);
+  }
+
+  static get totalMemoryNumber(): number {
+    release || somewhatImplemented("public flash.system.System::get totalMemoryNumber");
+    return 1024 * 1024 * 2;
+  }
+
+  static get freeMemory(): number {
+    release || somewhatImplemented("public flash.system.System::get freeMemory");
+    return 1024 * 1024;
+  }
+
+  static get privateMemory(): number {
+    release || somewhatImplemented("public flash.system.System::get privateMemory");
+    return 1024*1024;
+  }
+
+  static get useCodePage(): boolean {
+    return this._useCodePage;
+  }
+
+  static set useCodePage(value: boolean) {
+    release || somewhatImplemented("public flash.system.System::set useCodePage");
+    this._useCodePage = !!value;
+  }
+
+  static get vmVersion(): string {
+    return "1.0 Shumway - Mozilla Research";
+  }
+
+  static pause(): void {
+    // Debugging-only function we can just ignore.
+  }
+
+  static resume(): void {
+    // Debugging-only function we can just ignore.
+  }
+
+  static exit(code: number /*uint*/): void {
+    // Debugging-only function we can just ignore.
+  }
+
+  static gc(): void {
+    // Debugging-only function we can just ignore.
+  }
+
+  static pauseForGCIfCollectionImminent(imminence: number = 0.75): void {
+    // Not gonna happen, probably ever.
+  }
+
+  static disposeXML(node: ASXML): void {
+    // We have a cycle collector, so we can ignore this. \o/
+  }
+
+  static get swfVersion(): number {
+    return 19;
+  }
+
+  static get apiVersion(): number {
+    return 26;
+  }
+
+  static getArgv(): any [] {
+    return [];
+  }
+
+  static getRunmode(): string {
+    return "mixed";
+  }
+}
+
+export var OriginalSystem = System;
+
 // Do this here temporarily until we find a nicer place.
-Shumway.AVMX.AS.initializeBuiltins();
+initializeBuiltins();

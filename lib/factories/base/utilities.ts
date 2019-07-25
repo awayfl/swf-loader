@@ -40,7 +40,7 @@ declare var putstr;
 
 declare var dump: (message: string) => void;
 
-function dumpLine(line: string) {
+export function dumpLine(line: string) {
 	if (!release && typeof dump !== "undefined") {
 		dump(line + "\n");
 	}

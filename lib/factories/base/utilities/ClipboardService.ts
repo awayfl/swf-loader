@@ -6,12 +6,6 @@ export interface IClipboardService {
 	setClipboard(data: string): void;
 }
 
-export var instance: IClipboardService = {
+export var ClipboardService: IClipboardService = {
 	setClipboard(data: string) { notImplemented('setClipboard'); }
 };
-
-
-export class ClipboardService{
-	public static IClipboardService=IClipboardService;
-	public static instance=IClipboardService;
-}
