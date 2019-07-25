@@ -2,7 +2,7 @@
 import {BuildMode, IAsset, ColorUtils, Rectangle} from "@awayjs/core";
 
 import {EventBase, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
-import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
+import {Graphics, GradientFillStyle, TextureAtlas, Shape} from "@awayjs/graphics";
 import {HoverController, FrameScriptManager, Camera, MovieClip, Scene, MouseManager, SceneGraphPartition, DisplayObjectContainer, TextField} from "@awayjs/scene";
 
 import {MethodMaterial}	from "@awayjs/materials";
@@ -549,6 +549,10 @@ export class AVMAwayStage extends Sprite{
 			//this.dispatchEventRecursive(this._eventExitFrame);
 			//this.dispatchEventRecursive(this._eventRender);
 
+			if(!this._scene || !this._scene.renderer){
+				this._timer.stop();
+				return;
+			} 
 
 			this._currentFps++;
 			this._scene.render();
@@ -1286,6 +1290,8 @@ export class AVMAwayStage extends Sprite{
 		MovieClip.clearPool();
 		TextField.clearPool();
 		Sprite.clearPool();
+		Graphics.clearPool();
+		Shape.clearPool();
 	}
 
 }
