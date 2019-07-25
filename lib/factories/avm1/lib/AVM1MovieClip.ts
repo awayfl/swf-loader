@@ -296,18 +296,81 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
     public registerScriptObject(child:DisplayObject, force:boolean=true):void
 	{
+
+		// 	whenever multiple childs get registered for the same name, the child with the lowest depth wins
+		//	this is true for objects added via timeline, attachMovie, duplicateMovieClip and CreateEmptyMovieClip and also when renaming objects
+
+		// 	if a avm1 variable for a registered child-name was defined via script, it always wins over the child registration. 
+		//	for example, after setting "testMC='something'" in script, trying to get "testMC" will return "something", 
+		//	and childs with the name "testMC" will no longer be accessible.
+		//	this is true for all datatypes. once a variable is set by script, the value set by script will be returned
+		//	also true if the we do something like "testMC=null"
+
+		//	if a avm1 script creates a variable as reference to a registered child, it behaves like this:
+		//	the var is not updated if the child registered for the name changes
+		//	if we do something like this:
+		//			indirectRef = testMC;
+		//			this.attachMovie("somethingFromLib", "testMC", -16380)
+		//			testMC._x=100;
+		//			testMC._y=100;
+		//			indirectRef._x=100;
+		//			indirectRef._y=100;
+		//	this code will move both objects, because the attachMovie changes the object that is available under the name "testMC",
+		//	but the indirectRef still holds the reference to the original object.
+		//	however, if we remove the original child via removeMovieCLip or if it is removed via timeline, 
+		//	the variable will return a reference to the current object that might now be registered 
+		//	under the same name as the object that the variable was created for. 
+
+		// 	if a movieclip was tinted by a color object, and than another mc gets registered for the name, the tinting is applied to the new mc
+
+
 		if(child.adapter!=child)
 			(<any>child.adapter).setEnabled(true);
-		if (child.name){
-          /*  if(this._childrenByName[child.name]){
-                console.log("try register ",child.name, this._childrenByName[child.name], this._childrenByName[child.name].adaptee._depthID, child._depthID);
-            }
-            else{
-                console.log("try register no child exists",child.name, child._depthID);
-            }*/
+
+		var name = child.name;
+		if(name){
+			// 	in AVM1 FP<8, all names ignore case, so we can just convert everything to lower case
+			//	for FP>=8, only method names can be handled this way, object names need to keep their case
+			
+			name=name.toLowerCase();
+			
+			var hasVar=this.alHasOwnProperty(name);
+			if(hasVar){
+				// there exists a avm1 var for this name. Object registration should fail
+				return;
+			}
+
+			//	only register object if:
+			//			- no object is registered for this name,
+			//			- a already registered object has no valid parent
+			//			- the already registered object has a higher depthID than the new object
+			if(!this._childrenByName[name] 
+				|| (this._childrenByName[name].adaptee && this._childrenByName[name].adaptee.parent==null)
+				|| (this._childrenByName[name].adaptee && this._childrenByName[name].adaptee._depthID>child._depthID)){
+
+					if(this._childrenByName[name] && this._childrenByName[name].avmColor){
+						// if a object already is registered for this name, and we are going to replace it, 
+						// we need to check if it is tinted by a color-class, and if so change the target of the color class to the new object		
+						this.unregisteredColors[name]=this._childrenByName[name].avmColor;
+
+					}
+					//register new object
+					this._childrenByName[name]=getAVM1Object(child, this.context);
+					
+					// if a object was previous unregistered for this name, we need to check if it was tinted by a color 
+					// and if so, we need to apply the tint to the new object
+					if(this.unregisteredColors[name]){
+						this.unregisteredColors[name].changeTarget(child.adapter);
+						this.unregisteredColors[name]=null;
+					}
+			}
+
+
+			/* old stuff:
             if(force || !this._childrenByName[child.name] || (this._childrenByName[child.name].adaptee && this._childrenByName[child.name].adaptee.parent==null) ||
                 this._childrenByName[child.name].adaptee._depthID>child._depthID){
-                
+				
+				
                 // only replace value if no property exists yet, or if a existing prop was a Away-Object
                 var existingValue=this.alGet(child.name);
                 if(existingValue && existingValue.adaptee){
@@ -332,7 +395,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
                 }
                 // always register the child by name on the parent, no matter what avm1prop existed previously
 				this._childrenByName[child.name]=child._adapter;
-            }
+			}
+			*/
             /*
 			else{
 				
@@ -347,39 +411,83 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	{
 		if(child && child.adapter != child)
 			(<any>child.adapter).alPut("onEnterFrame", null);
-		if(child.name){
-          /*  if(this._childrenByName[child.name]){
-                console.log("try unregister ",child.name, this._childrenByName[child.name], this._childrenByName[child.name].adaptee.id, child.id);
-            }
-            else{
-                console.log("try unregister no child registered ",child.name, child.id);
-            }*/
-			if(this._childrenByName[child.name] && this._childrenByName[child.name].adaptee.id==child.id){
-				/*if(this._unregisteredChilds[child.name]){					
-					this.alPut(child.name, this._unregisteredChilds[child.name].adapter);
-					this._childrenByName[child.name]=this._unregisteredChilds[child.name].adapter;
-					delete this._unregisteredChilds[child.name];
+		var name = child.name;
+		if(name){
+			// 	in AVM1 FP<8, all names ignore case, so we can just convert everything to lower case
+			//	for FP>=8, only method names can be handled this way, object names need to keep their case
+			name=name.toLowerCase();
+			if(this._childrenByName[name] && this._childrenByName[name].adaptee.id==child.id){
+		
+				if(this._childrenByName[name] && this._childrenByName[name].avmColor){
+					this.unregisteredColors[name]=this._childrenByName[name].avmColor;
 				}
-				else{	*/				
-                    if(this._childrenByName[child.name] && this._childrenByName[child.name].avmColor){
-                        this.unregisteredColors[child.name]=this._childrenByName[child.name].avmColor;
-                    }
-                    if(this.scriptRefsToChilds[child.name]){     
-                        // update indirectReferences to this prop
-                        //this.scriptRefsToChilds[child.name].obj.alDeleteProperty(this.scriptRefsToChilds[child.name].name);
-                        //console.log("delete property: ", child.name, this.scriptRefsToChilds[child.name].name, this.scriptRefsToChilds[child.name].obj)
-                        //delete this.scriptRefsToChilds[child.name];
-                    }
-					this.alDeleteProperty(child.name);
-					delete this._childrenByName[child.name];
-				/*}
-			}
-			if(this._unregisteredChilds[child.name] && this._unregisteredChilds[child.name].adaptee.id==child.id){
-				delete this._unregisteredChilds[child.name];*/
+
+				// 	check if there is another child with the same name on the movieclip
+				//	and if so, register it instead
+				//	if multiple childs match the name, get the one with highest depth
+				//	attention: at this point the child that we unregister right now is still child of the mc
+				var allChilds=this.adaptee._children;
+				var allChildsLen=allChilds.length;
+				var tmpChild=null;
+				var newChild=null;
+				for(var i=0; i<allChildsLen; i++){
+					tmpChild=allChilds[i];
+					if(tmpChild!=child && tmpChild.name && tmpChild.name.toLowerCase()==name){
+						
+						if(!newChild || newChild._depthID>tmpChild._depthID){
+							newChild=tmpChild;
+						}
+					}
+				}
+
+				//	if we have a new child to register, we register it
+				//	if not, we delete the registration for this name
+				if(newChild){
+					this._childrenByName[name]=getAVM1Object(newChild, this.context);
+					
+					if(this.unregisteredColors[name]){
+						this.unregisteredColors[name].changeTarget(newChild.adapter);
+						this.unregisteredColors[name]=null;
+					}
+				}
+				else{
+					delete this._childrenByName[name];
+				}
 			}
 		}
 	}
 
+	public getLatestObjectForName(name:string) {
+
+		var hasVar=this.alHasOwnProperty(name);
+		if(hasVar){
+			// there exists a avm1 var for this name. Object registration should fail
+			return;
+		}
+		var allChilds=this.adaptee._children;
+		var allChildsLen=allChilds.length;
+		var tmpChild=null;
+		var newChild=null;
+		for(var i=0; i<allChildsLen; i++){
+			tmpChild=allChilds[i];
+			if(tmpChild.name && tmpChild.name.toLowerCase()==name){
+				
+				if(!newChild || newChild._depthID>tmpChild._depthID){
+					newChild=tmpChild;
+				}
+			}
+		}
+
+		//	if we have a new child to register, we register it
+		//	if not, we delete the registration for this name
+		if(newChild){
+			this._childrenByName[name]=getAVM1Object(newChild, this.context);
+			if(this.unregisteredColors[name]){
+				this.unregisteredColors[name].changeTarget(newChild.adapter);
+				this.unregisteredColors[name]=null;
+			}
+		}
+	}
 
 	private _hitArea: any;
 	private _lockroot: boolean;
@@ -1143,7 +1251,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			window.addEventListener("mouseup", this.stopDragDelegate);
 			window.addEventListener("touchend", this.stopDragDelegate);
 			AVM1Stage.stage.scene.mousePicker.dragEntity=this.adaptee;
-			AVM1Stage.stage.scene.mouseManager.isAVM1Dragging=true;
+			MouseManager.getInstance(AVM1Stage.stage.scene.renderer.renderGroup.pickGroup).isAVM1Dragging=true;
 
 		}
 	}
@@ -1192,7 +1300,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		this.isDragging=false;
         AVM1MovieClip.currentDraggedMC=null;
 		AVM1Stage.stage.scene.mousePicker.dragEntity=null;
-		AVM1Stage.stage.scene.mouseManager.isAVM1Dragging=true;
+		MouseManager.getInstance(AVM1Stage.stage.scene.renderer.renderGroup.pickGroup).isAVM1Dragging=true;
 		AVM1Stage.stage.removeEventListener("mouseMove3d", this.dragListenerDelegate);
 		window.removeEventListener("mouseup", this.stopDragDelegate);
 		window.removeEventListener("touchend", this.stopDragDelegate);
@@ -1231,10 +1339,14 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
         }
         else{
             this.hasSwappedDepth=true;
-        }
+		}
+		if(this.adaptee.name && parent && parent.adapter){
+			// the object has a name, and might be registered for access via script
+			// we need to check if that registration must be updated to another mc that has a higher depth
+			(<AVM1MovieClip>parent.adapter).getLatestObjectForName(this.adaptee.name.toLowerCase());
+		}
 
 	}
-
 	public getTabChildren(): boolean {
 		return getAwayObjectOrTemplate(this).tabChildren;
 	}
