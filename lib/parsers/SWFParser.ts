@@ -650,7 +650,7 @@ export class SWFParser extends ParserBase
 			if(swfFrames[i].exports){
 				awayTimeline.avm1Exports[i]=swfFrames[i].exports;
 				for(key in swfFrames[i].exports) {
-					console.log("\n\nfound export\n\n", swfFrames[i].exports[key]);
+					//console.log("\n\nfound export\n\n", swfFrames[i].exports[key]);
 					let asset = swfFrames[i].exports[key];
 					let awayAsset=this._awaySymbols[asset.symbolId];
 					if(!awayAsset){
