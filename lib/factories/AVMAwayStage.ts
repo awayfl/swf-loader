@@ -1237,7 +1237,7 @@ export class AVMAwayStage extends Sprite{
 	 */
 	public invalidate (){
 		//todo
-		console.log("invalidate not implemented yet in flash/AVMAwayStage");
+		//console.log("invalidate not implemented yet in flash/AVMAwayStage");
 	}
 
 	/**
