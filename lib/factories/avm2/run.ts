@@ -1,12 +1,12 @@
 import { Multiname, SORT, RuntimeTraits, Namespace, CONSTANT, ScriptInfo, ClassInfo, MethodInfo, ABCFile, ABCCatalog, NamespaceType, TRAIT, ExceptionInfo } from "./abc/lazy";
 import { Bytecode } from "./abc/ops";
-import { Errors, assert } from "@awayjs/graphics";
+import { assert } from "@awayjs/graphics";
 import { IndentingWriter, isIndex, dumpLine } from "../base/utilities";
 import { release, assertNotImplemented } from "../base/utilities/Debug";
 import { isNullOrUndefined } from "@awayjs/graphics/lib/data/utilities";
 import { isXMLCollection, ASXMLList, isXMLType, XMLParser, ASQName, ASNamespace, ASXML } from "./natives/xml";
 import { StringUtilities } from "../base/utilities/StringUtilities";
-import { formatErrorMessage } from "./errors";
+import { formatErrorMessage, Errors } from "./errors";
 import { defineNonEnumerableProperty, defineReadOnlyProperty } from "../base/utilities/ObjectUtilities";
 import { ASObject, ASNumber, ASClass, as3Compatibility, transformJSValueToAS, tryLinkNativeClass, getNativeInitializer, ISecurityDomain, installClassLoaders, installNativeFunctions } from "./nat";
 import { ScopeStack, interpret } from "./int";
@@ -835,8 +835,8 @@ export interface AXCallable {
 
 // Add the |axApply| and |axCall| methods on the function prototype so that we can treat
 // Functions as AXCallables.
-Function.prototype.axApply = Function.prototype.apply;
-Function.prototype.axCall = Function.prototype.call;
+(<any> Function.prototype).axApply = Function.prototype.apply;
+(<any> Function.prototype).axCall = Function.prototype.call;
 
 export interface AXActivation extends ITraits {
 
@@ -1306,7 +1306,7 @@ export class AXSecurityDomain {
     if (!fun) {
       release || assert(!methodInfo.isNative(), "Must provide a native initializer for " +
                                                 classInfo.instanceInfo.getClassName());
-      fun = function () {
+      fun = <any> function () {
         release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
         return interpret(this, methodInfo, scope, <any>arguments, null);
       };
@@ -1393,7 +1393,7 @@ export class AXSecurityDomain {
   prepareRootClassPrototype() {
     var dynamicClassPrototype: AXObject = Object.create(this.objectPrototype);
     var rootClassPrototype: AXObject = Object.create(dynamicClassPrototype);
-    rootClassPrototype.$BgtoString = function axClassToString() {
+    rootClassPrototype.$BgtoString = <any> function axClassToString() {
       return "[class " + this.classInfo.instanceInfo.getName().name + "]";
     };
 

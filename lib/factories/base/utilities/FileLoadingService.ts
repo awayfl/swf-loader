@@ -26,7 +26,7 @@ export interface IFileLoadingService {
 	navigateTo(url: string, target: string);
 }
 
-export var instance:IFileLoadingService;
+export var FileLoadingService:IFileLoadingService;
 
 
 

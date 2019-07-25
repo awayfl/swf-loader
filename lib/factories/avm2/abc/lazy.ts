@@ -1,15 +1,14 @@
-import {assert} from "@awayjs/graphics";
+import { assert, axCoerceString } from "@awayjs/graphics";
 
 import {AbcStream} from "../abc/stream";
 import {release, unexpected, warning} from "../../base/utilities/Debug";
 import {IndentingWriter, MapObject, isNumeric} from "../../base/utilities";
 import { BytecodeStream, Bytecode, getBytecodeName } from "./ops";
-import { axCoerceString } from "@awayjs/graphics";
+import { Errors } from "../errors";
 import { AXApplicationDomain, Scope, AXSecurityDomain, AXClass, AXGlobal, ScriptInfoState } from "../run";
 import { getNative, getMethodOrAccessorNative } from "../nat";
 import { StringUtilities } from "../../base/utilities/StringUtilities";
 import { HashUtilities } from "../../base/utilities/HashUtilities";
-import { Errors } from "@awayjs/graphics";
 import { jsGlobal } from "../../base/utilities/jsGlobal";
 import { interpret } from "../int";
 import { flashlog } from "../../base/flashlog";
@@ -1322,7 +1321,7 @@ export class Multiname {
 }
 
 // Used in _hashNamespace so we don't need to allocate a new buffer each time.
-var namespaceHashingBuffer = new Int32Array(100);
+var namespaceHashingBuffer = new Uint8Array(100);
 
 export class Namespace {
   public mangledName: string = null;
@@ -1350,7 +1349,7 @@ export class Namespace {
       return type << 2 | index;
     }
     var length = 1 + uri.length + prefix.length;
-    var data:Int32Array = length < 101 ? namespaceHashingBuffer : new Int32Array(length);
+    var data:Uint8Array = length < 101 ? namespaceHashingBuffer : new Uint8Array(length);
     var j = 0;
     data[j++] = type;
     for (var i = 0; i < uri.length; i++) {

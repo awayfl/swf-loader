@@ -1,12 +1,14 @@
+import { assert } from "@awayjs/graphics";
+
 import { NamespaceType, Multiname, CONSTANT, Namespace, RuntimeTraits, ClassInfo, TRAIT, SORT, MethodInfo, TraitInfo, InstanceInfo, Traits } from "./abc/lazy";
 import { AXSecurityDomain, getCurrentABC, checkValue, AXClass, AXObject, Scope, AXFunction, axCoerceName, validateCall, validateConstruct, ensureBoxedReceiver, axDefaultCompareFunction, axCompareFields, AXCallable, sliceArguments, axIsCallable, axCompare, IMetaobjectProtocol, runtimeWriter, AXApplicationDomain } from "./run";
 import { IndentingWriter, MapObject, isNumeric, isNumber, isString, isIndex } from "../base/utilities";
 import { jsGlobal } from "../base/utilities/jsGlobal";
-import { Errors, axCoerceString, isNullOrUndefined } from "@awayjs/graphics";
+import { axCoerceString, isNullOrUndefined } from "@awayjs/graphics";
 import { release, assertUnreachable, Debug, warning } from "../base/utilities/Debug";
-import { assert } from "@awayjs/graphics";
 import { Bytecode } from "./abc/ops";
-import { defineNonEnumerableProperty, ObjectUtilities, hasOwnProperty, hasOwnGetter, copyOwnPropertyDescriptors } from "../base/utilities/ObjectUtilities";
+import { Errors } from "./errors";
+import { defineNonEnumerableProperty, ObjectUtilities, hasOwnProperty, hasOwnGetter, copyOwnPropertyDescriptors, copyPropertiesByList } from "../base/utilities/ObjectUtilities";
 import { ASNamespace, ASQName, ASXML, ASXMLList } from "./natives/xml";
 import { getErrorInfo, formatErrorMessage } from "./errors";
 import { GenericVector, Vector } from "./natives/GenericVector";
@@ -14,6 +16,8 @@ import { Int32Vector } from "./natives/int32Vector";
 import { Uint32Vector } from "./natives/uint32Vector";
 import { Float64Vector } from "./natives/float64Vector";
 import { ASDate } from "./natives/date";
+import { FileLoadingService } from "../base/utilities/FileLoadingService";
+import { pushMany } from "../base/utilities/ArrayUtilities";
 
 /*
  * Copyright 2015 Mozilla Foundation
@@ -2434,7 +2438,7 @@ export function FlashNetScript_navigateToURL(sec: AXSecurityDomain, request, win
     return;
   }
   // TODO handle other methods than GET
-  FileLoadingService.instance.navigateTo(url, window_);
+  FileLoadingService.navigateTo(url, window_);
 }
 
 function FlashNetScript_sendToURL(sec: AXSecurityDomain, request) {
@@ -2445,7 +2449,7 @@ function FlashNetScript_sendToURL(sec: AXSecurityDomain, request) {
   if (!RequestClass.axIsType(request)) {
     sec.throwError('TypeError', Errors.CheckTypeFailedError, request, 'flash.net.URLRequest');
   }
-  var session = FileLoadingService.instance.createSession();
+  var session = FileLoadingService.createSession();
   session.onprogress = function () {
     // ...
   };

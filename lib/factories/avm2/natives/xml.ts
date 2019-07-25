@@ -1,8 +1,9 @@
-import { assert, Errors, axCoerceString, isObject} from "@awayjs/graphics";
+import { assert, axCoerceString, isObject} from "@awayjs/graphics";
 
 import { release, notImplemented } from "../../base/utilities/Debug";
 import { Namespace, Multiname, CONSTANT, internPrefixedNamespace, NamespaceType, internNamespace } from "../abc/lazy";
 import { ASObject, addPrototypeFunctionAlias } from "../nat";
+import { Errors } from "../errors";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
 import { isNullOrUndefined } from "@awayjs/graphics";
 import { AXSecurityDomain, getCurrentScope, checkValue, validateCall } from "../run";

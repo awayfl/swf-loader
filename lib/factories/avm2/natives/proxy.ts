@@ -17,7 +17,7 @@
 import { Multiname, CONSTANT, internNamespace, NamespaceType } from "../abc/lazy";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
 import { ASObject } from "../nat";
-import { Errors } from "@awayjs/graphics";
+import { Errors } from "../errors";
 import { Bytecode } from "../abc/ops";
 
 var proxyNamespace = internNamespace(NamespaceType.Public, "http://www.adobe.com/2006/actionscript/flash/proxy");

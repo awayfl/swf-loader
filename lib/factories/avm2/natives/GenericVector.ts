@@ -1,8 +1,10 @@
+import { assert } from "@awayjs/graphics";
+
 import { AXObject, checkValue, axCoerceName, AXCallable, axIsCallable, axCoerceString, axCoerceNumber, AXClass } from "../run";
 import { Multiname } from "../abc/lazy";
 import { Bytecode } from "../abc/ops";
 import { isNumeric, toNumber, isIndex } from "../../base/utilities";
-import { assert, Errors } from "@awayjs/graphics";
+import { Errors } from "../errors";
 import { release, assertNotImplemented, unexpected } from "../../base/utilities/Debug";
 import { isNullOrUndefined } from "@awayjs/graphics";
 import { Int32Vector } from "./int32Vector";
