@@ -29,7 +29,7 @@ if (typeof TextDecoder !== "undefined") {
 }
 
 export class AbcStream {
-  private static _resultBuffer = new Int32Array(256);
+  private static _resultBuffer = new Uint32Array(256);
   private _bytes: Uint8Array;
   private _view: DataView;
   private _position: number;
@@ -42,7 +42,7 @@ export class AbcStream {
 
   private static _getResultBuffer(length: number) {
     if (!AbcStream._resultBuffer || AbcStream._resultBuffer.length < length) {
-      AbcStream._resultBuffer = new Int32Array(length * 2);
+      AbcStream._resultBuffer = new Uint32Array(length * 2);
     }
     return AbcStream._resultBuffer;
   }
