@@ -3,7 +3,7 @@ import {BuildMode, IAsset, ColorUtils, Rectangle} from "@awayjs/core";
 
 import {EventBase, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
-import {HoverController, FrameScriptManager, Camera, MovieClip, Scene, MouseManager, SceneGraphPartition, DisplayObjectContainer} from "@awayjs/scene";
+import {HoverController, FrameScriptManager, Camera, MovieClip, Scene, MouseManager, SceneGraphPartition, DisplayObjectContainer, TextField} from "@awayjs/scene";
 
 import {MethodMaterial}	from "@awayjs/materials";
 import {DefaultRenderer} from  "@awayjs/renderer";
@@ -39,6 +39,7 @@ export class AVMAwayStage extends Sprite{
 	private _stageWidth: number;
 	private _stageHeight: number;
 	public htmlElement:HTMLElement;
+	public isStage:boolean=true;
 	protected _fpsTextField:HTMLDivElement;
 
 	private _layers:Sprite[];
@@ -529,6 +530,10 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
+		if(!this._scene || !this._scene.renderer){
+			this._timer.stop();
+			return;
+		} 
 		var frameMarker:number = 1000/this._frameRate;
 		this._stageTime += Math.min(dt, frameMarker);
 
@@ -1249,5 +1254,38 @@ export class AVMAwayStage extends Sprite{
 		return false;
 	}
 
+
+	
+	public dispose(){
+		if(this._scene && this._scene.renderer && this._scene.renderer.view && this._scene.renderer && this._scene.renderer.stage && this._scene.renderer.stage.container)
+			MouseManager.getInstance(PickGroup.getInstance(this._scene.renderer.view)).unregisterContainer(this._scene.renderer.stage.container);
+		if(this._scene)
+			this._scene.dispose();
+
+		this._scene=null;
+		AVMAwayStage._colorMaterials={};
+		AVMAwayStage._textureMaterials={};
+
+		PickGroup.clearAllInstances();
+
+		TextureAtlas.clearAllMaterials();
+		this._timer.stop();
+		
+        var len=this._layers.length;
+		//this.runAVM1Framescripts();
+		for(var i=0;i<len;i++) {
+			var myLayer=this._layers[i];
+			var numChilds = myLayer.numChildren;
+			for (var c = 0; c < numChilds; ++c) {
+				var child = myLayer.getChildAt(c);
+				child.dispose();
+			}
+		}
+		this._layers.length=0;
+		AVM1TextField.allTextfields={};
+		MovieClip.clearPool();
+		TextField.clearPool();
+		Sprite.clearPool();
+	}
 
 }
