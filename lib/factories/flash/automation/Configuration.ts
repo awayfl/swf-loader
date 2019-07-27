@@ -1,3 +1,7 @@
+import { ASObject } from "../../avm2/nat";
+import { notImplemented, release } from "../../base/utilities/Debug";
+import { axCoerceString } from "@awayjs/graphics";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,25 +18,22 @@
  * limitations under the License.
  */
 // Class: Configuration
-module Shumway.AVMX.AS.flash.automation {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class Configuration extends ASObject {
-    constructor () {
-      super();
-    }
-    // Static   JS -> AS Bindings
-    // Static   AS -> JS Bindings
-    get testAutomationConfiguration(): string {
-      release || release || notImplemented("public flash.automation.Configuration::get testAutomationConfiguration"); return;
-    }
-    set deviceConfiguration(configData: string) {
-      configData = axCoerceString(configData);
-      release || release || notImplemented("public flash.automation.Configuration::set deviceConfiguration"); return;
-    }
-    get deviceConfiguration(): string {
-      release || release || notImplemented("public flash.automation.Configuration::get deviceConfiguration"); return;
-    }
-    // Instance JS -> AS Bindings
-    // Instance AS -> JS Bindings
+export class Configuration extends ASObject {
+  constructor () {
+    super();
   }
+  // Static   JS -> AS Bindings
+  // Static   AS -> JS Bindings
+  get testAutomationConfiguration(): string {
+    release || release || notImplemented("public flash.automation.Configuration::get testAutomationConfiguration"); return;
+  }
+  set deviceConfiguration(configData: string) {
+    configData = axCoerceString(configData);
+    release || release || notImplemented("public flash.automation.Configuration::set deviceConfiguration"); return;
+  }
+  get deviceConfiguration(): string {
+    release || release || notImplemented("public flash.automation.Configuration::get deviceConfiguration"); return;
+  }
+  // Instance JS -> AS Bindings
+  // Instance AS -> JS Bindings
 }

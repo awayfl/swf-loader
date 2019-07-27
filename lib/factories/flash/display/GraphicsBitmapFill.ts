@@ -1,3 +1,9 @@
+import { ASObject } from "../../avm2/nat";
+import { BitmapData } from "./BitmapData";
+import { Matrix } from "../geom/Matrix";
+import { IGraphicsFill } from "./IGraphicsFill";
+import { IGraphicsData } from "./IGraphicsData";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,36 +20,32 @@
  * limitations under the License.
  */
 // Class: GraphicsBitmapFill
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class GraphicsBitmapFill extends ASObject implements IGraphicsFill, IGraphicsData {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class GraphicsBitmapFill extends ASObject implements IGraphicsFill, IGraphicsData {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["bitmapData", "matrix", "repeat", "smooth"];
-    
-    constructor (bitmapData: flash.display.BitmapData = null, matrix: flash.geom.Matrix = null, repeat: boolean = true, smooth: boolean = false) {
-      super();
-      this.bitmapData = bitmapData;
-      this.matrix = matrix;
-      this.repeat = !!repeat;
-      this.smooth = !!smooth;
-    }
-    
-    // JS -> AS Bindings
-    
-    bitmapData: flash.display.BitmapData;
-    matrix: flash.geom.Matrix;
-    repeat: boolean;
-    smooth: boolean;
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["bitmapData", "matrix", "repeat", "smooth"];
+  
+  constructor (bitmapData: BitmapData = null, matrix: Matrix = null, repeat: boolean = true, smooth: boolean = false) {
+    super();
+    this.bitmapData = bitmapData;
+    this.matrix = matrix;
+    this.repeat = !!repeat;
+    this.smooth = !!smooth;
   }
+  
+  // JS -> AS Bindings
+  
+  bitmapData: BitmapData;
+  matrix: Matrix;
+  repeat: boolean;
+  smooth: boolean;
+  
+  // AS -> JS Bindings
+  
 }

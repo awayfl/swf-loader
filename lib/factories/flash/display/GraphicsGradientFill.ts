@@ -1,3 +1,9 @@
+import { ASArray, ASObject } from "../../avm2/nat";
+import { Matrix } from "../geom/Matrix";
+import { IGraphicsFill } from "./IGraphicsFill";
+import { IGraphicsData } from "./IGraphicsData";
+import { axCoerceString } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,35 +20,31 @@
  * limitations under the License.
  */
 // Class: GraphicsGradientFill
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class GraphicsGradientFill extends ASObject implements IGraphicsFill, IGraphicsData {
+export class GraphicsGradientFill extends ASObject implements IGraphicsFill, IGraphicsData {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    constructor(type: string = "linear", colors: ASArray = null, alphas: ASArray = null,
-                ratios: ASArray = null, matrix: any = null, spreadMethod: any = "pad",
-                interpolationMethod: string = "rgb", focalPointRatio: number = 0)
-    {
-      super();
-      this.type = axCoerceString(type);
-      this.colors = colors;
-      this.alphas = alphas;
-      this.ratios = ratios;
-      this.matrix = matrix;
-      this.spreadMethod = spreadMethod;
-      this.interpolationMethod = axCoerceString(interpolationMethod);
-      this.focalPointRatio = +focalPointRatio;
-    }
-
-    colors: ASArray;
-    alphas: ASArray;
-    ratios: ASArray;
-    matrix: flash.geom.Matrix;
-    focalPointRatio: number;
-    type: string;
-    spreadMethod: any;
-    interpolationMethod: string;
+  constructor(type: string = "linear", colors: ASArray = null, alphas: ASArray = null,
+              ratios: ASArray = null, matrix: any = null, spreadMethod: any = "pad",
+              interpolationMethod: string = "rgb", focalPointRatio: number = 0)
+  {
+    super();
+    this.type = axCoerceString(type);
+    this.colors = colors;
+    this.alphas = alphas;
+    this.ratios = ratios;
+    this.matrix = matrix;
+    this.spreadMethod = spreadMethod;
+    this.interpolationMethod = axCoerceString(interpolationMethod);
+    this.focalPointRatio = +focalPointRatio;
   }
+
+  colors: ASArray;
+  alphas: ASArray;
+  ratios: ASArray;
+  matrix: Matrix;
+  focalPointRatio: number;
+  type: string;
+  spreadMethod: any;
+  interpolationMethod: string;
 }

@@ -1,3 +1,7 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { GameInputDevice } from "./GameInputDevice";
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,61 +18,58 @@
  * limitations under the License.
  */
 // Class: GameInputControl
-module Shumway.AVMX.AS.flash.ui {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class GameInputControl extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class GameInputControl extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
 
-    // _numValues: number /*int*/;
-    // _index: number /*int*/;
-    // _relative: boolean;
-    // _type: string;
-    // _hand: string;
-    // _finger: string;
-    // _device: flash.ui.GameInputDevice;
-    get numValues(): number /*int*/ {
-      release || notImplemented("public flash.ui.GameInputControl::get numValues"); return;
-      // return this._numValues;
-    }
-    get index(): number /*int*/ {
-      release || notImplemented("public flash.ui.GameInputControl::get index"); return;
-      // return this._index;
-    }
-    get relative(): boolean {
-      release || notImplemented("public flash.ui.GameInputControl::get relative"); return;
-      // return this._relative;
-    }
-    get type(): string {
-      release || notImplemented("public flash.ui.GameInputControl::get type"); return;
-      // return this._type;
-    }
-    get hand(): string {
-      release || notImplemented("public flash.ui.GameInputControl::get hand"); return;
-      // return this._hand;
-    }
-    get finger(): string {
-      release || notImplemented("public flash.ui.GameInputControl::get finger"); return;
-      // return this._finger;
-    }
-    get device(): flash.ui.GameInputDevice {
-      release || notImplemented("public flash.ui.GameInputControl::get device"); return;
-      // return this._device;
-    }
-    getValueAt(index: number /*int*/ = 0): number {
-      index = index | 0;
-      release || notImplemented("public flash.ui.GameInputControl::getValueAt"); return;
-    }
+  // _numValues: number /*int*/;
+  // _index: number /*int*/;
+  // _relative: boolean;
+  // _type: string;
+  // _hand: string;
+  // _finger: string;
+  // _device: flash.ui.GameInputDevice;
+  get numValues(): number /*int*/ {
+    release || notImplemented("public flash.ui.GameInputControl::get numValues"); return;
+    // return this._numValues;
+  }
+  get index(): number /*int*/ {
+    release || notImplemented("public flash.ui.GameInputControl::get index"); return;
+    // return this._index;
+  }
+  get relative(): boolean {
+    release || notImplemented("public flash.ui.GameInputControl::get relative"); return;
+    // return this._relative;
+  }
+  get type(): string {
+    release || notImplemented("public flash.ui.GameInputControl::get type"); return;
+    // return this._type;
+  }
+  get hand(): string {
+    release || notImplemented("public flash.ui.GameInputControl::get hand"); return;
+    // return this._hand;
+  }
+  get finger(): string {
+    release || notImplemented("public flash.ui.GameInputControl::get finger"); return;
+    // return this._finger;
+  }
+  get device(): GameInputDevice {
+    release || notImplemented("public flash.ui.GameInputControl::get device"); return;
+    // return this._device;
+  }
+  getValueAt(index: number /*int*/ = 0): number {
+    index = index | 0;
+    release || notImplemented("public flash.ui.GameInputControl::getValueAt"); return;
   }
 }

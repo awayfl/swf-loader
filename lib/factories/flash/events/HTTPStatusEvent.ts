@@ -1,3 +1,5 @@
+import { Event } from "./Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,37 +16,35 @@
  * limitations under the License.
  */
 // Class: HTTPStatusEvent
-module Shumway.AVMX.AS.flash.events {
-  export class HTTPStatusEvent extends flash.events.Event {
+export class HTTPStatusEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                status: number /*int*/ = 0) {
-      super(type, bubbles, cancelable);
-      this._status = status | 0;
-    }
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              status: number /*int*/ = 0) {
+    super(type, bubbles, cancelable);
+    this._status = status | 0;
+  }
 
-    static HTTP_STATUS: string = "httpStatus";
-    static HTTP_RESPONSE_STATUS: string = "httpResponseStatus";
+  static HTTP_STATUS: string = "httpStatus";
+  static HTTP_RESPONSE_STATUS: string = "httpResponseStatus";
 
-    private _status: number;
+  private _status: number;
 
-    _setStatus(value: number): void {
-      this._status = value;
-    }
-    get status(): number {
-      return this._status;
-    }
+  _setStatus(value: number): void {
+    this._status = value;
+  }
+  get status(): number {
+    return this._status;
+  }
 
-    clone(): Event {
-      return new this.sec.flash.events.HTTPStatusEvent(this.type, this.bubbles, this.cancelable,
-                                                       this.status);
-    }
+  clone(): Event {
+    return new HTTPStatusEvent(this.type, this.bubbles, this.cancelable,
+                                                      this.status);
+  }
 
-    toString(): string {
-      return this.formatToString('HTTPStatusEvent', 'type', 'bubbles', 'cancelable', 'eventPhase',
-                                 'status');
-    }
+  toString(): string {
+    return this.formatToString('HTTPStatusEvent', 'type', 'bubbles', 'cancelable', 'eventPhase',
+                                'status');
   }
 }

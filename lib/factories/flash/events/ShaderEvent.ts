@@ -1,3 +1,7 @@
+import { Event } from "./Event";
+import { BitmapData } from "../display/BitmapData";
+import { ByteArray } from "../../avm2/natives/byteArray";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,21 +18,19 @@
  * limitations under the License.
  */
 // Class: ShaderEvent
-module Shumway.AVMX.AS.flash.events {
-  export class ShaderEvent extends flash.events.Event {
+export class ShaderEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                bitmap: flash.display.BitmapData = null, array: flash.utils.ByteArray = null,
-                vector: ASVector<any> = null) {
-      super(type, bubbles, cancelable);
-    }
-
-    // JS -> AS Bindings
-    static COMPLETE: string = "complete";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              bitmap: BitmapData = null, array: ByteArray = null,
+              vector: ASVector<any> = null) {
+    super(type, bubbles, cancelable);
   }
+
+  // JS -> AS Bindings
+  static COMPLETE: string = "complete";
 }

@@ -1,3 +1,9 @@
+import { BitmapFilter } from "./BitmapFilter";
+import { somewhatImplemented, release } from "../../base/utilities/Debug";
+import { axCoerceString } from "../../avm2/run";
+import { Point } from "../geom/Point";
+import { BitmapData } from "../display/BitmapData";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,151 +20,146 @@
  * limitations under the License.
  */
 // Class: DisplacementMapFilter
-module Shumway.AVMX.AS.flash.filters {
 
-  import somewhatImplemented = Shumway.Debug.somewhatImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
+export class DisplacementMapFilter extends BitmapFilter {
 
-  export class DisplacementMapFilter extends flash.filters.BitmapFilter {
+  static axClass: typeof DisplacementMapFilter;
 
-    static axClass: typeof DisplacementMapFilter;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null;
 
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null;
+  public static FromUntyped(obj: any) {
+    return new DisplacementMapFilter(
+      obj.mapBitmap,
+      obj.mapPoint,
+      obj.componentX,
+      obj.componentY,
+      obj.scaleX,
+      obj.scaleY,
+      obj.mode,
+      obj.color,
+      obj.alpha
+    );
+  }
 
-    public static FromUntyped(obj: any) {
-      return new this.sec.flash.filters.DisplacementMapFilter(
-        obj.mapBitmap,
-        obj.mapPoint,
-        obj.componentX,
-        obj.componentY,
-        obj.scaleX,
-        obj.scaleY,
-        obj.mode,
-        obj.color,
-        obj.alpha
-      );
-    }
+  constructor (mapBitmap: BitmapData = null, mapPoint: Point = null, componentX: number /*uint*/ = 0, componentY: number /*uint*/ = 0, scaleX: number = 0, scaleY: number = 0, mode: string = "wrap", color: number /*uint*/ = 0, alpha: number = 0) {
+    super();
+    this.mapBitmap = mapBitmap;
+    this.mapPoint = mapPoint;
+    this.componentX = componentX;
+    this.componentY = componentY;
+    this.scaleX = scaleX;
+    this.scaleY = scaleY;
+    this.mode = mode;
+    this.color = color;
+    this.alpha = alpha;
+  }
 
-    constructor (mapBitmap: flash.display.BitmapData = null, mapPoint: flash.geom.Point = null, componentX: number /*uint*/ = 0, componentY: number /*uint*/ = 0, scaleX: number = 0, scaleY: number = 0, mode: string = "wrap", color: number /*uint*/ = 0, alpha: number = 0) {
-      super();
-      this.mapBitmap = mapBitmap;
-      this.mapPoint = mapPoint;
-      this.componentX = componentX;
-      this.componentY = componentY;
-      this.scaleX = scaleX;
-      this.scaleY = scaleY;
-      this.mode = mode;
-      this.color = color;
-      this.alpha = alpha;
-    }
+  // JS -> AS Bindings
 
-    // JS -> AS Bindings
+  // AS -> JS Bindings
 
-    // AS -> JS Bindings
+  private _mapBitmap: BitmapData;
+  private _mapPoint: Point;
+  private _componentX: number /*uint*/;
+  private _componentY: number /*uint*/;
+  private _scaleX: number;
+  private _scaleY: number;
+  private _mode: string;
+  private _color: number /*uint*/;
+  private _alpha: number;
 
-    private _mapBitmap: flash.display.BitmapData;
-    private _mapPoint: flash.geom.Point;
-    private _componentX: number /*uint*/;
-    private _componentY: number /*uint*/;
-    private _scaleX: number;
-    private _scaleY: number;
-    private _mode: string;
-    private _color: number /*uint*/;
-    private _alpha: number;
+  get mapBitmap(): BitmapData {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::get mapBitmap");
+    return this._mapBitmap;
+  }
+  set mapBitmap(value: BitmapData) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set mapBitmap");
+    this._mapBitmap = value;
+  }
 
-    get mapBitmap(): flash.display.BitmapData {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::get mapBitmap");
-      return this._mapBitmap;
-    }
-    set mapBitmap(value: flash.display.BitmapData) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set mapBitmap");
-      this._mapBitmap = value;
-    }
+  get mapPoint(): Point {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::get mapPoint");
+    return this._mapPoint;
+  }
+  set mapPoint(value: Point) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set mapPoint");
+    this._mapPoint = value;
+  }
 
-    get mapPoint(): flash.geom.Point {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::get mapPoint");
-      return this._mapPoint;
-    }
-    set mapPoint(value: flash.geom.Point) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set mapPoint");
-      this._mapPoint = value;
-    }
+  get componentX(): number /*uint*/ {
+    return this._componentX;
+  }
+  set componentX(value: number /*uint*/) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set componentX");
+    this._componentX = value >>> 0;
+  }
 
-    get componentX(): number /*uint*/ {
-      return this._componentX;
-    }
-    set componentX(value: number /*uint*/) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set componentX");
-      this._componentX = value >>> 0;
-    }
+  get componentY(): number /*uint*/ {
+    return this._componentY;
+  }
+  set componentY(value: number /*uint*/) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set componentY");
+    this._componentY = value >>> 0;
+  }
 
-    get componentY(): number /*uint*/ {
-      return this._componentY;
-    }
-    set componentY(value: number /*uint*/) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set componentY");
-      this._componentY = value >>> 0;
-    }
+  get scaleX(): number {
+    return this._scaleX;
+  }
+  set scaleX(value: number) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set scaleX");
+    this._scaleX = +value;
+  }
 
-    get scaleX(): number {
-      return this._scaleX;
-    }
-    set scaleX(value: number) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set scaleX");
-      this._scaleX = +value;
-    }
+  get scaleY(): number {
+    return this._scaleY;
+  }
+  set scaleY(value: number) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set scaleY");
+    this._scaleY = +value;
+  }
 
-    get scaleY(): number {
-      return this._scaleY;
-    }
-    set scaleY(value: number) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set scaleY");
-      this._scaleY = +value;
-    }
+  get mode(): string {
+    return this._mode;
+  }
+  set mode(value: string) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set mode");
+    this._mode = axCoerceString(value);
+  }
 
-    get mode(): string {
-      return this._mode;
-    }
-    set mode(value: string) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set mode");
-      this._mode = axCoerceString(value);
-    }
+  get color(): number /*uint*/ {
+    return this._color;
+  }
+  set color(value: number /*uint*/) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set color");
+    this._color = (value >>> 0) & 0xffffff;
+  }
 
-    get color(): number /*uint*/ {
-      return this._color;
-    }
-    set color(value: number /*uint*/) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set color");
-      this._color = (value >>> 0) & 0xffffff;
-    }
+  get alpha(): number {
+    return this._alpha;
+  }
+  set alpha(value: number) {
+    release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set alpha");
+    this._alpha = +value;
+  }
 
-    get alpha(): number {
-      return this._alpha;
-    }
-    set alpha(value: number) {
-      release || somewhatImplemented("public flash.filters.DisplacementMapFilter::set alpha");
-      this._alpha = +value;
-    }
-
-    clone(): BitmapFilter {
-      return new this.sec.flash.filters.DisplacementMapFilter(
-        this._mapBitmap,
-        this._mapPoint,
-        this._componentX,
-        this._componentY,
-        this._scaleX,
-        this._scaleY,
-        this._mode,
-        this._color,
-        this._alpha
-      );
-    }
+  clone(): BitmapFilter {
+    return new DisplacementMapFilter(
+      this._mapBitmap,
+      this._mapPoint,
+      this._componentX,
+      this._componentY,
+      this._scaleX,
+      this._scaleY,
+      this._mode,
+      this._color,
+      this._alpha
+    );
   }
 }

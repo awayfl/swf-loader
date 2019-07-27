@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,18 +16,14 @@
  * limitations under the License.
  */
 // Class: AutomationAction
-module Shumway.AVMX.AS.flash.automation {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class AutomationAction extends ASObject {
-    constructor () {
-      super();
-    }
-    // Static   JS -> AS Bindings
-    // Static   AS -> JS Bindings
-    // Instance JS -> AS Bindings
-    _type: string;
-    type: string;
-    // Instance AS -> JS Bindings
+export class AutomationAction extends ASObject {
+  constructor () {
+    super();
   }
+  // Static   JS -> AS Bindings
+  // Static   AS -> JS Bindings
+  // Instance JS -> AS Bindings
+  _type: string;
+  type: string;
+  // Instance AS -> JS Bindings
 }

@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 // Class: ISimpleTextSelection
-module Shumway.AVMX.AS.flash.accessibility {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export interface ISimpleTextSelection {
-    
-    // JS -> AS Bindings
-    
-    selectionAnchorIndex: number /*int*/;
-    selectionActiveIndex: number /*int*/;
-    
-    // AS -> JS Bindings
-    
-    // _selectionAnchorIndex: number /*int*/;
-    // _selectionActiveIndex: number /*int*/;
-  }
+export interface ISimpleTextSelection {
+  
+  // JS -> AS Bindings
+  
+  selectionAnchorIndex: number /*int*/;
+  selectionActiveIndex: number /*int*/;
+  
+  // AS -> JS Bindings
+  
+  // _selectionAnchorIndex: number /*int*/;
+  // _selectionActiveIndex: number /*int*/;
 }

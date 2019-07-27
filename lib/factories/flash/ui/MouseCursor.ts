@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,62 +16,60 @@
  * limitations under the License.
  */
 // Class: MouseCursor
-module Shumway.AVMX.AS.flash.ui {
-  export class MouseCursor extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static AUTO: string = "auto";
-    static ARROW: string = "arrow";
-    static BUTTON: string = "button";
-    static HAND: string = "hand";
-    static IBEAM: string = "ibeam";
-
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return MouseCursor.AUTO;
-        case 1:
-          return MouseCursor.ARROW;
-        case 2:
-          return MouseCursor.BUTTON;
-        case 3:
-          return MouseCursor.HAND;
-        case 4:
-          return MouseCursor.IBEAM;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case MouseCursor.AUTO:
-          return 0;
-        case MouseCursor.ARROW:
-          return 1;
-        case MouseCursor.BUTTON:
-          return 2;
-        case MouseCursor.HAND:
-          return 3;
-        case MouseCursor.IBEAM:
-          return 4;
-        default:
-          return -1;
-      }
-    }
-    
+export class MouseCursor extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static AUTO: string = "auto";
+  static ARROW: string = "arrow";
+  static BUTTON: string = "button";
+  static HAND: string = "hand";
+  static IBEAM: string = "ibeam";
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return MouseCursor.AUTO;
+      case 1:
+        return MouseCursor.ARROW;
+      case 2:
+        return MouseCursor.BUTTON;
+      case 3:
+        return MouseCursor.HAND;
+      case 4:
+        return MouseCursor.IBEAM;
+      default:
+        return null;
+    }
+  }
+
+  static toNumber(value: string): number {
+    switch (value) {
+      case MouseCursor.AUTO:
+        return 0;
+      case MouseCursor.ARROW:
+        return 1;
+      case MouseCursor.BUTTON:
+        return 2;
+      case MouseCursor.HAND:
+        return 3;
+      case MouseCursor.IBEAM:
+        return 4;
+      default:
+        return -1;
+    }
+  }
+  
 }

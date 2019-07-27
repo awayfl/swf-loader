@@ -1,3 +1,6 @@
+import { Event } from "./Event";
+import { GameInputDevice } from "../ui/GameInputDevice";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,24 +17,22 @@
  * limitations under the License.
  */
 // Class: GameInputEvent
-module Shumway.AVMX.AS.flash.events {
-  export class GameInputEvent extends flash.events.Event {
+export class GameInputEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
-    device: flash.ui.GameInputDevice;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
+  device: GameInputDevice;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                device: flash.ui.GameInputDevice = null) {
-      super(type, bubbles, cancelable);
-      // TODO: coerce
-      this.device = device;
-    }
-
-    // JS -> AS Bindings
-    static DEVICE_ADDED: string = "deviceAdded";
-    static DEVICE_REMOVED: string = "deviceRemoved";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              device: GameInputDevice = null) {
+    super(type, bubbles, cancelable);
+    // TODO: coerce
+    this.device = device;
   }
+
+  // JS -> AS Bindings
+  static DEVICE_ADDED: string = "deviceAdded";
+  static DEVICE_REMOVED: string = "deviceRemoved";
 }

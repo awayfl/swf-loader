@@ -1,3 +1,6 @@
+import { release, somewhatImplemented } from "../../base/utilities/Debug";
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,79 +17,76 @@
  * limitations under the License.
  */
 // Class: ContextMenuClipboardItems
-module Shumway.AVMX.AS.flash.ui {
-  import somewhatImplemented = Shumway.Debug.somewhatImplemented;
-  export class ContextMenuClipboardItems extends ASObject {
-    
-    static classInitializer: any = null;
-    static classSymbols: string [] = null; // [];
-    static instanceSymbols: string [] = null;
-    
-    constructor () {
-      super();
+export class ContextMenuClipboardItems extends ASObject {
+  
+  static classInitializer: any = null;
+  static classSymbols: string [] = null; // [];
+  static instanceSymbols: string [] = null;
+  
+  constructor () {
+    super();
 
-      this._cut = true;
-      this._copy = true;
-      this._paste = true;
-      this._clear = true;
-      this._selectAll = true;
-    }
+    this._cut = true;
+    this._copy = true;
+    this._paste = true;
+    this._clear = true;
+    this._selectAll = true;
+  }
 
-    _cut: boolean;
-    _copy: boolean;
-    _paste: boolean;
-    _clear: boolean;
-    _selectAll: boolean;
+  _cut: boolean;
+  _copy: boolean;
+  _paste: boolean;
+  _clear: boolean;
+  _selectAll: boolean;
 
 
-    get cut(): boolean {
-      release || somewhatImplemented("cut");
-      return this._cut;
-    }
-    set cut(val: boolean) {
-      release || somewhatImplemented("cut");
-      this._cut = !!val;
-    }
-    get copy(): boolean {
-      release || somewhatImplemented("copy");
-      return this._copy;
-    }
-    set copy(val: boolean) {
-      release || somewhatImplemented("copy");
-      this._copy = !!val;
-    }
-    get paste(): boolean {
-      release || somewhatImplemented("paste");
-      return this._paste;
-    }
-    set paste(val: boolean) {
-      release || somewhatImplemented("paste");
-      this._paste = !!val;
-    }
-    get clear(): boolean {
-      release || somewhatImplemented("clear");
-      return this._clear;
-    }
-    set clear(val: boolean) {
-      release || somewhatImplemented("clear");
-      this._clear = !!val;
-    }
-    get selectAll(): boolean {
-      release || somewhatImplemented("selectAll");
-      return this._selectAll;
-    }
-    set selectAll(val: boolean) {
-      release || somewhatImplemented("selectAll");
-      this._selectAll = !!val;
-    }
-    clone(): ContextMenuClipboardItems {
-      var items = new this.sec.flash.ui.ContextMenuClipboardItems();
-      items._cut = this._cut;
-      items._copy = this._copy;
-      items._paste = this._paste;
-      items._clear = this._clear;
-      items._selectAll = this._selectAll;
-      return items;
-    }
+  get cut(): boolean {
+    release || somewhatImplemented("cut");
+    return this._cut;
+  }
+  set cut(val: boolean) {
+    release || somewhatImplemented("cut");
+    this._cut = !!val;
+  }
+  get copy(): boolean {
+    release || somewhatImplemented("copy");
+    return this._copy;
+  }
+  set copy(val: boolean) {
+    release || somewhatImplemented("copy");
+    this._copy = !!val;
+  }
+  get paste(): boolean {
+    release || somewhatImplemented("paste");
+    return this._paste;
+  }
+  set paste(val: boolean) {
+    release || somewhatImplemented("paste");
+    this._paste = !!val;
+  }
+  get clear(): boolean {
+    release || somewhatImplemented("clear");
+    return this._clear;
+  }
+  set clear(val: boolean) {
+    release || somewhatImplemented("clear");
+    this._clear = !!val;
+  }
+  get selectAll(): boolean {
+    release || somewhatImplemented("selectAll");
+    return this._selectAll;
+  }
+  set selectAll(val: boolean) {
+    release || somewhatImplemented("selectAll");
+    this._selectAll = !!val;
+  }
+  clone(): ContextMenuClipboardItems {
+    var items = new ContextMenuClipboardItems();
+    items._cut = this._cut;
+    items._copy = this._copy;
+    items._paste = this._paste;
+    items._clear = this._clear;
+    items._selectAll = this._selectAll;
+    return items;
   }
 }

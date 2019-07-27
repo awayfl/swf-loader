@@ -1,3 +1,6 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { ASArray, ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,48 +17,44 @@
  * limitations under the License.
  */
 // Class: ShaderParameter
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class ShaderParameter extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class ShaderParameter extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    
-    // AS -> JS Bindings
-    
-    // _value: any [];
-    // _type: string;
-    // _index: number /*int*/;
-    get value(): ASArray {
-      release || notImplemented("public flash.display.ShaderParameter::get value"); return;
-      // return this._value;
-    }
-    set value(v: ASArray) {
-      v = v;
-      release || notImplemented("public flash.display.ShaderParameter::set value"); return;
-      // this._value = v;
-    }
-    get type(): string {
-      release || notImplemented("public flash.display.ShaderParameter::get type"); return;
-      // return this._type;
-    }
-    get index(): number /*int*/ {
-      release || notImplemented("public flash.display.ShaderParameter::get index"); return;
-      // return this._index;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  
+  
+  // AS -> JS Bindings
+  
+  // _value: any [];
+  // _type: string;
+  // _index: number /*int*/;
+  get value(): ASArray {
+    release || notImplemented("public flash.display.ShaderParameter::get value"); return;
+    // return this._value;
+  }
+  set value(v: ASArray) {
+    v = v;
+    release || notImplemented("public flash.display.ShaderParameter::set value"); return;
+    // this._value = v;
+  }
+  get type(): string {
+    release || notImplemented("public flash.display.ShaderParameter::get type"); return;
+    // return this._type;
+  }
+  get index(): number /*int*/ {
+    release || notImplemented("public flash.display.ShaderParameter::get index"); return;
+    // return this._index;
   }
 }

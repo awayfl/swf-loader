@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,21 +16,19 @@
  * limitations under the License.
  */
 // Class: ThrottleType
-module Shumway.AVMX.AS.flash.events {
-  export class ThrottleType extends ASObject {
+export class ThrottleType extends ASObject {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static THROTTLE: string = "throttle";
-    static PAUSE: string = "pause";
-    static RESUME: string = "resume";
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static THROTTLE: string = "throttle";
+  static PAUSE: string = "pause";
+  static RESUME: string = "resume";
 }

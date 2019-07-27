@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,24 +16,22 @@
  * limitations under the License.
  */
 // Class: SharedObjectFlushStatus
-module Shumway.AVMX.AS.flash.net {
-  export class SharedObjectFlushStatus extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class SharedObjectFlushStatus extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static FLUSHED: string = "flushed";
-    static PENDING: string = "pending";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static FLUSHED: string = "flushed";
+  static PENDING: string = "pending";
 }

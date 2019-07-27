@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,23 +16,21 @@
  * limitations under the License.
  */
 // Class: Endian
-module Shumway.AVMX.AS.flash.utils {
-  export class Endian extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    static BIG_ENDIAN: string = "bigEndian";
-    static LITTLE_ENDIAN: string = "littleEndian";
+export class Endian extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  static BIG_ENDIAN: string = "bigEndian";
+  static LITTLE_ENDIAN: string = "littleEndian";
 }

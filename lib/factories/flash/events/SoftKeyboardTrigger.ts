@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,20 +16,18 @@
  * limitations under the License.
  */
 // Class: SoftKeyboardTrigger
-module Shumway.AVMX.AS.flash.events {
-  export class SoftKeyboardTrigger extends ASObject {
+export class SoftKeyboardTrigger extends ASObject {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
-    }
-
-    // JS -> AS Bindings
-    static CONTENT_TRIGGERED: string = "contentTriggered";
-    static USER_TRIGGERED: string = "userTriggered";
+  constructor() {
+    super();
   }
+
+  // JS -> AS Bindings
+  static CONTENT_TRIGGERED: string = "contentTriggered";
+  static USER_TRIGGERED: string = "userTriggered";
 }

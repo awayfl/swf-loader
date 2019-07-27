@@ -1,3 +1,5 @@
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -13,24 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Class: SystemUpdater
-module Shumway.AVMX.AS.flash.system {
-  export class SystemUpdater extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+// Class: SystemUpdate
+export class SystemUpdater extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["update", "cancel"];
-    
-    constructor () {
-      super();
-    }
-
-    update: (type: string) => void;
-    cancel: () => void;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["update", "cancel"];
+  
+  constructor () {
+    super();
   }
+
+  update: (type: string) => void;
+  cancel: () => void;
 }

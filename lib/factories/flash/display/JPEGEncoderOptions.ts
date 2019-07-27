@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,30 +16,26 @@
  * limitations under the License.
  */
 // Class: JPEGEncoderOptions
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class JPEGEncoderOptions extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class JPEGEncoderOptions extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["quality"];
-    
-    constructor (quality: number /*uint*/ = 80) {
-      super();
-      this.quality = quality >>> 0;
-    }
-    
-    // JS -> AS Bindings
-    
-    quality: number /*uint*/;
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["quality"];
+  
+  constructor (quality: number /*uint*/ = 80) {
+    super();
+    this.quality = quality >>> 0;
   }
+  
+  // JS -> AS Bindings
+  
+  quality: number /*uint*/;
+  
+  // AS -> JS Bindings
+  
 }

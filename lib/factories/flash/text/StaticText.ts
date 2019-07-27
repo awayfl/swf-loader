@@ -1,3 +1,7 @@
+import { DisplayObject } from "../display/DisplayObject";
+import { assert, release } from "../../base/utilities/Debug";
+import { TextSymbol } from "./TextField";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,40 +18,37 @@
  * limitations under the License.
  */
 // Class: StaticText
-module Shumway.AVMX.AS.flash.text {
-  import assert = Debug.assert;
-  export class StaticText extends flash.display.DisplayObject {
+export class StaticText extends DisplayObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    _symbol: TextSymbol;
-    applySymbol() {
-      release || assert(this._symbol);
+  _symbol: TextSymbol;
+  applySymbol() {
+    release || assert(this._symbol);
+    this._initializeFields();
+    this._setStaticContentFromSymbol(this._symbol);
+  }
+
+  constructor () {
+    super();
+    if (!this._fieldsInitialized) {
       this._initializeFields();
-      this._setStaticContentFromSymbol(this._symbol);
     }
+  }
 
-    constructor () {
-      super();
-      if (!this._fieldsInitialized) {
-        this._initializeFields();
-      }
-    }
+  _canHaveTextContent(): boolean {
+    return true;
+  }
 
-    _canHaveTextContent(): boolean {
-      return true;
-    }
+  _getTextContent(): Shumway.TextContent {
+    return this._textContent;
+  }
 
-    _getTextContent(): Shumway.TextContent {
-      return this._textContent;
-    }
+  _textContent: Shumway.TextContent;
 
-    _textContent: Shumway.TextContent;
-
-    get text(): string {
-      return this._textContent.plainText;
-    }
+  get text(): string {
+    return this._textContent.plainText;
   }
 }

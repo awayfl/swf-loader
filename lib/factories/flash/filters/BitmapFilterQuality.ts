@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,30 +16,28 @@
  * limitations under the License.
  */
 // Class: BitmapFilterQuality
-module Shumway.AVMX.AS.flash.filters {
 
-  export class BitmapFilterQuality extends ASObject {
+export class BitmapFilterQuality extends ASObject {
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
 
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
 
-    constructor () {
-      super();
-    }
-
-    // JS -> AS Bindings
-
-    static LOW: number /*int*/ = 1;
-    static MEDIUM: number /*int*/ = 2;
-    static HIGH: number /*int*/ = 3;
-
-    // AS -> JS Bindings
-
+  constructor () {
+    super();
   }
+
+  // JS -> AS Bindings
+
+  static LOW: number /*int*/ = 1;
+  static MEDIUM: number /*int*/ = 2;
+  static HIGH: number /*int*/ = 3;
+
+  // AS -> JS Bindings
+
 }

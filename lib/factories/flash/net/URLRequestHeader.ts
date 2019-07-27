@@ -1,3 +1,6 @@
+import { ASObject } from "../../avm2/nat";
+import { axCoerceString } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,27 +17,24 @@
  * limitations under the License.
  */
 // Class: URLRequestHeader
-module Shumway.AVMX.AS.flash.net {
-  import axCoerceString = Shumway.AVMX.axCoerceString;
 
-  export class URLRequestHeader extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class URLRequestHeader extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = ["name!", "value!"];
-    
-    constructor (name: string = "", value: string = "") {
-      super();
-      this.name = axCoerceString(name);
-      this.value = axCoerceString(value);
-    }
-    
-    name: string;
-    value: string;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = ["name!", "value!"];
+  
+  constructor (name: string = "", value: string = "") {
+    super();
+    this.name = axCoerceString(name);
+    this.value = axCoerceString(value);
   }
+  
+  name: string;
+  value: string;
 }

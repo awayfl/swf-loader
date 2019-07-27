@@ -1,3 +1,7 @@
+import { ASObject } from "../../avm2/nat";
+import { FrameLabel } from "./FrameLabel";
+import { axCoerceString } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,72 +18,69 @@
  * limitations under the License.
  */
 // Class: Scene
-module Shumway.AVMX.AS.flash.display {
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class Scene extends ASObject {
+export class Scene extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null; // [];
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null; // [];
+  static instanceSymbols: string [] = null;
 
-    constructor (name: string, labels: {value: FrameLabel[]}, offset: number, numFrames: number /*int*/) {
-      super();
-      this._name = axCoerceString(name);
-      // Note: creating Scene objects in ActionScript, while possible, is undocumented and entirely
-      // useless. Luckily, that also means that they're not very carefully implemented.
-      // Specifically, the `labels` array isn't cloned during construction or when returned from
-      // the getter. I.e., it can be modified freely.
-      this._labels = labels;
-      this.offset = offset;
-      this._numFrames = numFrames | 0;
+  constructor (name: string, labels: {value: FrameLabel[]}, offset: number, numFrames: number /*int*/) {
+    super();
+    this._name = axCoerceString(name);
+    // Note: creating Scene objects in ActionScript, while possible, is undocumented and entirely
+    // useless. Luckily, that also means that they're not very carefully implemented.
+    // Specifically, the `labels` array isn't cloned during construction or when returned from
+    // the getter. I.e., it can be modified freely.
+    this._labels = labels;
+    this.offset = offset;
+    this._numFrames = numFrames | 0;
+  }
+
+  _name: string;
+  offset: number;
+  _numFrames: number /*int*/;
+  _labels: {value: FrameLabel[]};
+
+  get name(): string {
+    return this._name;
+  }
+
+  get labels(): {value: FrameLabel[]} {
+    return this._labels;
+  }
+
+  get numFrames(): number {
+    return this._numFrames;
+  }
+
+  clone(): Scene {
+    var labels_ = this._labels.value.map(function (label: FrameLabel) { return label.clone(); });
+    return new Scene(this._name, this.sec.createArrayUnsafe(labels_),
+                                            this.offset, this._numFrames);
+  }
+
+  getLabelByName(name: string, ignoreCase: boolean): FrameLabel {
+    if (ignoreCase) {
+      name = name.toLowerCase();
     }
-
-    _name: string;
-    offset: number;
-    _numFrames: number /*int*/;
-    _labels: {value: FrameLabel[]};
-
-    get name(): string {
-      return this._name;
-    }
-
-    get labels(): {value: FrameLabel[]} {
-      return this._labels;
-    }
-
-    get numFrames(): number {
-      return this._numFrames;
-    }
-
-    clone(): Scene {
-      var labels_ = this._labels.value.map(function (label: FrameLabel) { return label.clone(); });
-      return new this.sec.flash.display.Scene(this._name, this.sec.createArrayUnsafe(labels_),
-                                              this.offset, this._numFrames);
-    }
-
-    getLabelByName(name: string, ignoreCase: boolean): FrameLabel {
-      if (ignoreCase) {
-        name = name.toLowerCase();
+    var labels = this._labels.value;
+    for (var i = 0; i < labels.length; i++) {
+      var label = labels[i];
+      if (ignoreCase ? label.name.toLowerCase() === name : label.name === name) {
+        return label;
       }
-      var labels = this._labels.value;
-      for (var i = 0; i < labels.length; i++) {
-        var label = labels[i];
-        if (ignoreCase ? label.name.toLowerCase() === name : label.name === name) {
-          return label;
-        }
-      }
-      return null;
     }
+    return null;
+  }
 
-    getLabelByFrame(frame: number): FrameLabel {
-      var labels = this._labels.value;
-      for (var i = 0; i < labels.length; i++) {
-        var label = labels[i];
-        if (label.frame === frame) {
-          return label;
-        }
+  getLabelByFrame(frame: number): FrameLabel {
+    var labels = this._labels.value;
+    for (var i = 0; i < labels.length; i++) {
+      var label = labels[i];
+      if (label.frame === frame) {
+        return label;
       }
-      return null;
     }
+    return null;
   }
 }

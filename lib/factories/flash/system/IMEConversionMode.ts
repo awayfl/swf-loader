@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,30 +16,28 @@
  * limitations under the License.
  */
 // Class: IMEConversionMode
-module Shumway.AVMX.AS.flash.system {
-  export class IMEConversionMode extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class IMEConversionMode extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static ALPHANUMERIC_FULL: string = "ALPHANUMERIC_FULL";
-    static ALPHANUMERIC_HALF: string = "ALPHANUMERIC_HALF";
-    static CHINESE: string = "CHINESE";
-    static JAPANESE_HIRAGANA: string = "JAPANESE_HIRAGANA";
-    static JAPANESE_KATAKANA_FULL: string = "JAPANESE_KATAKANA_FULL";
-    static JAPANESE_KATAKANA_HALF: string = "JAPANESE_KATAKANA_HALF";
-    static KOREAN: string = "KOREAN";
-    static UNKNOWN: string = "UNKNOWN";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static ALPHANUMERIC_FULL: string = "ALPHANUMERIC_FULL";
+  static ALPHANUMERIC_HALF: string = "ALPHANUMERIC_HALF";
+  static CHINESE: string = "CHINESE";
+  static JAPANESE_HIRAGANA: string = "JAPANESE_HIRAGANA";
+  static JAPANESE_KATAKANA_FULL: string = "JAPANESE_KATAKANA_FULL";
+  static JAPANESE_KATAKANA_HALF: string = "JAPANESE_KATAKANA_HALF";
+  static KOREAN: string = "KOREAN";
+  static UNKNOWN: string = "UNKNOWN";
 }

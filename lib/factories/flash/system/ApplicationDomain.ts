@@ -1,3 +1,11 @@
+import { ASObject } from "../../avm2/nat";
+import { AXApplicationDomain, getCurrentABC, axCoerceString } from "../../avm2/run";
+import { assert, release, notImplemented } from "../../base/utilities/Debug";
+import { ByteArray } from "../../avm2/natives/byteArray";
+import { Errors } from "../../avm2/errors";
+import { Multiname, NamespaceType } from "../../avm2/abc/lazy";
+import { GenericVector } from "../../avm2/natives/GenericVector";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,85 +22,80 @@
  * limitations under the License.
  */
 // Class: ApplicationDomain
-module Shumway.AVMX.AS.flash.system {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  import AXApplicationDomain = Shumway.AVMX.AXApplicationDomain;
 
-  export class ApplicationDomain extends ASObject {
+export class ApplicationDomain extends ASObject {
 
-    axDomain: AXApplicationDomain;
+  axDomain: AXApplicationDomain;
 
-    constructor (parentDomainOrAXDomain: any = null) {
-      super();
-      release || Debug.assert(!(this instanceof ApplicationDomain));
-      if (parentDomainOrAXDomain instanceof AXApplicationDomain) {
-        this.axDomain = parentDomainOrAXDomain;
-        return;
-      }
-      var parentRuntimeDomain: AXApplicationDomain = null;
-      if (this.sec.flash.system.ApplicationDomain.axIsType(parentDomainOrAXDomain)) {
-        parentRuntimeDomain = (<ApplicationDomain>parentDomainOrAXDomain).axDomain;
-      } else {
-        parentRuntimeDomain = this.sec.application;
-      }
-      this.axDomain = new AXApplicationDomain(this.sec, parentRuntimeDomain);
+  constructor (parentDomainOrAXDomain: any = null) {
+    super();
+    release || assert(!(this instanceof ApplicationDomain));
+    if (parentDomainOrAXDomain instanceof AXApplicationDomain) {
+      this.axDomain = parentDomainOrAXDomain;
+      return;
     }
-
-    // This must return a new object each time.
-    static get currentDomain(): flash.system.ApplicationDomain {
-      var currentABC = getCurrentABC();
-      var app = currentABC ? currentABC.env.app : this.sec.application;
-      return new this.sec.flash.system.ApplicationDomain(app);
+    var parentRuntimeDomain: AXApplicationDomain = null;
+    if (ApplicationDomain.axIsType(parentDomainOrAXDomain)) {
+      parentRuntimeDomain = (<ApplicationDomain>parentDomainOrAXDomain).axDomain;
+    } else {
+      parentRuntimeDomain = this.sec.application;
     }
+    this.axDomain = new AXApplicationDomain(this.sec, parentRuntimeDomain);
+  }
 
-    static get MIN_DOMAIN_MEMORY_LENGTH(): number /*uint*/ {
-      release || notImplemented("public flash.system.ApplicationDomain::get MIN_DOMAIN_MEMORY_LENGTH"); return;
-      // return this._MIN_DOMAIN_MEMORY_LENGTH;
-    }
+  // This must return a new object each time.
+  static get currentDomain(): ApplicationDomain {
+    var currentABC = getCurrentABC();
+    var app = currentABC ? currentABC.env.app : this.sec.application;
+    return new ApplicationDomain(app);
+  }
 
-    get parentDomain(): flash.system.ApplicationDomain {
-      var currentABC = getCurrentABC();
-      var app = currentABC ? currentABC.env.app : this.sec.application;
-      release || Debug.assert(app.parent !== undefined);
-      return new this.sec.flash.system.ApplicationDomain(app.parent);
-    }
+  static get MIN_DOMAIN_MEMORY_LENGTH(): number /*uint*/ {
+    release || notImplemented("public flash.system.ApplicationDomain::get MIN_DOMAIN_MEMORY_LENGTH"); return;
+    // return this._MIN_DOMAIN_MEMORY_LENGTH;
+  }
 
-    get domainMemory(): flash.utils.ByteArray {
-      release || notImplemented("public flash.system.ApplicationDomain::get domainMemory"); return;
-      // return this._domainMemory;
-    }
+  get parentDomain(): ApplicationDomain {
+    var currentABC = getCurrentABC();
+    var app = currentABC ? currentABC.env.app : this.sec.application;
+    release || assert(app.parent !== undefined);
+    return new ApplicationDomain(app.parent);
+  }
 
-    set domainMemory(mem: flash.utils.ByteArray) {
-      mem = mem;
-      release || notImplemented("public flash.system.ApplicationDomain::set domainMemory"); return;
-      // this._domainMemory = mem;
-    }
+  get domainMemory(): ByteArray {
+    release || notImplemented("public flash.system.ApplicationDomain::get domainMemory"); return;
+    // return this._domainMemory;
+  }
 
-    getDefinition(name: string): Object {
-      var definition = this.getDefinitionImpl(name);
-      if (!definition) {
-        this.sec.throwError('ReferenceError', Errors.UndefinedVarError, name);
-      }
-      return definition;
-    }
+  set domainMemory(mem: ByteArray) {
+    mem = mem;
+    release || notImplemented("public flash.system.ApplicationDomain::set domainMemory"); return;
+    // this._domainMemory = mem;
+  }
 
-    hasDefinition(name: string): boolean {
-      return !!this.getDefinitionImpl(name);
+  getDefinition(name: string): Object {
+    var definition = this.getDefinitionImpl(name);
+    if (!definition) {
+      this.sec.throwError('ReferenceError', Errors.UndefinedVarError, name);
     }
+    return definition;
+  }
 
-    private getDefinitionImpl(name) {
-      name = axCoerceString(name);
-      if (!name) {
-        this.sec.throwError('TypeError', Errors.NullPointerError, 'definitionName');
-      }
-      var simpleName = name.replace("::", ".");
-      var mn = Multiname.FromFQNString(simpleName, NamespaceType.Public);
-      return this.axDomain.getProperty(mn, false, false);
-    }
+  hasDefinition(name: string): boolean {
+    return !!this.getDefinitionImpl(name);
+  }
 
-    getQualifiedDefinitionNames(): GenericVector {
-      release || notImplemented("public flash.system.ApplicationDomain::getQualifiedDefinitionNames"); return;
+  private getDefinitionImpl(name) {
+    name = axCoerceString(name);
+    if (!name) {
+      this.sec.throwError('TypeError', Errors.NullPointerError, 'definitionName');
     }
+    var simpleName = name.replace("::", ".");
+    var mn = Multiname.FromFQNString(simpleName, NamespaceType.Public);
+    return this.axDomain.getProperty(mn, false, false);
+  }
+
+  getQualifiedDefinitionNames(): GenericVector {
+    release || notImplemented("public flash.system.ApplicationDomain::getQualifiedDefinitionNames"); return;
   }
 }

@@ -1,3 +1,5 @@
+import { IDataOutput } from "../../avm2/natives/byteArray";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,15 +16,11 @@
  * limitations under the License.
  */
 // Class: IDataOutput2
-module Shumway.AVMX.AS.flash.utils {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export interface IDataOutput2 extends flash.utils.IDataOutput {
-    
-    // JS -> AS Bindings
-    
-    
-    // AS -> JS Bindings
-    
-  }
+export interface IDataOutput2 extends IDataOutput {
+  
+  // JS -> AS Bindings
+  
+  
+  // AS -> JS Bindings
+  
 }

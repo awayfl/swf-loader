@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,26 +16,24 @@
  * limitations under the License.
  */
 // Class: KeyLocation
-module Shumway.AVMX.AS.flash.ui {
-  export class KeyLocation extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    static STANDARD: number /*uint*/ = undefined;
-    static LEFT: number /*uint*/ = 1;
-    static RIGHT: number /*uint*/ = 2;
-    static NUM_PAD: number /*uint*/ = 3;
-    static D_PAD: number /*uint*/ = 4;
+export class KeyLocation extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  static STANDARD: number /*uint*/ = undefined;
+  static LEFT: number /*uint*/ = 1;
+  static RIGHT: number /*uint*/ = 2;
+  static NUM_PAD: number /*uint*/ = 3;
+  static D_PAD: number /*uint*/ = 4;
 }

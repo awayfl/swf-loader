@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,46 +16,44 @@
  * limitations under the License.
  */
 // Class: GridFitType
-module Shumway.AVMX.AS.flash.text {
-  export class GridFitType extends ASObject {
+export class GridFitType extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
+  constructor() {
+    super();
+  }
+
+  // JS -> AS Bindings
+  static NONE: string = "none";
+  static PIXEL: string = "pixel";
+  static SUBPIXEL: string = "subpixel";
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return GridFitType.NONE;
+      case 1:
+        return GridFitType.PIXEL;
+      case 2:
+        return GridFitType.SUBPIXEL;
+      default:
+        return null;
     }
+  }
 
-    // JS -> AS Bindings
-    static NONE: string = "none";
-    static PIXEL: string = "pixel";
-    static SUBPIXEL: string = "subpixel";
-
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return GridFitType.NONE;
-        case 1:
-          return GridFitType.PIXEL;
-        case 2:
-          return GridFitType.SUBPIXEL;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case GridFitType.NONE:
-          return 0;
-        case GridFitType.PIXEL:
-          return 1;
-        case GridFitType.SUBPIXEL:
-          return 2;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case GridFitType.NONE:
+        return 0;
+      case GridFitType.PIXEL:
+        return 1;
+      case GridFitType.SUBPIXEL:
+        return 2;
+      default:
+        return -1;
     }
   }
 }

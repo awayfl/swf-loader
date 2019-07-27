@@ -68,7 +68,7 @@ export class System extends ASObject {
     defineNonEnumerableProperty(this, '$Bgargv', this.sec.createArray([]));
   }
 
-  static get ime(): flash.system.IME {
+  static get ime(): IME {
     release || somewhatImplemented("public flash.system.System::get ime");
     return null;
   }

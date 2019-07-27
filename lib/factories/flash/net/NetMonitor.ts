@@ -1,3 +1,6 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,24 +17,22 @@
  * limitations under the License.
  */
 // Class: NetMonitor
-module Shumway.AVMX.AS.flash.net {
-  export class NetMonitor extends flash.events.EventDispatcher {
+export class NetMonitor extends EventDispatcher {
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
 
-    constructor () {
-      super();
-    }
+  constructor () {
+    super();
+  }
 
-    listStreams(): ASVector<any> {
-      release || notImplemented("public flash.net.NetMonitor::listStreams"); return;
-    }
+  listStreams(): ASVector<any> {
+    release || notImplemented("public flash.net.NetMonitor::listStreams"); return;
   }
 }

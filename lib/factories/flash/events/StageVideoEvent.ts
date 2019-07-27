@@ -1,3 +1,6 @@
+import { Event } from "./Event";
+import { axCoerceString } from "@awayjs/graphics";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,28 +17,26 @@
  * limitations under the License.
  */
 // Class: StageVideoEvent
-module Shumway.AVMX.AS.flash.events {
-  export class StageVideoEvent extends flash.events.Event {
+export class StageVideoEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    status: string;
-    colorSpace: string;
+  status: string;
+  colorSpace: string;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                status: string = null, colorSpace: string = null) {
-      super(type, bubbles, cancelable);
-      this.status = axCoerceString(status);
-      this.colorSpace = axCoerceString(colorSpace);
-    }
-
-    // JS -> AS Bindings
-    static RENDER_STATE: string = "renderState";
-    static RENDER_STATUS_UNAVAILABLE: string = "unavailable";
-    static RENDER_STATUS_SOFTWARE: string = "software";
-    static RENDER_STATUS_ACCELERATED: string = "accelerated";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              status: string = null, colorSpace: string = null) {
+    super(type, bubbles, cancelable);
+    this.status = axCoerceString(status);
+    this.colorSpace = axCoerceString(colorSpace);
   }
+
+  // JS -> AS Bindings
+  static RENDER_STATE: string = "renderState";
+  static RENDER_STATUS_UNAVAILABLE: string = "unavailable";
+  static RENDER_STATUS_SOFTWARE: string = "software";
+  static RENDER_STATUS_ACCELERATED: string = "accelerated";
 }

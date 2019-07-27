@@ -1,3 +1,6 @@
+import { Event } from "./Event";
+import { InteractiveObject } from "../display/InteractiveObject";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,22 +17,20 @@
  * limitations under the License.
  */
 // Class: SoftKeyboardEvent
-module Shumway.AVMX.AS.flash.events {
-  export class SoftKeyboardEvent extends flash.events.Event {
+export class SoftKeyboardEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string, bubbles: boolean, cancelable: boolean,
-                relatedObjectVal: flash.display.InteractiveObject, triggerTypeVal: string) {
-      super(type, bubbles, cancelable);
-    }
-
-    // JS -> AS Bindings
-    static SOFT_KEYBOARD_ACTIVATE: string = "softKeyboardActivate";
-    static SOFT_KEYBOARD_DEACTIVATE: string = "softKeyboardDeactivate";
-    static SOFT_KEYBOARD_ACTIVATING: string = "softKeyboardActivating";
+  constructor(type: string, bubbles: boolean, cancelable: boolean,
+              relatedObjectVal: InteractiveObject, triggerTypeVal: string) {
+    super(type, bubbles, cancelable);
   }
+
+  // JS -> AS Bindings
+  static SOFT_KEYBOARD_ACTIVATE: string = "softKeyboardActivate";
+  static SOFT_KEYBOARD_DEACTIVATE: string = "softKeyboardDeactivate";
+  static SOFT_KEYBOARD_ACTIVATING: string = "softKeyboardActivating";
 }

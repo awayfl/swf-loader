@@ -1,3 +1,5 @@
+import { TextEvent } from "./TextEvent";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,25 +16,23 @@
  * limitations under the License.
  */
 // Class: IMEEvent
-module Shumway.AVMX.AS.flash.events {
-  export class IMEEvent extends flash.events.TextEvent {
+export class IMEEvent extends TextEvent {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    imeClient: flash.text.ime.IIMEClient;
+  imeClient: IIMEClient;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                text: string = "", imeClient: flash.text.ime.IIMEClient = null) {
-      super(type, bubbles, cancelable, text);
-      // TODO: coerce
-      this.imeClient = imeClient;
-    }
-
-    // JS -> AS Bindings
-    static IME_COMPOSITION: string = "imeComposition";
-    static IME_START_COMPOSITION: string = "imeStartComposition";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              text: string = "", imeClient: IIMEClient = null) {
+    super(type, bubbles, cancelable, text);
+    // TODO: coerce
+    this.imeClient = imeClient;
   }
+
+  // JS -> AS Bindings
+  static IME_COMPOSITION: string = "imeComposition";
+  static IME_START_COMPOSITION: string = "imeStartComposition";
 }

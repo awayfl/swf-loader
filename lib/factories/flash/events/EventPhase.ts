@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,21 +16,19 @@
  * limitations under the License.
  */
 // Class: EventPhase
-module Shumway.AVMX.AS.flash.events {
-  export class EventPhase extends ASObject {
+export class EventPhase extends ASObject {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static CAPTURING_PHASE: number /*uint*/ = 1;
-    static AT_TARGET: number /*uint*/ = 2;
-    static BUBBLING_PHASE: number /*uint*/ = 3;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static CAPTURING_PHASE: number /*uint*/ = 1;
+  static AT_TARGET: number /*uint*/ = 2;
+  static BUBBLING_PHASE: number /*uint*/ = 3;
 }

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,91 +16,89 @@
  * limitations under the License.
  */
 // Class: NetStreamMulticastInfo
-module Shumway.AVMX.AS.flash.net {
-  export class NetStreamMulticastInfo extends ASObject {
+export class NetStreamMulticastInfo extends ASObject {
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
 
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null;
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null;
 
-    constructor(sendDataBytesPerSecond: number, sendControlBytesPerSecond: number,
-                receiveDataBytesPerSecond: number, receiveControlBytesPerSecond: number,
-                bytesPushedToPeers: number, fragmentsPushedToPeers: number,
-                bytesRequestedByPeers: number, fragmentsRequestedByPeers: number,
-                bytesPushedFromPeers: number, fragmentsPushedFromPeers: number,
-                bytesRequestedFromPeers: number, fragmentsRequestedFromPeers: number,
-                sendControlBytesPerSecondToServer: number,
-                receiveDataBytesPerSecondFromServer: number, bytesReceivedFromServer: number,
-                fragmentsReceivedFromServer: number,
-                receiveDataBytesPerSecondFromIPMulticast: number,
-                bytesReceivedFromIPMulticast: number, fragmentsReceivedFromIPMulticast: number)
-    {
-      this.sendDataBytesPerSecond = +sendDataBytesPerSecond;
-      this.sendControlBytesPerSecond = +sendControlBytesPerSecond;
-      this.receiveDataBytesPerSecond = +receiveDataBytesPerSecond;
-      this.receiveControlBytesPerSecond = +receiveControlBytesPerSecond;
-      this.bytesPushedToPeers = +bytesPushedToPeers;
-      this.fragmentsPushedToPeers = +fragmentsPushedToPeers;
-      this.bytesRequestedByPeers = +bytesRequestedByPeers;
-      this.fragmentsRequestedByPeers = +fragmentsRequestedByPeers;
-      this.bytesPushedFromPeers = +bytesPushedFromPeers;
-      this.fragmentsPushedFromPeers = +fragmentsPushedFromPeers;
-      this.bytesRequestedFromPeers = +bytesRequestedFromPeers;
-      this.fragmentsRequestedFromPeers = +fragmentsRequestedFromPeers;
-      this.sendControlBytesPerSecondToServer = +sendControlBytesPerSecondToServer;
-      this.receiveDataBytesPerSecondFromServer = +receiveDataBytesPerSecondFromServer;
-      this.bytesReceivedFromServer = +bytesReceivedFromServer;
-      this.fragmentsReceivedFromServer = +fragmentsReceivedFromServer;
-      this.receiveDataBytesPerSecondFromIPMulticast = +receiveDataBytesPerSecondFromIPMulticast;
-      this.bytesReceivedFromIPMulticast = +bytesReceivedFromIPMulticast;
-      this.fragmentsReceivedFromIPMulticast = +fragmentsReceivedFromIPMulticast;
-      super();
-    }
-
-    // JS -> AS Bindings
-
-    _sendDataBytesPerSecond: number;
-    _sendControlBytesPerSecond: number;
-    _receiveDataBytesPerSecond: number;
-    _receiveControlBytesPerSecond: number;
-    _bytesPushedToPeers: number;
-    _fragmentsPushedToPeers: number;
-    _bytesRequestedByPeers: number;
-    _fragmentsRequestedByPeers: number;
-    _bytesPushedFromPeers: number;
-    _fragmentsPushedFromPeers: number;
-    _bytesRequestedFromPeers: number;
-    _fragmentsRequestedFromPeers: number;
-    _sendControlBytesPerSecondToServer: number;
-    _receiveDataBytesPerSecondFromServer: number;
-    _bytesReceivedFromServer: number;
-    _fragmentsReceivedFromServer: number;
-    _receiveDataBytesPerSecondFromIPMulticast: number;
-    _bytesReceivedFromIPMulticast: number;
-    _fragmentsReceivedFromIPMulticast: number;
-    sendDataBytesPerSecond: number;
-    sendControlBytesPerSecond: number;
-    receiveDataBytesPerSecond: number;
-    receiveControlBytesPerSecond: number;
-    bytesPushedToPeers: number;
-    fragmentsPushedToPeers: number;
-    bytesRequestedByPeers: number;
-    fragmentsRequestedByPeers: number;
-    bytesPushedFromPeers: number;
-    fragmentsPushedFromPeers: number;
-    bytesRequestedFromPeers: number;
-    fragmentsRequestedFromPeers: number;
-    sendControlBytesPerSecondToServer: number;
-    receiveDataBytesPerSecondFromServer: number;
-    bytesReceivedFromServer: number;
-    fragmentsReceivedFromServer: number;
-    receiveDataBytesPerSecondFromIPMulticast: number;
-    bytesReceivedFromIPMulticast: number;
-    fragmentsReceivedFromIPMulticast: number;
+  constructor(sendDataBytesPerSecond: number, sendControlBytesPerSecond: number,
+              receiveDataBytesPerSecond: number, receiveControlBytesPerSecond: number,
+              bytesPushedToPeers: number, fragmentsPushedToPeers: number,
+              bytesRequestedByPeers: number, fragmentsRequestedByPeers: number,
+              bytesPushedFromPeers: number, fragmentsPushedFromPeers: number,
+              bytesRequestedFromPeers: number, fragmentsRequestedFromPeers: number,
+              sendControlBytesPerSecondToServer: number,
+              receiveDataBytesPerSecondFromServer: number, bytesReceivedFromServer: number,
+              fragmentsReceivedFromServer: number,
+              receiveDataBytesPerSecondFromIPMulticast: number,
+              bytesReceivedFromIPMulticast: number, fragmentsReceivedFromIPMulticast: number)
+  {
+    super();
+    this.sendDataBytesPerSecond = +sendDataBytesPerSecond;
+    this.sendControlBytesPerSecond = +sendControlBytesPerSecond;
+    this.receiveDataBytesPerSecond = +receiveDataBytesPerSecond;
+    this.receiveControlBytesPerSecond = +receiveControlBytesPerSecond;
+    this.bytesPushedToPeers = +bytesPushedToPeers;
+    this.fragmentsPushedToPeers = +fragmentsPushedToPeers;
+    this.bytesRequestedByPeers = +bytesRequestedByPeers;
+    this.fragmentsRequestedByPeers = +fragmentsRequestedByPeers;
+    this.bytesPushedFromPeers = +bytesPushedFromPeers;
+    this.fragmentsPushedFromPeers = +fragmentsPushedFromPeers;
+    this.bytesRequestedFromPeers = +bytesRequestedFromPeers;
+    this.fragmentsRequestedFromPeers = +fragmentsRequestedFromPeers;
+    this.sendControlBytesPerSecondToServer = +sendControlBytesPerSecondToServer;
+    this.receiveDataBytesPerSecondFromServer = +receiveDataBytesPerSecondFromServer;
+    this.bytesReceivedFromServer = +bytesReceivedFromServer;
+    this.fragmentsReceivedFromServer = +fragmentsReceivedFromServer;
+    this.receiveDataBytesPerSecondFromIPMulticast = +receiveDataBytesPerSecondFromIPMulticast;
+    this.bytesReceivedFromIPMulticast = +bytesReceivedFromIPMulticast;
+    this.fragmentsReceivedFromIPMulticast = +fragmentsReceivedFromIPMulticast;
   }
+
+  // JS -> AS Bindings
+
+  _sendDataBytesPerSecond: number;
+  _sendControlBytesPerSecond: number;
+  _receiveDataBytesPerSecond: number;
+  _receiveControlBytesPerSecond: number;
+  _bytesPushedToPeers: number;
+  _fragmentsPushedToPeers: number;
+  _bytesRequestedByPeers: number;
+  _fragmentsRequestedByPeers: number;
+  _bytesPushedFromPeers: number;
+  _fragmentsPushedFromPeers: number;
+  _bytesRequestedFromPeers: number;
+  _fragmentsRequestedFromPeers: number;
+  _sendControlBytesPerSecondToServer: number;
+  _receiveDataBytesPerSecondFromServer: number;
+  _bytesReceivedFromServer: number;
+  _fragmentsReceivedFromServer: number;
+  _receiveDataBytesPerSecondFromIPMulticast: number;
+  _bytesReceivedFromIPMulticast: number;
+  _fragmentsReceivedFromIPMulticast: number;
+  sendDataBytesPerSecond: number;
+  sendControlBytesPerSecond: number;
+  receiveDataBytesPerSecond: number;
+  receiveControlBytesPerSecond: number;
+  bytesPushedToPeers: number;
+  fragmentsPushedToPeers: number;
+  bytesRequestedByPeers: number;
+  fragmentsRequestedByPeers: number;
+  bytesPushedFromPeers: number;
+  fragmentsPushedFromPeers: number;
+  bytesRequestedFromPeers: number;
+  fragmentsRequestedFromPeers: number;
+  sendControlBytesPerSecondToServer: number;
+  receiveDataBytesPerSecondFromServer: number;
+  bytesReceivedFromServer: number;
+  fragmentsReceivedFromServer: number;
+  receiveDataBytesPerSecondFromIPMulticast: number;
+  bytesReceivedFromIPMulticast: number;
+  fragmentsReceivedFromIPMulticast: number;
 }

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,20 +16,18 @@
  * limitations under the License.
  */
 // Class: TextDisplayMode
-module Shumway.AVMX.AS.flash.text {
-  export class TextDisplayMode extends ASObject {
+export class TextDisplayMode extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
-    }
-
-    // JS -> AS Bindings
-    static LCD: string = "lcd";
-    static CRT: string = "crt";
-    static DEFAULT: string = "default";
+  constructor() {
+    super();
   }
+
+  // JS -> AS Bindings
+  static LCD: string = "lcd";
+  static CRT: string = "crt";
+  static DEFAULT: string = "default";
 }

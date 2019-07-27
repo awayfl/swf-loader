@@ -1,3 +1,7 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+
+import { Event } from "./Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,45 +18,42 @@
  * limitations under the License.
  */
 // Class: TextEvent
-module Shumway.AVMX.AS.flash.events {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class TextEvent extends flash.events.Event {
+export class TextEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string, bubbles: boolean, cancelable: boolean, text: string) {
-      super(type, bubbles, cancelable);
-      this._text = text;
-    }
+  constructor(type: string, bubbles: boolean, cancelable: boolean, text: string) {
+    super(type, bubbles, cancelable);
+    this._text = text;
+  }
 
-    static LINK: string = "link";
-    static TEXT_INPUT: string = "textInput";
+  static LINK: string = "link";
+  static TEXT_INPUT: string = "textInput";
 
-    _text: string;
+  _text: string;
 
-    get text(): string {
-      return this._text;
-    }
-     set text(value: string) {
-      this._text = value;
-    }
+  get text(): string {
+    return this._text;
+  }
+    set text(value: string) {
+    this._text = value;
+  }
 
-    clone(): Event {
-      var textEvent = new this.sec.flash.events.TextEvent(this.type, this.bubbles,
-                                                                     this.cancelable, this.text);
-      //this.copyNativeData(textEvent);
-      return textEvent;
-    }
+  clone(): Event {
+    var textEvent = new TextEvent(this.type, this.bubbles,
+                                                                    this.cancelable, this.text);
+    //this.copyNativeData(textEvent);
+    return textEvent;
+  }
 
-    toString(): string {
-      return this.formatToString('TextEvent', 'type', 'bubbles', 'cancelable', 'text');
-    }
+  toString(): string {
+    return this.formatToString('TextEvent', 'type', 'bubbles', 'cancelable', 'text');
+  }
 
-    copyNativeData(event: flash.events.TextEvent): void {
-      release || notImplemented("public flash.events.TextEvent::copyNativeData");
-    }
+  copyNativeData(event: TextEvent): void {
+    release || notImplemented("public flash.events.TextEvent::copyNativeData");
   }
 }

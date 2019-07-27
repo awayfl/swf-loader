@@ -87,11 +87,11 @@ export class XMLNode extends ASObject {
   }
   // Instance JS -> AS Bindings
   nodeType: number /*uint*/;
-  previousSibling: flash.xml.XMLNode;
-  nextSibling: flash.xml.XMLNode;
-  parentNode: flash.xml.XMLNode;
-  firstChild: flash.xml.XMLNode;
-  lastChild: flash.xml.XMLNode;
+  previousSibling: XMLNode;
+  nextSibling: XMLNode;
+  parentNode: XMLNode;
+  firstChild: XMLNode;
+  lastChild: XMLNode;
   childNodes: any [];
   _childNodes: any [];
   attributes: ASObject;
@@ -100,10 +100,10 @@ export class XMLNode extends ASObject {
   nodeValue: string;
   init: (type: number /*uint*/, value: string) => void;
   hasChildNodes: () => boolean;
-  cloneNode: (deep: boolean) => flash.xml.XMLNode;
+  cloneNode: (deep: boolean) => XMLNode;
   removeNode: () => void;
-  insertBefore: (node: flash.xml.XMLNode, before: flash.xml.XMLNode) => void;
-  appendChild: (node: flash.xml.XMLNode) => void;
+  insertBefore: (node: XMLNode, before: XMLNode) => void;
+  appendChild: (node: XMLNode) => void;
   getNamespaceForPrefix: (prefix: string) => string;
   getPrefixForNamespace: (ns: string) => string;
   localName: string;
@@ -112,7 +112,7 @@ export class XMLNode extends ASObject {
   // Instance AS -> JS Bindings
 }
 
-export class XMLDocument extends flash.xml.XMLNode {
+export class XMLDocument extends XMLNode {
   constructor (text: string = null) {
     text = axCoerceString(text);
     super(1, "");
@@ -121,8 +121,8 @@ export class XMLDocument extends flash.xml.XMLNode {
   docTypeDecl: ASObject;
   idMap: ASObject;
   ignoreWhite: boolean;
-  createElement: (name: string) => flash.xml.XMLNode;
-  createTextNode: (text: string) => flash.xml.XMLNode;
+  createElement: (name: string) => XMLNode;
+  createTextNode: (text: string) => XMLNode;
   parseXML: (source: string) => void;
 }
 
@@ -281,7 +281,7 @@ export class XMLParser extends ASObject {
     this.queue = parser.queue;
   }
 
-  getNext(tag: flash.xml.XMLTag): number /*int*/ {
+  getNext(tag: XMLTag): number /*int*/ {
     if (this.queue.length === 0) {
       return XMLParserErrorCode.EndOfDocument;
     }

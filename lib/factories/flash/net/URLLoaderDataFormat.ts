@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,25 +16,23 @@
  * limitations under the License.
  */
 // Class: URLLoaderDataFormat
-module Shumway.AVMX.AS.flash.net {
-  export class URLLoaderDataFormat extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class URLLoaderDataFormat extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static TEXT: string = "text";
-    static BINARY: string = "binary";
-    static VARIABLES: string = "variables";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static TEXT: string = "text";
+  static BINARY: string = "binary";
+  static VARIABLES: string = "variables";
 }

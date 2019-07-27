@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,30 +16,26 @@
  * limitations under the License.
  */
 // Class: H264Profile
-module Shumway.AVMX.AS.flash.media {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class H264Profile extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static BASELINE: string = "baseline";
-    static MAIN: string = "main";
-    
-    
-    // AS -> JS Bindings
-    
+export class H264Profile extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static BASELINE: string = "baseline";
+  static MAIN: string = "main";
+  
+  
+  // AS -> JS Bindings
+  
 }

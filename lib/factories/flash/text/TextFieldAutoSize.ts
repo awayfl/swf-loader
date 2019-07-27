@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,51 +16,49 @@
  * limitations under the License.
  */
 // Class: TextFieldAutoSize
-module Shumway.AVMX.AS.flash.text {
-  export class TextFieldAutoSize extends ASObject {
+export class TextFieldAutoSize extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
+  constructor() {
+    super();
+  }
+
+  // JS -> AS Bindings
+  static NONE: string = "none";
+  static LEFT: string = "left";
+  static CENTER: string = "center";
+  static RIGHT: string = "right";
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return TextFieldAutoSize.NONE;
+      case 1:
+        return TextFieldAutoSize.CENTER;
+      case 2:
+        return TextFieldAutoSize.LEFT;
+      case 3:
+        return TextFieldAutoSize.RIGHT;
+      default:
+        return null;
     }
+  }
 
-    // JS -> AS Bindings
-    static NONE: string = "none";
-    static LEFT: string = "left";
-    static CENTER: string = "center";
-    static RIGHT: string = "right";
-
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return TextFieldAutoSize.NONE;
-        case 1:
-          return TextFieldAutoSize.CENTER;
-        case 2:
-          return TextFieldAutoSize.LEFT;
-        case 3:
-          return TextFieldAutoSize.RIGHT;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case TextFieldAutoSize.NONE:
-          return 0;
-        case TextFieldAutoSize.CENTER:
-          return 1;
-        case TextFieldAutoSize.LEFT:
-          return 2;
-        case TextFieldAutoSize.RIGHT:
-          return 3;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case TextFieldAutoSize.NONE:
+        return 0;
+      case TextFieldAutoSize.CENTER:
+        return 1;
+      case TextFieldAutoSize.LEFT:
+        return 2;
+      case TextFieldAutoSize.RIGHT:
+        return 3;
+      default:
+        return -1;
     }
   }
 }

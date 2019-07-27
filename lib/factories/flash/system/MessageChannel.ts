@@ -1,3 +1,6 @@
+import { EventDispatcher } from "../events/EventDispatcher";
+import { notImplemented, release } from "../../base/utilities/Debug";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,48 +17,45 @@
  * limitations under the License.
  */
 // Class: MessageChannel
-module Shumway.AVMX.AS.flash.system {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class MessageChannel extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class MessageChannel extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["addEventListener", "removeEventListener", "toString"];
-    
-    constructor () {
-      super();
-    }
-    
-    // addEventListener: (type: string, listener: ASFunction, useCapture: boolean = false, priority: number /*int*/ = 0, useWeakReference: boolean = false) => void;
-    // removeEventListener: (type: string, listener: ASFunction, useCapture: boolean = false) => void;
-    
-    // AS -> JS Bindings
-    
-    // _messageAvailable: boolean;
-    // _state: string;
-    get messageAvailable(): boolean {
-      release || notImplemented("public flash.system.MessageChannel::get messageAvailable"); return;
-      // return this._messageAvailable;
-    }
-    get state(): string {
-      release || notImplemented("public flash.system.MessageChannel::get state"); return;
-      // return this._state;
-    }
-    send(arg: any, queueLimit: number /*int*/ = -1): void {
-      queueLimit = queueLimit | 0;
-      release || notImplemented("public flash.system.MessageChannel::send"); return;
-    }
-    receive(blockUntilReceived: boolean = false): any {
-      blockUntilReceived = !!blockUntilReceived;
-      release || notImplemented("public flash.system.MessageChannel::receive"); return;
-    }
-    close(): void {
-      release || notImplemented("public flash.system.MessageChannel::close"); return;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["addEventListener", "removeEventListener", "toString"];
+  
+  constructor () {
+    super();
+  }
+  
+  // addEventListener: (type: string, listener: ASFunction, useCapture: boolean = false, priority: number /*int*/ = 0, useWeakReference: boolean = false) => void;
+  // removeEventListener: (type: string, listener: ASFunction, useCapture: boolean = false) => void;
+  
+  // AS -> JS Bindings
+  
+  // _messageAvailable: boolean;
+  // _state: string;
+  get messageAvailable(): boolean {
+    release || notImplemented("public flash.system.MessageChannel::get messageAvailable"); return;
+    // return this._messageAvailable;
+  }
+  get state(): string {
+    release || notImplemented("public flash.system.MessageChannel::get state"); return;
+    // return this._state;
+  }
+  send(arg: any, queueLimit: number /*int*/ = -1): void {
+    queueLimit = queueLimit | 0;
+    release || notImplemented("public flash.system.MessageChannel::send"); return;
+  }
+  receive(blockUntilReceived: boolean = false): any {
+    blockUntilReceived = !!blockUntilReceived;
+    release || notImplemented("public flash.system.MessageChannel::receive"); return;
+  }
+  close(): void {
+    release || notImplemented("public flash.system.MessageChannel::close"); return;
   }
 }

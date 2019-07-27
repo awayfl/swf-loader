@@ -32,4 +32,4 @@ export interface ILocalConnectionService {
 				 secure: boolean);
 }
 
-export var instance: ILocalConnectionService;
+export var LocalConnectionService: ILocalConnectionService;

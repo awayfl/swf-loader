@@ -1,3 +1,6 @@
+import { release, somewhatImplemented } from "../../base/utilities/Debug";
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,35 +17,30 @@
  * limitations under the License.
  */
 // Class: NativeMenuItem
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import somewhatImplemented = Shumway.Debug.somewhatImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class NativeMenuItem extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class NativeMenuItem extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-      this._enabled = true;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+    this._enabled = true;
+  }
 
-    _enabled: boolean;
-    get enabled(): boolean {
-      release || somewhatImplemented("public flash.display.NativeMenuItem::get enabled");
-      return this._enabled;
-    }
-    set enabled(isSeparator: boolean) {
-      isSeparator = !!isSeparator;
-      release || somewhatImplemented("public flash.display.NativeMenuItem::set enabled");
-      this._enabled = isSeparator;
-    }
+  _enabled: boolean;
+  get enabled(): boolean {
+    release || somewhatImplemented("public flash.display.NativeMenuItem::get enabled");
+    return this._enabled;
+  }
+  set enabled(isSeparator: boolean) {
+    isSeparator = !!isSeparator;
+    release || somewhatImplemented("public flash.display.NativeMenuItem::set enabled");
+    this._enabled = isSeparator;
   }
 }

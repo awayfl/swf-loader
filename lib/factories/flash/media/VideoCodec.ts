@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,31 +16,27 @@
  * limitations under the License.
  */
 // Class: VideoCodec
-module Shumway.AVMX.AS.flash.media {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class VideoCodec extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class VideoCodec extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static H264AVC: string = "H264Avc";
-    static SORENSON: string = "Sorenson";
-    static VP6: string = "VP6";
-    
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static H264AVC: string = "H264Avc";
+  static SORENSON: string = "Sorenson";
+  static VP6: string = "VP6";
+  
+  
+  // AS -> JS Bindings
+  
 }

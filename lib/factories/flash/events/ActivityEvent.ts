@@ -1,3 +1,5 @@
+import { Event } from "./Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,23 +16,21 @@
  * limitations under the License.
  */
 // Class: ActivityEvent
-module Shumway.AVMX.AS.flash.events {
-  export class ActivityEvent extends flash.events.Event {
+export class ActivityEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    activating: boolean;
+  activating: boolean;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                activating: boolean = false) {
-      super(type, bubbles, cancelable);
-      this.activating = !!activating;
-    }
-
-    // JS -> AS Bindings
-    static ACTIVITY: string = "activity";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              activating: boolean = false) {
+    super(type, bubbles, cancelable);
+    this.activating = !!activating;
   }
+
+  // JS -> AS Bindings
+  static ACTIVITY: string = "activity";
 }

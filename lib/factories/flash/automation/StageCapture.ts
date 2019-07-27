@@ -1,3 +1,7 @@
+import { notImplemented, release } from "../../base/utilities/Debug";
+import { axCoerceString } from "@awayjs/graphics";
+
+import { EventDispatcher } from "../events/EventDispatcher";
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,47 +18,43 @@
  * limitations under the License.
  */
 // Class: StageCapture
-module Shumway.AVMX.AS.flash.automation {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class StageCapture extends flash.events.EventDispatcher {
-    constructor () {
-      super();
-    }
-    // Static   JS -> AS Bindings
-    // Static   AS -> JS Bindings
-    // Instance JS -> AS Bindings
-    // Instance AS -> JS Bindings
-    capture(type: string): void {
-      type = axCoerceString(type);
-      release || notImplemented("public flash.automation.StageCapture::capture"); return;
-    }
-    cancel(): void {
-      release || notImplemented("public flash.automation.StageCapture::cancel"); return;
-    }
-    set fileNameBase(value: string) {
-      value = axCoerceString(value);
-      release || notImplemented("public flash.automation.StageCapture::set fileNameBase"); return;
-    }
-    get fileNameBase(): string {
-      release || notImplemented("public flash.automation.StageCapture::get fileNameBase"); return;
-    }
-    set clipRect(value: flash.geom.Rectangle) {
-      value = value;
-      release || notImplemented("public flash.automation.StageCapture::set clipRect"); return;
-    }
-    get clipRect(): flash.geom.Rectangle {
-      release || notImplemented("public flash.automation.StageCapture::get clipRect"); return;
-    }
-    captureBitmapData(): flash.display.BitmapData {
-      release || notImplemented("public flash.automation.StageCapture::captureBitmapData"); return;
-    }
-    set captureSource(value: string) {
-      value = axCoerceString(value);
-      release || notImplemented("public flash.automation.StageCapture::set captureSource"); return;
-    }
-    get captureSource(): string {
-      release || notImplemented("public flash.automation.StageCapture::get captureSource"); return;
-    }
+export class StageCapture extends EventDispatcher {
+  constructor () {
+    super();
+  }
+  // Static   JS -> AS Bindings
+  // Static   AS -> JS Bindings
+  // Instance JS -> AS Bindings
+  // Instance AS -> JS Bindings
+  capture(type: string): void {
+    type = axCoerceString(type);
+    release || notImplemented("public flash.automation.StageCapture::capture"); return;
+  }
+  cancel(): void {
+    release || notImplemented("public flash.automation.StageCapture::cancel"); return;
+  }
+  set fileNameBase(value: string) {
+    value = axCoerceString(value);
+    release || notImplemented("public flash.automation.StageCapture::set fileNameBase"); return;
+  }
+  get fileNameBase(): string {
+    release || notImplemented("public flash.automation.StageCapture::get fileNameBase"); return;
+  }
+  set clipRect(value: Rectangle) {
+    value = value;
+    release || notImplemented("public flash.automation.StageCapture::set clipRect"); return;
+  }
+  get clipRect(): Rectangle {
+    release || notImplemented("public flash.automation.StageCapture::get clipRect"); return;
+  }
+  captureBitmapData(): BitmapData {
+    release || notImplemented("public flash.automation.StageCapture::captureBitmapData"); return;
+  }
+  set captureSource(value: string) {
+    value = axCoerceString(value);
+    release || notImplemented("public flash.automation.StageCapture::set captureSource"); return;
+  }
+  get captureSource(): string {
+    release || notImplemented("public flash.automation.StageCapture::get captureSource"); return;
   }
 }

@@ -1,3 +1,5 @@
+import { Event } from "./Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,52 +16,49 @@
  * limitations under the License.
  */
 // Class: ProgressEvent
-module Shumway.AVMX.AS.flash.events {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class ProgressEvent extends flash.events.Event {
+export class ProgressEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                bytesLoaded: number = 0, bytesTotal: number = 0) {
-      super(type, bubbles, cancelable);
-      this._bytesLoaded = bytesLoaded;
-      this._bytesTotal = bytesTotal;
-    }
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              bytesLoaded: number = 0, bytesTotal: number = 0) {
+    super(type, bubbles, cancelable);
+    this._bytesLoaded = bytesLoaded;
+    this._bytesTotal = bytesTotal;
+  }
 
-    // JS -> AS Bindings
-    static PROGRESS: string = "progress";
-    static SOCKET_DATA: string = "socketData";
+  // JS -> AS Bindings
+  static PROGRESS: string = "progress";
+  static SOCKET_DATA: string = "socketData";
 
-    private _bytesLoaded: number;
-    private _bytesTotal: number;
+  private _bytesLoaded: number;
+  private _bytesTotal: number;
 
-    public get bytesLoaded(): number {
-      return this._bytesLoaded;
-    }
-    public set bytesLoaded(value: number) {
-      this._bytesLoaded = value;
-    }
-    public get bytesTotal(): number {
-      return this._bytesTotal;
-    }
+  public get bytesLoaded(): number {
+    return this._bytesLoaded;
+  }
+  public set bytesLoaded(value: number) {
+    this._bytesLoaded = value;
+  }
+  public get bytesTotal(): number {
+    return this._bytesTotal;
+  }
 
-    public set bytesTotal(value: number) {
-      this._bytesTotal = value;
-    }
+  public set bytesTotal(value: number) {
+    this._bytesTotal = value;
+  }
 
-    public clone(): Event {
-      return new this.sec.flash.events.ProgressEvent(this._type, this._bubbles,
-                                                                this._cancelable, this._bytesLoaded,
-                                                                this._bytesTotal);
-    }
+  public clone(): Event {
+    return new ProgressEvent(this._type, this._bubbles,
+                                                              this._cancelable, this._bytesLoaded,
+                                                              this._bytesTotal);
+  }
 
-    public toString(): string {
-      return this.formatToString('ProgressEvent', 'bubbles', 'cancelable', 'eventPhase',
-                                 'bytesLoaded', 'bytesTotal');
-    }
+  public toString(): string {
+    return this.formatToString('ProgressEvent', 'bubbles', 'cancelable', 'eventPhase',
+                                'bytesLoaded', 'bytesTotal');
   }
 }

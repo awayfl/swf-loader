@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -13,23 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Class: GesturePhase
-module Shumway.AVMX.AS.flash.events {
-  export class GesturePhase extends ASObject {
+// Class: GesturePhas
+export class GesturePhase extends ASObject {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
-    }
-
-    // JS -> AS Bindings
-    static BEGIN: string = "begin";
-    static UPDATE: string = "update";
-    static END: string = "end";
-    static ALL: string = "all";
+  constructor() {
+    super();
   }
+
+  // JS -> AS Bindings
+  static BEGIN: string = "begin";
+  static UPDATE: string = "update";
+  static END: string = "end";
+  static ALL: string = "all";
 }

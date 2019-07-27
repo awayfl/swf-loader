@@ -1,3 +1,5 @@
+import { Event } from "./Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,28 +16,26 @@
  * limitations under the License.
  */
 // Class: ContextMenuEvent
-module Shumway.AVMX.AS.flash.events {
-  export class ContextMenuEvent extends flash.events.Event {
+export class ContextMenuEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    mouseTarget: flash.display.InteractiveObject;
-    contextMenuOwner: flash.display.InteractiveObject;
+  mouseTarget: InteractiveObject;
+  contextMenuOwner: InteractiveObject;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                mouseTarget: flash.display.InteractiveObject = null,
-                contextMenuOwner: flash.display.InteractiveObject = null) {
-      super(type, bubbles, cancelable);
-      // TODO: coerce
-      this.mouseTarget = mouseTarget;
-      this.contextMenuOwner = contextMenuOwner;
-    }
-
-    // JS -> AS Bindings
-    static MENU_ITEM_SELECT: string = "menuItemSelect";
-    static MENU_SELECT: string = "menuSelect";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              mouseTarget: InteractiveObject = null,
+              contextMenuOwner: InteractiveObject = null) {
+    super(type, bubbles, cancelable);
+    // TODO: coerce
+    this.mouseTarget = mouseTarget;
+    this.contextMenuOwner = contextMenuOwner;
   }
+
+  // JS -> AS Bindings
+  static MENU_ITEM_SELECT: string = "menuItemSelect";
+  static MENU_SELECT: string = "menuSelect";
 }

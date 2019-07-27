@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,56 +16,52 @@
  * limitations under the License.
  */
 // Class: ColorCorrection
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class ColorCorrection extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class ColorCorrection extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static DEFAULT: string = "default";
+  static ON: string = "on";
+  static OFF: string = "off";
+
+
+  // AS -> JS Bindings
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return ColorCorrection.DEFAULT;
+      case 1:
+        return ColorCorrection.ON;
+      case 2:
+        return ColorCorrection.OFF;
+      default:
+        return null;
     }
-    
-    // JS -> AS Bindings
-    static DEFAULT: string = "default";
-    static ON: string = "on";
-    static OFF: string = "off";
+  }
 
-
-    // AS -> JS Bindings
-
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return ColorCorrection.DEFAULT;
-        case 1:
-          return ColorCorrection.ON;
-        case 2:
-          return ColorCorrection.OFF;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case ColorCorrection.DEFAULT:
-          return 0;
-        case ColorCorrection.ON:
-          return 1;
-        case ColorCorrection.OFF:
-          return 2;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case ColorCorrection.DEFAULT:
+        return 0;
+      case ColorCorrection.ON:
+        return 1;
+      case ColorCorrection.OFF:
+        return 2;
+      default:
+        return -1;
     }
   }
 }

@@ -1,3 +1,6 @@
+import { NativeMenuItem } from "../display/NativeMenuItem";
+import { axCoerceString } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,57 +17,53 @@
  * limitations under the License.
  */
 // Class: ContextMenuItem
-module Shumway.AVMX.AS.flash.ui {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class ContextMenuItem extends flash.display.NativeMenuItem {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["clone"];
-    
-    constructor (caption: string, separatorBefore: boolean = false,
-                 enabled: boolean = true, visible: boolean = true) {
-      super();
-      caption = axCoerceString(caption); separatorBefore = !!separatorBefore; enabled = !!enabled; visible = !!visible;
-      this._caption = caption ? caption : "";
-      this._separatorBefore = separatorBefore;
-      this._enabled = enabled;
-      this._visible = visible;
-    }
-    
-    clone: () => flash.ui.ContextMenuItem;
+export class ContextMenuItem extends NativeMenuItem {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["clone"];
+  
+  constructor (caption: string, separatorBefore: boolean = false,
+                enabled: boolean = true, visible: boolean = true) {
+    super();
+    caption = axCoerceString(caption); separatorBefore = !!separatorBefore; enabled = !!enabled; visible = !!visible;
+    this._caption = caption ? caption : "";
+    this._separatorBefore = separatorBefore;
+    this._enabled = enabled;
+    this._visible = visible;
+  }
+  
+  clone: () => ContextMenuItem;
 
-    _caption: string;
-    _separatorBefore: boolean;
-    _visible: boolean;
-    _enabled: boolean;
+  _caption: string;
+  _separatorBefore: boolean;
+  _visible: boolean;
+  _enabled: boolean;
 
-    get caption(): string {
-      return this._caption;
-    }
-    set caption(value: string) {
-      value = axCoerceString(value);
-      this._caption = value;
-    }
-    get separatorBefore(): boolean {
-      return this._separatorBefore;
-    }
-    set separatorBefore(value: boolean) {
-      value = !!value;
-      this._separatorBefore = value;
-    }
-    get visible(): boolean {
-      return this._visible;
-    }
-    set visible(value: boolean) {
-      value = !!value;
-      this._visible = value;
-    }
+  get caption(): string {
+    return this._caption;
+  }
+  set caption(value: string) {
+    value = axCoerceString(value);
+    this._caption = value;
+  }
+  get separatorBefore(): boolean {
+    return this._separatorBefore;
+  }
+  set separatorBefore(value: boolean) {
+    value = !!value;
+    this._separatorBefore = value;
+  }
+  get visible(): boolean {
+    return this._visible;
+  }
+  set visible(value: boolean) {
+    value = !!value;
+    this._visible = value;
   }
 }

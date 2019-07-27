@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,27 +16,25 @@
  * limitations under the License.
  */
 // Class: GameInputControlType
-module Shumway.AVMX.AS.flash.ui {
-  export class GameInputControlType extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class GameInputControlType extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    static MOVEMENT: string = "movement";
-    static ROTATION: string = "rotation";
-    static DIRECTION: string = "direction";
-    static ACCELERATION: string = "acceleration";
-    static BUTTON: string = "button";
-    static TRIGGER: string = "trigger";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  static MOVEMENT: string = "movement";
+  static ROTATION: string = "rotation";
+  static DIRECTION: string = "direction";
+  static ACCELERATION: string = "acceleration";
+  static BUTTON: string = "button";
+  static TRIGGER: string = "trigger";
 }

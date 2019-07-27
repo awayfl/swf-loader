@@ -1,3 +1,6 @@
+import { ISecurityDomain } from "../../avm2/nat";
+import { axCoerceString } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,25 +17,22 @@
  * limitations under the License.
  */
 // Class: FSCommand
-module Shumway.AVMX.AS.flash.system {
-  import axCoerceString = Shumway.AVMX.axCoerceString;
 
-  export interface IFSCommandListener {
-    executeFSCommand(command: string, args: string);
+export interface IFSCommandListener {
+  executeFSCommand(command: string, args: string);
+}
+
+export function fscommand(sec: ISecurityDomain, command: string, args: string): void {
+  command = axCoerceString(command);
+  args = axCoerceString(args);
+  console.log('FSCommand: ' + command + '; ' + args);
+  command = command.toLowerCase();
+  if (command === 'debugger') {
+    /* tslint:disable */
+    debugger;
+    /* tslint:enable */
+    return;
   }
 
-  export function fscommand(sec: ISecurityDomain, command: string, args: string): void {
-    command = axCoerceString(command);
-    args = axCoerceString(args);
-    console.log('FSCommand: ' + command + '; ' + args);
-    command = command.toLowerCase();
-    if (command === 'debugger') {
-      /* tslint:disable */
-      debugger;
-      /* tslint:enable */
-      return;
-    }
-
-    sec.player.executeFSCommand(command, args);
-  }
+  sec.player.executeFSCommand(command, args);
 }

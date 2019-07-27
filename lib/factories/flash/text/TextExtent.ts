@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,25 +16,23 @@
  * limitations under the License.
  */
 // Class: TextExtent
-module Shumway.AVMX.AS.flash.text {
-  export class TextExtent extends ASObject {
+export class TextExtent extends ASObject {
 
-    constructor(width: number, height: number, textFieldWidth: number, textFieldHeight: number,
-                ascent: number, descent: number) {
-      super();
-      this.width = +width;
-      this.height = +height;
-      this.textFieldWidth = +textFieldWidth;
-      this.textFieldHeight = +textFieldHeight;
-      this.ascent = +ascent;
-      this.descent = +descent;
-    }
-
-    width: number;
-    height: number;
-    textFieldWidth: number;
-    textFieldHeight: number;
-    ascent: number;
-    descent: number;
+  constructor(width: number, height: number, textFieldWidth: number, textFieldHeight: number,
+              ascent: number, descent: number) {
+    super();
+    this.width = +width;
+    this.height = +height;
+    this.textFieldWidth = +textFieldWidth;
+    this.textFieldHeight = +textFieldHeight;
+    this.ascent = +ascent;
+    this.descent = +descent;
   }
+
+  width: number;
+  height: number;
+  textFieldWidth: number;
+  textFieldHeight: number;
+  ascent: number;
+  descent: number;
 }

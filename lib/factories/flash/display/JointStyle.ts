@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,56 +16,52 @@
  * limitations under the License.
  */
 // Class: JointStyle
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class JointStyle extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class JointStyle extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static ROUND: string = "round";
+  static BEVEL: string = "bevel";
+  static MITER: string = "miter";
+  
+  
+  // AS -> JS Bindings
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return JointStyle.ROUND;
+      case 1:
+        return JointStyle.BEVEL;
+      case 2:
+        return JointStyle.MITER;
+      default:
+        return null;
     }
-    
-    // JS -> AS Bindings
-    static ROUND: string = "round";
-    static BEVEL: string = "bevel";
-    static MITER: string = "miter";
-    
-    
-    // AS -> JS Bindings
+  }
 
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return JointStyle.ROUND;
-        case 1:
-          return JointStyle.BEVEL;
-        case 2:
-          return JointStyle.MITER;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case JointStyle.ROUND:
-          return 0;
-        case JointStyle.BEVEL:
-          return 1;
-        case JointStyle.MITER:
-          return 2;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case JointStyle.ROUND:
+        return 0;
+      case JointStyle.BEVEL:
+        return 1;
+      case JointStyle.MITER:
+        return 2;
+      default:
+        return -1;
     }
   }
 }

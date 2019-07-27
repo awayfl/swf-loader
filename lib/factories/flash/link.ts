@@ -1,3 +1,128 @@
+import { ASClass, registerNativeFunction, registerNativeClass } from "../avm2/nat";
+import { Symbol } from "./symbol";
+import { XMLDocument, XMLNode } from "../avm2/natives/xml-document";
+import { ByteArray, ObjectEncoding } from "../avm2/natives/byteArray";
+import { Timer } from "./utils/Timer";
+import { AccessibilityProperties } from "./accessibility/AccessibilityProperties";
+import { Accessibility } from "./accessibility/Accessibility";
+import { LoaderContext } from "./system/LoaderContext";
+import { JPEGLoaderContext } from "./system/JPEGLoaderContext";
+import { ApplicationDomain } from "./system/ApplicationDomain";
+import { SecurityDomain } from "./system/SecurityDomain";
+import { System } from "../avm2/natives/system";
+import { EventDispatcher } from "./events/EventDispatcher";
+import { DisplayObject } from "./display/DisplayObject";
+import { DisplayObjectContainer } from "./display/DisplayObjectContainer";
+import { InteractiveObject } from "./display/InteractiveObject";
+import { AVM1Movie } from "./display/AVM1Movie";
+import { Stage } from "./display/Stage";
+import { Loader } from "./display/Loader";
+import { LoaderInfo } from "./display/LoaderInfo";
+import { MovieClip } from "./display/MovieClip";
+import { Sprite } from "./display/Sprite";
+import { Shape } from "./display/Shape";
+import { MorphShape } from "./display/MorphShape";
+import { Graphics } from "./display/Graphics";
+import { Bitmap } from "./display/Bitmap";
+import { BitmapData } from "./display/BitmapData";
+import { SimpleButton } from "./display/SimpleButton";
+import { Scene } from "./display/Scene";
+import { NativeMenu } from "./display/NativeMenu";
+import { NativeMenuItem } from "./display/NativeMenuItem";
+import { FrameLabel } from "./display/FrameLabel";
+import { GradientType } from "./display/GradientType";
+import { SpreadMethod } from "./display/SpreadMethod";
+import { InterpolationMethod } from "./display/InterpolationMethod";
+import { LineScaleMode } from "./display/LineScaleMode";
+import { CapsStyle } from "./display/CapsStyle";
+import { JointStyle } from "./display/JointStyle";
+import { BevelFilter } from "./filters/BevelFilter";
+import { BitmapFilter } from "./filters/BitmapFilter";
+import { BlurFilter } from "./filters/BlurFilter";
+import { ColorMatrixFilter } from "./filters/ColorMatrixFilter";
+import { ConvolutionFilter } from "./filters/ConvolutionFilter";
+import { DisplacementMapFilter } from "./filters/DisplacementMapFilter";
+import { DropShadowFilter } from "./filters/DropShadowFilter";
+import { GlowFilter } from "./filters/GlowFilter";
+import { GradientBevelFilter } from "./filters/GradientBevelFilter";
+import { GradientGlowFilter } from "./filters/GradientGlowFilter";
+import { Point } from "./geom/Point";
+import { Rectangle } from "./geom/Rectangle";
+import { Matrix } from "./geom/Matrix";
+import { Matrix3D } from "./geom/Matrix3D";
+import { Vector3D } from "./geom/Vector3D";
+import { Transform } from "./geom/Transform";
+import { ColorTransform } from "./geom/ColorTransform";
+import { PerspectiveProjection } from "./geom/PerspectiveProjection";
+import { Event } from "./events/Event";
+import { ErrorEvent } from "./events/ErrorEvent";
+import { IOErrorEvent } from "./events/IOErrorEvent";
+import { KeyboardEvent } from "./events/KeyboardEvent";
+import { MouseEvent } from "./events/MouseEvent";
+import { TextEvent } from "./events/TextEvent";
+import { TimerEvent } from "./events/TimerEvent";
+import { ProgressEvent } from "./events/ProgressEvent";
+import { HTTPStatusEvent } from "./events/HTTPStatusEvent";
+import { UncaughtErrorEvents } from "./events/UncaughtErrorEvents";
+import { ExternalInterface } from "./external/ExternalInterface";
+import { ContextMenu } from "./ui/ContextMenu";
+import { ContextMenuItem } from "./ui/ContextMenuItem";
+import { ContextMenuBuiltInItems } from "./ui/ContextMenuBuiltInItems";
+import { ContextMenuClipboardItems } from "./ui/ContextMenuClipboardItems";
+import { Keyboard } from "./ui/Keyboard";
+import { Mouse } from "./ui/Mouse";
+import { MouseCursorData } from "./ui/MouseCursorData";
+import { GameInput } from "./ui/GameInput";
+import { GameInputControl } from "./ui/GameInputControl";
+import { GameInputControlType } from "./ui/GameInputControlType";
+import { GameInputDevice } from "./ui/GameInputDevice";
+import { GameInputFinger } from "./ui/GameInputFinger";
+import { GameInputHand } from "./ui/GameInputHand";
+import { Font } from "./text/Font";
+import { TextField } from "./text/TextField";
+import { StaticText } from "./text/StaticText";
+import { StyleSheet } from "./text/StyleSheet";
+import { TextFormat } from "./text/TextFormat";
+import { TextRun } from "./text/TextRun";
+import { TextSnapshot } from "./text/TextSnapshot";
+import { TextLineMetrics } from "./text/TextLineMetrics";
+import { Sound } from "./media/Sound";
+import { SoundChannel } from "./media/SoundChannel";
+import { SoundMixer } from "./media/SoundMixer";
+import { SoundTransform } from "./media/SoundTransform";
+import { StageVideo } from "./media/StageVideo";
+import { Video } from "./media/Video";
+import { TouchEvent } from "./events/TouchEvent";
+import { MultitouchInputMode } from "./ui/MultitouchInputMode";
+import { Multitouch } from "./ui/Multitouch";
+import { GameInputEvent } from "./events/GameInputEvent";
+import { AsyncErrorEvent } from "./events/AsyncErrorEvent";
+import { NetStatusEvent } from "./events/NetStatusEvent";
+import { StatusEvent } from "./events/StatusEvent";
+import { GestureEvent } from "./events/GestureEvent";
+import { ID3Info } from "./media/ID3Info";
+import { Microphone } from "./media/Microphone";
+import { Camera } from "./media/Camera";
+import { FileFilter } from "./net/FileFilter";
+import { FileReference } from "./net/FileReference";
+import { NetConnection } from "./net/NetConnection";
+import { NetStream } from "./net/NetStream";
+import { NetStreamInfo } from "./net/NetStreamInfo";
+import { Responder } from "./net/Responder";
+import { URLRequest } from "./net/URLRequest";
+import { URLRequestHeader } from "./net/URLRequestHeader";
+import { URLStream } from "./net/URLStream";
+import { FileReferenceList } from "./net/FileReferenceList";
+import { URLLoader } from "./net/URLLoader";
+import { SharedObject } from "./net/SharedObject";
+import { LocalConnection } from "./net/LocalConnection";
+import { URLVariables } from "./net/URLVariables";
+import { Socket } from "./net/Socket";
+import { Capabilities } from "./system/Capabilities";
+import { Security } from "./system/Security";
+import { fscommand } from "./system/FSCommand";
+import { release, assert } from "../base/utilities/Debug";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,265 +139,155 @@
  * limitations under the License.
  */
 
-import flashPackage = Shumway.AVMX.AS.flash;
-interface ISecurityDomain {
-  player: Shumway.Player.SWFPlayer;
-  flash?: {
-    display: {
-      EventDispatcher: typeof flashPackage.events.EventDispatcher;
-      DisplayObject: typeof flashPackage.display.DisplayObject;
-      DisplayObjectContainer: typeof flashPackage.display.DisplayObjectContainer;
-      InteractiveObject: typeof flashPackage.display.InteractiveObject;
-      AVM1Movie: typeof flashPackage.display.AVM1Movie;
-      Stage: typeof flashPackage.display.Stage;
-      Loader: typeof flashPackage.display.Loader;
-      LoaderInfo: typeof flashPackage.display.LoaderInfo;
-      MovieClip: typeof flashPackage.display.MovieClip;
-      Sprite: typeof flashPackage.display.Sprite;
-      Shape: typeof flashPackage.display.Shape;
-      MorphShape: typeof flashPackage.display.MorphShape;
-      Graphics: typeof flashPackage.display.Graphics;
-      Bitmap: typeof flashPackage.display.Bitmap;
-      BitmapData: typeof flashPackage.display.BitmapData;
-      SimpleButton: typeof flashPackage.display.SimpleButton;
-      Scene: typeof flashPackage.display.Scene;
-      FrameLabel: typeof flashPackage.display.FrameLabel;
-    };
-    events: {
-      EventDispatcher: typeof flashPackage.events.EventDispatcher;
-      Event: typeof flashPackage.events.Event;
-      KeyboardEvent: typeof flashPackage.events.KeyboardEvent;
-      MouseEvent: typeof flashPackage.events.MouseEvent;
-      ProgressEvent: typeof flashPackage.events.ProgressEvent;
-      ErrorEvent: typeof flashPackage.events.ErrorEvent;
-      GestureEvent: typeof flashPackage.events.GestureEvent;
-      StatusEvent: typeof flashPackage.events.StatusEvent;
-      HTTPStatusEvent: typeof flashPackage.events.HTTPStatusEvent;
-      IOErrorEvent: typeof flashPackage.events.IOErrorEvent;
-      NetStatusEvent: typeof flashPackage.events.NetStatusEvent;
-      TextEvent: typeof flashPackage.events.TextEvent;
-      TimerEvent: typeof flashPackage.events.TimerEvent;
-      TouchEvent: typeof flashPackage.events.TouchEvent;
-      UncaughtErrorEvents: typeof flashPackage.events.UncaughtErrorEvents;
-      AsyncErrorEvent: typeof flashPackage.events.AsyncErrorEvent;
-    };
-    filters: {
-      BitmapFilter: typeof flashPackage.filters.BitmapFilter;
-      BlurFilter: typeof flashPackage.filters.BlurFilter;
-      DropShadowFilter: typeof flashPackage.filters.DropShadowFilter;
-      GlowFilter: typeof flashPackage.filters.GlowFilter;
-      BevelFilter: typeof flashPackage.filters.BevelFilter;
-      ColorMatrixFilter: typeof flashPackage.filters.ColorMatrixFilter;
-      ConvolutionFilter: typeof flashPackage.filters.ConvolutionFilter;
-      DisplacementMapFilter: typeof flashPackage.filters.DisplacementMapFilter;
-      GradientBevelFilter: typeof flashPackage.filters.GradientBevelFilter;
-      GradientGlowFilter: typeof flashPackage.filters.GradientGlowFilter;
-    };
-    text: {
-      StaticText: typeof flashPackage.text.StaticText;
-      TextField: typeof flashPackage.text.TextField;
-      TextFormat: typeof flashPackage.text.TextFormat;
-      TextRun: typeof flashPackage.text.TextRun;
-      TextLineMetrics: typeof flashPackage.text.TextLineMetrics;
-      Font: typeof flashPackage.text.Font;
-    };
-    ui: {
-      Mouse: typeof flashPackage.ui.Mouse;
-      ContextMenu: typeof flashPackage.ui.ContextMenu;
-      ContextMenuBuiltInItems: typeof flashPackage.ui.ContextMenuBuiltInItems;
-      ContextMenuClipboardItems: typeof flashPackage.ui.ContextMenuClipboardItems;
-    }
-    geom: {
-      Point: typeof flashPackage.geom.Point;
-      Rectangle: typeof flashPackage.geom.Rectangle;
-      Matrix: typeof flashPackage.geom.Matrix;
-      Matrix3D: typeof flashPackage.geom.Matrix3D;
-      Vector3D: typeof flashPackage.geom.Vector3D;
-      ColorTransform: typeof flashPackage.geom.ColorTransform;
-      Transform: typeof flashPackage.geom.Transform;
-      PerspectiveProjection: typeof flashPackage.geom.PerspectiveProjection;
-    }
-    net: {
-      URLRequest: typeof flashPackage.net.URLRequest;
-      URLRequestHeader: typeof flashPackage.net.URLRequestHeader;
-      URLStream: typeof flashPackage.net.URLStream;
-      NetStreamInfo: typeof flashPackage.net.NetStreamInfo;
-      URLVariables: typeof flashPackage.net.URLVariables;
-      URLLoader: typeof flashPackage.net.URLLoader;
-      SharedObject: typeof flashPackage.net.SharedObject;
-    }
-    utils: {
-      ByteArray: typeof flashPackage.utils.ByteArray;
-    }
-    media: {
-      Sound: typeof flashPackage.media.Sound;
-      SoundChannel: typeof flashPackage.media.SoundChannel;
-      SoundTransform: typeof flashPackage.media.SoundTransform;
-      Video: typeof flashPackage.media.Video;
-      ID3Info: typeof flashPackage.media.ID3Info;
-    }
-    system: {
-      LoaderContext: typeof flashPackage.system.LoaderContext;
-      JPEGLoaderContext: typeof flashPackage.system.JPEGLoaderContext;
-      ApplicationDomain: typeof flashPackage.system.ApplicationDomain;
-      SecurityDomain: typeof flashPackage.system.SecurityDomain;
-      fscommand: typeof flashPackage.system.fscommand;
-    }
-  }
+function M(name: string, asClass: ASClass) {
+  registerNativeClass(name, asClass);
 }
+M("flash.display.DisplayObject", DisplayObject);
+M("flash.display.InteractiveObject", InteractiveObject);
+M("flash.display.DisplayObjectContainer", DisplayObjectContainer);
+M("flash.display.Sprite", Sprite);
+M("flash.display.MovieClip", MovieClip);
+M("flash.display.Shape", Shape);
+M("flash.display.Bitmap", Bitmap);
+M("flash.display.BitmapData", BitmapData);
+M("flash.display.Stage", Stage);
+M("flash.display.Loader", Loader);
+M("flash.display.LoaderInfo", LoaderInfo);
+M("flash.display.Graphics", Graphics);
+M("flash.display.SimpleButton", SimpleButton);
+M("flash.display.MorphShape", MorphShape);
+M("flash.display.NativeMenu", NativeMenu);
+M("flash.display.NativeMenuItem", NativeMenuItem);
+M("flash.display.FrameLabel", FrameLabel);
+M("flash.display.Scene", Scene);
+M("flash.display.AVM1Movie", AVM1Movie);
 
-///<reference path='references.ts' />
-module Shumway.AVMX.AS {
-  function M(name: string, asClass: ASClass) {
-    registerNativeClass(name, asClass);
+M("flash.display.GradientType", GradientType);
+M("flash.display.SpreadMethod", SpreadMethod);
+M("flash.display.InterpolationMethod", InterpolationMethod);
+M("flash.display.LineScaleMode", LineScaleMode);
+M("flash.display.CapsStyle", CapsStyle);
+M("flash.display.JointStyle", JointStyle);
+
+M("flash.filters.BevelFilter", BevelFilter);
+M("flash.filters.BitmapFilter", BitmapFilter);
+M("flash.filters.BlurFilter", BlurFilter);
+M("flash.filters.ColorMatrixFilter", ColorMatrixFilter);
+M("flash.filters.ConvolutionFilter", ConvolutionFilter);
+M("flash.filters.DisplacementMapFilter", DisplacementMapFilter);
+M("flash.filters.DropShadowFilter", DropShadowFilter);
+M("flash.filters.GlowFilter", GlowFilter);
+M("flash.filters.GradientBevelFilter", GradientBevelFilter);
+M("flash.filters.GradientGlowFilter", GradientGlowFilter);
+
+M("flash.geom.Point", Point);
+M("flash.geom.Rectangle", Rectangle);
+M("flash.geom.Matrix", Matrix);
+M("flash.geom.Matrix3D", Matrix3D);
+M("flash.geom.Vector3D", Vector3D);
+M("flash.geom.Transform", Transform);
+M("flash.geom.ColorTransform", ColorTransform);
+M("flash.geom.PerspectiveProjection", PerspectiveProjection);
+
+M("flash.events.EventDispatcher", EventDispatcher);
+M("flash.events.Event", Event);
+M("flash.events.ErrorEvent", ErrorEvent);
+M("flash.events.IOErrorEvent", IOErrorEvent);
+M("flash.events.KeyboardEvent", KeyboardEvent);
+M("flash.events.MouseEvent", MouseEvent);
+M("flash.events.GestureEvent", GestureEvent);
+M("flash.events.TextEvent", TextEvent);
+M("flash.events.TimerEvent", TimerEvent);
+M("flash.events.ProgressEvent", ProgressEvent);
+M("flash.events.StatusEvent", StatusEvent);
+M("flash.events.NetStatusEvent", NetStatusEvent);
+M("flash.events.HTTPStatusEvent", HTTPStatusEvent);
+M("flash.events.AsyncErrorEvent", AsyncErrorEvent);
+M("flash.events.UncaughtErrorEvents", UncaughtErrorEvents);
+
+M("flash.external.ExternalInterface", ExternalInterface);
+
+M("flash.ui.ContextMenu", ContextMenu);
+M("flash.ui.ContextMenuItem", ContextMenuItem);
+M("flash.ui.ContextMenuBuiltInItems", ContextMenuBuiltInItems);
+M("flash.ui.ContextMenuClipboardItems", ContextMenuClipboardItems);
+M("flash.ui.Keyboard", Keyboard);
+M("flash.ui.Mouse", Mouse);
+M("flash.ui.MouseCursorData", MouseCursorData);
+
+M("flash.ui.GameInput", GameInput);
+M("flash.events.GameInputEvent", GameInputEvent);
+M("flash.ui.GameInputControl", GameInputControl);
+M("flash.ui.GameInputControlType", GameInputControlType);
+M("flash.ui.GameInputDevice", GameInputDevice);
+M("flash.ui.GameInputFinger", GameInputFinger);
+M("flash.ui.GameInputHand", GameInputHand);
+M("flash.ui.Multitouch", Multitouch);
+M("flash.ui.MultitouchInputMode", MultitouchInputMode);
+M("flash.events.TouchEvent", TouchEvent);
+
+M("flash.text.Font", Font);
+M("flash.text.TextField", TextField);
+M("flash.text.StaticText", StaticText);
+M("flash.text.StyleSheet", StyleSheet);
+M("flash.text.TextFormat", TextFormat);
+M("flash.text.TextRun", TextRun);
+M("flash.text.TextSnapshot", TextSnapshot);
+M("flash.text.TextLineMetrics", TextLineMetrics);
+
+M("flash.media.Sound", Sound);
+M("flash.media.SoundChannel", SoundChannel);
+M("flash.media.SoundMixer", SoundMixer);
+M("flash.media.SoundTransform", SoundTransform);
+M("flash.media.Video", Video);
+M("flash.media.StageVideo", StageVideo);
+M("flash.media.ID3Info", ID3Info);
+M("flash.media.Microphone", Microphone);
+M("flash.media.Camera", Camera);
+
+M("flash.net.FileFilter", FileFilter);
+M("flash.net.FileReference", FileReference);
+M("flash.net.FileReferenceList", FileReferenceList);
+M("flash.net.NetConnection", NetConnection);
+M("flash.net.NetStream", NetStream);
+M("flash.net.NetStreamInfo", NetStreamInfo);
+M("flash.net.Responder", Responder);
+M("flash.net.URLRequest", URLRequest);
+M("flash.net.URLRequestHeader", URLRequestHeader);
+M("flash.net.URLStream", URLStream);
+M("flash.net.URLLoader", URLLoader);
+M("flash.net.SharedObject", SharedObject);
+M("flash.net.ObjectEncoding", ObjectEncoding);
+M("flash.net.LocalConnection", LocalConnection);
+M("flash.net.Socket", Socket);
+M("flash.net.URLVariables", URLVariables);
+
+M("flash.system.Capabilities", Capabilities);
+M("flash.system.Security", Security);
+M("flash.system.System", System);
+M("flash.system.SecurityDomain", SecurityDomain);
+M("flash.system.ApplicationDomain", ApplicationDomain);
+M("flash.system.JPEGLoaderContext", JPEGLoaderContext);
+M("flash.system.LoaderContext", LoaderContext);
+
+M("flash.accessibility.Accessibility", Accessibility);
+M("flash.accessibility.AccessibilityProperties", AccessibilityProperties);
+
+M("flash.utils.Timer", Timer);
+M("flash.utils.ByteArray", ByteArray);
+
+M("flash.xml.XMLNode", XMLNode);
+M("flash.xml.XMLDocument", XMLDocument);
+
+registerNativeFunction('flash.system.fscommand', fscommand);
+
+export function constructClassFromSymbol(symbol: Symbol, axClass: ASClass) {
+  var instance = Object.create(axClass.tPrototype);
+  if (instance._symbol) {
+    release || assert(instance._symbol === symbol);
+  } else {
+    instance._symbol = symbol;
   }
-  M("flash.display.DisplayObject", flash.display.DisplayObject);
-  M("flash.display.InteractiveObject", flash.display.InteractiveObject);
-  M("flash.display.DisplayObjectContainer", flash.display.DisplayObjectContainer);
-  M("flash.display.Sprite", flash.display.Sprite);
-  M("flash.display.MovieClip", flash.display.MovieClip);
-  M("flash.display.Shape", flash.display.Shape);
-  M("flash.display.Bitmap", flash.display.Bitmap);
-  M("flash.display.BitmapData", flash.display.BitmapData);
-  M("flash.display.Stage", flash.display.Stage);
-  M("flash.display.Loader", flash.display.Loader);
-  M("flash.display.LoaderInfo", flash.display.LoaderInfo);
-  M("flash.display.Graphics", flash.display.Graphics);
-  M("flash.display.SimpleButton", flash.display.SimpleButton);
-  M("flash.display.MorphShape", flash.display.MorphShape);
-  M("flash.display.NativeMenu", flash.display.NativeMenu);
-  M("flash.display.NativeMenuItem", flash.display.NativeMenuItem);
-  M("flash.display.FrameLabel", flash.display.FrameLabel);
-  M("flash.display.Scene", flash.display.Scene);
-  M("flash.display.AVM1Movie", flash.display.AVM1Movie);
-
-  M("flash.display.GradientType", flash.display.GradientType);
-  M("flash.display.SpreadMethod", flash.display.SpreadMethod);
-  M("flash.display.InterpolationMethod", flash.display.InterpolationMethod);
-  M("flash.display.LineScaleMode", flash.display.LineScaleMode);
-  M("flash.display.CapsStyle", flash.display.CapsStyle);
-  M("flash.display.JointStyle", flash.display.JointStyle);
-
-  M("flash.filters.BevelFilter", flash.filters.BevelFilter);
-  M("flash.filters.BitmapFilter", flash.filters.BitmapFilter);
-  M("flash.filters.BlurFilter", flash.filters.BlurFilter);
-  M("flash.filters.ColorMatrixFilter", flash.filters.ColorMatrixFilter);
-  M("flash.filters.ConvolutionFilter", flash.filters.ConvolutionFilter);
-  M("flash.filters.DisplacementMapFilter", flash.filters.DisplacementMapFilter);
-  M("flash.filters.DropShadowFilter", flash.filters.DropShadowFilter);
-  M("flash.filters.GlowFilter", flash.filters.GlowFilter);
-  M("flash.filters.GradientBevelFilter", flash.filters.GradientBevelFilter);
-  M("flash.filters.GradientGlowFilter", flash.filters.GradientGlowFilter);
-
-  M("flash.geom.Point", flash.geom.Point);
-  M("flash.geom.Rectangle", flash.geom.Rectangle);
-  M("flash.geom.Matrix", flash.geom.Matrix);
-  M("flash.geom.Matrix3D", flash.geom.Matrix3D);
-  M("flash.geom.Vector3D", flash.geom.Vector3D);
-  M("flash.geom.Transform", flash.geom.Transform);
-  M("flash.geom.ColorTransform", flash.geom.ColorTransform);
-  M("flash.geom.PerspectiveProjection", flash.geom.PerspectiveProjection);
-
-  M("flash.events.EventDispatcher", flash.events.EventDispatcher);
-  M("flash.events.Event", flash.events.Event);
-  M("flash.events.ErrorEvent", flash.events.ErrorEvent);
-  M("flash.events.IOErrorEvent", flash.events.IOErrorEvent);
-  M("flash.events.KeyboardEvent", flash.events.KeyboardEvent);
-  M("flash.events.MouseEvent", flash.events.MouseEvent);
-  M("flash.events.GestureEvent", flash.events.GestureEvent);
-  M("flash.events.TextEvent", flash.events.TextEvent);
-  M("flash.events.TimerEvent", flash.events.TimerEvent);
-  M("flash.events.ProgressEvent", flash.events.ProgressEvent);
-  M("flash.events.StatusEvent", flash.events.StatusEvent);
-  M("flash.events.NetStatusEvent", flash.events.NetStatusEvent);
-  M("flash.events.HTTPStatusEvent", flash.events.HTTPStatusEvent);
-  M("flash.events.AsyncErrorEvent", flash.events.AsyncErrorEvent);
-  M("flash.events.UncaughtErrorEvents", flash.events.UncaughtErrorEvents);
-
-  M("flash.external.ExternalInterface", flash.external.ExternalInterface);
-
-  M("flash.ui.ContextMenu", flash.ui.ContextMenu);
-  M("flash.ui.ContextMenuItem", flash.ui.ContextMenuItem);
-  M("flash.ui.ContextMenuBuiltInItems", flash.ui.ContextMenuBuiltInItems);
-  M("flash.ui.ContextMenuClipboardItems", flash.ui.ContextMenuClipboardItems);
-  M("flash.ui.Keyboard", flash.ui.Keyboard);
-  M("flash.ui.Mouse", flash.ui.Mouse);
-  M("flash.ui.MouseCursorData", flash.ui.MouseCursorData);
-
-  M("flash.ui.GameInput", flash.ui.GameInput);
-  M("flash.events.GameInputEvent", flash.events.GameInputEvent);
-  M("flash.ui.GameInputControl", flash.ui.GameInputControl);
-  M("flash.ui.GameInputControlType", flash.ui.GameInputControlType);
-  M("flash.ui.GameInputDevice", flash.ui.GameInputDevice);
-  M("flash.ui.GameInputFinger", flash.ui.GameInputFinger);
-  M("flash.ui.GameInputHand", flash.ui.GameInputHand);
-  M("flash.ui.Multitouch", flash.ui.Multitouch);
-  M("flash.ui.MultitouchInputMode", flash.ui.MultitouchInputMode);
-  M("flash.events.TouchEvent", flash.events.TouchEvent);
-
-  M("flash.text.Font", flash.text.Font);
-  M("flash.text.TextField", flash.text.TextField);
-  M("flash.text.StaticText", flash.text.StaticText);
-  M("flash.text.StyleSheet", flash.text.StyleSheet);
-  M("flash.text.TextFormat", flash.text.TextFormat);
-  M("flash.text.TextRun", flash.text.TextRun);
-  M("flash.text.TextSnapshot", flash.text.TextSnapshot);
-  M("flash.text.TextLineMetrics", flash.text.TextLineMetrics);
-
-  M("flash.media.Sound", flash.media.Sound);
-  M("flash.media.SoundChannel", flash.media.SoundChannel);
-  M("flash.media.SoundMixer", flash.media.SoundMixer);
-  M("flash.media.SoundTransform", flash.media.SoundTransform);
-  M("flash.media.Video", flash.media.Video);
-  M("flash.media.StageVideo", flash.media.StageVideo);
-  M("flash.media.ID3Info", flash.media.ID3Info);
-  M("flash.media.Microphone", flash.media.Microphone);
-  M("flash.media.Camera", flash.media.Camera);
-
-  M("flash.net.FileFilter", flash.net.FileFilter);
-  M("flash.net.FileReference", flash.net.FileReference);
-  M("flash.net.FileReferenceList", flash.net.FileReferenceList);
-  M("flash.net.NetConnection", flash.net.NetConnection);
-  M("flash.net.NetStream", flash.net.NetStream);
-  M("flash.net.NetStreamInfo", flash.net.NetStreamInfo);
-  M("flash.net.Responder", flash.net.Responder);
-  M("flash.net.URLRequest", flash.net.URLRequest);
-  M("flash.net.URLRequestHeader", flash.net.URLRequestHeader);
-  M("flash.net.URLStream", flash.net.URLStream);
-  M("flash.net.URLLoader", flash.net.URLLoader);
-  M("flash.net.SharedObject", flash.net.SharedObject);
-  M("flash.net.ObjectEncoding", flash.net.ObjectEncoding);
-  M("flash.net.LocalConnection", flash.net.LocalConnection);
-  M("flash.net.Socket", flash.net.Socket);
-  M("flash.net.URLVariables", flash.net.URLVariables);
-
-  M("flash.system.Capabilities", flash.system.Capabilities);
-  M("flash.system.Security", flash.system.Security);
-  M("flash.system.System", flash.system.System);
-  M("flash.system.SecurityDomain", flash.system.SecurityDomain);
-  M("flash.system.ApplicationDomain", flash.system.ApplicationDomain);
-  M("flash.system.JPEGLoaderContext", flash.system.JPEGLoaderContext);
-  M("flash.system.LoaderContext", flash.system.LoaderContext);
-
-  M("flash.accessibility.Accessibility", flash.accessibility.Accessibility);
-  M("flash.accessibility.AccessibilityProperties", flash.accessibility.AccessibilityProperties);
-
-  M("flash.utils.Timer", flash.utils.Timer);
-  M("flash.utils.ByteArray", flash.utils.ByteArray);
-
-  M("flash.xml.XMLNode", flash.xml.XMLNode);
-  M("flash.xml.XMLDocument", flash.xml.XMLDocument);
-
-  registerNativeFunction('flash.system.fscommand', flash.system.fscommand);
-
-  export function constructClassFromSymbol(symbol: Timeline.Symbol, axClass: ASClass) {
-    var instance = Object.create(axClass.tPrototype);
-    if (instance._symbol) {
-      release || Debug.assert(instance._symbol === symbol);
-    } else {
-      instance._symbol = symbol;
-    }
-    instance.applySymbol();
-    return instance;
-  }
+  instance.applySymbol();
+  return instance;
 }

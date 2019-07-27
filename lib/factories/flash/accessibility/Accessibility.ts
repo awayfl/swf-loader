@@ -14,42 +14,39 @@
  * limitations under the License.
  */
 // Class: Accessibility
-module Shumway.AVMX.AS.flash.accessibility {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  import somewhatImplemented = Shumway.Debug.somewhatImplemented;
+import { release, somewhatImplemented, notImplemented } from "../../base/utilities/Debug";
+import { ASObject } from "../../avm2/nat";
 
-  export class Accessibility extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class Accessibility extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    
-    // AS -> JS Bindings
-    private static _active: boolean = false;
-    static get active(): boolean {
-      release || somewhatImplemented("public flash.accessibility.Accessibility::get active");
-      return Accessibility._active;
-    }
-    static sendEvent(source: flash.display.DisplayObject, childID: number /*uint*/, eventType: number /*uint*/, nonHTML: boolean = false): void {
-      source = source; childID = childID >>> 0; eventType = eventType >>> 0; nonHTML = !!nonHTML;
-      release || release || notImplemented("public flash.accessibility.Accessibility::static sendEvent"); return;
-    }
-    static updateProperties(): void {
-      release || release || notImplemented("public flash.accessibility.Accessibility::static updateProperties"); return;
-    }
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  
+  
+  // AS -> JS Bindings
+  private static _active: boolean = false;
+  static get active(): boolean {
+    release || somewhatImplemented("public flash.accessibility.Accessibility::get active");
+    return Accessibility._active;
+  }
+  static sendEvent(source: DisplayObject, childID: number /*uint*/, eventType: number /*uint*/, nonHTML: boolean = false): void {
+    source = source; childID = childID >>> 0; eventType = eventType >>> 0; nonHTML = !!nonHTML;
+    release || release || notImplemented("public flash.accessibility.Accessibility::static sendEvent"); return;
+  }
+  static updateProperties(): void {
+    release || release || notImplemented("public flash.accessibility.Accessibility::static updateProperties"); return;
+  }
+  
 }

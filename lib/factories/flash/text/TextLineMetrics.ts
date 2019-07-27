@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,30 +16,28 @@
  * limitations under the License.
  */
 // Class: TextLineMetrics
-module Shumway.AVMX.AS.flash.text {
-  export class TextLineMetrics extends ASObject {
+export class TextLineMetrics extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null; // ["x", "width", "height", "ascent", "descent", "leading"];
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null; // ["x", "width", "height", "ascent", "descent", "leading"];
 
-    constructor(x: number, width: number, height: number, ascent: number, descent: number,
-                leading: number) {
-      super();
-      this.x = +x;
-      this.width = +width;
-      this.height = +height;
-      this.ascent = +ascent;
-      this.descent = +descent;
-      this.leading = +leading;
-    }
-
-    // JS -> AS Bindings
-    x: number;
-    width: number;
-    height: number;
-    ascent: number;
-    descent: number;
-    leading: number;
+  constructor(x: number, width: number, height: number, ascent: number, descent: number,
+              leading: number) {
+    super();
+    this.x = +x;
+    this.width = +width;
+    this.height = +height;
+    this.ascent = +ascent;
+    this.descent = +descent;
+    this.leading = +leading;
   }
+
+  // JS -> AS Bindings
+  x: number;
+  width: number;
+  height: number;
+  ascent: number;
+  descent: number;
+  leading: number;
 }

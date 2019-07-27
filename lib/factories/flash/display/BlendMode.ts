@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,115 +16,111 @@
  * limitations under the License.
  */
 // Class: BlendMode
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class BlendMode extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class BlendMode extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static NORMAL: string = "normal";
+  static LAYER: string = "layer";
+  static MULTIPLY: string = "multiply";
+  static SCREEN: string = "screen";
+  static LIGHTEN: string = "lighten";
+  static DARKEN: string = "darken";
+  static ADD: string = "add";
+  static SUBTRACT: string = "subtract";
+  static DIFFERENCE: string = "difference";
+  static INVERT: string = "invert";
+  static OVERLAY: string = "overlay";
+  static HARDLIGHT: string = "hardlight";
+  static ALPHA: string = "alpha";
+  static ERASE: string = "erase";
+  static SHADER: string = "shader";
+
+
+  /**
+   * Returns the blend mode string from the numeric value that appears in the
+   * swf file.
+   */
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+      case 1:
+        return BlendMode.NORMAL;
+      case 2:
+        return BlendMode.LAYER;
+      case 3:
+        return BlendMode.MULTIPLY;
+      case 4:
+        return BlendMode.SCREEN;
+      case 5:
+        return BlendMode.LIGHTEN;
+      case 6:
+        return BlendMode.DARKEN;
+      case 7:
+        return BlendMode.DIFFERENCE;
+      case 8:
+        return BlendMode.ADD;
+      case 9:
+        return BlendMode.SUBTRACT;
+      case 10:
+        return BlendMode.INVERT;
+      case 11:
+        return BlendMode.ALPHA;
+      case 12:
+        return BlendMode.ERASE;
+      case 13:
+        return BlendMode.OVERLAY;
+      case 14:
+        return BlendMode.HARDLIGHT;
+      default:
+        return null;
     }
-    
-    // JS -> AS Bindings
-    static NORMAL: string = "normal";
-    static LAYER: string = "layer";
-    static MULTIPLY: string = "multiply";
-    static SCREEN: string = "screen";
-    static LIGHTEN: string = "lighten";
-    static DARKEN: string = "darken";
-    static ADD: string = "add";
-    static SUBTRACT: string = "subtract";
-    static DIFFERENCE: string = "difference";
-    static INVERT: string = "invert";
-    static OVERLAY: string = "overlay";
-    static HARDLIGHT: string = "hardlight";
-    static ALPHA: string = "alpha";
-    static ERASE: string = "erase";
-    static SHADER: string = "shader";
+  }
 
-
-    /**
-     * Returns the blend mode string from the numeric value that appears in the
-     * swf file.
-     */
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-        case 1:
-          return BlendMode.NORMAL;
-        case 2:
-          return BlendMode.LAYER;
-        case 3:
-          return BlendMode.MULTIPLY;
-        case 4:
-          return BlendMode.SCREEN;
-        case 5:
-          return BlendMode.LIGHTEN;
-        case 6:
-          return BlendMode.DARKEN;
-        case 7:
-          return BlendMode.DIFFERENCE;
-        case 8:
-          return BlendMode.ADD;
-        case 9:
-          return BlendMode.SUBTRACT;
-        case 10:
-          return BlendMode.INVERT;
-        case 11:
-          return BlendMode.ALPHA;
-        case 12:
-          return BlendMode.ERASE;
-        case 13:
-          return BlendMode.OVERLAY;
-        case 14:
-          return BlendMode.HARDLIGHT;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case BlendMode.NORMAL:
-          return 1;
-        case BlendMode.LAYER:
-          return 2;
-        case BlendMode.MULTIPLY:
-          return 3;
-        case BlendMode.SCREEN:
-          return 4;
-        case BlendMode.LIGHTEN:
-          return 5;
-        case BlendMode.DARKEN:
-          return 6;
-        case BlendMode.DIFFERENCE:
-          return 7;
-        case BlendMode.ADD:
-          return 8;
-        case BlendMode.SUBTRACT:
-          return 9;
-        case BlendMode.INVERT:
-          return 10;
-        case BlendMode.ALPHA:
-          return 11;
-        case BlendMode.ERASE:
-          return 12;
-        case BlendMode.OVERLAY:
-          return 13;
-        case BlendMode.HARDLIGHT:
-          return 14;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case BlendMode.NORMAL:
+        return 1;
+      case BlendMode.LAYER:
+        return 2;
+      case BlendMode.MULTIPLY:
+        return 3;
+      case BlendMode.SCREEN:
+        return 4;
+      case BlendMode.LIGHTEN:
+        return 5;
+      case BlendMode.DARKEN:
+        return 6;
+      case BlendMode.DIFFERENCE:
+        return 7;
+      case BlendMode.ADD:
+        return 8;
+      case BlendMode.SUBTRACT:
+        return 9;
+      case BlendMode.INVERT:
+        return 10;
+      case BlendMode.ALPHA:
+        return 11;
+      case BlendMode.ERASE:
+        return 12;
+      case BlendMode.OVERLAY:
+        return 13;
+      case BlendMode.HARDLIGHT:
+        return 14;
+      default:
+        return -1;
     }
   }
 }

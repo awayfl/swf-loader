@@ -1,3 +1,7 @@
+import { ASObject } from "../../avm2/nat";
+import { Errors } from "../../avm2/errors";
+import { getCurrentABC } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -13,21 +17,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module Shumway.AVMX.AS.flash.system {
-  export class SecurityDomain extends ASObject {
-    
-    static classInitializer: any = null;
+export class SecurityDomain extends ASObject {
+  
+  static classInitializer: any = null;
 
-    constructor () {
-      super();
-      this.sec.throwError('ArgumentError', Errors.CantInstantiateError, 'SecurityDomain');
-    }
+  constructor () {
+    super();
+    this.sec.throwError('ArgumentError', Errors.CantInstantiateError, 'SecurityDomain');
+  }
 
-    static get currentDomain(): flash.system.SecurityDomain {
-      var currentABC = getCurrentABC();
-      var sec = currentABC ? currentABC.env.app.sec : this.sec;
-      // TODO: memoize the flash.system.SecurityDomain instance
-      return Object.create(sec.flash.system.SecurityDomain.axClass.tPrototype);
-    }
+  static get currentDomain(): SecurityDomain {
+    var currentABC = getCurrentABC();
+    var sec = currentABC ? currentABC.env.app.sec : this.sec;
+    // TODO: memoize the flash.system.SecurityDomain instance
+    return Object.create(SecurityDomain.axClass.tPrototype);
   }
 }

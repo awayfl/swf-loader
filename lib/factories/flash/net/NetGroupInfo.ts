@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,42 +16,40 @@
  * limitations under the License.
  */
 // Class: NetGroupInfo
-module Shumway.AVMX.AS.flash.net {
-  export class NetGroupInfo extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class NetGroupInfo extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null;
-    
-    constructor(postingSendDataBytesPerSecond: number, postingSendControlBytesPerSecond: number,
-                postingReceiveDataBytesPerSecond: number,
-                postingReceiveControlBytesPerSecond: number, routingSendBytesPerSecond: number,
-                routingReceiveBytesPerSecond: number, objectReplicationSendBytesPerSecond: number,
-                objectReplicationReceiveBytesPerSecond: number)
-    {
-      super();
-      this.postingSendDataBytesPerSecond = +postingSendDataBytesPerSecond;
-      this.postingSendControlBytesPerSecond = +postingSendControlBytesPerSecond;
-      this.postingReceiveDataBytesPerSecond = +postingReceiveDataBytesPerSecond;
-      this.postingReceiveControlBytesPerSecond = +postingReceiveControlBytesPerSecond;
-      this.routingSendBytesPerSecond = +routingSendBytesPerSecond;
-      this.routingReceiveBytesPerSecond = +routingReceiveBytesPerSecond;
-      this.objectReplicationSendBytesPerSecond = +objectReplicationSendBytesPerSecond;
-      this.objectReplicationReceiveBytesPerSecond = +objectReplicationReceiveBytesPerSecond;
-    }
-    
-    postingSendDataBytesPerSecond: number;
-    postingSendControlBytesPerSecond: number;
-    postingReceiveDataBytesPerSecond: number;
-    postingReceiveControlBytesPerSecond: number;
-    routingSendBytesPerSecond: number;
-    routingReceiveBytesPerSecond: number;
-    objectReplicationSendBytesPerSecond: number;
-    objectReplicationReceiveBytesPerSecond: number;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null;
+  
+  constructor(postingSendDataBytesPerSecond: number, postingSendControlBytesPerSecond: number,
+              postingReceiveDataBytesPerSecond: number,
+              postingReceiveControlBytesPerSecond: number, routingSendBytesPerSecond: number,
+              routingReceiveBytesPerSecond: number, objectReplicationSendBytesPerSecond: number,
+              objectReplicationReceiveBytesPerSecond: number)
+  {
+    super();
+    this.postingSendDataBytesPerSecond = +postingSendDataBytesPerSecond;
+    this.postingSendControlBytesPerSecond = +postingSendControlBytesPerSecond;
+    this.postingReceiveDataBytesPerSecond = +postingReceiveDataBytesPerSecond;
+    this.postingReceiveControlBytesPerSecond = +postingReceiveControlBytesPerSecond;
+    this.routingSendBytesPerSecond = +routingSendBytesPerSecond;
+    this.routingReceiveBytesPerSecond = +routingReceiveBytesPerSecond;
+    this.objectReplicationSendBytesPerSecond = +objectReplicationSendBytesPerSecond;
+    this.objectReplicationReceiveBytesPerSecond = +objectReplicationReceiveBytesPerSecond;
   }
+  
+  postingSendDataBytesPerSecond: number;
+  postingSendControlBytesPerSecond: number;
+  postingReceiveDataBytesPerSecond: number;
+  postingReceiveControlBytesPerSecond: number;
+  routingSendBytesPerSecond: number;
+  routingReceiveBytesPerSecond: number;
+  objectReplicationSendBytesPerSecond: number;
+  objectReplicationReceiveBytesPerSecond: number;
 }

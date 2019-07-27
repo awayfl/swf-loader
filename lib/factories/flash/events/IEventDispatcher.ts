@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 // Class: IEventDispatcher
-module Shumway.AVMX.AS.flash.events {
+import { Event } from "../events/Event";
 
-  export interface EventHandler {
-    (event: flash.events.Event): void;
-  }
+export interface EventHandler {
+  (event: Event): void;
+}
 
-  export interface IEventDispatcher {
-    addEventListener: (type: string, listener: EventHandler, useCapture?: boolean,
-                       priority?: number /*int*/, useWeakReference?: boolean) => void;
-    removeEventListener: (type: string, listener: EventHandler, useCapture?: boolean) => void;
-    hasEventListener: (type: string) => boolean;
-    willTrigger: (type: string) => boolean;
-    dispatchEvent: (event: flash.events.Event) => boolean;
-  }
+export interface IEventDispatcher {
+  addEventListener: (type: string, listener: EventHandler, useCapture?: boolean,
+                      priority?: number /*int*/, useWeakReference?: boolean) => void;
+  removeEventListener: (type: string, listener: EventHandler, useCapture?: boolean) => void;
+  hasEventListener: (type: string) => boolean;
+  willTrigger: (type: string) => boolean;
+  dispatchEvent: (event: Event) => boolean;
 }

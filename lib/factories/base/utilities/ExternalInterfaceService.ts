@@ -10,7 +10,7 @@ export interface IExternalInterfaceService {
 	getId(): string;
 }
 
-export var instance: IExternalInterfaceService = {
+export var ExternalInterfaceService: IExternalInterfaceService = {
 	enabled: false,
 	initJS(callback: (functionName: string, args: any[]) => any) {
 		// ...
@@ -28,8 +28,4 @@ export var instance: IExternalInterfaceService = {
 		// ...
 	},
 	getId(): string { return null; }
-};
-
-export let ExternalInterfaceService={
-	IExternalInterfaceService:IExternalInterfaceService
 };

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,28 +16,26 @@
  * limitations under the License.
  */
 // Class: URLRequestMethod
-module Shumway.AVMX.AS.flash.net {
-  export class URLRequestMethod extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class URLRequestMethod extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static POST: string = "POST";
-    static GET: string = "GET";
-    static PUT: string = "PUT";
-    static DELETE: string = "DELETE";
-    static HEAD: string = "HEAD";
-    static OPTIONS: string = "OPTIONS";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static POST: string = "POST";
+  static GET: string = "GET";
+  static PUT: string = "PUT";
+  static DELETE: string = "DELETE";
+  static HEAD: string = "HEAD";
+  static OPTIONS: string = "OPTIONS";
 }

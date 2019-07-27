@@ -18,6 +18,11 @@ import { Float64Vector } from "./natives/float64Vector";
 import { ASDate } from "./natives/date";
 import { FileLoadingService } from "../base/utilities/FileLoadingService";
 import { pushMany } from "../base/utilities/ArrayUtilities";
+import { XMLNode, XMLDocument, XMLParser, XMLTag, XMLNodeType } from "./natives/xml-document";
+import { ByteArray } from "./natives/byteArray";
+import { Dictionary } from "./natives/dictionary";
+import { ASProxy } from "./natives/proxy";
+import { OriginalSystem } from "./natives/system";
 
 /*
  * Copyright 2015 Mozilla Foundation
@@ -2358,22 +2363,22 @@ export function initializeBuiltins() {
   builtinNativeClasses["XML"]                 = ASXML;
   builtinNativeClasses["XMLList"]             = ASXMLList;
 
-  builtinNativeClasses["flash.xml.XMLNode"] = flash.xml.XMLNode;
-  builtinNativeClasses["flash.xml.XMLDocument"] = flash.xml.XMLDocument;
-  builtinNativeClasses["flash.xml.XMLParser"] = flash.xml.XMLParser;
-  builtinNativeClasses["flash.xml.XMLTag"] = flash.xml.XMLTag;
-  builtinNativeClasses["flash.xml.XMLNodeType"] = flash.xml.XMLNodeType;
+  builtinNativeClasses["flash.xml.XMLNode"] = XMLNode;
+  builtinNativeClasses["flash.xml.XMLDocument"] = XMLDocument;
+  builtinNativeClasses["flash.xml.XMLParser"] = XMLParser;
+  builtinNativeClasses["flash.xml.XMLTag"] = XMLTag;
+  builtinNativeClasses["flash.xml.XMLNodeType"] = XMLNodeType;
 
   builtinNativeClasses["Math"]                = ASMath;
   builtinNativeClasses["Date"]                = ASDate;
   builtinNativeClasses["RegExp"]              = ASRegExp;
   builtinNativeClasses["JSON"]                = ASJSON;
 
-  builtinNativeClasses["flash.utils.Proxy"]      = flash.utils.ASProxy;
-  builtinNativeClasses["flash.utils.Dictionary"] = flash.utils.Dictionary;
-  builtinNativeClasses["flash.utils.ByteArray"]  = flash.utils.ByteArray;
+  builtinNativeClasses["flash.utils.Proxy"]      = ASProxy;
+  builtinNativeClasses["flash.utils.Dictionary"] = Dictionary;
+  builtinNativeClasses["flash.utils.ByteArray"]  = ByteArray;
 
-  builtinNativeClasses["avmplus.System"]  = flash.system.OriginalSystem;
+  builtinNativeClasses["avmplus.System"]  = OriginalSystem;
 
   // Errors
   builtinNativeClasses["Error"]               = ASError;

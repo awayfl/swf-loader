@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,45 +16,42 @@
  * limitations under the License.
  */
 // Class: GradientType
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class GradientType extends ASObject {
-    
-    static classInitializer: any = null;
-    static classSymbols: string [] = null; // [];
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static LINEAR: string = "linear";
-    static RADIAL: string = "radial";
-    
-    
-    // AS -> JS Bindings
+export class GradientType extends ASObject {
+  
+  static classInitializer: any = null;
+  static classSymbols: string [] = null; // [];
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static LINEAR: string = "linear";
+  static RADIAL: string = "radial";
+  
+  
+  // AS -> JS Bindings
 
-    static fromNumber(n: number): string {
-      switch (n) {
-        case Shumway.GradientType.Linear:
-          return GradientType.LINEAR;
-        case Shumway.GradientType.Radial:
-          return GradientType.RADIAL;
-        default:
-          return null;
-      }
+  static fromNumber(n: number): string {
+    switch (n) {
+      case GradientType.Linear:
+        return GradientType.LINEAR;
+      case GradientType.Radial:
+        return GradientType.RADIAL;
+      default:
+        return null;
     }
+  }
 
-    static toNumber(value: string): number {
-      switch (value) {
-        case GradientType.LINEAR:
-          return Shumway.GradientType.Linear;
-        case GradientType.RADIAL:
-          return Shumway.GradientType.Radial;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case GradientType.LINEAR:
+        return GradientType.Linear;
+      case GradientType.RADIAL:
+        return GradientType.Radial;
+      default:
+        return -1;
     }
   }
 }

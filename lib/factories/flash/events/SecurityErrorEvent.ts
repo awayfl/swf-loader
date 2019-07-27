@@ -1,3 +1,5 @@
+import { ErrorEvent } from "./ErrorEvent";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,20 +16,18 @@
  * limitations under the License.
  */
 // Class: SecurityErrorEvent
-module Shumway.AVMX.AS.flash.events {
-  export class SecurityErrorEvent extends flash.events.ErrorEvent {
+export class SecurityErrorEvent extends ErrorEvent {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                text: string = "", id: number /*int*/ = 0) {
-      super(type, bubbles, cancelable, text, id);
-    }
-
-    // JS -> AS Bindings
-    static SECURITY_ERROR: string = "securityError";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              text: string = "", id: number /*int*/ = 0) {
+    super(type, bubbles, cancelable, text, id);
   }
+
+  // JS -> AS Bindings
+  static SECURITY_ERROR: string = "securityError";
 }

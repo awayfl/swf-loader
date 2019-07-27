@@ -1,3 +1,9 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { axCoerceString } from "../../avm2/run";
+import { ByteArray } from "../../avm2/natives/byteArray";
+import { ASObject } from "../../avm2/nat";
+import { ShaderData } from "./ShaderData";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,52 +20,48 @@
  * limitations under the License.
  */
 // Class: Shader
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class Shader extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class Shader extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["byteCode"];
-    
-    constructor (code: flash.utils.ByteArray = null) {
-      super();
-      // TODO: coerce
-      this.code = code;
-    }
-    
-    // JS -> AS Bindings
-    
-    byteCode: flash.utils.ByteArray;
-    
-    // AS -> JS Bindings
-    
-    // _byteCode: flash.utils.ByteArray;
-    // _data: flash.display.ShaderData;
-    // _precisionHint: string;
-    get data(): flash.display.ShaderData {
-      release || notImplemented("public flash.display.Shader::get data"); return;
-      // return this._data;
-    }
-    set data(p: flash.display.ShaderData) {
-      p = p;
-      release || notImplemented("public flash.display.Shader::set data"); return;
-      // this._data = p;
-    }
-    get precisionHint(): string {
-      release || notImplemented("public flash.display.Shader::get precisionHint"); return;
-      // return this._precisionHint;
-    }
-    set precisionHint(p: string) {
-      p = axCoerceString(p);
-      release || notImplemented("public flash.display.Shader::set precisionHint"); return;
-      // this._precisionHint = p;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["byteCode"];
+  
+  constructor (code: ByteArray = null) {
+    super();
+    // TODO: coerce
+    this.code = code;
+  }
+  
+  // JS -> AS Bindings
+  
+  byteCode: ByteArray;
+  
+  // AS -> JS Bindings
+  
+  // _byteCode: flash.utils.ByteArray;
+  // _data: flash.display.ShaderData;
+  // _precisionHint: string;
+  get data(): ShaderData {
+    release || notImplemented("public flash.display.Shader::get data"); return;
+    // return this._data;
+  }
+  set data(p: ShaderData) {
+    p = p;
+    release || notImplemented("public flash.display.Shader::set data"); return;
+    // this._data = p;
+  }
+  get precisionHint(): string {
+    release || notImplemented("public flash.display.Shader::get precisionHint"); return;
+    // return this._precisionHint;
+  }
+  set precisionHint(p: string) {
+    p = axCoerceString(p);
+    release || notImplemented("public flash.display.Shader::set precisionHint"); return;
+    // this._precisionHint = p;
   }
 }

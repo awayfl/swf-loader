@@ -1,3 +1,7 @@
+import { ASObject } from "../../avm2/nat";
+import { IGraphicsFill } from "./IGraphicsFill";
+import { IGraphicsData } from "./IGraphicsData";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,32 +18,28 @@
  * limitations under the License.
  */
 // Class: GraphicsSolidFill
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class GraphicsSolidFill extends ASObject implements IGraphicsFill, IGraphicsData {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class GraphicsSolidFill extends ASObject implements IGraphicsFill, IGraphicsData {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["color", "alpha"];
-    
-    constructor (color: number /*uint*/ = 0, alpha: number = 1) {
-      super();
-      this.color = color >>> 0;
-      this.alpha = +alpha;
-    }
-    
-    // JS -> AS Bindings
-    
-    color: number /*uint*/;
-    alpha: number;
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["color", "alpha"];
+  
+  constructor (color: number /*uint*/ = 0, alpha: number = 1) {
+    super();
+    this.color = color >>> 0;
+    this.alpha = +alpha;
   }
+  
+  // JS -> AS Bindings
+  
+  color: number /*uint*/;
+  alpha: number;
+  
+  // AS -> JS Bindings
+  
 }

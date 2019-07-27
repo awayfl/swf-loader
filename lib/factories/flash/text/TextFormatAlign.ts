@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,61 +16,59 @@
  * limitations under the License.
  */
 // Class: TextFormatAlign
-module Shumway.AVMX.AS.flash.text {
-  export class TextFormatAlign extends ASObject {
+export class TextFormatAlign extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
+  constructor() {
+    super();
+  }
+
+  // JS -> AS Bindings
+  static LEFT: string = "left";
+  static CENTER: string = "center";
+  static RIGHT: string = "right";
+  static JUSTIFY: string = "justify";
+  static START: string = "start";
+  static END: string = "end";
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return TextFormatAlign.LEFT;
+      case 1:
+        return TextFormatAlign.RIGHT;
+      case 2:
+        return TextFormatAlign.CENTER;
+      case 3:
+        return TextFormatAlign.JUSTIFY;
+      case 4:
+        return TextFormatAlign.START;
+      case 5:
+        return TextFormatAlign.END;
+      default:
+        return null;
     }
+  }
 
-    // JS -> AS Bindings
-    static LEFT: string = "left";
-    static CENTER: string = "center";
-    static RIGHT: string = "right";
-    static JUSTIFY: string = "justify";
-    static START: string = "start";
-    static END: string = "end";
-
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return TextFormatAlign.LEFT;
-        case 1:
-          return TextFormatAlign.RIGHT;
-        case 2:
-          return TextFormatAlign.CENTER;
-        case 3:
-          return TextFormatAlign.JUSTIFY;
-        case 4:
-          return TextFormatAlign.START;
-        case 5:
-          return TextFormatAlign.END;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case TextFormatAlign.LEFT:
-          return 0;
-        case TextFormatAlign.RIGHT:
-          return 1;
-        case TextFormatAlign.CENTER:
-          return 2;
-        case TextFormatAlign.JUSTIFY:
-          return 3;
-        case TextFormatAlign.START:
-          return 4;
-        case TextFormatAlign.END:
-          return 5;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case TextFormatAlign.LEFT:
+        return 0;
+      case TextFormatAlign.RIGHT:
+        return 1;
+      case TextFormatAlign.CENTER:
+        return 2;
+      case TextFormatAlign.JUSTIFY:
+        return 3;
+      case TextFormatAlign.START:
+        return 4;
+      case TextFormatAlign.END:
+        return 5;
+      default:
+        return -1;
     }
   }
 }

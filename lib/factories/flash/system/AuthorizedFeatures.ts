@@ -1,3 +1,11 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { ASXML } from "../../avm2/natives/xml";
+import { ByteArray } from "../../avm2/natives/byteArray";
+import { ApplicationInstaller } from "./ApplicationInstaller";
+import { axCoerceString } from "../../avm2/run";
+import { ASObject } from "../../avm2/nat";
+import { URLStream } from "../net/URLStream";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,37 +22,34 @@
  * limitations under the License.
  */
 // Class: AuthorizedFeatures
-module Shumway.AVMX.AS.flash.system {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class AuthorizedFeatures extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class AuthorizedFeatures extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
 
-    createApplicationInstaller(strings: ASXML, icon: flash.utils.ByteArray): flash.system.ApplicationInstaller {
-      strings = strings; icon = icon;
-      release || notImplemented("public flash.system.AuthorizedFeatures::createApplicationInstaller"); return;
-    }
-    enableDiskCache(stream: flash.net.URLStream): boolean {
-      stream = stream;
-      release || notImplemented("public flash.system.AuthorizedFeatures::enableDiskCache"); return;
-    }
-    isFeatureEnabled(feature: string, data: string = null): boolean {
-      feature = axCoerceString(feature); data = axCoerceString(data);
-      release || notImplemented("public flash.system.AuthorizedFeatures::isFeatureEnabled"); return;
-    }
-    isNegativeToken(): boolean {
-      release || notImplemented("public flash.system.AuthorizedFeatures::isNegativeToken"); return;
-    }
+  createApplicationInstaller(strings: ASXML, icon: ByteArray): ApplicationInstaller {
+    strings = strings; icon = icon;
+    release || notImplemented("public flash.system.AuthorizedFeatures::createApplicationInstaller"); return;
+  }
+  enableDiskCache(stream: URLStream): boolean {
+    stream = stream;
+    release || notImplemented("public flash.system.AuthorizedFeatures::enableDiskCache"); return;
+  }
+  isFeatureEnabled(feature: string, data: string = null): boolean {
+    feature = axCoerceString(feature); data = axCoerceString(data);
+    release || notImplemented("public flash.system.AuthorizedFeatures::isFeatureEnabled"); return;
+  }
+  isNegativeToken(): boolean {
+    release || notImplemented("public flash.system.AuthorizedFeatures::isNegativeToken"); return;
   }
 }

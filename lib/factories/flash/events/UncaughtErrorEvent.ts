@@ -1,3 +1,5 @@
+import { ErrorEvent } from "./ErrorEvent";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,20 +16,18 @@
  * limitations under the License.
  */
 // Class: UncaughtErrorEvent
-module Shumway.AVMX.AS.flash.events {
-  export class UncaughtErrorEvent extends flash.events.ErrorEvent {
+export class UncaughtErrorEvent extends ErrorEvent {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string = "uncaughtError", bubbles: boolean = true, cancelable: boolean = true,
-                error_in: any = null) {
-      super(type, bubbles, cancelable, error_in);
-    }
-
-    // JS -> AS Bindings
-    static UNCAUGHT_ERROR: string = "uncaughtError";
+  constructor(type: string = "uncaughtError", bubbles: boolean = true, cancelable: boolean = true,
+              error_in: any = null) {
+    super(type, bubbles, cancelable, error_in);
   }
+
+  // JS -> AS Bindings
+  static UNCAUGHT_ERROR: string = "uncaughtError";
 }

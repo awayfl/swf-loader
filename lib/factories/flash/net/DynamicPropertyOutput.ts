@@ -1,3 +1,8 @@
+import { ASObject } from "../../avm2/nat";
+import { axCoerceString } from "../../avm2/run";
+import { notImplemented, release } from "../../base/utilities/Debug";
+import { IDynamicPropertyOutput } from "./IDynamicPropertyOutput";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,32 +19,28 @@
  * limitations under the License.
  */
 // Class: DynamicPropertyOutput
-module Shumway.AVMX.AS.flash.net {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class DynamicPropertyOutput extends ASObject implements IDynamicPropertyOutput {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class DynamicPropertyOutput extends ASObject implements IDynamicPropertyOutput {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    
-    // AS -> JS Bindings
-    
-    writeDynamicProperty(name: string, value: any): void {
-      name = axCoerceString(name);
-      release || notImplemented("packageInternal flash.net.DynamicPropertyOutput::writeDynamicProperty"); return;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  
+  
+  // AS -> JS Bindings
+  
+  writeDynamicProperty(name: string, value: any): void {
+    name = axCoerceString(name);
+    release || notImplemented("packageInternal flash.net.DynamicPropertyOutput::writeDynamicProperty"); return;
   }
 }

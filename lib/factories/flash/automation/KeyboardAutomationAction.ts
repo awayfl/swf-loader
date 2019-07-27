@@ -1,3 +1,6 @@
+import { AutomationAction } from "./AutomationAction";
+import { axCoerceString } from "@awayjs/graphics";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,19 +17,15 @@
  * limitations under the License.
  */
 // Class: KeyboardAutomationAction
-module Shumway.AVMX.AS.flash.automation {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class KeyboardAutomationAction extends flash.automation.AutomationAction {
-    constructor (type: string, keyCode: number /*uint*/ = 0) {
-      type = axCoerceString(type); keyCode = keyCode >>> 0;
-      super();
-    }
-    // Static   JS -> AS Bindings
-    // Static   AS -> JS Bindings
-    // Instance JS -> AS Bindings
-    _keyCode: number /*uint*/;
-    keyCode: number /*uint*/;
-    // Instance AS -> JS Bindings
+export class KeyboardAutomationAction extends AutomationAction {
+  constructor (type: string, keyCode: number /*uint*/ = 0) {
+    type = axCoerceString(type); keyCode = keyCode >>> 0;
+    super();
   }
+  // Static   JS -> AS Bindings
+  // Static   AS -> JS Bindings
+  // Instance JS -> AS Bindings
+  _keyCode: number /*uint*/;
+  keyCode: number /*uint*/;
+  // Instance AS -> JS Bindings
 }

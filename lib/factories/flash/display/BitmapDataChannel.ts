@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,32 +16,28 @@
  * limitations under the License.
  */
 // Class: BitmapDataChannel
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class BitmapDataChannel extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class BitmapDataChannel extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static RED: number /*uint*/ = 1;
-    static GREEN: number /*uint*/ = 2;
-    static BLUE: number /*uint*/ = 4;
-    static ALPHA: number /*uint*/ = 8;
-    
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static RED: number /*uint*/ = 1;
+  static GREEN: number /*uint*/ = 2;
+  static BLUE: number /*uint*/ = 4;
+  static ALPHA: number /*uint*/ = 8;
+  
+  
+  // AS -> JS Bindings
+  
 }

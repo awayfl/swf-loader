@@ -1,3 +1,7 @@
+import { ASObject } from "../../avm2/nat";
+import { notImplemented, release } from "../../base/utilities/Debug";
+import { AutomationAction } from "./AutomationAction";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,20 +18,17 @@
  * limitations under the License.
  */
 // Class: ActionGenerator
-module Shumway.AVMX.AS.flash.automation {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class ActionGenerator extends ASObject {
-    constructor () {
-      super();
-    }
-    // Static   JS -> AS Bindings
-    // Static   AS -> JS Bindings
-    // Instance JS -> AS Bindings
-    generateAction: (action: flash.automation.AutomationAction) => void;
-    // Instance AS -> JS Bindings
-    generateActions(a: any []): void {
-      a = a;
-      release || release || notImplemented("public flash.automation.ActionGenerator::generateActions"); return;
-    }
+export class ActionGenerator extends ASObject {
+  constructor () {
+    super();
+  }
+  // Static   JS -> AS Bindings
+  // Static   AS -> JS Bindings
+  // Instance JS -> AS Bindings
+  generateAction: (action: AutomationAction) => void;
+  // Instance AS -> JS Bindings
+  generateActions(a: any []): void {
+    a = a;
+    release || release || notImplemented("public flash.automation.ActionGenerator::generateActions"); return;
   }
 }

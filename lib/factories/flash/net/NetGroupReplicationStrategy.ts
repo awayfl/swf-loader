@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,28 +16,26 @@
  * limitations under the License.
  */
 // Class: NetGroupReplicationStrategy
-module Shumway.AVMX.AS.flash.net {
-  export class NetGroupReplicationStrategy extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class NetGroupReplicationStrategy extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static RAREST_FIRST: string = "rarestFirst";
-    static LOWEST_FIRST: string = "lowestFirst";
-    
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static RAREST_FIRST: string = "rarestFirst";
+  static LOWEST_FIRST: string = "lowestFirst";
+  
+  
+  // AS -> JS Bindings
+  
 }

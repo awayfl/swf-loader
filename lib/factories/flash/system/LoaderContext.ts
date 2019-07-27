@@ -1,3 +1,9 @@
+import { ASObject } from "../../avm2/nat";
+import { ApplicationDomain } from "./ApplicationDomain";
+import { SecurityDomain } from "./SecurityDomain";
+import { DisplayObjectContainer } from "../display/DisplayObjectContainer";
+import { ImageDecodingPolicy } from "./ImageDecodingPolicy";
+
 /**
  * Copyright 2015 Mozilla Foundation
  *
@@ -14,65 +20,63 @@
  * limitations under the License.
  */
 // Class: LoaderContext
-module Shumway.AVMX.AS.flash.system {
 
-  export class LoaderContext extends ASObject {
+export class LoaderContext extends ASObject {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static instanceSymbols: string [] = ["checkPolicyFile!", "applicationDomain!", "sec!",
-                                         "allowCodeImport!", "requestedContentParent!",
-                                         "parameters!", "imageDecodingPolicy!"];
+  static instanceSymbols: string [] = ["checkPolicyFile!", "applicationDomain!", "sec!",
+                                        "allowCodeImport!", "requestedContentParent!",
+                                        "parameters!", "imageDecodingPolicy!"];
 
-    private $BgcheckPolicyFile: boolean;
-    private $BgapplicationDomain: flash.system.ApplicationDomain;
-    private $BgsecurityDomain: flash.system.SecurityDomain;
-    private $BgallowCodeImport: boolean;
-    private $BgrequestedContentParent: flash.display.DisplayObjectContainer;
-    private $Bgparameters: ASObject;
-    private $BgimageDecodingPolicy: string;
+  private $BgcheckPolicyFile: boolean;
+  private $BgapplicationDomain: ApplicationDomain;
+  private $BgsecurityDomain: SecurityDomain;
+  private $BgallowCodeImport: boolean;
+  private $BgrequestedContentParent: DisplayObjectContainer;
+  private $Bgparameters: ASObject;
+  private $BgimageDecodingPolicy: string;
 
-    _avm1Context: AVM1.AVM1Context;
+  _avm1Context: AVM1Context;
 
-    constructor(checkPolicyFile: boolean = false,
-                applicationDomain: flash.system.ApplicationDomain = null,
-                securityDomain: flash.system.SecurityDomain = null)
-    {
-      super();
-      this.$BgcheckPolicyFile = !!checkPolicyFile;
-      this.$BgapplicationDomain = applicationDomain;
-      this.$BgsecurityDomain = securityDomain;
-      this.$BgimageDecodingPolicy = flash.system.ImageDecodingPolicy.ON_DEMAND;
+  constructor(checkPolicyFile: boolean = false,
+              applicationDomain: ApplicationDomain = null,
+              securityDomain: SecurityDomain = null)
+  {
+    super();
+    this.$BgcheckPolicyFile = !!checkPolicyFile;
+    this.$BgapplicationDomain = applicationDomain;
+    this.$BgsecurityDomain = securityDomain;
+    this.$BgimageDecodingPolicy = ImageDecodingPolicy.ON_DEMAND;
 
-      this._avm1Context = null;
-    }
+    this._avm1Context = null;
+  }
 
-    public get imageDecodingPolicy(): string {
-      return this.$BgimageDecodingPolicy;
-    }
+  public get imageDecodingPolicy(): string {
+    return this.$BgimageDecodingPolicy;
+  }
 
-    public get parameters(): ASObject {
-      return this.$Bgparameters;
-    }
+  public get parameters(): ASObject {
+    return this.$Bgparameters;
+  }
 
-    public get requestedContentParent(): flash.display.DisplayObjectContainer {
-      return this.$BgrequestedContentParent;
-    }
+  public get requestedContentParent(): DisplayObjectContainer {
+    return this.$BgrequestedContentParent;
+  }
 
-    public get allowCodeImport(): boolean {
-      return this.$BgallowCodeImport;
-    }
+  public get allowCodeImport(): boolean {
+    return this.$BgallowCodeImport;
+  }
 
-    public get securityDomain(): flash.system.SecurityDomain {
-      return this.$BgsecurityDomain;
-    }
+  public get securityDomain(): SecurityDomain {
+    return this.$BgsecurityDomain;
+  }
 
-    public get applicationDomain(): flash.system.ApplicationDomain {
-      return this.$BgapplicationDomain;
-    }
+  public get applicationDomain(): ApplicationDomain {
+    return this.$BgapplicationDomain;
+  }
 
-    public get checkPolicyFile(): boolean {
-      return this.$BgcheckPolicyFile;
-    }
+  public get checkPolicyFile(): boolean {
+    return this.$BgcheckPolicyFile;
   }
 }

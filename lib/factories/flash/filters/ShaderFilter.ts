@@ -1,3 +1,7 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { Shader } from "../display/Shader";
+import { BitmapFilter } from "./BitmapFilter";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,48 +18,45 @@
  * limitations under the License.
  */
 // Class: ShaderFilter
-module Shumway.AVMX.AS.flash.filters {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class ShaderFilter extends flash.filters.BitmapFilter {
+export class ShaderFilter extends BitmapFilter {
 
-    static axClass: typeof ShaderFilter;
+  static axClass: typeof ShaderFilter;
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["leftExtension", "leftExtension", "topExtension", "topExtension", "rightExtension", "rightExtension", "bottomExtension", "bottomExtension"];
-    
-    constructor (shader: flash.display.Shader = null) {
-      super();
-      shader = shader;
-    }
-    
-    // JS -> AS Bindings
-    
-    leftExtension: number /*int*/;
-    topExtension: number /*int*/;
-    rightExtension: number /*int*/;
-    bottomExtension: number /*int*/;
-    
-    // AS -> JS Bindings
-    
-    // _shader: flash.display.Shader;
-    // _leftExtension: number /*int*/;
-    // _topExtension: number /*int*/;
-    // _rightExtension: number /*int*/;
-    // _bottomExtension: number /*int*/;
-    get shader(): flash.display.Shader {
-      release || notImplemented("public flash.filters.ShaderFilter::get shader"); return;
-      // return this._shader;
-    }
-    set shader(shader: flash.display.Shader) {
-      shader = shader;
-      release || notImplemented("public flash.filters.ShaderFilter::set shader"); return;
-      // this._shader = shader;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["leftExtension", "leftExtension", "topExtension", "topExtension", "rightExtension", "rightExtension", "bottomExtension", "bottomExtension"];
+  
+  constructor (shader: Shader = null) {
+    super();
+    shader = shader;
+  }
+  
+  // JS -> AS Bindings
+  
+  leftExtension: number /*int*/;
+  topExtension: number /*int*/;
+  rightExtension: number /*int*/;
+  bottomExtension: number /*int*/;
+  
+  // AS -> JS Bindings
+  
+  // _shader: flash.display.Shader;
+  // _leftExtension: number /*int*/;
+  // _topExtension: number /*int*/;
+  // _rightExtension: number /*int*/;
+  // _bottomExtension: number /*int*/;
+  get shader(): Shader {
+    release || notImplemented("public flash.filters.ShaderFilter::get shader"); return;
+    // return this._shader;
+  }
+  set shader(shader: Shader) {
+    shader = shader;
+    release || notImplemented("public flash.filters.ShaderFilter::set shader"); return;
+    // this._shader = shader;
   }
 }

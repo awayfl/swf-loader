@@ -1,3 +1,5 @@
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,15 +16,13 @@
  * limitations under the License.
  */
 // Class: NativeMenu
-module Shumway.AVMX.AS.flash.display {
-  export class NativeMenu extends flash.events.EventDispatcher {
-    
-    static classInitializer: any = null;
-    static classSymbols: string [] = null; // [];
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
+export class NativeMenu extends EventDispatcher {
+  
+  static classInitializer: any = null;
+  static classSymbols: string [] = null; // [];
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
 }

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,33 +16,31 @@
  * limitations under the License.
  */
 // Class: NetStreamPlayTransitions
-module Shumway.AVMX.AS.flash.net {
-  export class NetStreamPlayTransitions extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class NetStreamPlayTransitions extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static APPEND: string = "append";
-    static RESET: string = "reset";
-    static SWITCH: string = "switch";
-    static SWAP: string = "swap";
-    static STOP: string = "stop";
-    static RESUME: string = "resume";
-    static APPEND_AND_WAIT: string = "appendAndWait";
-    
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static APPEND: string = "append";
+  static RESET: string = "reset";
+  static SWITCH: string = "switch";
+  static SWAP: string = "swap";
+  static STOP: string = "stop";
+  static RESUME: string = "resume";
+  static APPEND_AND_WAIT: string = "appendAndWait";
+  
+  
+  // AS -> JS Bindings
+  
 }

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,29 +16,27 @@
  * limitations under the License.
  */
 // Class: SecurityPanel
-module Shumway.AVMX.AS.flash.system {
-  export class SecurityPanel extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class SecurityPanel extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static DEFAULT: string = "default";
-    static PRIVACY: string = "privacy";
-    static LOCAL_STORAGE: string = "localStorage";
-    static MICROPHONE: string = "microphone";
-    static CAMERA: string = "camera";
-    static DISPLAY: string = "display";
-    static SETTINGS_MANAGER: string = "settingsManager";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static DEFAULT: string = "default";
+  static PRIVACY: string = "privacy";
+  static LOCAL_STORAGE: string = "localStorage";
+  static MICROPHONE: string = "microphone";
+  static CAMERA: string = "camera";
+  static DISPLAY: string = "display";
+  static SETTINGS_MANAGER: string = "settingsManager";
 }

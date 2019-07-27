@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,34 +16,30 @@
  * limitations under the License.
  */
 // Class: AudioDecoder
-module Shumway.AVMX.AS.flash.media {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class AudioDecoder extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static DOLBY_DIGITAL: string = "DolbyDigital";
-    static DOLBY_DIGITAL_PLUS: string = "DolbyDigitalPlus";
-    static DTS: string = "DTS";
-    static DTS_EXPRESS: string = "DTSExpress";
-    static DTS_HD_HIGH_RESOLUTION_AUDIO: string = "DTSHDHighResolutionAudio";
-    static DTS_HD_MASTER_AUDIO: string = "DTSHDMasterAudio";
-    
-    
-    // AS -> JS Bindings
-    
+export class AudioDecoder extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static DOLBY_DIGITAL: string = "DolbyDigital";
+  static DOLBY_DIGITAL_PLUS: string = "DolbyDigitalPlus";
+  static DTS: string = "DTS";
+  static DTS_EXPRESS: string = "DTSExpress";
+  static DTS_HD_HIGH_RESOLUTION_AUDIO: string = "DTSHDHighResolutionAudio";
+  static DTS_HD_MASTER_AUDIO: string = "DTSHDMasterAudio";
+  
+  
+  // AS -> JS Bindings
+  
 }

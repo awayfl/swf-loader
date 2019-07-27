@@ -1,3 +1,9 @@
+import { Int32Vector } from "../../avm2/natives/int32Vector";
+import { axCoerceString } from "@awayjs/graphics";
+import { ASObject } from "../../avm2/nat";
+import { IGraphicsPath } from "./IGraphicsPath";
+import { IGraphicsData } from "./IGraphicsData";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,43 +20,39 @@
  * limitations under the License.
  */
 // Class: GraphicsPath
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class GraphicsPath extends ASObject implements IGraphicsPath, IGraphicsData {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class GraphicsPath extends ASObject implements IGraphicsPath, IGraphicsData {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["commands", "data", "_winding", "winding", "winding", "moveTo", "lineTo", "curveTo", "cubicCurveTo", "wideLineTo", "wideMoveTo", "ensureLists"];
-    
-    constructor (commands: Int32Vector = null, data: Int32Vector = null, winding: string = "evenOdd") {
-      super();
-      this.commands = commands;
-      this.data = data;
-      this.winding = axCoerceString(winding);
-    }
-    
-    // JS -> AS Bindings
-    
-    commands: Int32Vector;
-    data: Int32Vector;
-    _winding: string;
-    winding: string;
-    moveTo: (x: number, y: number) => void;
-    lineTo: (x: number, y: number) => void;
-    curveTo: (controlX: number, controlY: number, anchorX: number, anchorY: number) => void;
-    cubicCurveTo: (controlX1: number, controlY1: number, controlX2: number, controlY2: number, anchorX: number, anchorY: number) => void;
-    wideLineTo: (x: number, y: number) => void;
-    wideMoveTo: (x: number, y: number) => void;
-    ensureLists: () => void;
-    
-    // AS -> JS Bindings
-    
-    // _winding: string;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["commands", "data", "_winding", "winding", "winding", "moveTo", "lineTo", "curveTo", "cubicCurveTo", "wideLineTo", "wideMoveTo", "ensureLists"];
+  
+  constructor (commands: Int32Vector = null, data: Int32Vector = null, winding: string = "evenOdd") {
+    super();
+    this.commands = commands;
+    this.data = data;
+    this.winding = axCoerceString(winding);
   }
+  
+  // JS -> AS Bindings
+  
+  commands: Int32Vector;
+  data: Int32Vector;
+  _winding: string;
+  winding: string;
+  moveTo: (x: number, y: number) => void;
+  lineTo: (x: number, y: number) => void;
+  curveTo: (controlX: number, controlY: number, anchorX: number, anchorY: number) => void;
+  cubicCurveTo: (controlX1: number, controlY1: number, controlX2: number, controlY2: number, anchorX: number, anchorY: number) => void;
+  wideLineTo: (x: number, y: number) => void;
+  wideMoveTo: (x: number, y: number) => void;
+  ensureLists: () => void;
+  
+  // AS -> JS Bindings
+  
+  // _winding: string;
 }

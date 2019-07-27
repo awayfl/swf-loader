@@ -1,3 +1,6 @@
+import { axCoerceString } from "../../avm2/run";
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,55 +17,51 @@
  * limitations under the License.
  */
 // Class: GroupSpecifier
-module Shumway.AVMX.AS.flash.net {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class GroupSpecifier extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class GroupSpecifier extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // ["encodePostingAuthorization", "encodePublishAuthorization", "encodeIPMulticastAddressSpec", "encodeBootstrapPeerIDSpec"];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["makeUnique", "routingEnabled", "routingEnabled", "multicastEnabled", "multicastEnabled", "objectReplicationEnabled", "objectReplicationEnabled", "postingEnabled", "postingEnabled", "peerToPeerDisabled", "peerToPeerDisabled", "ipMulticastMemberUpdatesEnabled", "ipMulticastMemberUpdatesEnabled", "setPublishPassword", "setPostingPassword", "serverChannelEnabled", "serverChannelEnabled", "addBootstrapPeer", "addIPMulticastAddress", "toString", "groupspecWithoutAuthorizations", "groupspecWithAuthorizations", "authorizations"];
-    
-    constructor (name: string) {
-      super();
-      name = axCoerceString(name);
-    }
-    
-    // JS -> AS Bindings
-    static encodePostingAuthorization: (password: string) => string;
-    static encodePublishAuthorization: (password: string) => string;
-    static encodeIPMulticastAddressSpec: (address: string, port: any = null, source: string = null) => string;
-    static encodeBootstrapPeerIDSpec: (peerID: string) => string;
-    
-    makeUnique: () => void;
-    routingEnabled: boolean;
-    multicastEnabled: boolean;
-    objectReplicationEnabled: boolean;
-    postingEnabled: boolean;
-    peerToPeerDisabled: boolean;
-    ipMulticastMemberUpdatesEnabled: boolean;
-    setPublishPassword: (password: string = null, salt: string = null) => void;
-    setPostingPassword: (password: string = null, salt: string = null) => void;
-    serverChannelEnabled: boolean;
-    addBootstrapPeer: (peerID: string) => void;
-    addIPMulticastAddress: (address: string, port: any = null, source: string = null) => void;
-    groupspecWithoutAuthorizations: () => string;
-    groupspecWithAuthorizations: () => string;
-    authorizations: () => string;
-    
-    // AS -> JS Bindings
-    
-    // _routingEnabled: boolean;
-    // _multicastEnabled: boolean;
-    // _objectReplicationEnabled: boolean;
-    // _postingEnabled: boolean;
-    // _peerToPeerDisabled: boolean;
-    // _ipMulticastMemberUpdatesEnabled: boolean;
-    // _serverChannelEnabled: boolean;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // ["encodePostingAuthorization", "encodePublishAuthorization", "encodeIPMulticastAddressSpec", "encodeBootstrapPeerIDSpec"];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["makeUnique", "routingEnabled", "routingEnabled", "multicastEnabled", "multicastEnabled", "objectReplicationEnabled", "objectReplicationEnabled", "postingEnabled", "postingEnabled", "peerToPeerDisabled", "peerToPeerDisabled", "ipMulticastMemberUpdatesEnabled", "ipMulticastMemberUpdatesEnabled", "setPublishPassword", "setPostingPassword", "serverChannelEnabled", "serverChannelEnabled", "addBootstrapPeer", "addIPMulticastAddress", "toString", "groupspecWithoutAuthorizations", "groupspecWithAuthorizations", "authorizations"];
+  
+  constructor (name: string) {
+    super();
+    name = axCoerceString(name);
   }
+  
+  // JS -> AS Bindings
+  static encodePostingAuthorization: (password: string) => string;
+  static encodePublishAuthorization: (password: string) => string;
+  static encodeIPMulticastAddressSpec: (address: string, port?: any, source?: string) => string;
+  static encodeBootstrapPeerIDSpec: (peerID: string) => string;
+  
+  makeUnique: () => void;
+  routingEnabled: boolean;
+  multicastEnabled: boolean;
+  objectReplicationEnabled: boolean;
+  postingEnabled: boolean;
+  peerToPeerDisabled: boolean;
+  ipMulticastMemberUpdatesEnabled: boolean;
+  setPublishPassword: (password?: string, salt?: string) => void;
+  setPostingPassword: (password?: string, salt?: string) => void;
+  serverChannelEnabled: boolean;
+  addBootstrapPeer: (peerID: string) => void;
+  addIPMulticastAddress: (address: string, port?: any, source?: string) => void;
+  groupspecWithoutAuthorizations: () => string;
+  groupspecWithAuthorizations: () => string;
+  authorizations: () => string;
+  
+  // AS -> JS Bindings
+  
+  // _routingEnabled: boolean;
+  // _multicastEnabled: boolean;
+  // _objectReplicationEnabled: boolean;
+  // _postingEnabled: boolean;
+  // _peerToPeerDisabled: boolean;
+  // _ipMulticastMemberUpdatesEnabled: boolean;
+  // _serverChannelEnabled: boolean;
 }

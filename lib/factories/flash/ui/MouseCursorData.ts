@@ -1,3 +1,8 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { Point } from "../geom/Point";
+import { GenericVector } from "../../avm2/natives/GenericVector";
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,52 +19,49 @@
  * limitations under the License.
  */
 // Class: MouseCursorData
-module Shumway.AVMX.AS.flash.ui {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class MouseCursorData extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
-    
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
+export class MouseCursorData extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
+  
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
 
-    // _data: ASVector<any>;
-    // _hotSpot: flash.geom.Point;
-    // _frameRate: number;
-    get data(): GenericVector {
-      release || notImplemented("public flash.ui.MouseCursorData::get data"); return;
-      // return this._data;
-    }
-    set data(data: GenericVector) {
-      data = data;
-      release || notImplemented("public flash.ui.MouseCursorData::set data"); return;
-      // this._data = data;
-    }
-    get hotSpot(): flash.geom.Point {
-      release || notImplemented("public flash.ui.MouseCursorData::get hotSpot"); return;
-      // return this._hotSpot;
-    }
-    set hotSpot(data: flash.geom.Point) {
-      data = data;
-      release || notImplemented("public flash.ui.MouseCursorData::set hotSpot"); return;
-      // this._hotSpot = data;
-    }
-    get frameRate(): number {
-      release || notImplemented("public flash.ui.MouseCursorData::get frameRate"); return;
-      // return this._frameRate;
-    }
-    set frameRate(data: number) {
-      data = +data;
-      release || notImplemented("public flash.ui.MouseCursorData::set frameRate"); return;
-      // this._frameRate = data;
-    }
+  // _data: ASVector<any>;
+  // _hotSpot: flash.geom.Point;
+  // _frameRate: number;
+  get data(): GenericVector {
+    release || notImplemented("public flash.ui.MouseCursorData::get data"); return;
+    // return this._data;
+  }
+  set data(data: GenericVector) {
+    data = data;
+    release || notImplemented("public flash.ui.MouseCursorData::set data"); return;
+    // this._data = data;
+  }
+  get hotSpot(): Point {
+    release || notImplemented("public flash.ui.MouseCursorData::get hotSpot"); return;
+    // return this._hotSpot;
+  }
+  set hotSpot(data: Point) {
+    data = data;
+    release || notImplemented("public flash.ui.MouseCursorData::set hotSpot"); return;
+    // this._hotSpot = data;
+  }
+  get frameRate(): number {
+    release || notImplemented("public flash.ui.MouseCursorData::get frameRate"); return;
+    // return this._frameRate;
+  }
+  set frameRate(data: number) {
+    data = +data;
+    release || notImplemented("public flash.ui.MouseCursorData::set frameRate"); return;
+    // this._frameRate = data;
   }
 }

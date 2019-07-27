@@ -1,3 +1,6 @@
+import { axCoerceString } from "../../avm2/run";
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,29 +17,25 @@
  * limitations under the License.
  */
 // Class: JPEGXREncoderOptions
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class JPEGXREncoderOptions extends ASObject {
+export class JPEGXREncoderOptions extends ASObject {
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
 
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["quantization", "colorSpace", "trimFlexBits"];
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["quantization", "colorSpace", "trimFlexBits"];
 
-    constructor (quantization: number /*uint*/ = 20, colorSpace: string = "auto", trimFlexBits: number /*uint*/ = 0) {
-      super();
-      this.quantization = quantization >>> 0;
-      this.colorSpace = axCoerceString(colorSpace);
-      this.trimFlexBits = trimFlexBits >>> 0;
-    }
-
-    quantization: number /*uint*/;
-    colorSpace: string;
-    trimFlexBits: number /*uint*/;
+  constructor (quantization: number /*uint*/ = 20, colorSpace: string = "auto", trimFlexBits: number /*uint*/ = 0) {
+    super();
+    this.quantization = quantization >>> 0;
+    this.colorSpace = axCoerceString(colorSpace);
+    this.trimFlexBits = trimFlexBits >>> 0;
   }
+
+  quantization: number /*uint*/;
+  colorSpace: string;
+  trimFlexBits: number /*uint*/;
 }

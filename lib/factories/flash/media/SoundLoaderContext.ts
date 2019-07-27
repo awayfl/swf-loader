@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,32 +16,28 @@
  * limitations under the License.
  */
 // Class: SoundLoaderContext
-module Shumway.AVMX.AS.flash.media {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class SoundLoaderContext extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class SoundLoaderContext extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["bufferTime", "checkPolicyFile"];
-    
-    constructor (bufferTime: number = 1000, checkPolicyFile: boolean = false) {
-      super();
-      this.bufferTime = +bufferTime;
-      this.checkPolicyFile = !!checkPolicyFile;
-    }
-    
-    // JS -> AS Bindings
-    
-    bufferTime: number;
-    checkPolicyFile: boolean;
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["bufferTime", "checkPolicyFile"];
+  
+  constructor (bufferTime: number = 1000, checkPolicyFile: boolean = false) {
+    super();
+    this.bufferTime = +bufferTime;
+    this.checkPolicyFile = !!checkPolicyFile;
   }
+  
+  // JS -> AS Bindings
+  
+  bufferTime: number;
+  checkPolicyFile: boolean;
+  
+  // AS -> JS Bindings
+  
 }

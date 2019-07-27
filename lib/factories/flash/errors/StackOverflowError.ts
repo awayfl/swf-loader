@@ -1,3 +1,5 @@
+import { ASError } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,20 +16,18 @@
  * limitations under the License.
  */
 // Class: StackOverflowError
-module Shumway.AVMX.AS.flash.errors {
-  export class StackOverflowError extends ASError {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class StackOverflowError extends ASError {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor (message: string = "", id: number /*int*/ = 0) {
-      super(message, id);
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor (message: string = "", id: number /*int*/ = 0) {
+    super(message, id);
   }
 }

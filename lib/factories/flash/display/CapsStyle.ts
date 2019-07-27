@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,56 +16,52 @@
  * limitations under the License.
  */
 // Class: CapsStyle
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class CapsStyle extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class CapsStyle extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static ROUND: string = "round";
+  static NONE: string = "none";
+  static SQUARE: string = "square";
+  
+  
+  // AS -> JS Bindings
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return CapsStyle.ROUND;
+      case 1:
+        return CapsStyle.NONE;
+      case 2:
+        return CapsStyle.SQUARE;
+      default:
+        return null;
     }
-    
-    // JS -> AS Bindings
-    static ROUND: string = "round";
-    static NONE: string = "none";
-    static SQUARE: string = "square";
-    
-    
-    // AS -> JS Bindings
+  }
 
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return CapsStyle.ROUND;
-        case 1:
-          return CapsStyle.NONE;
-        case 2:
-          return CapsStyle.SQUARE;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case CapsStyle.ROUND:
-          return 0;
-        case CapsStyle.NONE:
-          return 1;
-        case CapsStyle.SQUARE:
-          return 2;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case CapsStyle.ROUND:
+        return 0;
+      case CapsStyle.NONE:
+        return 1;
+      case CapsStyle.SQUARE:
+        return 2;
+      default:
+        return -1;
     }
   }
 }

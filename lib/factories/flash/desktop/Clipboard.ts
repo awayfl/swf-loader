@@ -1,3 +1,7 @@
+import { notImplemented, release } from "../../base/utilities/Debug";
+import { axCoerceString } from "../../avm2/run";
+import { ASObject, ASFunction } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,50 +18,45 @@
  * limitations under the License.
  */
 // Class: Clipboard
-module Shumway.AVMX.AS.flash.desktop {
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class Clipboard extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class Clipboard extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["setData", "setDataHandler", "getData", "hasFormat"];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    setData: (format: string, data: ASObject, serializable: boolean = true) => boolean;
-    setDataHandler: (format: string, handler: ASFunction, serializable: boolean = true) => boolean;
-    getData: (format: string, transferMode: string = "originalPreferred") => ASObject;
-    hasFormat: (format: string) => boolean;
-    
-    // AS -> JS Bindings
-    // static _generalClipboard: flash.desktop.Clipboard;
-    get generalClipboard(): flash.desktop.Clipboard {
-      release || notImplemented("public flash.desktop.Clipboard::get generalClipboard"); return;
-      // return this._generalClipboard;
-    }
-    
-    // _formats: any [];
-    get formats(): any [] {
-      release || notImplemented("public flash.desktop.Clipboard::get formats"); return;
-      // return this._formats;
-    }
-    clear(): void {
-      release || notImplemented("public flash.desktop.Clipboard::clear"); return;
-    }
-    clearData(format: string): void {
-      format = axCoerceString(format);
-      release || notImplemented("public flash.desktop.Clipboard::clearData"); return;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["setData", "setDataHandler", "getData", "hasFormat"];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  
+  setData: (format: string, data: ASObject, serializable: boolean = true) => boolean;
+  setDataHandler: (format: string, handler: ASFunction, serializable: boolean = true) => boolean;
+  getData: (format: string, transferMode: string = "originalPreferred") => ASObject;
+  hasFormat: (format: string) => boolean;
+  
+  // AS -> JS Bindings
+  // static _generalClipboard: flash.desktop.Clipboard;
+  get generalClipboard(): Clipboard {
+    release || notImplemented("public flash.desktop.Clipboard::get generalClipboard"); return;
+    // return this._generalClipboard;
+  }
+  
+  // _formats: any [];
+  get formats(): any [] {
+    release || notImplemented("public flash.desktop.Clipboard::get formats"); return;
+    // return this._formats;
+  }
+  clear(): void {
+    release || notImplemented("public flash.desktop.Clipboard::clear"); return;
+  }
+  clearData(format: string): void {
+    format = axCoerceString(format);
+    release || notImplemented("public flash.desktop.Clipboard::clearData"); return;
   }
 }

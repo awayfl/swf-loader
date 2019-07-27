@@ -1,3 +1,7 @@
+import { TextEvent } from "./TextEvent";
+import { Event } from "./Event";
+
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,40 +18,38 @@
  * limitations under the License.
  */
 // Class: ErrorEvent
-module Shumway.AVMX.AS.flash.events {
-  export class ErrorEvent extends flash.events.TextEvent {
+export class ErrorEvent extends TextEvent {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                text: string = "", id: number /*int*/ = 0) {
-      super(type, bubbles, cancelable, text);
-      this.setID(id);
-    }
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              text: string = "", id: number /*int*/ = 0) {
+    super(type, bubbles, cancelable, text);
+    this.setID(id);
+  }
 
-    // JS -> AS Bindings
-    static ERROR: string = "error";
+  // JS -> AS Bindings
+  static ERROR: string = "error";
 
-    _id: number;
+  _id: number;
 
-    private setID(id: number) {
-      this._id = id;
-    }
+  private setID(id: number) {
+    this._id = id;
+  }
 
-    get errorID(): number {
-      return this._id;
-    }
+  get errorID(): number {
+    return this._id;
+  }
 
-    clone(): Event {
-      return new this.sec.flash.events.ErrorEvent(this.type, this.bubbles,
-                                                             this.cancelable, this.text, this.errorID);
-    }
+  clone(): Event {
+    return new ErrorEvent(this.type, this.bubbles,
+                                                            this.cancelable, this.text, this.errorID);
+  }
 
-    toString(): string {
-      return this.formatToString('ErrorEvent', 'type', 'bubbles', 'cancelable', 'text', 'errorID');
-    }
+  toString(): string {
+    return this.formatToString('ErrorEvent', 'type', 'bubbles', 'cancelable', 'text', 'errorID');
   }
 }

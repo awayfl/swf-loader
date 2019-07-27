@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,61 +16,57 @@
  * limitations under the License.
  */
 // Class: LineScaleMode
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class LineScaleMode extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class LineScaleMode extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static NORMAL: string = "normal";
+  static VERTICAL: string = "vertical";
+  static HORIZONTAL: string = "horizontal";
+  static NONE: string = "none";
+  
+  
+  // AS -> JS Bindings
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return LineScaleMode.NONE;
+      case 1:
+        return LineScaleMode.NORMAL;
+      case 2:
+        return LineScaleMode.VERTICAL;
+      case 3:
+        return LineScaleMode.HORIZONTAL;
+      default:
+        return null;
     }
-    
-    // JS -> AS Bindings
-    static NORMAL: string = "normal";
-    static VERTICAL: string = "vertical";
-    static HORIZONTAL: string = "horizontal";
-    static NONE: string = "none";
-    
-    
-    // AS -> JS Bindings
+  }
 
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return LineScaleMode.NONE;
-        case 1:
-          return LineScaleMode.NORMAL;
-        case 2:
-          return LineScaleMode.VERTICAL;
-        case 3:
-          return LineScaleMode.HORIZONTAL;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case LineScaleMode.NONE:
-          return 0;
-        case LineScaleMode.NORMAL:
-          return 1;
-        case LineScaleMode.VERTICAL:
-          return 2;
-        case LineScaleMode.HORIZONTAL:
-          return 3;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case LineScaleMode.NONE:
+        return 0;
+      case LineScaleMode.NORMAL:
+        return 1;
+      case LineScaleMode.VERTICAL:
+        return 2;
+      case LineScaleMode.HORIZONTAL:
+        return 3;
+      default:
+        return -1;
     }
   }
 }

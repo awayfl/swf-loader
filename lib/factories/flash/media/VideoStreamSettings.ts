@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,45 +16,41 @@
  * limitations under the License.
  */
 // Class: VideoStreamSettings
-module Shumway.AVMX.AS.flash.media {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class VideoStreamSettings extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class VideoStreamSettings extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["width", "height", "fps", "quality", "bandwidth", "keyFrameInterval", "codec", "setMode", "setQuality", "setKeyFrameInterval"];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    width: number /*int*/;
-    height: number /*int*/;
-    fps: number;
-    quality: number /*int*/;
-    bandwidth: number /*int*/;
-    keyFrameInterval: number /*int*/;
-    codec: string;
-    setMode: (width: number /*int*/, height: number /*int*/, fps: number) => void;
-    setQuality: (bandwidth: number /*int*/, quality: number /*int*/) => void;
-    setKeyFrameInterval: (keyFrameInterval: number /*int*/) => void;
-    
-    // AS -> JS Bindings
-    
-    // _width: number /*int*/;
-    // _height: number /*int*/;
-    // _fps: number;
-    // _quality: number /*int*/;
-    // _bandwidth: number /*int*/;
-    // _keyFrameInterval: number /*int*/;
-    // _codec: string;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["width", "height", "fps", "quality", "bandwidth", "keyFrameInterval", "codec", "setMode", "setQuality", "setKeyFrameInterval"];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  
+  width: number /*int*/;
+  height: number /*int*/;
+  fps: number;
+  quality: number /*int*/;
+  bandwidth: number /*int*/;
+  keyFrameInterval: number /*int*/;
+  codec: string;
+  setMode: (width: number /*int*/, height: number /*int*/, fps: number) => void;
+  setQuality: (bandwidth: number /*int*/, quality: number /*int*/) => void;
+  setKeyFrameInterval: (keyFrameInterval: number /*int*/) => void;
+  
+  // AS -> JS Bindings
+  
+  // _width: number /*int*/;
+  // _height: number /*int*/;
+  // _fps: number;
+  // _quality: number /*int*/;
+  // _bandwidth: number /*int*/;
+  // _keyFrameInterval: number /*int*/;
+  // _codec: string;
 }

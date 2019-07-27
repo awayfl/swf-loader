@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,19 +16,17 @@
  * limitations under the License.
  */
 // Class: TextFormatDisplay
-module Shumway.AVMX.AS.flash.text {
-  export class TextFormatDisplay extends ASObject {
+export class TextFormatDisplay extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    constructor() {
-      super();
-    }
-
-    // JS -> AS Bindings
-    static INLINE: string = "inline";
-    static BLOCK: string = "block";
+  constructor() {
+    super();
   }
+
+  // JS -> AS Bindings
+  static INLINE: string = "inline";
+  static BLOCK: string = "block";
 }

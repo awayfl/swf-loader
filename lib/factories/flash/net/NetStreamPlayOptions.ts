@@ -1,3 +1,5 @@
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,32 +16,30 @@
  * limitations under the License.
  */
 // Class: NetStreamPlayOptions
-module Shumway.AVMX.AS.flash.net {
-  export class NetStreamPlayOptions extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class NetStreamPlayOptions extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["streamName", "oldStreamName", "start", "len", "offset", "transition"];
-    
-    constructor () {
-      super(undefined);
-    }
-    
-    // JS -> AS Bindings
-    
-    streamName: string;
-    oldStreamName: string;
-    start: number;
-    len: number;
-    offset: number;
-    transition: string;
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["streamName", "oldStreamName", "start", "len", "offset", "transition"];
+  
+  constructor () {
+    super(undefined);
   }
+  
+  // JS -> AS Bindings
+  
+  streamName: string;
+  oldStreamName: string;
+  start: number;
+  len: number;
+  offset: number;
+  transition: string;
+  
+  // AS -> JS Bindings
+  
 }

@@ -1,3 +1,7 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { ASArray } from "../../avm2/nat";
+import { EventDispatcher } from "../events/EventDispatcher";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,25 +18,21 @@
  * limitations under the License.
  */
 // Class: FileReferenceList
-module Shumway.AVMX.AS.flash.net {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class FileReferenceList extends flash.events.EventDispatcher {
-    
-    static classInitializer: any = null;
+export class FileReferenceList extends EventDispatcher {
+  
+  static classInitializer: any = null;
 
-    constructor () {
-      super();
-    }
+  constructor () {
+    super();
+  }
 
-    // _fileList: any [];
-    get fileList(): ASArray {
-      release || notImplemented("public flash.net.FileReferenceList::get fileList"); return;
-      // return this._fileList;
-    }
-    browse(typeFilter: ASArray = null): boolean {
-      typeFilter = typeFilter;
-      release || notImplemented("public flash.net.FileReferenceList::browse"); return;
-    }
+  // _fileList: any [];
+  get fileList(): ASArray {
+    release || notImplemented("public flash.net.FileReferenceList::get fileList"); return;
+    // return this._fileList;
+  }
+  browse(typeFilter: ASArray = null): boolean {
+    typeFilter = typeFilter;
+    release || notImplemented("public flash.net.FileReferenceList::browse"); return;
   }
 }

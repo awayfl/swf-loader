@@ -1,3 +1,6 @@
+import { ASObject } from "../../avm2/nat";
+import { GradientInterpolationMethod } from "@awayjs/graphics";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,46 +17,42 @@
  * limitations under the License.
  */
 // Class: InterpolationMethod
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import GradientInterpolationMethod = Shumway.GradientInterpolationMethod;
-  export class InterpolationMethod extends ASObject {
+export class InterpolationMethod extends ASObject {
 
-    static classInitializer: any = null;
-    static classSymbols: string [] = null; // [];
-    static instanceSymbols: string [] = null; // [];
+  static classInitializer: any = null;
+  static classSymbols: string [] = null; // [];
+  static instanceSymbols: string [] = null; // [];
 
-    constructor () {
-      super();
+  constructor () {
+    super();
+  }
+
+  // JS -> AS Bindings
+  static RGB: string = "rgb";
+  static LINEAR_RGB: string = "linearRGB";
+
+
+  // AS -> JS Bindings
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case GradientInterpolationMethod.RGB:
+        return InterpolationMethod.RGB;
+      case GradientInterpolationMethod.LinearRGB:
+        return InterpolationMethod.LINEAR_RGB;
+      default:
+        return null;
     }
+  }
 
-    // JS -> AS Bindings
-    static RGB: string = "rgb";
-    static LINEAR_RGB: string = "linearRGB";
-
-
-    // AS -> JS Bindings
-
-    static fromNumber(n: number): string {
-      switch (n) {
-        case GradientInterpolationMethod.RGB:
-          return InterpolationMethod.RGB;
-        case GradientInterpolationMethod.LinearRGB:
-          return InterpolationMethod.LINEAR_RGB;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case InterpolationMethod.RGB:
-          return GradientInterpolationMethod.RGB;
-        case InterpolationMethod.LINEAR_RGB:
-          return GradientInterpolationMethod.LinearRGB;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case InterpolationMethod.RGB:
+        return GradientInterpolationMethod.RGB;
+      case InterpolationMethod.LINEAR_RGB:
+        return GradientInterpolationMethod.LinearRGB;
+      default:
+        return -1;
     }
   }
 }

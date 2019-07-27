@@ -1,3 +1,7 @@
+import { axCoerceString } from "@awayjs/graphics";
+
+import { Event } from "../events/Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,22 +18,18 @@
  * limitations under the License.
  */
 // Class: StageCaptureEvent
-module Shumway.AVMX.AS.flash.automation {
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class StageCaptureEvent extends flash.events.Event {
-    constructor (type: string, bubbles: boolean = false, cancelable: boolean = false, url: string = "", checksum: number /*uint*/ = 0) {
-      type = axCoerceString(type); bubbles = !!bubbles; cancelable = !!cancelable; url = axCoerceString(url); checksum = checksum >>> 0;
-      super(undefined, undefined, undefined);
-    }
-    // Static   JS -> AS Bindings
-    // Static   AS -> JS Bindings
-    // Instance JS -> AS Bindings
-    m_url: string;
-    m_checksum: number /*uint*/;
-    clone: () => flash.events.Event;
-    url: string;
-    checksum: number /*uint*/;
-    // Instance AS -> JS Bindings
+export class StageCaptureEvent extends Event {
+  constructor (type: string, bubbles: boolean = false, cancelable: boolean = false, url: string = "", checksum: number /*uint*/ = 0) {
+    type = axCoerceString(type); bubbles = !!bubbles; cancelable = !!cancelable; url = axCoerceString(url); checksum = checksum >>> 0;
+    super(undefined, undefined, undefined);
   }
+  // Static   JS -> AS Bindings
+  // Static   AS -> JS Bindings
+  // Instance JS -> AS Bindings
+  m_url: string;
+  m_checksum: number /*uint*/;
+  clone: () => Event;
+  url: string;
+  checksum: number /*uint*/;
+  // Instance AS -> JS Bindings
 }

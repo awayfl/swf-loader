@@ -1,3 +1,5 @@
+import { ASFunction, ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,34 +16,32 @@
  * limitations under the License.
  */
 // Class: Responder
-module Shumway.AVMX.AS.flash.net {
 
-  export class Responder extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class Responder extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor (result: ASFunction, status: ASFunction = null) {
-      super();
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor (result: ASFunction, status: ASFunction = null) {
+    super();
+  }
 
-    private _result: ASFunction;
-    private _status: ASFunction;
+  private _result: ASFunction;
+  private _status: ASFunction;
 
-    // JS -> AS Bindings
-    
-    
-    // AS -> JS Bindings
-    
-    ctor(result: ASFunction, status: ASFunction): void {
-      this._result = result;
-      this._status = status;
-    }
+  // JS -> AS Bindings
+  
+  
+  // AS -> JS Bindings
+  
+  ctor(result: ASFunction, status: ASFunction): void {
+    this._result = result;
+    this._status = status;
   }
 }

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,20 +16,18 @@
  * limitations under the License.
  */
 // Class: FontType
-module Shumway.AVMX.AS.flash.text {
-  export class FontType extends ASObject {
-    
-    static classInitializer: any = null;
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static EMBEDDED: string = "embedded";
-    static EMBEDDED_CFF: string = "embeddedCFF";
-    static DEVICE: string = "device";
+export class FontType extends ASObject {
+  
+  static classInitializer: any = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static EMBEDDED: string = "embedded";
+  static EMBEDDED_CFF: string = "embeddedCFF";
+  static DEVICE: string = "device";
 }

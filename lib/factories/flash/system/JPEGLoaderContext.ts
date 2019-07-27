@@ -1,3 +1,7 @@
+import { ApplicationDomain } from "./ApplicationDomain";
+import { SecurityDomain } from "./SecurityDomain";
+import { LoaderContext } from "./LoaderContext";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,28 +18,26 @@
  * limitations under the License.
  */
 // Class: JPEGLoaderContext
-module Shumway.AVMX.AS.flash.system {
-  export class JPEGLoaderContext extends flash.system.LoaderContext {
+export class JPEGLoaderContext extends LoaderContext {
 
-    static axClass: typeof JPEGLoaderContext;
+  static axClass: typeof JPEGLoaderContext;
 
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
 
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["deblockingFilter"];
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["deblockingFilter"];
 
-    constructor(deblockingFilter: number = 0, checkPolicyFile: boolean = false,
-                applicationDomain: flash.system.ApplicationDomain = null,
-                securityDomain: flash.system.SecurityDomain = null)
-    {
-      super(checkPolicyFile, applicationDomain, securityDomain);
-      this.deblockingFilter = +deblockingFilter;
-    }
-
-    deblockingFilter: number;
+  constructor(deblockingFilter: number = 0, checkPolicyFile: boolean = false,
+              applicationDomain: ApplicationDomain = null,
+              securityDomain: SecurityDomain = null)
+  {
+    super(checkPolicyFile, applicationDomain, securityDomain);
+    this.deblockingFilter = +deblockingFilter;
   }
+
+  deblockingFilter: number;
 }

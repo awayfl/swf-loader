@@ -1,3 +1,6 @@
+import { axCoerceString } from "../../avm2/run";
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,50 +17,46 @@
  * limitations under the License.
  */
 // Class: FileFilter
-module Shumway.AVMX.AS.flash.net {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
 
-  export class FileFilter extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class FileFilter extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor (description: string, extension: string, macType: string = null) {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    
-    // AS -> JS Bindings
-    
-    private _description: string;
-    private _extension: string;
-    private _macType: string;
-    get description(): string {
-      return this._description;
-    }
-    set description(value: string) {
-      this._description = axCoerceString(value);
-    }
-    get extension(): string {
-      return this._extension;
-    }
-    set extension(value: string) {
-      this._extension = axCoerceString(value);
-    }
-    get macType(): string {
-      return this._macType;
-    }
-    set macType(value: string) {
-      this._macType = axCoerceString(value);
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor (description: string, extension: string, macType: string = null) {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  
+  
+  // AS -> JS Bindings
+  
+  private _description: string;
+  private _extension: string;
+  private _macType: string;
+  get description(): string {
+    return this._description;
+  }
+  set description(value: string) {
+    this._description = axCoerceString(value);
+  }
+  get extension(): string {
+    return this._extension;
+  }
+  set extension(value: string) {
+    this._extension = axCoerceString(value);
+  }
+  get macType(): string {
+    return this._macType;
+  }
+  set macType(value: string) {
+    this._macType = axCoerceString(value);
   }
 }

@@ -1,3 +1,10 @@
+import { release, somewhatImplemented } from "../../base/utilities/Debug";
+import { Event } from "../events/Event";
+import { Rectangle } from "../geom/Rectangle";
+import { DisplayObject } from "./DisplayObject";
+import { AccessibilityImplementation } from "../accessibility/AccessibilityImplementation";
+import { ContextMenu } from "../ui/ContextMenu";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,143 +21,136 @@
  * limitations under the License.
  */
 // Class: InteractiveObject
-module Shumway.AVMX.AS.flash.display {
-  import somewhatImplemented = Shumway.Debug.somewhatImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
+export class InteractiveObject extends DisplayObject {
+  
+  static classInitializer: any = null;
 
-  import events = flash.events;
-
-  export class InteractiveObject extends flash.display.DisplayObject {
-    
-    static classInitializer: any = null;
-
-    constructor () {
-      super();
-      if (!this._fieldsInitialized) {
-        this._initializeFields();
-      }
+  constructor () {
+    super();
+    if (!this._fieldsInitialized) {
+      this._initializeFields();
     }
+  }
 
-    protected _initializeFields() {
-      super._initializeFields();
-      this._tabEnabled = false;
-      this._tabIndex = -1;
-      this._focusRect = null;
-      this._mouseEnabled = true;
-      this._doubleClickEnabled = false;
-      this._accessibilityImplementation = null;
-      this._softKeyboardInputAreaOfInterest = null;
-      this._needsSoftKeyboard = false;
-      this._contextMenu = null;
-    }
-    
-    _tabEnabled: boolean;
-    _tabIndex: number /*int*/;
-    _focusRect: any;
-    _mouseEnabled: boolean;
-    _doubleClickEnabled: boolean;
-    _accessibilityImplementation: flash.accessibility.AccessibilityImplementation;
-    _softKeyboardInputAreaOfInterest: flash.geom.Rectangle;
-    _needsSoftKeyboard: boolean;
-    _contextMenu: flash.ui.ContextMenu;
+  protected _initializeFields() {
+    super._initializeFields();
+    this._tabEnabled = false;
+    this._tabIndex = -1;
+    this._focusRect = null;
+    this._mouseEnabled = true;
+    this._doubleClickEnabled = false;
+    this._accessibilityImplementation = null;
+    this._softKeyboardInputAreaOfInterest = null;
+    this._needsSoftKeyboard = false;
+    this._contextMenu = null;
+  }
+  
+  _tabEnabled: boolean;
+  _tabIndex: number /*int*/;
+  _focusRect: any;
+  _mouseEnabled: boolean;
+  _doubleClickEnabled: boolean;
+  _accessibilityImplementation: AccessibilityImplementation;
+  _softKeyboardInputAreaOfInterest: Rectangle;
+  _needsSoftKeyboard: boolean;
+  _contextMenu: ContextMenu;
 
-    get tabEnabled(): boolean {
-      return this._tabEnabled;
-    }
+  get tabEnabled(): boolean {
+    return this._tabEnabled;
+  }
 
-    set tabEnabled(enabled: boolean) {
-      enabled = !!enabled;
-      var old = this._tabEnabled;
-      this._tabEnabled = enabled;
-      if (old !== enabled) {
-        this.dispatchEvent(this.sec.flash.events.Event.axClass.getInstance(events.Event.TAB_ENABLED_CHANGE, true));
-      }
+  set tabEnabled(enabled: boolean) {
+    enabled = !!enabled;
+    var old = this._tabEnabled;
+    this._tabEnabled = enabled;
+    if (old !== enabled) {
+      this.dispatchEvent(Event.axClass.getInstance(Event.TAB_ENABLED_CHANGE, true));
     }
+  }
 
-    get tabIndex(): number /*int*/ {
-      return this._tabIndex;
-    }
+  get tabIndex(): number /*int*/ {
+    return this._tabIndex;
+  }
 
-    set tabIndex(index: number /*int*/) {
-      index = index | 0;
-      var old = this._tabIndex;
-      this._tabIndex = index;
-      if (old !== index) {
-        this.dispatchEvent(this.sec.flash.events.Event.axClass.getInstance(events.Event.TAB_INDEX_CHANGE, true));
-      }
+  set tabIndex(index: number /*int*/) {
+    index = index | 0;
+    var old = this._tabIndex;
+    this._tabIndex = index;
+    if (old !== index) {
+      this.dispatchEvent(Event.axClass.getInstance(Event.TAB_INDEX_CHANGE, true));
     }
+  }
 
-    get focusRect(): any {
-      return this._focusRect;
-    }
+  get focusRect(): any {
+    return this._focusRect;
+  }
 
-    /**
-     * The given |focusRect| can be one of: |true|, |false| or |null|.
-     */
-    set focusRect(focusRect: any) {
-      release || somewhatImplemented("public flash.display.InteractiveObject::set focusRect");
-      this._focusRect = focusRect;
-    }
+  /**
+   * The given |focusRect| can be one of: |true|, |false| or |null|.
+   */
+  set focusRect(focusRect: any) {
+    release || somewhatImplemented("public flash.display.InteractiveObject::set focusRect");
+    this._focusRect = focusRect;
+  }
 
-    get mouseEnabled(): boolean {
-      return this._mouseEnabled;
-    }
+  get mouseEnabled(): boolean {
+    return this._mouseEnabled;
+  }
 
-    set mouseEnabled(enabled: boolean) {
-      this._mouseEnabled = !!enabled;
-    }
+  set mouseEnabled(enabled: boolean) {
+    this._mouseEnabled = !!enabled;
+  }
 
-    get doubleClickEnabled(): boolean {
-      return this._doubleClickEnabled;
-    }
+  get doubleClickEnabled(): boolean {
+    return this._doubleClickEnabled;
+  }
 
-    set doubleClickEnabled(enabled: boolean) {
-      this._doubleClickEnabled = !!enabled;
-    }
+  set doubleClickEnabled(enabled: boolean) {
+    this._doubleClickEnabled = !!enabled;
+  }
 
-    get accessibilityImplementation(): flash.accessibility.AccessibilityImplementation {
-      return this._accessibilityImplementation;
-    }
+  get accessibilityImplementation(): AccessibilityImplementation {
+    return this._accessibilityImplementation;
+  }
 
-    set accessibilityImplementation(value: flash.accessibility.AccessibilityImplementation) {
-      release || somewhatImplemented("public flash.display.InteractiveObject::set" +
-                         " accessibilityImplementation");
-      this._accessibilityImplementation = value;
-    }
+  set accessibilityImplementation(value: AccessibilityImplementation) {
+    release || somewhatImplemented("public flash.display.InteractiveObject::set" +
+                        " accessibilityImplementation");
+    this._accessibilityImplementation = value;
+  }
 
-    get softKeyboardInputAreaOfInterest(): flash.geom.Rectangle {
-      return this._softKeyboardInputAreaOfInterest;
-    }
+  get softKeyboardInputAreaOfInterest(): Rectangle {
+    return this._softKeyboardInputAreaOfInterest;
+  }
 
-    set softKeyboardInputAreaOfInterest(value: flash.geom.Rectangle) {
-      release || somewhatImplemented("public flash.display.InteractiveObject::set" +
-                          " softKeyboardInputAreaOfInterest");
-       this._softKeyboardInputAreaOfInterest = value;
-    }
+  set softKeyboardInputAreaOfInterest(value: Rectangle) {
+    release || somewhatImplemented("public flash.display.InteractiveObject::set" +
+                        " softKeyboardInputAreaOfInterest");
+      this._softKeyboardInputAreaOfInterest = value;
+  }
 
-    get needsSoftKeyboard(): boolean {
-      return this._needsSoftKeyboard;
-    }
+  get needsSoftKeyboard(): boolean {
+    return this._needsSoftKeyboard;
+  }
 
-    set needsSoftKeyboard(value: boolean) {
-      value = !!value;
-      release || somewhatImplemented("public flash.display.InteractiveObject::set needsSoftKeyboard");
-       this._needsSoftKeyboard = value;
-    }
+  set needsSoftKeyboard(value: boolean) {
+    value = !!value;
+    release || somewhatImplemented("public flash.display.InteractiveObject::set needsSoftKeyboard");
+      this._needsSoftKeyboard = value;
+  }
 
-    get contextMenu(): flash.ui.ContextMenu {
-      return this._contextMenu;
-    }
+  get contextMenu(): ContextMenu {
+    return this._contextMenu;
+  }
 
-    set contextMenu(cm: flash.ui.ContextMenu) {
-      cm = cm;
-      release || somewhatImplemented("public flash.display.InteractiveObject::set contextMenu");
-      this._contextMenu = cm;
-    }
+  set contextMenu(cm: ContextMenu) {
+    cm = cm;
+    release || somewhatImplemented("public flash.display.InteractiveObject::set contextMenu");
+    this._contextMenu = cm;
+  }
 
-    requestSoftKeyboard(): boolean {
-      release || somewhatImplemented("public flash.display.InteractiveObject::requestSoftKeyboard");
-      return false;
-    }
+  requestSoftKeyboard(): boolean {
+    release || somewhatImplemented("public flash.display.InteractiveObject::requestSoftKeyboard");
+    return false;
   }
 }

@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,38 +16,34 @@
  * limitations under the License.
  */
 // Class: MicrophoneEnhancedOptions
-module Shumway.AVMX.AS.flash.media {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class MicrophoneEnhancedOptions extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class MicrophoneEnhancedOptions extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["mode", "mode", "echoPath", "echoPath", "nonLinearProcessing", "nonLinearProcessing", "autoGain", "autoGain", "isVoiceDetected", "isVoiceDetected"];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    mode: string;
-    echoPath: number /*int*/;
-    nonLinearProcessing: boolean;
-    autoGain: boolean;
-    isVoiceDetected: number /*int*/;
-    
-    // AS -> JS Bindings
-    
-    // _mode: string;
-    // _echoPath: number /*int*/;
-    // _nonLinearProcessing: boolean;
-    // _autoGain: boolean;
-    // _isVoiceDetected: number /*int*/;
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["mode", "mode", "echoPath", "echoPath", "nonLinearProcessing", "nonLinearProcessing", "autoGain", "autoGain", "isVoiceDetected", "isVoiceDetected"];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  
+  mode: string;
+  echoPath: number /*int*/;
+  nonLinearProcessing: boolean;
+  autoGain: boolean;
+  isVoiceDetected: number /*int*/;
+  
+  // AS -> JS Bindings
+  
+  // _mode: string;
+  // _echoPath: number /*int*/;
+  // _nonLinearProcessing: boolean;
+  // _autoGain: boolean;
+  // _isVoiceDetected: number /*int*/;
 }

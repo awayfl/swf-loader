@@ -1,3 +1,6 @@
+import { Event } from "./Event";
+import { axCoerceString } from "../../avm2/run";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,46 +17,44 @@
  * limitations under the License.
  */
 // Class: StatusEvent
-module Shumway.AVMX.AS.flash.events {
-  export class StatusEvent extends flash.events.Event {
+export class StatusEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    private _code: string;
-    private _level: string;
+  private _code: string;
+  private _level: string;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                code: string = "", level: string = "") {
-      super(type, bubbles, cancelable);
-      this._code = axCoerceString(code);
-      this._level = axCoerceString(level);
-    }
-
-    public get level(): string {
-      return this._level;
-    }
-
-    public set level(value: string) {
-      this._level = value;
-    }
-    public get code(): string {
-      return this._code;
-    }
-
-    public set code(value: string) {
-      this._code = value;
-    }
-
-    clone(): Shumway.AVMX.AS.flash.events.Event {
-      return new this.sec.flash.events.StatusEvent(this._type, this._bubbles, this._cancelable,
-                                                   this._code, this._level);
-    }
-
-    toString(): string {
-      return this.formatToString('StatusEvent', 'type', 'bubbles', 'cancelable', 'eventPhase',
-                                 'code', 'level');
-    }
-
-    static STATUS: string = "status";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              code: string = "", level: string = "") {
+    super(type, bubbles, cancelable);
+    this._code = axCoerceString(code);
+    this._level = axCoerceString(level);
   }
+
+  public get level(): string {
+    return this._level;
+  }
+
+  public set level(value: string) {
+    this._level = value;
+  }
+  public get code(): string {
+    return this._code;
+  }
+
+  public set code(value: string) {
+    this._code = value;
+  }
+
+  clone(): Event {
+    return new StatusEvent(this._type, this._bubbles, this._cancelable,
+                                                  this._code, this._level);
+  }
+
+  toString(): string {
+    return this.formatToString('StatusEvent', 'type', 'bubbles', 'cancelable', 'eventPhase',
+                                'code', 'level');
+  }
+
+  static STATUS: string = "status";
 }

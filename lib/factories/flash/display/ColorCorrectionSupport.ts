@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,56 +16,52 @@
  * limitations under the License.
  */
 // Class: ColorCorrectionSupport
-module Shumway.AVMX.AS.flash.display {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export class ColorCorrectionSupport extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class ColorCorrectionSupport extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
+  
+  // JS -> AS Bindings
+  static UNSUPPORTED: string = "unsupported";
+  static DEFAULT_ON: string = "defaultOn";
+  static DEFAULT_OFF: string = "defaultOff";
+  
+  
+  // AS -> JS Bindings
+
+  static fromNumber(n: number): string {
+    switch (n) {
+      case 0:
+        return ColorCorrectionSupport.UNSUPPORTED;
+      case 1:
+        return ColorCorrectionSupport.DEFAULT_ON;
+      case 2:
+        return ColorCorrectionSupport.DEFAULT_OFF;
+      default:
+        return null;
     }
-    
-    // JS -> AS Bindings
-    static UNSUPPORTED: string = "unsupported";
-    static DEFAULT_ON: string = "defaultOn";
-    static DEFAULT_OFF: string = "defaultOff";
-    
-    
-    // AS -> JS Bindings
+  }
 
-    static fromNumber(n: number): string {
-      switch (n) {
-        case 0:
-          return ColorCorrectionSupport.UNSUPPORTED;
-        case 1:
-          return ColorCorrectionSupport.DEFAULT_ON;
-        case 2:
-          return ColorCorrectionSupport.DEFAULT_OFF;
-        default:
-          return null;
-      }
-    }
-
-    static toNumber(value: string): number {
-      switch (value) {
-        case ColorCorrectionSupport.UNSUPPORTED:
-          return 0;
-        case ColorCorrectionSupport.DEFAULT_ON:
-          return 1;
-        case ColorCorrectionSupport.DEFAULT_OFF:
-          return 2;
-        default:
-          return -1;
-      }
+  static toNumber(value: string): number {
+    switch (value) {
+      case ColorCorrectionSupport.UNSUPPORTED:
+        return 0;
+      case ColorCorrectionSupport.DEFAULT_ON:
+        return 1;
+      case ColorCorrectionSupport.DEFAULT_OFF:
+        return 2;
+      default:
+        return -1;
     }
   }
 }

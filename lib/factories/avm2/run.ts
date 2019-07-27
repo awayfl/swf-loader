@@ -3,7 +3,7 @@ import { Bytecode } from "./abc/ops";
 import { assert } from "@awayjs/graphics";
 import { IndentingWriter, isIndex, dumpLine } from "../base/utilities";
 import { release, assertNotImplemented } from "../base/utilities/Debug";
-import { isNullOrUndefined } from "@awayjs/graphics/lib/data/utilities";
+import { isNullOrUndefined } from "@awayjs/graphics";
 import { isXMLCollection, ASXMLList, isXMLType, XMLParser, ASQName, ASNamespace, ASXML } from "./natives/xml";
 import { StringUtilities } from "../base/utilities/StringUtilities";
 import { formatErrorMessage, Errors } from "./errors";

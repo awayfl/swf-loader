@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 // Class: IDynamicPropertyOutput
-module Shumway.AVMX.AS.flash.net {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export interface IDynamicPropertyOutput {
-    
-    // JS -> AS Bindings
-    
-    writeDynamicProperty: (name: string, value: any) => void;
-    
-    // AS -> JS Bindings
-    
-  }
+export interface IDynamicPropertyOutput {
+  
+  // JS -> AS Bindings
+  
+  writeDynamicProperty: (name: string, value: any) => void;
+  
+  // AS -> JS Bindings
+  
 }

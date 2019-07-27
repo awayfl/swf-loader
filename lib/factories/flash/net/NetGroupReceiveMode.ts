@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,24 +16,22 @@
  * limitations under the License.
  */
 // Class: NetGroupReceiveMode
-module Shumway.AVMX.AS.flash.net {
-  export class NetGroupReceiveMode extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class NetGroupReceiveMode extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    static EXACT: string = "exact";
-    static NEAREST: string = "nearest";
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  static EXACT: string = "exact";
+  static NEAREST: string = "nearest";
 }

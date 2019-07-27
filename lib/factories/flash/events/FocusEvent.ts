@@ -1,3 +1,5 @@
+import { Event } from "./Event";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,32 +16,30 @@
  * limitations under the License.
  */
 // Class: FocusEvent
-module Shumway.AVMX.AS.flash.events {
-  export class FocusEvent extends flash.events.Event {
+export class FocusEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
 
-    relatedObject: flash.display.InteractiveObject;
-    shiftKey: boolean;
-    keyCode: number;
+  relatedObject: InteractiveObject;
+  shiftKey: boolean;
+  keyCode: number;
 
-    constructor(type: string, bubbles: boolean = true, cancelable: boolean = false,
-                relatedObject: flash.display.InteractiveObject = null, shiftKey: boolean = false,
-                keyCode: number /*uint*/ = 0) {
-      super(type, bubbles, cancelable);
-      // TODO: coerce
-      this.relatedObject = relatedObject;
-      this.shiftKey = !!shiftKey;
-      this.keyCode = keyCode >>> 0;
-    }
-
-    // JS -> AS Bindings
-    static FOCUS_IN: string = "focusIn";
-    static FOCUS_OUT: string = "focusOut";
-    static KEY_FOCUS_CHANGE: string = "keyFocusChange";
-    static MOUSE_FOCUS_CHANGE: string = "mouseFocusChange";
+  constructor(type: string, bubbles: boolean = true, cancelable: boolean = false,
+              relatedObject: InteractiveObject = null, shiftKey: boolean = false,
+              keyCode: number /*uint*/ = 0) {
+    super(type, bubbles, cancelable);
+    // TODO: coerce
+    this.relatedObject = relatedObject;
+    this.shiftKey = !!shiftKey;
+    this.keyCode = keyCode >>> 0;
   }
+
+  // JS -> AS Bindings
+  static FOCUS_IN: string = "focusIn";
+  static FOCUS_OUT: string = "focusOut";
+  static KEY_FOCUS_CHANGE: string = "keyFocusChange";
+  static MOUSE_FOCUS_CHANGE: string = "mouseFocusChange";
 }

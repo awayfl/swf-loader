@@ -1,3 +1,8 @@
+import { notImplemented, release } from "../../base/utilities/Debug";
+import { ASXML } from "../../avm2/natives/xml";
+import { EventDispatcher } from "../events/EventDispatcher";
+import { ByteArray } from "../../avm2/natives/byteArray";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,40 +19,37 @@
  * limitations under the License.
  */
 // Class: ApplicationInstaller
-module Shumway.AVMX.AS.flash.system {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class ApplicationInstaller extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class ApplicationInstaller extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
 
-    static stringsDigest(strings: ASXML): string {
-      strings = strings;
-      release || notImplemented("public flash.system.ApplicationInstaller::static stringsDigest"); return;
-    }
-    static iconDigest(icon: flash.utils.ByteArray): string {
-      icon = icon;
-      release || notImplemented("public flash.system.ApplicationInstaller::static iconDigest"); return;
-    }
-    
-    // _isInstalled: boolean;
-    get isInstalled(): boolean {
-      release || notImplemented("public flash.system.ApplicationInstaller::get isInstalled"); return;
-      // return this._isInstalled;
-    }
-    install(shortcutsOnly: boolean = false): void {
-      shortcutsOnly = !!shortcutsOnly;
-      release || notImplemented("public flash.system.ApplicationInstaller::install"); return;
-    }
+  static stringsDigest(strings: ASXML): string {
+    strings = strings;
+    release || notImplemented("public flash.system.ApplicationInstaller::static stringsDigest"); return;
+  }
+  static iconDigest(icon: ByteArray): string {
+    icon = icon;
+    release || notImplemented("public flash.system.ApplicationInstaller::static iconDigest"); return;
+  }
+  
+  // _isInstalled: boolean;
+  get isInstalled(): boolean {
+    release || notImplemented("public flash.system.ApplicationInstaller::get isInstalled"); return;
+    // return this._isInstalled;
+  }
+  install(shortcutsOnly: boolean = false): void {
+    shortcutsOnly = !!shortcutsOnly;
+    release || notImplemented("public flash.system.ApplicationInstaller::install"); return;
   }
 }

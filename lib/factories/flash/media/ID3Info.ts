@@ -1,3 +1,5 @@
+import { ASObject } from "../../avm2/nat";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,34 +16,32 @@
  * limitations under the License.
  */
 // Class: ID3Info
-module Shumway.AVMX.AS.flash.media {
 
-  export class ID3Info extends ASObject {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class ID3Info extends ASObject {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = ["songName", "artist", "album", "year", "comment", "genre", "track"];
-    
-    constructor () {
-      super();
-    }
-    
-    // JS -> AS Bindings
-    
-    songName: string;
-    artist: string;
-    album: string;
-    year: string;
-    comment: string;
-    genre: string;
-    track: string;
-    
-    // AS -> JS Bindings
-    
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = ["songName", "artist", "album", "year", "comment", "genre", "track"];
+  
+  constructor () {
+    super();
   }
+  
+  // JS -> AS Bindings
+  
+  songName: string;
+  artist: string;
+  album: string;
+  year: string;
+  comment: string;
+  genre: string;
+  track: string;
+  
+  // AS -> JS Bindings
+  
 }

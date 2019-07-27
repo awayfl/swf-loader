@@ -1,3 +1,8 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { Socket } from "./Socket";
+import { ByteArray } from "../../avm2/natives/byteArray";
+import { X509Certificate } from "../security/X509Certificate";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,44 +19,41 @@
  * limitations under the License.
  */
 // Class: SecureSocket
-module Shumway.AVMX.AS.flash.net {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class SecureSocket extends flash.net.Socket {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class SecureSocket extends Socket {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // ["serverCertificateStatus", "connect"];
-    
-    constructor () {
-      super(undefined, undefined);
-    }
-    
-    // JS -> AS Bindings
-    
-    serverCertificateStatus: string;
-    connect: (host: string, port: number /*int*/) => void;
-    
-    // AS -> JS Bindings
-    // static _isSupported: boolean;
-    get isSupported(): boolean {
-      release || notImplemented("public flash.net.SecureSocket::get isSupported"); return;
-      // return this._isSupported;
-    }
-    
-    // _serverCertificateStatus: string;
-    // _serverCertificate: flash.security.X509Certificate;
-    get serverCertificate(): flash.security.X509Certificate {
-      release || notImplemented("public flash.net.SecureSocket::get serverCertificate"); return;
-      // return this._serverCertificate;
-    }
-    addBinaryChainBuildingCertificate(certificate: flash.utils.ByteArray, trusted: boolean): void {
-      certificate = certificate; trusted = !!trusted;
-      release || notImplemented("public flash.net.SecureSocket::addBinaryChainBuildingCertificate"); return;
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // ["serverCertificateStatus", "connect"];
+  
+  constructor () {
+    super(undefined, undefined);
+  }
+  
+  // JS -> AS Bindings
+  
+  serverCertificateStatus: string;
+  connect: (host: string, port: number /*int*/) => void;
+  
+  // AS -> JS Bindings
+  // static _isSupported: boolean;
+  get isSupported(): boolean {
+    release || notImplemented("public flash.net.SecureSocket::get isSupported"); return;
+    // return this._isSupported;
+  }
+  
+  // _serverCertificateStatus: string;
+  // _serverCertificate: flash.security.X509Certificate;
+  get serverCertificate(): X509Certificate {
+    release || notImplemented("public flash.net.SecureSocket::get serverCertificate"); return;
+    // return this._serverCertificate;
+  }
+  addBinaryChainBuildingCertificate(certificate: ByteArray, trusted: boolean): void {
+    certificate = certificate; trusted = !!trusted;
+    release || notImplemented("public flash.net.SecureSocket::addBinaryChainBuildingCertificate"); return;
   }
 }

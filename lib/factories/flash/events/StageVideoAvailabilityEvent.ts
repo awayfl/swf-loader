@@ -1,3 +1,6 @@
+import { Event } from "./Event";
+import { axCoerceString } from "@awayjs/graphics";
+
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -14,22 +17,20 @@
  * limitations under the License.
  */
 // Class: StageVideoAvailabilityEvent
-module Shumway.AVMX.AS.flash.events {
-  export class StageVideoAvailabilityEvent extends flash.events.Event {
+export class StageVideoAvailabilityEvent extends Event {
 
-    static classInitializer: any = null;
+  static classInitializer: any = null;
 
-    static classSymbols: string [] = null;
-    static instanceSymbols: string [] = null;
-    availability: string;
+  static classSymbols: string [] = null;
+  static instanceSymbols: string [] = null;
+  availability: string;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
-                availability: string = null) {
-      super(type, bubbles, cancelable);
-      this.availability = axCoerceString(availability);
-    }
-
-    // JS -> AS Bindings
-    static STAGE_VIDEO_AVAILABILITY: string = "stageVideoAvailability";
+  constructor(type: string, bubbles: boolean = false, cancelable: boolean = false,
+              availability: string = null) {
+    super(type, bubbles, cancelable);
+    this.availability = axCoerceString(availability);
   }
+
+  // JS -> AS Bindings
+  static STAGE_VIDEO_AVAILABILITY: string = "stageVideoAvailability";
 }

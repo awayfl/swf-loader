@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 // Class: ISearchableText
-module Shumway.AVMX.AS.flash.accessibility {
-  import notImplemented = Shumway.Debug.notImplemented;
-  import axCoerceString = Shumway.AVMX.axCoerceString;
-  export interface ISearchableText {
-    
-    // JS -> AS Bindings
-    
-    searchText: string;
-    
-    // AS -> JS Bindings
-    
-    // _searchText: string;
-  }
+export interface ISearchableText {
+  
+  // JS -> AS Bindings
+  
+  searchText: string;
+  
+  // AS -> JS Bindings
+  
+  // _searchText: string;
 }

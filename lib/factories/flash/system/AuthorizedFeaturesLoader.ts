@@ -1,3 +1,7 @@
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { EventDispatcher } from "../events/EventDispatcher";
+import { AuthorizedFeatures } from "./AuthorizedFeatures";
+
 /**
  * Copyright 2014 Mozilla Foundation
  * 
@@ -14,33 +18,30 @@
  * limitations under the License.
  */
 // Class: AuthorizedFeaturesLoader
-module Shumway.AVMX.AS.flash.system {
-  import notImplemented = Shumway.Debug.notImplemented;
-  export class AuthorizedFeaturesLoader extends flash.events.EventDispatcher {
-    
-    // Called whenever the class is initialized.
-    static classInitializer: any = null;
+export class AuthorizedFeaturesLoader extends EventDispatcher {
+  
+  // Called whenever the class is initialized.
+  static classInitializer: any = null;
 
-    // List of static symbols to link.
-    static classSymbols: string [] = null; // [];
-    
-    // List of instance symbols to link.
-    static instanceSymbols: string [] = null; // [];
-    
-    constructor () {
-      super();
-    }
+  // List of static symbols to link.
+  static classSymbols: string [] = null; // [];
+  
+  // List of instance symbols to link.
+  static instanceSymbols: string [] = null; // [];
+  
+  constructor () {
+    super();
+  }
 
-    // _authorizedFeatures: flash.system.AuthorizedFeatures;
-    get authorizedFeatures(): flash.system.AuthorizedFeatures {
-      release || notImplemented("public flash.system.AuthorizedFeaturesLoader::get authorizedFeatures"); return;
-      // return this._authorizedFeatures;
-    }
-    loadAuthorizedFeatures(): void {
-      release || notImplemented("public flash.system.AuthorizedFeaturesLoader::loadAuthorizedFeatures"); return;
-    }
-    makeGlobal(): void {
-      release || notImplemented("public flash.system.AuthorizedFeaturesLoader::makeGlobal"); return;
-    }
+  // _authorizedFeatures: flash.system.AuthorizedFeatures;
+  get authorizedFeatures(): AuthorizedFeatures {
+    release || notImplemented("public flash.system.AuthorizedFeaturesLoader::get authorizedFeatures"); return;
+    // return this._authorizedFeatures;
+  }
+  loadAuthorizedFeatures(): void {
+    release || notImplemented("public flash.system.AuthorizedFeaturesLoader::loadAuthorizedFeatures"); return;
+  }
+  makeGlobal(): void {
+    release || notImplemented("public flash.system.AuthorizedFeaturesLoader::makeGlobal"); return;
   }
 }
