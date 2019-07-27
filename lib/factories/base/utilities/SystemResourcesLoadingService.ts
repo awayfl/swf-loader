@@ -15,6 +15,6 @@ export var instance: ISystemResourcesLoadingService;
 
 
 export let SystemResourcesLoadingService={
-	SystemResourceId:SystemResourceId,
-	ISystemResourcesLoadingService:ISystemResourcesLoadingService
+	//SystemResourceId:SystemResourceId,
+	//ISystemResourcesLoadingService:ISystemResourcesLoadingService
 };

@@ -1,15 +1,13 @@
-import { assert } from "@awayjs/graphics";
-
+import { assert } from "../base/utilities/Debug";
 import { NamespaceType, Multiname, CONSTANT, Namespace, RuntimeTraits, ClassInfo, TRAIT, SORT, MethodInfo, TraitInfo, InstanceInfo, Traits } from "./abc/lazy";
-import { AXSecurityDomain, getCurrentABC, checkValue, AXClass, AXObject, Scope, AXFunction, axCoerceName, validateCall, validateConstruct, ensureBoxedReceiver, axDefaultCompareFunction, axCompareFields, AXCallable, sliceArguments, axIsCallable, axCompare, IMetaobjectProtocol, runtimeWriter, AXApplicationDomain } from "./run";
-import { IndentingWriter, MapObject, isNumeric, isNumber, isString, isIndex } from "../base/utilities";
+import { AXSecurityDomain, getCurrentABC, checkValue, AXClass, AXObject, Scope, AXFunction, axCoerceName, validateCall, validateConstruct, ensureBoxedReceiver, axDefaultCompareFunction, axCompareFields, AXCallable, sliceArguments, axIsCallable, axCompare, IMetaobjectProtocol, runtimeWriter, AXApplicationDomain, axCoerceString } from "./run";
+import { IndentingWriter, MapObject, isNumeric, isNumber, isString, isIndex, isNullOrUndefined } from "../base/utilities";
 import { jsGlobal } from "../base/utilities/jsGlobal";
-import { axCoerceString, isNullOrUndefined } from "@awayjs/graphics";
 import { release, assertUnreachable, Debug, warning } from "../base/utilities/Debug";
 import { Bytecode } from "./abc/ops";
 import { Errors } from "./errors";
 import { defineNonEnumerableProperty, ObjectUtilities, hasOwnProperty, hasOwnGetter, copyOwnPropertyDescriptors, copyPropertiesByList } from "../base/utilities/ObjectUtilities";
-import { ASNamespace, ASQName, ASXML, ASXMLList } from "./natives/xml";
+//import { ASQName, ASXML, ASXMLList, XMLParser } from "./natives/xml";
 import { getErrorInfo, formatErrorMessage } from "./errors";
 import { GenericVector, Vector } from "./natives/GenericVector";
 import { Int32Vector } from "./natives/int32Vector";
@@ -18,11 +16,15 @@ import { Float64Vector } from "./natives/float64Vector";
 import { ASDate } from "./natives/date";
 import { FileLoadingService } from "../base/utilities/FileLoadingService";
 import { pushMany } from "../base/utilities/ArrayUtilities";
+<<<<<<< HEAD
 import { XMLNode, XMLDocument, XMLParser, XMLTag, XMLNodeType } from "./natives/xml-document";
 import { ByteArray } from "./natives/byteArray";
 import { Dictionary } from "./natives/dictionary";
 import { ASProxy } from "./natives/proxy";
 import { OriginalSystem } from "./natives/system";
+=======
+import { XML, XMLNodeType, Dictionary, ByteArray } from '@as3web/flash';
+>>>>>>> hacks for fixing compiler errors
 
 /*
  * Copyright 2015 Mozilla Foundation
@@ -2345,7 +2347,7 @@ export function initializeBuiltins() {
   builtinNativeClasses["Function"]            = ASFunction;
   builtinNativeClasses["Boolean"]             = ASBoolean;
   builtinNativeClasses["builtin.as$0.MethodClosure"] = ASMethodClosure;
-  builtinNativeClasses["Namespace"]           = ASNamespace;
+  //builtinNativeClasses["Namespace"]           = ASNamespace;
   builtinNativeClasses["Number"]              = ASNumber;
   builtinNativeClasses["int"]                 = ASInt;
   builtinNativeClasses["uint"]                = ASUint;
@@ -2358,27 +2360,44 @@ export function initializeBuiltins() {
   builtinNativeClasses["__AS3__.vec.Vector$uint"]   = Uint32Vector;
   builtinNativeClasses["__AS3__.vec.Vector$double"] = Float64Vector;
 
-  builtinNativeClasses["Namespace"]           = ASNamespace;
-  builtinNativeClasses["QName"]               = ASQName;
-  builtinNativeClasses["XML"]                 = ASXML;
-  builtinNativeClasses["XMLList"]             = ASXMLList;
+  //builtinNativeClasses["Namespace"]           = ASNamespace;
+  //builtinNativeClasses["QName"]               = ASQName;
+  //builtinNativeClasses["XML"]                 = ASXML;
+  //builtinNativeClasses["XMLList"]             = ASXMLList;
 
+<<<<<<< HEAD
   builtinNativeClasses["flash.xml.XMLNode"] = XMLNode;
   builtinNativeClasses["flash.xml.XMLDocument"] = XMLDocument;
   builtinNativeClasses["flash.xml.XMLParser"] = XMLParser;
   builtinNativeClasses["flash.xml.XMLTag"] = XMLTag;
   builtinNativeClasses["flash.xml.XMLNodeType"] = XMLNodeType;
+=======
+  // todo: take care of XML classes
+  //builtinNativeClasses["flash.xml.XMLNode"] = (<any>XML);
+  //builtinNativeClasses["flash.xml.XMLDocument"] = (<any>XMLDocument);
+  //builtinNativeClasses["flash.xml.XMLParser"] = (<any>XMLParser);
+  //builtinNativeClasses["flash.xml.XMLTag"] = (<any>XMLTag);
+  //builtinNativeClasses["flash.xml.XMLNodeType"] = (<any>XMLNodeType);
+>>>>>>> hacks for fixing compiler errors
 
   builtinNativeClasses["Math"]                = ASMath;
   builtinNativeClasses["Date"]                = ASDate;
   builtinNativeClasses["RegExp"]              = ASRegExp;
   builtinNativeClasses["JSON"]                = ASJSON;
 
+<<<<<<< HEAD
   builtinNativeClasses["flash.utils.Proxy"]      = ASProxy;
   builtinNativeClasses["flash.utils.Dictionary"] = Dictionary;
   builtinNativeClasses["flash.utils.ByteArray"]  = ByteArray;
 
   builtinNativeClasses["avmplus.System"]  = OriginalSystem;
+=======
+  //builtinNativeClasses["flash.utils.Proxy"]      = ASProxy;
+  builtinNativeClasses["flash.utils.Dictionary"] = (<any> Dictionary);
+  builtinNativeClasses["flash.utils.ByteArray"]  = (<any> ByteArray);
+
+  //builtinNativeClasses["avmplus.System"]  = flash.system.OriginalSystem;
+>>>>>>> hacks for fixing compiler errors
 
   // Errors
   builtinNativeClasses["Error"]               = ASError;
@@ -2682,7 +2701,7 @@ function linkClass(axClass: AXClass, asClass: ASClass) {
 
   // TypeScript's static inheritance can lead to subtle linking bugs. Make sure we don't fall
   // victim to this by checking that we don't inherit non-null static properties.
-  if (false && !release && axClass.superClass) {
+  /*if (false && !release && axClass.superClass) {
     if (asClass.classSymbols) {
       release || assert(asClass.classSymbols !== axClass.superClass.asClass.classSymbols,
         "Make sure class " + axClass + " doesn't inherit super class's classSymbols.");
@@ -2695,7 +2714,7 @@ function linkClass(axClass: AXClass, asClass: ASClass) {
       release || assert(asClass.classInitializer !== axClass.superClass.asClass.classInitializer,
         "Make sure class " + axClass + " doesn't inherit super class's class initializer.");
     }
-  }
+  }*/
 
   if (asClass.classSymbols) {
     linkSymbols(asClass.classSymbols, axClass.classInfo.traits, axClass);
