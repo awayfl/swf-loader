@@ -1,6 +1,10 @@
-import { assert } from "@awayjs/graphics";
-import { release } from "../../base/utilities/Debug";
-import { DisplayObject } from "./DisplayObject";
+import { assert, Bounds } from "@awayjs/graphics";
+import { release, notImplemented } from "../../base/utilities/Debug";
+import { DisplayObject, IAdvancable, DisplayObjectDirtyFlags, DisplayObjectFlags, HitTestingType, HitTestingResult } from "./DisplayObject";
+import { Sprite } from './Sprite';
+import { ASFunction } from '../../avm2/nat';
+import { SWFFrame } from '../../../parsers/SWFParser';
+import { MovieClip } from './MovieClip';
 
 /**
  * Copyright 2014 Mozilla Foundation

@@ -36,16 +36,16 @@ export class ObjectEncoding extends ASObject {
   public static DEFAULT = AMFEncoding.DEFAULT;
 
   static get dynamicPropertyWriter(): any /* flash.net.IDynamicPropertyWriter */ {
-    release || release || notImplemented("public flash.net.ObjectEncoding::get dynamicPropertyWriter");
+    release || release || notImplemented("public ObjectEncoding::get dynamicPropertyWriter");
     return null;
   }
   static set dynamicPropertyWriter(value: any /* flash.net.IDynamicPropertyWriter */) {
-    release || release || notImplemented("public flash.net.ObjectEncoding::set dynamicPropertyWriter");
+    release || release || notImplemented("public ObjectEncoding::set dynamicPropertyWriter");
   }
 }
 
 export interface IDataInput {
-  readBytes: (bytes: flash.utils.ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
+  readBytes: (bytes: ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
   readBoolean: () => boolean;
   readByte: () => number /*int*/;
   readUnsignedByte: () => number /*uint*/;
@@ -65,7 +65,7 @@ export interface IDataInput {
 }
 
 export interface IDataOutput {
-  writeBytes: (bytes: flash.utils.ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
+  writeBytes: (bytes: ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
   writeBoolean: (value: boolean) => void;
   writeByte: (value: number /*int*/) => void;
   writeShort: (value: number /*int*/) => void;
@@ -140,7 +140,7 @@ export class ByteArray extends ASObject implements IDataInput, IDataOutput {
   /* The initial size of the backing, in bytes. Doubled every OOM. */
   private static INITIAL_SIZE = 128;
 
-  private static _defaultObjectEncoding: number = flash.net.ObjectEncoding.DEFAULT;
+  private static _defaultObjectEncoding: number = ObjectEncoding.DEFAULT;
 
   static get defaultObjectEncoding(): number /*uint*/ {
     return this._defaultObjectEncoding;
@@ -166,7 +166,7 @@ export class ByteArray extends ASObject implements IDataInput, IDataOutput {
 
   private _resetViews: () => void;
 
-  readBytes: (bytes: flash.utils.ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
+  readBytes: (bytes: ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
   readBoolean: () => boolean;
   readByte: () => number /*int*/;
   readUnsignedByte: () => number /*uint*/;
@@ -182,16 +182,16 @@ export class ByteArray extends ASObject implements IDataInput, IDataOutput {
   bytesAvailable: number /*uint*/;
   readObject(): any {
     switch (this._objectEncoding) {
-      case flash.net.ObjectEncoding.AMF0:
+      case ObjectEncoding.AMF0:
         return AMF0.read(this);
-      case flash.net.ObjectEncoding.AMF3:
+      case ObjectEncoding.AMF3:
         return AMF3.read(this);
       default:
         unexpected("Object Encoding");
     }
   }
 
-  writeBytes: (bytes: flash.utils.ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
+  writeBytes: (bytes: ByteArray, offset?: number /*uint*/, length?: number /*uint*/) => void;
   writeBoolean: (value: boolean) => void;
   writeByte: (value: number /*int*/) => void;
   writeShort: (value: number /*int*/) => void;
@@ -204,9 +204,9 @@ export class ByteArray extends ASObject implements IDataInput, IDataOutput {
   writeUTFBytes: (value: string) => void;
   writeObject(object: any) {
     switch (this._objectEncoding) {
-      case flash.net.ObjectEncoding.AMF0:
+      case ObjectEncoding.AMF0:
         return AMF0.write(this, object);
-      case flash.net.ObjectEncoding.AMF3:
+      case ObjectEncoding.AMF3:
         return AMF3.write(this, object);
       default:
         unexpected("Object Encoding");

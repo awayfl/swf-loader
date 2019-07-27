@@ -16,6 +16,7 @@
 import {ShumwayCom} from "./external";
 import {ImageType} from "./utilities";
 import {DataBuffer} from "@awayjs/graphics";
+import { notImplemented } from './utilities/Debug';
 
 export interface IRemotable {
 	_id: number;
@@ -311,19 +312,23 @@ export class WindowTransportPeer implements ITransportPeer  {
  */
 export class ShumwayComTransportPeer implements ITransportPeer  {
 	set onAsyncMessage(callback: (msg: any) => void) {
-		ShumwayCom.setAsyncMessageCallback(callback);
+		notImplemented("ShumwayComTransportPeer.onAsyncMessage not implemented yet");
+		//ShumwayCom.setAsyncMessageCallback(callback);
 	}
 
 	set onSyncMessage(callback: (msg: any) => any) {
-		ShumwayCom.setSyncMessageCallback(callback);
+		notImplemented("ShumwayComTransportPeer.onSyncMessage not implemented yet");
+		//ShumwayCom.setSyncMessageCallback(callback);
 	}
 
 	postAsyncMessage(msg: any, transfers?: any[]): void {
-		ShumwayCom.postAsyncMessage(msg);
+		notImplemented("ShumwayComTransportPeer.postAsyncMessage not implemented yet");
+		//ShumwayCom.postAsyncMessage(msg);
 	}
 
 	sendSyncMessage(msg: any, transfers?: any[]): any {
-		return ShumwayCom.sendSyncMessage(msg);
+		notImplemented("ShumwayComTransportPeer.sendSyncMessage not implemented yet");
+		return null;//ShumwayCom.sendSyncMessage(msg);
 	}
 }
 

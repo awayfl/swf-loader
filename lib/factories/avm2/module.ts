@@ -17,18 +17,19 @@
 
 import { release } from "../base/utilities/Debug";
 
-  export var timelineBuffer = Shumway.Tools ? new TimelineBuffer("AVX") : null;
-  export var counter = new Counter(!release);
-
-  export function countTimeline(name: string, value: number = 1) {
-    timelineBuffer && timelineBuffer.count(name, value);
-  }
-
-  export function enterTimeline(name: string, data?: any) {
-    profile && timelineBuffer && timelineBuffer.enter(name, data);
-  }
-
-  export function leaveTimeline(data?: any) {
-    profile && timelineBuffer && timelineBuffer.leave(null, data);
-  }
+export var timelineBuffer = null;
+//export var timelineBuffer = Shumway.Tools ? new TimelineBuffer("AVX") : null;
+export var counter = null;//new Counter(!release);
+var profile=false;
+export function countTimeline(name: string, value: number = 1) {
+  timelineBuffer && timelineBuffer.count(name, value);
 }
+
+export function enterTimeline(name: string, data?: any) {
+  profile && timelineBuffer && timelineBuffer.enter(name, data);
+}
+
+export function leaveTimeline(data?: any) {
+  profile && timelineBuffer && timelineBuffer.leave(null, data);
+}
+

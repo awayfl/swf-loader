@@ -1,20 +1,11 @@
 import {SWFParser} from "../../parsers/SWFParser";
-import {createSecurityDomain} from "./avmLoader"
-import { Stage, Loader, LoaderContext, Event, ApplicationDomain, Sprite, DisplayObjectContainer } from "@as3web/flash";
-class SWFFile{
-    private _name:string;
-    private _url:string;
-    private _buffer:Uint8Array;
-    private _parser:SWFParser;
-    constructor(name:string, url:string, buffer:Uint8Array){
-        this._name=name;
-        this._url=url;
-        this._buffer=buffer;
-        this._parser=new SWFParser();
-
-    }
-}
-
+import {createSecurityDomain} from "./avmLoader";
+import {Sprite} from "../flash/display/Sprite";
+import { Loader } from '../flash/display/Loader';
+import { Stage } from '../flash/display/Stage';
+import { LoaderContext } from '../flash/system/LoaderContext';
+import { ApplicationDomain } from '../flash/system/ApplicationDomain';
+import { Event} from "../flash/events/Event";
 class EntryClass extends Sprite{
     constructor(){
         super();
@@ -41,9 +32,9 @@ export class Player{
 	private _onLoadCompleteDelegate:(event:Event) => void;
     public onLoadComplete(buffer){
         window["hidePokiProgressBar"]();
-        this._stage=new Stage(null, window.innerWidth, window.innerHeight, 0xff0000);
-        this._stage.init(EntryClass);
-        (<DisplayObjectContainer>this._stage.getChildAt(0)).addChild(this._loader);
+        this._stage=new Stage();//null, window.innerWidth, window.innerHeight, 0xff0000);
+        //this._stage.init(EntryClass);
+        //(<DisplayObjectContainer>this._stage.getChildAt(0)).addChild(this._loader);
 
 
         //  now the loader has Finished, check if bytedata was transfered

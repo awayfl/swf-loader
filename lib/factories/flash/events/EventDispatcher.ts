@@ -25,6 +25,7 @@ import { Errors } from "../../avm2/errors";
 import { axCoerceString, axIsCallable } from "../../avm2/run";
 import { EventPhase } from "./EventPhase";
 import { DisplayObject } from "../display/DisplayObject";
+import { counter } from '../../avm2/module';
 
 class EventListenerEntry {
   constructor(public listener: EventHandler, public useCapture: boolean, public priority: number) {
@@ -393,7 +394,7 @@ export class EventDispatcher extends ASObject implements IEventDispatcher {
       return true;
     } else if (event._bubbles && DisplayObject.axIsType(this)) {
       // Check to see if there are any event listeners on the path to the root.
-      for (var node = (<DisplayObject>this)._parent; node; node = node._parent) {
+      for (var node = (<DisplayObject><any>this)._parent; node; node = node._parent) {
         if (node._hasEventListener(event.type)) {
           return false;
         }

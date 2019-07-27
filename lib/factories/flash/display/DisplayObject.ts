@@ -1852,7 +1852,7 @@ export class DisplayObject extends EventDispatcher implements IBitmapDrawable, I
   /**
    * Gets the text content of this object. StaticTexts and TextFields override this.
    */
-  _getTextContent(): TextContent {
+  _getTextContent(): any/*TextContent*/ {
     return null;
   }
 

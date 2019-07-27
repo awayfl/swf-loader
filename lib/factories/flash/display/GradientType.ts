@@ -30,6 +30,9 @@ export class GradientType extends ASObject {
   static LINEAR: string = "linear";
   static RADIAL: string = "radial";
   
+  //80pro: todo:
+  static Linear: number = 0;
+  static Radial: number = 1;
   
   // AS -> JS Bindings
 

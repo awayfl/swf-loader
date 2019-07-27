@@ -16,15 +16,11 @@ import { Float64Vector } from "./natives/float64Vector";
 import { ASDate } from "./natives/date";
 import { FileLoadingService } from "../base/utilities/FileLoadingService";
 import { pushMany } from "../base/utilities/ArrayUtilities";
-<<<<<<< HEAD
 import { XMLNode, XMLDocument, XMLParser, XMLTag, XMLNodeType } from "./natives/xml-document";
 import { ByteArray } from "./natives/byteArray";
 import { Dictionary } from "./natives/dictionary";
 import { ASProxy } from "./natives/proxy";
 import { OriginalSystem } from "./natives/system";
-=======
-import { XML, XMLNodeType, Dictionary, ByteArray } from '@as3web/flash';
->>>>>>> hacks for fixing compiler errors
 
 /*
  * Copyright 2015 Mozilla Foundation
@@ -2365,39 +2361,22 @@ export function initializeBuiltins() {
   //builtinNativeClasses["XML"]                 = ASXML;
   //builtinNativeClasses["XMLList"]             = ASXMLList;
 
-<<<<<<< HEAD
   builtinNativeClasses["flash.xml.XMLNode"] = XMLNode;
   builtinNativeClasses["flash.xml.XMLDocument"] = XMLDocument;
   builtinNativeClasses["flash.xml.XMLParser"] = XMLParser;
   builtinNativeClasses["flash.xml.XMLTag"] = XMLTag;
   builtinNativeClasses["flash.xml.XMLNodeType"] = XMLNodeType;
-=======
-  // todo: take care of XML classes
-  //builtinNativeClasses["flash.xml.XMLNode"] = (<any>XML);
-  //builtinNativeClasses["flash.xml.XMLDocument"] = (<any>XMLDocument);
-  //builtinNativeClasses["flash.xml.XMLParser"] = (<any>XMLParser);
-  //builtinNativeClasses["flash.xml.XMLTag"] = (<any>XMLTag);
-  //builtinNativeClasses["flash.xml.XMLNodeType"] = (<any>XMLNodeType);
->>>>>>> hacks for fixing compiler errors
 
   builtinNativeClasses["Math"]                = ASMath;
   builtinNativeClasses["Date"]                = ASDate;
   builtinNativeClasses["RegExp"]              = ASRegExp;
   builtinNativeClasses["JSON"]                = ASJSON;
 
-<<<<<<< HEAD
   builtinNativeClasses["flash.utils.Proxy"]      = ASProxy;
   builtinNativeClasses["flash.utils.Dictionary"] = Dictionary;
   builtinNativeClasses["flash.utils.ByteArray"]  = ByteArray;
 
   builtinNativeClasses["avmplus.System"]  = OriginalSystem;
-=======
-  //builtinNativeClasses["flash.utils.Proxy"]      = ASProxy;
-  builtinNativeClasses["flash.utils.Dictionary"] = (<any> Dictionary);
-  builtinNativeClasses["flash.utils.ByteArray"]  = (<any> ByteArray);
-
-  //builtinNativeClasses["avmplus.System"]  = flash.system.OriginalSystem;
->>>>>>> hacks for fixing compiler errors
 
   // Errors
   builtinNativeClasses["Error"]               = ASError;

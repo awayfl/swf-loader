@@ -16,6 +16,7 @@
 // Class: Accessibility
 import { release, somewhatImplemented, notImplemented } from "../../base/utilities/Debug";
 import { ASObject } from "../../avm2/nat";
+import { DisplayObject } from '../display/DisplayObject';
 
 export class Accessibility extends ASObject {
   

@@ -13,6 +13,8 @@ import { ASArray } from "../../avm2/nat";
 import { Point } from "../geom/Point";
 import { AVM1Movie } from "./AVM1Movie";
 import { TextSnapshot } from "../text/TextSnapshot";
+import { counter } from '../../avm2/module';
+import { initializeAVM1Object } from '../../avm1/lib/AVM1Utils';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -113,7 +115,7 @@ export class DisplayObjectContainer extends InteractiveObject {
         child._removeFlags(DisplayObjectFlags.HasPlaceObjectInitPending);
 
         var avm1Context = child._symbol.avm1Context;
-        Shumway.AVM1.Lib.initializeAVM1Object(child, avm1Context, child._placeObjectTag);
+        initializeAVM1Object(child, avm1Context, child._placeObjectTag);
 
         try {
           child.dispatchEvent(eventClass.getInstance(Event.AVM1_INIT));

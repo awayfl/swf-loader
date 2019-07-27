@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-import isString from "@awayjs/graphics";
-import isNumber from "@awayjs/graphics";
-import isNumeric from "@awayjs/graphics";
-import isObject from "@awayjs/graphics";
-import assert from "@awayjs/graphics";
 import { StringUtilities } from "../../base/utilities/StringUtilities";
 
 declare var TextDecoder;

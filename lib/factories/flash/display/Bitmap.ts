@@ -1,7 +1,9 @@
-import { DisplayObject } from "./DisplayObject";
-import { assert, axCoerceString } from "@awayjs/graphics";
+import { DisplayObject, DisplayObjectDirtyFlags } from "./DisplayObject";
+import { assert, axCoerceString, PixelSnapping, Bounds } from "@awayjs/graphics";
 import { release } from "../../base/utilities/Debug";
 import { constructClassFromSymbol } from "../link";
+import { BitmapSymbol, BitmapData } from './BitmapData';
+import { Errors } from '../../avm2/errors';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -52,10 +54,10 @@ export class Bitmap extends DisplayObject {
   static instanceSymbols: string [] = null; // [];
   
   constructor (bitmapData: BitmapData = null, pixelSnapping: string = "auto", smoothing: boolean = false) {
+    super();
     if (this._symbol && !this._fieldsInitialized) {
       this.applySymbol();
     }
-    super();
     if (!this._symbol) {
       this.bitmapData = bitmapData;
       this._pixelSnapping = axCoerceString(pixelSnapping);
@@ -65,7 +67,7 @@ export class Bitmap extends DisplayObject {
 
   _pixelSnapping: string;
   _smoothing: boolean;
-  _bitmapData: flash.display.BitmapData;
+  _bitmapData: BitmapData;
 
   get pixelSnapping(): string {
     return this._pixelSnapping;
@@ -86,11 +88,11 @@ export class Bitmap extends DisplayObject {
     this._smoothing = !!value;
   }
 
-  get bitmapData(): flash.display.BitmapData {
+  get bitmapData(): BitmapData {
     return this._bitmapData;
   }
 
-  set bitmapData(value: flash.display.BitmapData) {
+  set bitmapData(value: BitmapData) {
     if (this._bitmapData !== value) {
       if (this._bitmapData) {
         this._bitmapData._removeBitmapReferrer(this);
