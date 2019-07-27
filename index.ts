@@ -1,4 +1,4 @@
-console.debug("AwayJS - SWF-viewer - 0.3.25");
+console.debug("AwayJS - SWF-viewer - 0.3.26");
 
 
 export {SWFParser} from "./lib/parsers/SWFParser";
