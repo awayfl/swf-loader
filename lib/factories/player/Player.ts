@@ -1,6 +1,6 @@
 import {SWFParser} from "../../parsers/SWFParser";
 export {BaseVector} from "../avm2/natives/GenericVector"
-import {createSecurityDomain} from "./avmLoader";
+import {createSecurityDomain, AVM2LoadLibrariesFlags} from "./avmLoader";
 import {System} from "../avm2/natives/system";
 /*import {Sprite} from "../flash/display/Sprite";
 import { Loader } from '../flash/display/Loader';
@@ -22,7 +22,7 @@ export class Player{
         window["hidePokiProgressBar"]();
 
         // for now just try to load and init the builtin.abc and playerglobal.abcs
-        createSecurityDomain(4)
+        createSecurityDomain(AVM2LoadLibrariesFlags.Builtin | AVM2LoadLibrariesFlags.Playerglobal);
 
 		//this._onLoadCompleteDelegate = (event:Event) => this.onLoadComplete(event);
 
