@@ -37,7 +37,7 @@ export function createSecurityDomain(
   release || assert(!!(libraries & AVM2LoadLibrariesFlags.Builtin));
   console.log("Load builton.abc file");
   BrowserSystemResourcesLoadingService.getInstance()
-    .load("./assets/builtins/builtin.abc", "arrayBuffer")
+    .load("./assets/builtins/builtin.abc", "arraybuffer")
     .then(function(buffer) {
       var sec = new AXSecurityDomain();
       var env = { url: "builtin.abc", app: sec.system };
@@ -64,7 +64,7 @@ export function createSecurityDomain(
       if (!!(libraries & AVM2LoadLibrariesFlags.Playerglobal)) {
         return Promise.all([
             BrowserSystemResourcesLoadingService.getInstance().load(
-              "./assets/builtins/playerglobal.abcs", "arrayBuffer"
+              "./assets/builtins/playerglobal.abcs", "arraybuffer"
           ),
           BrowserSystemResourcesLoadingService.getInstance().load(
             "./assets/builtins/playerglobal.json", "json"
