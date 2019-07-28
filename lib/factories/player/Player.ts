@@ -1,6 +1,7 @@
 import {SWFParser} from "../../parsers/SWFParser";
 export {BaseVector} from "../avm2/natives/GenericVector"
 import {createSecurityDomain} from "./avmLoader";
+import {System} from "../avm2/natives/system";
 /*import {Sprite} from "../flash/display/Sprite";
 import { Loader } from '../flash/display/Loader';
 import { Stage } from '../flash/display/Stage';
@@ -13,6 +14,7 @@ import { Event} from "../flash/events/Event";*/
         
     }
 }*/
+console.log("System", System)
 export class Player{
     //private _stage:Stage;
     //private _loader:Loader;
@@ -21,7 +23,7 @@ export class Player{
 
         // for now just try to load and init the builtin.abc and playerglobal.abcs
         createSecurityDomain(4)
-        
+
 		//this._onLoadCompleteDelegate = (event:Event) => this.onLoadComplete(event);
 
     }

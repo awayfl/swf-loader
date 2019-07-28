@@ -44,6 +44,7 @@ import { OriginalSystem } from "../natives/system";
 import {builtinNativeClasses} from"./builtinNativeClasses";
 import {nativeClasses} from"./builtinNativeClasses";
 import {nativeClassLoaderNames} from"./builtinNativeClasses";
+import { ASNamespace, ASQName, ASXML, ASXMLList } from '../natives/xml';
 
 export function initializeBuiltins() {
   builtinNativeClasses["Object"]              = ASObject;
@@ -64,10 +65,10 @@ export function initializeBuiltins() {
   builtinNativeClasses["__AS3__.vec.Vector$uint"]   = Uint32Vector;
   builtinNativeClasses["__AS3__.vec.Vector$double"] = Float64Vector;
 
-  //builtinNativeClasses["Namespace"]           = ASNamespace;
-  //builtinNativeClasses["QName"]               = ASQName;
-  //builtinNativeClasses["XML"]                 = ASXML;
-  //builtinNativeClasses["XMLList"]             = ASXMLList;
+  builtinNativeClasses["Namespace"]           = ASNamespace;
+  builtinNativeClasses["QName"]               = ASQName;
+  builtinNativeClasses["XML"]                 = ASXML;
+  builtinNativeClasses["XMLList"]             = ASXMLList;
 
 /*
   builtinNativeClasses["flash.xml.XMLNode"] = XMLNode;
