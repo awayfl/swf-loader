@@ -41,10 +41,10 @@ export class MorphShape extends DisplayObject {
   }
 
   constructor () {
+    super();
     if (this._symbol && !this._fieldsInitialized) {
       this.applySymbol();
     }
-    super();
     release || assert(!this._symbol);
   }
 

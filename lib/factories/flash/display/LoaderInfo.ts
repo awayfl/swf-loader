@@ -6,7 +6,7 @@ import { DisplayObject } from "./DisplayObject";
 import { ByteArray } from "../../avm2/natives/byteArray";
 import { transformJSValueToAS, ASClass } from "../../avm2/nat";
 import { UncaughtErrorEvents } from "../events/UncaughtErrorEvents";
-import { AXClass } from "../../avm2/run";
+import { AXClass } from "../../avm2/run/AXClass";
 import { constructClassFromSymbol } from "../link";
 import { ActionScriptVersion } from "./ActionScriptVersion";
 import { ApplicationDomain } from "../system/ApplicationDomain";
@@ -20,6 +20,7 @@ import { SpriteSymbol } from "./Sprite";
 import { FontSymbol } from "../text/Font";
 import { VideoSymbol } from "../media/Video";
 import { SoundSymbol } from "../media/Sound";
+import { AVM1Context } from '../../avm1/context';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -127,7 +128,7 @@ export class LoaderInfo extends EventDispatcher {
   _allowCodeExecution: boolean;
 
   _dictionary: Symbol [];
-  _avm1Context: Shumway.AVM1.AVM1Context;
+  _avm1Context: AVM1Context;
 
   get loaderURL(): string {
     if (!this._loader) {

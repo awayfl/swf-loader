@@ -1,5 +1,5 @@
-import { ASObject, addPrototypeFunctionAlias } from "../nat";
-
+import { ASObject } from "../nat/ASObject";
+import { addPrototypeFunctionAlias } from "../nat/addPrototypeFunctionAlias";
 /*
  * Copyright 2014 Mozilla Foundation
  *

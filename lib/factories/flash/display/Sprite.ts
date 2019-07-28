@@ -65,10 +65,10 @@ export class Sprite extends DisplayObjectContainer {
   static instanceSymbols: string [] = null; // [];
 
   constructor () {
+    super();
     if (this._symbol && !this._fieldsInitialized) {
       this.applySymbol();
     }
-    super();
     if (!this._fieldsInitialized) {
       this._initializeFields();
     }

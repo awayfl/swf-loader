@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-import { Multiname, CONSTANT, internNamespace, NamespaceType } from "../abc/lazy";
+import { Multiname } from "../abc/lazy/Multiname";
+import { CONSTANT } from "../abc/lazy/CONSTANT";
+import { internNamespace } from "../abc/lazy/internNamespace";
+import { NamespaceType } from "../abc/lazy/NamespaceType";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
-import { ASObject } from "../nat";
+import { ASObject } from "../nat/ASObject";
 import { Errors } from "../errors";
 import { Bytecode } from "../abc/ops";
 

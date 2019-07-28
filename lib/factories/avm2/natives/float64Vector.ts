@@ -1,12 +1,13 @@
 import { BaseVector, GenericVector } from "./GenericVector";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
-import { ASObject } from "../nat";
-import { AXObject, axCoerceName } from "../run";
+import { ASObject } from "../nat/ASObject";
 import { assert } from "@awayjs/graphics";
 import { unexpected, assertNotImplemented, release } from "../../base/utilities/Debug";
 import { isNumeric, isIndex } from "../../base/utilities";
 import { Errors } from "../errors";
-import { Multiname } from "../abc/lazy";
+import { Multiname } from "../abc/lazy/Multiname";
+import { AXObject } from '../run/AXObject';
+import { axCoerceName } from '../run/axCoerceName';
 
 /* THIS FILE WAS AUTOMATICALLY GENERATED FROM int32Vector.ts */
 

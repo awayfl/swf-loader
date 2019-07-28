@@ -1,13 +1,37 @@
 import { assert } from "@awayjs/graphics";
 
-import { Scope, interpreterWriter, AXFunction, executionWriter, AXApplicationDomain, HasNext2Info, AXSecurityDomain, sliceArguments, scopeStacks, axEquals, validateCall, validateConstruct, axGetDescendants, checkValue, axCoerceString, axCheckFilter, axConvertString, axAdd, axTypeOf, isValidASValue } from "./run";
+
+
+import { Scope } from "./run/Scope";
+import { interpreterWriter, executionWriter, sliceArguments } from "./run/writers";
+import { AXFunction } from "./run/AXFunction";
+import { AXApplicationDomain } from "./run/AXApplicationDomain";
+import { HasNext2Info } from "./run/HasNext2Info";
+import { AXSecurityDomain } from "./run/AXSecurityDomain";
+import { scopeStacks } from "./run/scopeStacks";
+import { axEquals } from "./run/axEquals";
+import { validateCall } from "./run/validateCall";
+import { validateConstruct } from "./run/validateConstruct";
+import { axGetDescendants } from "./run/axGetDescendants";
+import { checkValue } from "./run/checkValue";
+import { axCoerceString } from "./run/axCoerceString";
+import { axCheckFilter } from "./run/axCheckFilter";
+import { axConvertString } from "./run/axConvertString";
+import { axAdd } from "./run/axAdd";
+import { axTypeOf } from "./run/axTypeOf";
 import { release, notImplemented } from "../base/utilities/Debug";
-import { Multiname, CONSTANT, MethodInfo, MethodBodyInfo, internNamespace, NamespaceType } from "./abc/lazy";
+import { Multiname } from "./abc/lazy/Multiname";
+import {  CONSTANT } from "./abc/lazy/CONSTANT";
+import {  MethodInfo } from "./abc/lazy/MethodInfo";
+import {  MethodBodyInfo } from "./abc/lazy/MethodBodyInfo";
+import {  internNamespace } from "./abc/lazy/internNamespace";
+import {  NamespaceType } from "./abc/lazy/NamespaceType";
 import { Bytecode, getBytecodeName } from "./abc/ops";
 import { popManyInto } from "../base/utilities/ArrayUtilities";
 import { escapeAttributeValue, escapeElementValue } from "./natives/xml";
 import { Errors } from "./errors";
 import { getPropertyDescriptor } from "../base/utilities/ObjectUtilities";
+import { isValidASValue } from './run/initializeAXBasePrototype';
 
 /**
  * Helps the interpreter allocate fewer Scope objects.

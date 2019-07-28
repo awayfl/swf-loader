@@ -2,7 +2,8 @@ import { IReferenceCountable, WeakList, Bounds, isInteger, IndentingWriter } fro
 import { EventDispatcher } from "../events/EventDispatcher";
 import { Event } from "../events/Event";
 import { DisplaySymbol } from "../symbol";
-import { AXObject, checkNullParameter } from "../../avm2/run";
+import { AXObject } from "../../avm2/run/AXObject";
+import { checkNullParameter } from "../../avm2/run/checkNullParameter";
 import { assert, axCoerceString, isNullOrUndefined } from "@awayjs/graphics";
 import { release, somewhatImplemented, notImplemented } from "../../base/utilities/Debug";
 import { Matrix } from "../geom/Matrix";
@@ -631,7 +632,7 @@ export class DisplayObject extends EventDispatcher implements IBitmapDrawable, I
 
   _setParent(parent: DisplayObjectContainer, depth: number) {
     var oldParent = this._parent;
-    release || assert(parent !== this);
+    release || assert(parent !== <DisplayObjectContainer><any>this);
     this._parent = parent;
     this._setDepth(depth);
     if (parent) {
@@ -1889,10 +1890,10 @@ export class DisplayObject extends EventDispatcher implements IBitmapDrawable, I
     } else if (symbol instanceof TextSymbol) {
       release || assert(StaticText.axIsType(this));
       var newTextContent = (<TextSymbol>symbol).textContent;
-      if ((<StaticText>this)._textContent === newTextContent) {
+      if ((<StaticText><any>this)._textContent === newTextContent) {
         return;
       }
-      (<StaticText>this)._textContent = newTextContent;
+      (<StaticText><any>this)._textContent = newTextContent;
       this._setDirtyFlags(DisplayObjectDirtyFlags.DirtyTextContent);
     }
     this._symbol = symbol;

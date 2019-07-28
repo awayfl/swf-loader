@@ -19,14 +19,17 @@
  * http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/devnet/amf/pdf/amf-file-format-spec.pdf
  */
 
-import { ASObject } from "./nat";
-import { ASArray } from "./nat";
+import { ASObject } from "./nat/ASObject";
+import { ASArray } from "./nat/ASArray";
 import { ByteArray } from "./natives/byteArray";
-import { ITraits, AXClass, AXBasePrototype, forEachPublicProperty } from "./run";
 import { assert } from "@awayjs/graphics";
 import { release } from "../base/utilities/Debug";
 import { StringUtilities } from "../base/utilities/StringUtilities";
 import { isNumeric } from "../base/utilities";
+import { ITraits } from './run/ITraits';
+import { AXClass } from './run/AXClass';
+import { AXBasePrototype } from './run/initializeAXBasePrototype';
+import { forEachPublicProperty } from './run/forEachPublicProperty';
 
 class AMF3ReferenceTables {
   strings: any [] = [];

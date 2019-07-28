@@ -1,5 +1,6 @@
-import { Multiname } from "../abc/lazy";
-import { ASObject, addPrototypeFunctionAlias } from "../nat";
+import { Multiname } from "../abc/lazy/Multiname";
+import { ASObject } from "../nat/ASObject";
+import { addPrototypeFunctionAlias } from "../nat/addPrototypeFunctionAlias";
 import { assert } from "@awayjs/graphics";
 import { release } from "../../base/utilities/Debug";
 import { Bytecode } from "../abc/ops";

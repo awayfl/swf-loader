@@ -17,10 +17,11 @@
 import {assert, DataBuffer} from "@awayjs/graphics";
 
 import {release, notImplemented, unexpected} from "../../base/utilities/Debug";
-import { Multiname } from "../abc/lazy";
+import { Multiname } from "../abc/lazy/Multiname";
 import { isNumeric } from "../../base/utilities";
-import { checkValue, axCoerceName } from "../run";
-import { ASObject } from "../nat";
+import { checkValue  } from "../run/checkValue";
+import { axCoerceName } from "../run/axCoerceName";
+import { ASObject } from "../nat/ASObject";
 import { ObjectUtilities } from "../../base/utilities/ObjectUtilities";
 import { AMF0, AMF3 } from "../amf";
 import { Bytecode } from "../abc/ops";

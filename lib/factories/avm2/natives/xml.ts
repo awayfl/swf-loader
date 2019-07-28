@@ -1,14 +1,23 @@
-import { assert, axCoerceString, isObject} from "@awayjs/graphics";
+import { assert} from "@awayjs/graphics";
 
 import { release, notImplemented } from "../../base/utilities/Debug";
-import { Namespace, Multiname, CONSTANT, internPrefixedNamespace, NamespaceType, internNamespace } from "../abc/lazy";
-import { ASObject, addPrototypeFunctionAlias } from "../nat";
+import { Namespace } from "../abc/lazy/Namespace";
+import { Multiname } from "../abc/lazy/Multiname";
+import { CONSTANT } from "../abc/lazy/CONSTANT";
+import { internPrefixedNamespace } from "../abc/lazy/internPrefixedNamespace";
+import { NamespaceType } from "../abc/lazy/NamespaceType";
+import { internNamespace } from "../abc/lazy/internNamespace";
+import { ASObject } from "../nat/ASObject";
+import { addPrototypeFunctionAlias } from "../nat/addPrototypeFunctionAlias";
 import { Errors } from "../errors";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
-import { isNullOrUndefined } from "@awayjs/graphics";
-import { AXSecurityDomain, getCurrentScope, checkValue, validateCall } from "../run";
-import { isIndex } from "../../base/utilities";
+import { isIndex, isNullOrUndefined, isObject } from "../../base/utilities";
 import { Bytecode } from "../abc/ops";
+import { AXSecurityDomain } from '../run/AXSecurityDomain';
+import { axCoerceString } from '../run/axCoerceString';
+import { checkValue } from '../run/checkValue';
+import { validateCall } from '../run/validateCall';
+import { getCurrentScope } from '../run/getCurrentScope';
 
 /* tslint:disable */
 /*

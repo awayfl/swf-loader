@@ -15,9 +15,9 @@
  */
 
 import { XMLParserErrorCode, XMLParserBase } from "./xml";
-import { axCoerceString } from "@awayjs/graphics";
 import { ASObject, ISecurityDomain } from "../nat";
 import { warning } from "../../base/utilities/Debug";
+import { axCoerceString } from '../run/axCoerceString';
 
 enum XMLSpecialChars {
   APOS = 39, // "\'"

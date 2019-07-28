@@ -81,10 +81,10 @@ export class SimpleButton extends InteractiveObject {
               overState?: DisplayObject,
               downState?: DisplayObject,
               hitTestState?: DisplayObject) {
+                super();
     if (this._symbol && !this._fieldsInitialized) {
       this.applySymbol();
     }
-    super();
     DisplayObject.axClass._advancableInstances.push(this);
     if (!this._fieldsInitialized) {
       this._initializeFields();

@@ -11,7 +11,8 @@ import { ByteArray } from "../../avm2/natives/byteArray";
 import { SoundChannel } from "./SoundChannel";
 import { isNullOrUndefined } from "../../base/utilities";
 import { SoundTransform } from "./SoundTransform";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { Telemetry } from '../../base/utilities/Telemetry';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -117,11 +118,11 @@ export class Sound extends EventDispatcher {
   static instanceSymbols: string [] = null; // ["load"];
   
   constructor (stream?: URLRequest, context?: SoundLoaderContext) {
+    super();
     if (this._symbol) {
       this.applySymbol();
     }
 
-    super();
 
     Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.SOUND_FEATURE});
 
@@ -229,7 +230,7 @@ export class Sound extends EventDispatcher {
     var checkPolicyFile: boolean = context ? context.checkPolicyFile : false;
     var bufferTime: number = context ? context.bufferTime : 1000;
 
-    var _this = this;
+    var _myThis = this;
     var stream = this._stream = new URLStream();
     var data = new ByteArray();
     var dataPosition = 0;
@@ -239,23 +240,23 @@ export class Sound extends EventDispatcher {
     soundData.completed = false;
 
     stream.addEventListener("progress", function (event) {
-      _this._bytesLoaded = event.axGetPublicProperty("bytesLoaded");
-      _this._bytesTotal = event.axGetPublicProperty("bytesTotal");
+      _myThis._bytesLoaded = event.axGetPublicProperty("bytesLoaded");
+      _myThis._bytesTotal = event.axGetPublicProperty("bytesTotal");
 
       if (playUsingWebAudio && !mp3DecodingSession) {
         // initialize MP3 decoding
         mp3DecodingSession = decodeMP3(soundData, function (duration, final) {
-          if (_this._length === 0) {
+          if (_myThis._length === 0) {
             // once we have some data, trying to play it
-            _this._soundData = soundData;
+            _myThis._soundData = soundData;
 
-            _this._playQueue.forEach(function (item) {
+            _myThis._playQueue.forEach(function (item) {
               item.channel._playSoundDataViaChannel(soundData, item.startTime);
             });
           }
           // estimate duration based on bytesTotal and current loaded data time
-          _this._length = final ? duration * 1000 : Math.max(duration,
-            mp3DecodingSession.estimateDuration(_this._bytesTotal)) * 1000;
+          _myThis._length = final ? duration * 1000 : Math.max(duration,
+            mp3DecodingSession.estimateDuration(_myThis._bytesTotal)) * 1000;
         });
       }
 

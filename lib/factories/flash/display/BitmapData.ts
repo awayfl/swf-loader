@@ -35,7 +35,7 @@ import { DataBuffer } from "@awayjs/graphics";
 import { indexOf } from "../../base/utilities/ArrayUtilities";
 import { swap32 } from "../../base/utilities/IntegerUtilities";
 import { BitmapFilter } from "../filters/BitmapFilter";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { LoaderInfo } from "./LoaderInfo";
 import { constructClassFromSymbol } from "../link";
 

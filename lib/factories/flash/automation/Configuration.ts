@@ -1,6 +1,7 @@
 import { ASObject } from "../../avm2/nat";
 import { notImplemented, release } from "../../base/utilities/Debug";
-import { axCoerceString } from "@awayjs/graphics";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+
 
 /**
  * Copyright 2014 Mozilla Foundation

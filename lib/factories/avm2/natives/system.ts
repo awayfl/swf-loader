@@ -16,9 +16,10 @@
 
 import { ASXML } from "./xml";
 import { release, warning, somewhatImplemented } from "../../base/utilities/Debug";
-import { axCoerceString } from "../run";
+import { axCoerceString } from "../run/axCoerceString";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
-import { ASObject, initializeBuiltins } from "../nat";
+import { ASObject } from "../nat/ASObject";
+import { initializeBuiltins } from "../nat/initializeBuiltins";
 import { ClipboardService } from "../../base/utilities/ClipboardService";
 
 export class IME extends ASObject /* flash.events.EventDispatcher */ {

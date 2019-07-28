@@ -3,10 +3,10 @@ import { InteractiveObject } from "./InteractiveObject";
 import { DisplayObjectDirtyFlags, DisplayObjectFlags, DisplayObject, HitTestingType, HitTestingResult } from "./DisplayObject";
 import { Event } from "../events/Event";
 import { release, warning, notImplemented } from "../../base/utilities/Debug";
-import { checkParameterType } from "../../avm2/run";
+import { checkParameterType } from "../../avm2/run/checkParameterType";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
 import { clamp } from "@awayjs/graphics";
-import { axCoerceString } from "@awayjs/graphics";
 import { assert } from "@awayjs/graphics";
 import { Bounds } from "../../base/utilities";
 import { ASArray } from "../../avm2/nat";
@@ -134,13 +134,13 @@ export class DisplayObjectContainer extends InteractiveObject {
       }
 
       try {
-        child.dispatchEvent(eventClass.getInstance(events.Event.ADDED, true));
+        child.dispatchEvent(eventClass.getInstance(Event.ADDED, true));
       } catch (e) {
         warning('caught error under DisplayObject ADDED event: ', e);
       }
       if (child.stage) {
         try {
-          child.dispatchEvent(eventClass.getInstance(events.Event.ADDED_TO_STAGE));
+          child.dispatchEvent(eventClass.getInstance(Event.ADDED_TO_STAGE));
         } catch (e) {
           warning('caught error under DisplayObject ADDED_TO_STAGE event: ', e);
         }

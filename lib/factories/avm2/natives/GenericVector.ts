@@ -1,15 +1,21 @@
 import { assert } from "@awayjs/graphics";
 
-import { AXObject, checkValue, axCoerceName, AXCallable, axIsCallable, axCoerceString, axCoerceNumber, AXClass } from "../run";
-import { Multiname } from "../abc/lazy";
+import { Multiname } from "../abc/lazy/Multiname";
 import { Bytecode } from "../abc/ops";
-import { isNumeric, toNumber, isIndex } from "../../base/utilities";
+import { isNumeric, toNumber, isIndex, isNullOrUndefined } from "../../base/utilities";
 import { Errors } from "../errors";
 import { release, assertNotImplemented, unexpected } from "../../base/utilities/Debug";
-import { isNullOrUndefined } from "@awayjs/graphics";
-import { Int32Vector } from "./int32Vector";
+//import { Int32Vector } from "./int32Vector";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
-import { ASObject } from "../nat";
+import { ASObject } from "../nat/ASObject";
+import { axCoerceName } from '../run/axCoerceName';
+import { checkValue } from '../run/checkValue';
+import { AXCallable } from '../run/AXCallable';
+import { axIsCallable } from '../run/axIsCallable';
+import { AXObject } from '../run/AXObject';
+import { AXClass } from '../run/AXClass';
+import { axCoerceNumber } from '../run/axCoerceNumber';
+import { axCoerceString } from '../run/axCoerceString';
 
 /*
  * Copyright 2014 Mozilla Foundation
@@ -263,8 +269,9 @@ export class GenericVector extends BaseVector {
       return this;
     }
     var options = sortBehavior|0;
-    release || assertNotImplemented (!(options & Int32Vector.UNIQUESORT), "UNIQUESORT");
-    release || assertNotImplemented (!(options & Int32Vector.RETURNINDEXEDARRAY), "RETURNINDEXEDARRAY");
+    // 80pro: todo:
+    //release || assertNotImplemented (!(options & Int32Vector.UNIQUESORT), "UNIQUESORT");
+    //release || assertNotImplemented (!(options & Int32Vector.RETURNINDEXEDARRAY), "RETURNINDEXEDARRAY");
     if (options & GenericVector.NUMERIC) {
       if (options & GenericVector.DESCENDING) {
         this._buffer.sort((a, b) => axCoerceNumber(b) - axCoerceNumber(a));

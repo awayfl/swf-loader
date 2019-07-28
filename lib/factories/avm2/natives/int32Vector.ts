@@ -4,9 +4,10 @@ import { release, assertNotImplemented, unexpected } from "../../base/utilities/
 import { assert } from "@awayjs/graphics";
 import { isNumeric, isIndex } from "../../base/utilities";
 import { Errors } from "../errors";
-import { Multiname } from "../abc/lazy";
-import { axCoerceName, AXObject } from "../run";
-import { ASObject } from "../nat";
+import { Multiname } from "../abc/lazy/Multiname";
+import { ASObject } from "../nat/ASObject";
+import { AXObject } from '../run/AXObject';
+import { axCoerceName } from '../run/axCoerceName';
 
 /*
  * Copyright 2014 Mozilla Foundation

@@ -13,7 +13,6 @@ import { LoaderInfo } from "./LoaderInfo";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
 import { ProgressEvent } from "../events/ProgressEvent";
 import { Event } from "../events/Event";
-import { getCurrentABC } from "../../avm2/run";
 import { Stage } from "./Stage";
 import { JPEGLoaderContext } from "../system/JPEGLoaderContext";
 import { LoaderContext } from "../system/LoaderContext";
@@ -29,6 +28,9 @@ import { ABCFile, Multiname, NamespaceType } from "../../avm2/abc/lazy";
 import { Font } from "../text/Font";
 import { Sprite, SpriteSymbol } from "./Sprite";
 import { MovieClip, FrameNavigationModel } from "./MovieClip";
+import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';
+import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
+import { getCurrentABC } from "../../avm2/run/getCurrentABC";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -59,7 +61,7 @@ enum LoadingType {
 }
 
 export class Loader extends DisplayObjectContainer
-                    implements IAdvancable, ILoadListener {
+                    implements IAdvancable { // 80pro:}, ILoadListener {
 
   static axClass: typeof Loader;
 
@@ -780,7 +782,7 @@ export class Loader extends DisplayObjectContainer
     release || assert(contentLoaderInfo);
 
     var avm1Context = this._contentLoaderInfo._avm1Context;
-    var avm1MovieClip = <AVM1MovieClip>AVM1.Lib.getAVM1Object(root, avm1Context);
+    var avm1MovieClip = <AVM1MovieClip>getAVM1Object(root, avm1Context);
 
     var parameters = contentLoaderInfo._parameters;
     avm1MovieClip.setParameters(parameters);

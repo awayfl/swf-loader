@@ -5,8 +5,9 @@ import { ColorTransform } from "./ColorTransform";
 import { Rectangle } from "./Rectangle";
 import { Matrix3D } from "./Matrix3D";
 import { release, somewhatImplemented } from "../../base/utilities/Debug";
-import { checkNullParameter } from "../../avm2/run";
+import { checkNullParameter } from "../../avm2/run/checkNullParameter";
 import { PerspectiveProjection } from "./PerspectiveProjection";
+import { DisplayObjectFlags } from '../display/DisplayObject';
 
 /**
  * Copyright 2014 Mozilla Foundation

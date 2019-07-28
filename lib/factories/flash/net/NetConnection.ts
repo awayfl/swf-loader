@@ -1,11 +1,12 @@
 import { EventDispatcher } from "../events/EventDispatcher";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { ASObject, ASArray } from "../../avm2/nat";
 import { somewhatImplemented, release, notImplemented } from "../../base/utilities/Debug";
 import { NetStatusEvent } from "../events/NetStatusEvent";
 import { Capabilities } from "../system/Capabilities";
 import { IRootElementService } from "../display/LoaderInfo";
 import { Responder } from "./Responder";
+import { Telemetry } from '../../base/utilities/Telemetry';
 
 /**
  * Copyright 2014 Mozilla Foundation

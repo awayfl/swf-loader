@@ -1,4 +1,4 @@
-import { warning, abstractMethod } from "../../base/utilities/Debug";
+import { warning, abstractMethod, notImplemented } from "../../base/utilities/Debug";
 import { ISecurityDomain } from "../../avm2/nat";
 import { SoundChannel } from "../media/SoundChannel";
 import { Sound } from "../media/Sound";
@@ -258,11 +258,13 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 
 class WebAudioMP3Adapter extends WebAudioAdapter {
   private _decoderPosition: number;
-  private _decoderSession: MP3DecoderSession;
+  private _decoderSession: any;//80pro: MP3DecoderSession;
 
   constructor(sec: ISecurityDomain, data: any) {
     super(sec, data);
 
+    notImplemented("WebAudioMP3Adapter not implemented yet");
+    /*
     this._decoderPosition = 0;
     this._decoderSession = new MP3DecoderSession();
     this._decoderSession.onframedata = function (frameData) {
@@ -275,7 +277,7 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
     }.bind(this);
     this._decoderSession.onerror = function (error) {
       warning('MP3DecoderSession error: ' + error);
-    };
+    };*/
   }
 
   queueData(frame: DecodedSound) {

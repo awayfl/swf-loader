@@ -7,7 +7,7 @@ import { InitActionBlock, ActionBlock } from "@awayjs/graphics";
 import { Scene } from "./Scene";
 import { ASArray } from "../../avm2/nat";
 import { FrameLabel } from "./FrameLabel";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
 import { SoundStart } from "../symbol";
 import { Event } from "../events/Event";
@@ -15,6 +15,7 @@ import { SoundSymbol, Sound } from "../media/Sound";
 import { MovieClipSoundStream } from "./MovieClipSoundStream";
 import { constructClassFromSymbol } from "../link";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
+import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -303,7 +304,7 @@ export class MovieClip extends Sprite implements IAdvancable {
       var actionsData = avm1Context.actionsDataFactory.createActionsData(
         actionsBlock.actionsData, 's' + symbol.id + 'f' + frameIndex + 'i' + i);
       var script: FrameScript = function (actionsData) {
-        var as2MovieClip = AVM1.Lib.getAVM1Object(this, avm1Context);
+        var as2MovieClip = getAVM1Object(this, avm1Context);
         avm1Context.executeActions(actionsData, as2MovieClip);
       }.bind(this, actionsData);
       script.precedence = this._getScriptPrecedence().concat(actionsBlock.precedence);

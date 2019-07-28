@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 // Class: EventDispatcher
-import { assert, isNullOrUndefined } from "@awayjs/graphics";
+import { assert } from "@awayjs/graphics";
 
 import { warning, release } from "../../base/utilities/Debug";
-import { MapObject } from "../../base/utilities";
+import { MapObject, isNullOrUndefined } from "../../base/utilities";
 import { Event } from "./Event";
 import { ASObject } from "../../avm2/nat";
 import { IEventDispatcher, EventHandler } from "./IEventDispatcher";
 import { Errors } from "../../avm2/errors";
-import { axCoerceString, axIsCallable } from "../../avm2/run";
+import { axCoerceString  } from "../../avm2/run/axCoerceString";
+import { axIsCallable } from "../../avm2/run/axIsCallable";
 import { EventPhase } from "./EventPhase";
 import { DisplayObject } from "../display/DisplayObject";
 import { counter } from '../../avm2/module';

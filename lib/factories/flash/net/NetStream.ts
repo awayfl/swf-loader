@@ -1,6 +1,6 @@
 import { EventDispatcher } from "../events/EventDispatcher";
 import { NetConnection } from "./NetConnection";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { DisplayObject } from "../display/DisplayObject";
 import { VideoControlEvent, VideoPlaybackEvent } from "../../base/remoting";
 import { SoundTransform } from "../media/SoundTransform";
@@ -18,6 +18,10 @@ import { FileLoadingService } from "../../base/utilities/FileLoadingService";
 import { URLRequest } from "./URLRequest";
 import { URLStream } from "./URLStream";
 import { AMF0 } from "../../avm2/amf";
+import { VideoStreamSettings } from "../media/VideoStreamSettings";
+import { Video } from '../media/Video';
+import { Microphone } from '../media/Microphone';
+import { Camera } from '../media/Camera';
 
 /**
  * Copyright 2014 Mozilla Foundation

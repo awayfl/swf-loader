@@ -17,9 +17,11 @@ import {SystemResourcesLoadingService} from "../base/utilities/SystemResourcesLo
 
 import { PromiseWrapper } from "../base/utilities";
 import { BrowserSystemResourcesLoadingService } from "./BrowserSystemResourcesLoadingService";
-import { AXSecurityDomain } from "../avm2/run";
-import { ABCFile, ABCCatalog } from "../avm2/abc/lazy";
+
+import { ABCFile } from "../avm2/abc/lazy/ABCFile";
+import { ABCCatalog } from "../avm2/abc/lazy/ABCCatalog";
 import { release, assert } from "../base/utilities/Debug";
+import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 
 export enum AVM2LoadLibrariesFlags {
   Builtin = 1,
@@ -35,7 +37,7 @@ export function createSecurityDomain(
   release || assert(!!(libraries & AVM2LoadLibrariesFlags.Builtin));
   console.log("Load builton.abc file");
   BrowserSystemResourcesLoadingService.getInstance()
-    .load("https://github.com/mozilla/shumway/blob/gh-pages/build/libs/builtin.abc", "arrayBuffer")
+    .load("./assets/builtins/builtin.abc", "arrayBuffer")
     .then(function(buffer) {
       var sec = new AXSecurityDomain();
       var env = { url: "builtin.abc", app: sec.system };
@@ -62,10 +64,10 @@ export function createSecurityDomain(
       if (!!(libraries & AVM2LoadLibrariesFlags.Playerglobal)) {
         return Promise.all([
             BrowserSystemResourcesLoadingService.getInstance().load(
-            "https://github.com/mozilla/shumway/tree/gh-pages/build/playerglobal/playerglobal.abcs", "arrayBuffer"
+              "./assets/builtins/playerglobal.abcs", "arrayBuffer"
           ),
           BrowserSystemResourcesLoadingService.getInstance().load(
-            "https://github.com/mozilla/shumway/blob/gh-pages/build/playerglobal/playerglobal.json", "json"
+            "./assets/builtins/playerglobal.json", "json"
           )
         ]).then(function(results) {
           var catalog = new ABCCatalog(

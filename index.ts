@@ -21,4 +21,5 @@ export {Debug, release} from "./lib/factories/base/utilities/Debug";
 export {alIsFunction} from "./lib/factories/avm1/runtime";
 
 
+export {BaseVector} from "./lib/factories/avm2/natives/GenericVector";
 export {Player} from "./lib/factories/player/Player";

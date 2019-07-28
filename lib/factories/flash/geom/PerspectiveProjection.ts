@@ -5,6 +5,7 @@ import { assert } from "@awayjs/graphics";
 
 import { Point } from "./Point";
 import { Matrix3D } from "./Matrix3D";
+import { DisplayObject } from '../display/DisplayObject';
 
 /**
  * Copyright 2014 Mozilla Foundation

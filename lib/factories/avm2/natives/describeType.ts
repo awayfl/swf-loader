@@ -15,12 +15,14 @@
  */
 
 import { release } from "../../base/utilities/Debug";
-import { isNullOrUndefined } from "@awayjs/graphics";
-import { AXSecurityDomain, AXClass, AXXMLClass } from "../run";
 import { ClassInfo, CONSTANT, Namespace, Multiname, MetadataInfo, TraitInfo, TRAIT, MethodTraitInfo, SlotTraitInfo } from "../abc/lazy";
 import { ASXML, escapeAttributeValue } from "./xml";
 import { assert } from "@awayjs/graphics";
 import { ASArray } from "../nat";
+import { AXSecurityDomain } from "../run/AXSecurityDomain";
+import { isNullOrUndefined } from "../../base/utilities";
+import { AXClass } from "../run/AXClass";
+import { AXXMLClass } from "../run/AXXMLClass";
 
 const enum DescribeTypeFlags {
   HIDE_NSURI_METHODS  = 0x0001,
