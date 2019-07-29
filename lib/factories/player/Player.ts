@@ -28,7 +28,9 @@ export class Player{
         window["hidePokiProgressBar"]();
 
         // for now just try to load and init the builtin.abc and playerglobal.abcs
-        createSecurityDomain(AVM2LoadLibrariesFlags.Builtin | AVM2LoadLibrariesFlags.Playerglobal);
+        createSecurityDomain(AVM2LoadLibrariesFlags.Builtin | AVM2LoadLibrariesFlags.Playerglobal).then(function(){
+            console.log("builtins are loaded fine")
+        });
 
 		//this._onLoadCompleteDelegate = (event:Event) => this.onLoadComplete(event);
 
