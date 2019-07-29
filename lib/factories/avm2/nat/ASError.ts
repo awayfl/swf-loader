@@ -1,9 +1,12 @@
 import { ASObject } from "./ASObject";
-import { getErrorInfo, formatErrorMessage } from "../errors";
+import { getErrorInfo, formatErrorMessage, getErrorMessage } from "../errors";
 import { ASClass } from "./ASClass";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
 
 export class ASError extends ASObject {
+
+  public static getErrorMessage = getErrorMessage;
+
     public static throwError(type: ASClass, id: number /*, ...rest */) {
       var info = getErrorInfo(id);
       var args = [info];

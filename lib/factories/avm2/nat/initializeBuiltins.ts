@@ -46,13 +46,17 @@ import {nativeClasses} from"./builtinNativeClasses";
 import {nativeClassLoaderNames} from"./builtinNativeClasses";
 import { ASNamespace, ASQName, ASXML, ASXMLList } from '../natives/xml';
 
+import {isNaN} from "./isNaN";
+
+console.log("isNaN", isNaN);
+
 export function initializeBuiltins() {
   builtinNativeClasses["Object"]              = ASObject;
   builtinNativeClasses["Class"]               = ASClass;
   builtinNativeClasses["Function"]            = ASFunction;
   builtinNativeClasses["Boolean"]             = ASBoolean;
   builtinNativeClasses["builtin.as$0.MethodClosure"] = ASMethodClosure;
-  //builtinNativeClasses["Namespace"]           = ASNamespace;
+
   builtinNativeClasses["Number"]              = ASNumber;
   builtinNativeClasses["int"]                 = ASInt;
   builtinNativeClasses["uint"]                = ASUint;
