@@ -296,6 +296,7 @@ export class ASObject implements IMetaobjectProtocol {
     axCallProperty(mn: Multiname, args: any [], isLex: boolean): any {
       var name = this.axResolveMultiname(mn);
       var fun = this[name];
+      console.log("call function name:" , name);
       validateCall(this.sec, fun, args.length);
       return fun.axApply(isLex ? null : this, args);
     }

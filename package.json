@@ -51,6 +51,7 @@
     "@awayjs/renderer": "^0.10.0",
     "@awayjs/materials": "^0.5.0",
     "@awayjs/view": "^0.5.0",
+    "@as3web/flash": "^0.1.118",
     "tslib": "^1.9.0"
   },
   "devDependencies": {
@@ -61,6 +62,7 @@
     "@awayjs/renderer": "^0.10.0",
     "@awayjs/materials": "^0.5.0",
     "@awayjs/view": "^0.5.0",
+    "@as3web/flash": "^0.1.118",
     "tslib": "^1.9.0",
     "rimraf": "^2.5.2",
     "rollup": "^0.57.1",

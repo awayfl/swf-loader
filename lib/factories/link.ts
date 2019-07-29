@@ -18,6 +18,6 @@ export function constructClassFromSymbol(symbol: TimelineSymbol, axClass: ASClas
 	} else {
 		instance._symbol = symbol;
 	}
-	instance.applySymbol();
+	//instance.applySymbol();
 	return instance;
 }

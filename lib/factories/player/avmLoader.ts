@@ -70,11 +70,13 @@ export function createSecurityDomain(
             "./assets/builtins/playerglobal.json", "json"
           )
         ]).then(function(results) {
+          console.log("Load playerglobal.abcs & playerglobal.json");
           var catalog = new ABCCatalog(
             sec.system,
             new Uint8Array(results[0]),
             results[1]
           );
+          console.log("add playerglobals as ABCCatalog");
           sec.addCatalog(catalog);
           result.resolve(sec);
         }, result.reject);
