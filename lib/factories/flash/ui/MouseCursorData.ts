@@ -1,7 +1,7 @@
 import { release, notImplemented } from "../../base/utilities/Debug";
 import { Point } from "../geom/Point";
 import { GenericVector } from "../../avm2/natives/GenericVector";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * Copyright 2014 Mozilla Foundation

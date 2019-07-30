@@ -2,7 +2,7 @@
 import {argumentsToString} from "../utilities";
 import {omitRepeatedWarnings} from "../settings";
 
-export var release:boolean=true;
+export var release:boolean=false;
 
 export class Debug{
 	public static release:boolean=release;

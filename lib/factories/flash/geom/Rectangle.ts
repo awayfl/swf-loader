@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { Bounds } from "../../base/utilities";
 import { Point } from "./Point";
 import { IDataInput, IDataOutput } from "../../avm2/natives/byteArray";

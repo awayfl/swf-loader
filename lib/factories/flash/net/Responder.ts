@@ -1,5 +1,5 @@
-import { ASFunction, ASObject } from "../../avm2/nat";
-
+import { ASFunction  } from "../../avm2/nat/ASFunction";
+import { ASObject  } from "../../avm2/nat/ASObject";
 /**
  * Copyright 2014 Mozilla Foundation
  * 

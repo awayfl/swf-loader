@@ -1,12 +1,13 @@
 import { DisplayObject, DisplayObjectFlags } from "./DisplayObject";
-import { ASObject, ASArray } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { Bounds, isNullOrUndefined } from "../../base/utilities";
 import { ShapeData, assert, PathCommand } from "@awayjs/graphics";
 import { BitmapData } from "./BitmapData";
 import { release, notImplemented, assertUnreachable } from "../../base/utilities/Debug";
 import { Matrix } from "../geom/Matrix";
 import { clamp } from "@awayjs/graphics";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { CapsStyle } from "./CapsStyle";
 import { JointStyle } from "./JointStyle";
 import { LineScaleMode } from "./LineScaleMode";

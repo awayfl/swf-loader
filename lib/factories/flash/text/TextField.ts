@@ -12,13 +12,14 @@ import { DisplaySymbol, SymbolData } from "../symbol";
 import { Bounds, isNullOrUndefined } from "../../base/utilities";
 import { DisplayObjectDirtyFlags, DisplayObject } from "../display/DisplayObject";
 import { DataBuffer } from "@awayjs/graphics";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
 import { clamp } from "../../base/utilities/NumberUtilities";
 import { TextRecordFlags, TextRecord, TextFlags, TextTag } from "../../../utils/SWFTags"
 import { Rectangle } from "../geom/Rectangle";
 import { TextLineMetrics } from "./TextLineMetrics";
-import { ASArray, ISecurityDomain } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { LoaderInfo } from "../display/LoaderInfo";
 import { StaticText } from "./StaticText";
 import { Matrix } from "../geom/Matrix";
@@ -144,7 +145,8 @@ export class TextField extends InteractiveObject {
     );
     defaultTextFormat.letterSpacing = 0;
     defaultTextFormat.kerning = 0;
-    this._textContent = new Shumway.TextContent(this.sec, defaultTextFormat);
+    console.log("80pro todo: TextContent");
+    //this._textContent = new TextContent(this.sec, defaultTextFormat);
   }
 
   _setFillAndLineBoundsFromSymbol(symbol: DisplaySymbol) {
@@ -163,7 +165,7 @@ export class TextField extends InteractiveObject {
     return true;
   }
 
-  _getTextContent(): Shumway.TextContent {
+  _getTextContent(): any/*TextContent*/ {
     return this._textContent;
   }
 
@@ -181,12 +183,14 @@ export class TextField extends InteractiveObject {
   }
 
   private _invalidateContent() {
-    if (this._textContent.flags & Shumway.TextContentFlags.Dirty) {
+    console.log("80pro todo: _invalidateContent");
+    /*
+    if (this._textContent.flags & TextContentFlag.Dirty) {
       this._setDirtyFlags(DisplayObjectDirtyFlags.DirtyTextContent);
-    }
+    }*/
   }
 
-  _textContent: Shumway.TextContent;
+  _textContent: any;//TextContent;
   _lineMetricsData: DataBuffer;
 
   // JS -> AS Bindings
@@ -907,7 +911,7 @@ export class TextSymbol extends DisplaySymbol {
   maxChars: number = 0;
   autoSize: string = TextFieldAutoSize.NONE;
   variableName: string = null;
-  textContent: Shumway.TextContent = null;
+  textContent: any/*TextContent*/ = null;
 
   constructor(data: SymbolData, sec: ISecurityDomain) {
     super(data, TextField.axClass, true);
@@ -922,13 +926,15 @@ export class TextSymbol extends DisplaySymbol {
       symbol.dynamic = false;
       symbol.symbolClass = StaticText.axClass;
       if (tag.initialText) {
-        var textContent = new Shumway.TextContent(sec);
+        console.log("80pro todo: TextContent");
+        /*
+        var textContent = new TextContent(sec);
         textContent.bounds = symbol.lineBounds;
         textContent.parseHtml(tag.initialText, null, false);
         textContent.matrix = new Matrix();
         textContent.matrix.copyFromUntyped(data.matrix);
         textContent.coords = data.coords;
-        symbol.textContent = textContent;
+        symbol.textContent = textContent;*/
       }
     }
     if (tag.flags & TextFlags.HasColor) {

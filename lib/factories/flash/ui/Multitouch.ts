@@ -1,6 +1,7 @@
 import { notImplemented, release, somewhatImplemented } from "../../base/utilities/Debug";
-import { axCoerceString } from "../../avm2/run";
-import { ASObject } from "../../avm2/nat";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { GenericVector } from '../../avm2/natives/GenericVector';
 
 /**
  * Copyright 2014 Mozilla Foundation

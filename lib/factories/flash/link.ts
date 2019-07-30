@@ -1,4 +1,4 @@
-import { ASClass, registerNativeFunction, registerNativeClass } from "../avm2/nat";
+
 import { Symbol } from "./symbol";
 import { XMLDocument, XMLNode } from "../avm2/natives/xml-document";
 import { ByteArray, ObjectEncoding } from "../avm2/natives/byteArray";
@@ -122,6 +122,8 @@ import { Capabilities } from "./system/Capabilities";
 import { Security } from "./system/Security";
 import { fscommand } from "./system/FSCommand";
 import { release, assert } from "../base/utilities/Debug";
+import { ASClass } from '../avm2/nat/ASClass';
+import { registerNativeClass, registerNativeFunction } from '../avm2/nat/initializeBuiltins';
 
 /**
  * Copyright 2014 Mozilla Foundation

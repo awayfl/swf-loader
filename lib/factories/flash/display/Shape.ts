@@ -2,7 +2,7 @@ import { DisplayObject } from "./DisplayObject";
 import { assert, release, warning } from "../../base/utilities/Debug";
 import { Graphics } from "./Graphics";
 import { DisplaySymbol, SymbolData } from "../symbol";
-import { ASClass } from "../../avm2/nat";
+import { ASClass } from "../../avm2/nat/ASClass";
 import { LoaderInfo } from "./LoaderInfo";
 import { BitmapSymbol } from "./BitmapData";
 
@@ -39,10 +39,10 @@ export class Shape extends DisplayObject {
     this._setStaticContentFromSymbol(this._symbol);
   }
   constructor () {
+    super();
     if (this._symbol && !this._fieldsInitialized) {
       this.applySymbol();
     }
-    super();
     if (!this._fieldsInitialized) {
       this._initializeFields();
     }

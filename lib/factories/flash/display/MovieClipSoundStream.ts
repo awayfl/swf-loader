@@ -1,5 +1,5 @@
 import { warning, abstractMethod, notImplemented } from "../../base/utilities/Debug";
-import { ISecurityDomain } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { SoundChannel } from "../media/SoundChannel";
 import { Sound } from "../media/Sound";
 import { DecodedSound, SoundStream } from "../../../utils/parser/sound";
@@ -318,6 +318,7 @@ export class MovieClipSoundStream {
 
     var sec = movieClip.sec;
     var isMP3 = streamInfo.format === 'mp3';
+    /*
     if (isMP3 && !webAudioMP3Option.value) {
       var element = document.createElement('audio');
       element.preload = 'metadata'; // for mobile devices
@@ -339,6 +340,7 @@ export class MovieClipSoundStream {
       }
       // Falls through to WebAudio if element cannot play MP3.
     }
+    */
 
     // TODO fix streamInfo.samplesCount name -- its actually average value
     var totalSamples = (streamInfo.samplesCount + 1) * this.movieClip.totalFrames * streamInfo.channels;

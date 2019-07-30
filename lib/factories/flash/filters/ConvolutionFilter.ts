@@ -1,6 +1,6 @@
 import { BitmapFilter } from "./BitmapFilter";
 import { NumberUtilities } from "../../base/utilities/NumberUtilities";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { Errors } from "../../avm2/errors";
 import { isNullOrUndefined, toNumber } from "../../base/utilities";
 

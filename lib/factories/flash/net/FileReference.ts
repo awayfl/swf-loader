@@ -1,8 +1,8 @@
 import { release, notImplemented } from "../../base/utilities/Debug";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { ByteArray } from "../../avm2/natives/byteArray";
 import { URLRequest } from "./URLRequest";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { ASDate } from "../../avm2/natives/date";
 import { EventDispatcher } from "../events/EventDispatcher";
 

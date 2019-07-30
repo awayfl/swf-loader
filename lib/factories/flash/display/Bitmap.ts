@@ -74,9 +74,10 @@ export class Bitmap extends DisplayObject {
   }
 
   set pixelSnapping(value: string) {
-    if (PixelSnapping.toNumber(value) < 0) {
+    console.log("todo: Bitmap.pixelSnapping");
+    /*if (PixelSnapping.toNumber(value) < 0) {
       this.sec.throwError("ArgumentError", Errors.InvalidEnumError, "pixelSnapping");
-    }
+    }*/
     this._pixelSnapping = axCoerceString(value);
   }
 

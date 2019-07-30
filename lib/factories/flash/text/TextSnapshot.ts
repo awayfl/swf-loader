@@ -1,6 +1,7 @@
 import { release, notImplemented } from "../../base/utilities/Debug";
-import { axCoerceString } from "../../avm2/run";
-import { ASArray, ASObject } from "../../avm2/nat";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { ASArray } from "../../avm2/nat/ASArray";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * Copyright 2014 Mozilla Foundation

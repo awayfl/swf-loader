@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { DataBuffer } from "@awayjs/graphics";
 import { Point } from "./Point";
 import { Bounds } from "../../base/utilities";

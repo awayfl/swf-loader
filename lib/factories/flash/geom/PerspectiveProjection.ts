@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { release, somewhatImplemented } from "../../base/utilities/Debug";
 
 import { assert } from "@awayjs/graphics";

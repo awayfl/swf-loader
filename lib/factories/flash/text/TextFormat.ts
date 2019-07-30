@@ -1,7 +1,8 @@
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Style } from "./StyleSheet";
 import { roundHalfEven } from "../../base/utilities/NumberUtilities";
-import { ASArray, ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { Errors } from "../../avm2/errors";
 import { FontStyle } from "./FontStyle";
 import { TextFormatDisplay } from "./TextFormatDisplay";

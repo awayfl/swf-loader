@@ -3,7 +3,7 @@ import { Errors } from "../../avm2/errors";
 import { ByteArray, IDataInput } from "../../avm2/natives/byteArray";
 import { EventDispatcher } from "../events/EventDispatcher";
 import { FileLoadingSession, FileLoadingService } from "../../base/utilities/FileLoadingService";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { URLRequest } from "./URLRequest";
 import { ProgressEvent } from "../events/ProgressEvent";
 import { IOErrorEvent } from "../events/IOErrorEvent";
@@ -105,15 +105,15 @@ export class URLStream extends EventDispatcher implements IDataInput {
       self.dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR, false, false,
                                                         error));
       var isXDomainError = typeof error === 'string' && error.indexOf('XDOMAIN') >= 0;
-      Telemetry.instance.reportTelemetry({topic: 'loadResource',
+      /*Telemetry.instance.reportTelemetry({topic: 'loadResource',
         resultType: isXDomainError ? Telemetry.LoadResource.StreamCrossdomain :
-                                      Telemetry.LoadResource.StreamDenied});
+                                      Telemetry.LoadResource.StreamDenied});*/
     };
     session.onopen = function () {
       self._connected = true;
       self.dispatchEvent(new Event(Event.OPEN, false, false));
-      Telemetry.instance.reportTelemetry({topic: 'loadResource',
-        resultType: Telemetry.LoadResource.StreamAllowed});
+      /*Telemetry.instance.reportTelemetry({topic: 'loadResource',
+        resultType: Telemetry.LoadResource.StreamAllowed});*/
     };
     session.onhttpstatus = function (location: string, httpStatus: number, httpHeaders: any) {
       var httpStatusEvent = new HTTPStatusEvent(HTTPStatusEvent.HTTP_STATUS, false,

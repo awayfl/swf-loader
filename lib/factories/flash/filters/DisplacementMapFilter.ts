@@ -1,6 +1,6 @@
 import { BitmapFilter } from "./BitmapFilter";
 import { somewhatImplemented, release } from "../../base/utilities/Debug";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Point } from "../geom/Point";
 import { BitmapData } from "../display/BitmapData";
 

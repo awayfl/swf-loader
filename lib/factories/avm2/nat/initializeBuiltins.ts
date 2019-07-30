@@ -46,9 +46,6 @@ import {nativeClasses} from"./builtinNativeClasses";
 import {nativeClassLoaderNames} from"./builtinNativeClasses";
 import { ASNamespace, ASQName, ASXML, ASXMLList } from '../natives/xml';
 
-import {isNaN} from "./isNaN";
-
-console.log("isNaN", isNaN);
 
 export function initializeBuiltins() {
   builtinNativeClasses["Object"]              = ASObject;

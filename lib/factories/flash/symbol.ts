@@ -1,10 +1,12 @@
 import { PromiseWrapper, isInteger, Bounds, ImageType } from "../base/utilities";
-import { ASClass, ISecurityDomain } from "../avm2/nat";
+import { ISecurityDomain } from "../avm2/nat/ISecurityDomain";
+import { ASClass } from "../avm2/nat/ASClass";
 import { release, warning, assert } from "../base/utilities/Debug";
-import { Multiname, NamespaceType } from "../avm2/abc/lazy";
+import { Multiname } from "../avm2/abc/lazy/Multiname";
+import { NamespaceType } from "../avm2/abc/lazy/NamespaceType";
 import { LoaderInfo } from "./display/LoaderInfo";
 import { ByteArray } from "../avm2/natives/byteArray";
-import { AXApplicationDomain } from "../avm2/run";
+import { AXApplicationDomain } from "../avm2/run/AXApplicationDomain";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -45,7 +47,7 @@ export class Symbol {
   resolveAssetPromise: PromiseWrapper<any>;
   data: any;
   isAVM1Object: boolean;
-  avm1Context: AVM1Context;
+  avm1Context: any;//80pro: todo: AVM1Context;
   symbolClass: ASClass;
 
   constructor(data: SymbolData, symbolDefaultClass: ASClass) {

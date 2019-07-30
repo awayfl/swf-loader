@@ -3,7 +3,7 @@ import { assert, release } from "../../base/utilities/Debug";
 import { BitmapFilterType } from "./BitmapFilterType";
 import { Rectangle } from "../geom/Rectangle";
 import { NumberUtilities } from "../../base/utilities/NumberUtilities";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
 
 /**

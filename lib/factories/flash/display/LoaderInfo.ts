@@ -4,7 +4,8 @@ import { assert, release, notImplemented, somewhatImplemented, warning } from ".
 import { Loader } from "./Loader";
 import { DisplayObject } from "./DisplayObject";
 import { ByteArray } from "../../avm2/natives/byteArray";
-import { transformJSValueToAS, ASClass } from "../../avm2/nat";
+import { transformJSValueToAS  } from "../../avm2/nat/transformJSValueToAS";
+import { ASClass } from "../../avm2/nat/ASClass";
 import { UncaughtErrorEvents } from "../events/UncaughtErrorEvents";
 import { AXClass } from "../../avm2/run/AXClass";
 import { constructClassFromSymbol } from "../link";
@@ -21,6 +22,10 @@ import { FontSymbol } from "../text/Font";
 import { VideoSymbol } from "../media/Video";
 import { SoundSymbol } from "../media/Sound";
 import { AVM1Context } from '../../avm1/context';
+//import { SWFFile } from "../../../parsers/SWFParser";
+
+declare var SWFFile:any;
+declare var ImageFile:any;
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -47,10 +52,10 @@ export class LoaderInfo extends EventDispatcher {
   // Constructing LoaderInfo without providing this token throws, preventing it from AS3.
   static CtorToken = {};
   constructor (token: Object) {
+    super();
     if (token !== LoaderInfo.CtorToken) {
       this.sec.throwError('ArgumentError', Errors.CantInstantiateError, 'LoaderInfo$');
     }
-    super();
     this._loader = null;
     this._loaderUrl = '';
     this.reset();
@@ -167,7 +172,7 @@ export class LoaderInfo extends EventDispatcher {
     return this._file ? this._applicationDomain : null;
   }
 
-  get app() {
+  get app():any {
     return this._applicationDomain.axDomain;
   }
 
@@ -421,7 +426,7 @@ export class LoaderInfo extends EventDispatcher {
 
   // TODO: Frames should be parsed lazily when they're first needed, and this removed.
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1114656
-  getFrame(sprite: {frames: SWFFrame[]}, index: number): SWFFrame {
+  getFrame(sprite: {frames: any[]/*SWFFrame[]*/}, index: number): any/*SWFFrame*/ {
     var file = this._file;
     release || assert(file instanceof SWFFile);
     if (!sprite) {

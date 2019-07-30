@@ -1,5 +1,5 @@
 import { NativeMenuItem } from "../display/NativeMenuItem";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 
 /**
  * Copyright 2014 Mozilla Foundation

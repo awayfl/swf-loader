@@ -1,10 +1,14 @@
 import { ASXML } from "../../avm2/natives/xml";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { MapObject } from "../../base/utilities";
 import { Errors } from "../../avm2/errors";
 import { ExternalInterfaceService } from "../../base/utilities/ExternalInterfaceService";
-import { AXFunction, axCoerceString, AXXMLClass, AXObject } from "../../avm2/run";
-import { Multiname, NamespaceType } from "../../avm2/abc/lazy";
+import { AXFunction } from "../../avm2/run/AXFunction";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { AXXMLClass } from "../../avm2/run/AXXMLClass";
+import { AXObject } from "../../avm2/run/AXObject";
+import { NamespaceType} from "../../avm2/abc/lazy/NamespaceType";
+import { Multiname } from "../../avm2/abc/lazy/Multiname";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -43,10 +47,10 @@ export class ExternalInterface extends ASObject {
     if (this.initialized) {
       return;
     }
-    Telemetry.instance.reportTelemetry({
+    /*Telemetry.instance.reportTelemetry({
                                           topic: 'feature',
                                           feature: Telemetry.Feature.EXTERNAL_INTERFACE_FEATURE
-                                        });
+                                        });*/
     this.initialized = true;
     ExternalInterfaceService.initJS(this._callIn);
   }

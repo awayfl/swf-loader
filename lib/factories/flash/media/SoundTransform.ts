@@ -1,5 +1,5 @@
 import { somewhatImplemented, release } from "../../base/utilities/Debug";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * Copyright 2014 Mozilla Foundation

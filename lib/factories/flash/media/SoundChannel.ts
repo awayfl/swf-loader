@@ -2,7 +2,7 @@ import { error, somewhatImplemented, release, assert } from "../../base/utilitie
 import { EventDispatcher } from "../events/EventDispatcher";
 import { ISoundSource, SoundMixer } from "./SoundMixer";
 import { SoundTransform } from "./SoundTransform";
-import { ISecurityDomain } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { Sound } from "./Sound";
 import { isNullOrUndefined } from "../../base/utilities";
 import { Event } from "../events/Event";

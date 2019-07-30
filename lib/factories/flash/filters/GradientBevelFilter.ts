@@ -1,10 +1,10 @@
 import { BitmapFilter, GradientArrays } from "./BitmapFilter";
 import { BitmapFilterType } from "./BitmapFilterType";
 import { Errors } from "../../avm2/errors";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { NumberUtilities } from "../../base/utilities/NumberUtilities";
 import { isNullOrUndefined } from "../../base/utilities";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { Rectangle } from "../geom/Rectangle";
 
 /**

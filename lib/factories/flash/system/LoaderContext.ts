@@ -1,8 +1,9 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { ApplicationDomain } from "./ApplicationDomain";
 import { SecurityDomain } from "./SecurityDomain";
 import { DisplayObjectContainer } from "../display/DisplayObjectContainer";
 import { ImageDecodingPolicy } from "./ImageDecodingPolicy";
+import { AVM1Context } from '../../avm1/context';
 
 /**
  * Copyright 2015 Mozilla Foundation

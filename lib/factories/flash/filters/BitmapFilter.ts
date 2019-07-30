@@ -1,7 +1,7 @@
 import { NumberUtilities } from "../../base/utilities/NumberUtilities";
 import { isNullOrUndefined } from "../../base/utilities";
 import { Rectangle } from "../geom/Rectangle";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * Copyright 2014 Mozilla Foundation

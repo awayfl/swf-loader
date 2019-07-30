@@ -1,5 +1,5 @@
-import { ISecurityDomain } from "../../avm2/nat";
-import { axCoerceString } from "../../avm2/run";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -34,5 +34,5 @@ export function fscommand(sec: ISecurityDomain, command: string, args: string): 
     return;
   }
 
-  sec.player.executeFSCommand(command, args);
+  (<any>sec).player.executeFSCommand(command, args);
 }

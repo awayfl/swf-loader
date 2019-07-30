@@ -1,6 +1,6 @@
 import { release, somewhatImplemented } from "../../base/utilities/Debug";
 import { ContextMenuClipboardItems } from "./ContextMenuClipboardItems";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { URLRequest } from "../net/URLRequest";
 import { ContextMenuBuiltInItems } from "./ContextMenuBuiltInItems";
 import { NativeMenu } from "../display/NativeMenu";

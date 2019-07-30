@@ -93,7 +93,7 @@ export class SWFParser extends ParserBase
 
 	private frames: SWFFrame[];
 	public abcBlocks: ABCBlock[];
-	private dictionary: DictionaryEntry[];
+	public dictionary: DictionaryEntry[];
 	private fonts: {name: string; style: string; id: number}[];
 	private swfData: Uint8Array;
 	private env: any;

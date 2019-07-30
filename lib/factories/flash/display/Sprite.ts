@@ -13,6 +13,7 @@ import { Graphics } from "./Graphics";
 import { ActionScriptVersion } from "./ActionScriptVersion";
 import { MovieClip } from "./MovieClip";
 import { SwfTagCode, PlaceObjectTag, PlaceObjectFlags } from "../../../utils/SWFTags";
+import { SWFFrame } from '../../../parsers/SWFParser';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -106,7 +107,7 @@ export class Sprite extends DisplayObjectContainer {
   private _dragBounds: Rectangle;
   _hitTarget: Sprite;
 
-  _addFrame(frame: Shumway.SWF.SWFFrame) {
+  _addFrame(frame: SWFFrame) {
     var frames = (<SpriteSymbol><any>this._symbol).frames;
     frames.push(frame);
     if (frames.length === 1) {
@@ -114,7 +115,7 @@ export class Sprite extends DisplayObjectContainer {
     }
   }
 
-  _initializeChildren(frame: Shumway.SWF.SWFFrame): void {
+  _initializeChildren(frame: SWFFrame): void {
     if (frame.controlTags) {
       this._processControlTags(frame.controlTags, false);
     }

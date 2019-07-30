@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { Errors } from "../../avm2/errors";
 import { Matrix } from "./Matrix";
 import { ColorTransform } from "./ColorTransform";
@@ -7,7 +7,7 @@ import { Matrix3D } from "./Matrix3D";
 import { release, somewhatImplemented } from "../../base/utilities/Debug";
 import { checkNullParameter } from "../../avm2/run/checkNullParameter";
 import { PerspectiveProjection } from "./PerspectiveProjection";
-import { DisplayObjectFlags } from '../display/DisplayObject';
+import { DisplayObjectFlags, DisplayObject } from '../display/DisplayObject';
 
 /**
  * Copyright 2014 Mozilla Foundation

@@ -1,6 +1,6 @@
 import { Graphics } from "./Graphics";
 import { SymbolData } from "../symbol";
-import { ISecurityDomain } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { Bounds } from "../../base/utilities";
 import { ShapeSymbol } from "./Shape";
 import { LoaderInfo } from "./LoaderInfo";

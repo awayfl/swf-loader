@@ -13,7 +13,8 @@ import { Transform } from "../geom/Transform";
 import { ColorTransform } from "../geom/ColorTransform";
 import { Rectangle } from "../geom/Rectangle";
 import { Vector3D } from "../geom/Vector3D";
-import { ASObject, ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { Errors } from "../../avm2/errors";
 import { StringUtilities } from "../../base/utilities/StringUtilities";
 import { IBitmapDrawable } from "./IBitmapDrawable";
@@ -1968,7 +1969,7 @@ export class DisplayObject extends EventDispatcher implements IBitmapDrawable, I
         objects[0] = this;
       } else if (testingType === HitTestingType.ObjectsUnderPoint ||
                   InteractiveObject.axIsType(this) &&
-                  (<InteractiveObject>this)._mouseEnabled) {
+                  (<InteractiveObject><any>this)._mouseEnabled) {
         // For getObjectsUnderPoint, push all direct hits, for mouse target finding
         // InteractiveObjects only.
         objects.push(this);

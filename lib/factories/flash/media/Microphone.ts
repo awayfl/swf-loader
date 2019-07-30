@@ -1,8 +1,8 @@
 import { release, notImplemented, somewhatImplemented } from "../../base/utilities/Debug";
 import { SoundTransform } from "./SoundTransform";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { EventDispatcher } from "../events/EventDispatcher";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 
 /**
  * Copyright 2014 Mozilla Foundation

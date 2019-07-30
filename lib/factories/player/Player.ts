@@ -16,14 +16,14 @@ import { Event } from "@as3web/flash";
 import { RequestAnimationFrame } from '@awayjs/core';
 import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
-import { constructClassFromSymbol } from '../link';
-import { traceASClass } from '../avm2/nat/traceASClass';
+import { constructClassFromSymbol } from '../flash/link';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
 	}
 }
 console.log("System", System);
+console.log("constructClassFromSymbol", constructClassFromSymbol);
 
 // Add the |axApply| and |axCall| methods on the function prototype so that we can treat
 // Functions as AXCallables.
@@ -80,6 +80,23 @@ export class Player {
               this._sec.application.loadAndExecuteABC(abc);
 			}
 		}
+/*
+		var symbol = <SpriteSymbol><any>this._parser.dictionary[0];
+		if (!symbol) {
+		  var data = {
+			id: 0,
+			className: this._parser.symbolClassesMap[0],
+			env: this
+		  };
+		  /*symbol = new SpriteSymbol(data, this);
+		  symbol.isRoot = true;
+		  symbol.numFrames = this._file.frameCount;
+		  this._syncAVM1Attributes(symbol);
+		  this._dictionary[0] = symbol;
+	}*/
+		//new this._sec.flash.display.Scene(name, labels, offset, numFrames)
+		// 
+		//var fun = this._sec.createInitializerFunction();
 
 
 		// todo: 	to get the abc code executed from swf, we now need to get the root of the swf created as a MovieClip-AXClass

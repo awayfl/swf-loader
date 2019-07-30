@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { release, notImplemented, somewhatImplemented } from "../../base/utilities/Debug";
 import { toKeyValueArray } from "../../base/utilities/ObjectUtilities";
 import { TouchscreenType } from "./TouchscreenType";

@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -19,9 +19,9 @@ import { ASObject } from "../../avm2/nat";
 
 export class Vector3D extends ASObject {
   static classInitializer() {
-    this.X_AXIS = Object.freeze(this.Create(1, 0, 0, 0));
-    this.Y_AXIS = Object.freeze(this.Create(1, 0, 0, 0));
-    this.Z_AXIS = Object.freeze(this.Create(1, 0, 0, 0));
+    this.X_AXIS = <any>Object.freeze(this.Create(1, 0, 0, 0));
+    this.Y_AXIS = <any>Object.freeze(this.Create(1, 0, 0, 0));
+    this.Z_AXIS = <any>Object.freeze(this.Create(1, 0, 0, 0));
   }
 
   static Create(x: number, y: number, z: number, w: number) {

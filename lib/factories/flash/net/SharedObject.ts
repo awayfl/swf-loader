@@ -1,8 +1,8 @@
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { somewhatImplemented, release, assert, notImplemented, warning } from "../../base/utilities/Debug";
 import { StringUtilities } from "../../base/utilities/StringUtilities";
 import { ByteArray, AMFEncoding, ObjectEncoding } from "../../avm2/natives/byteArray";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { EventDispatcher } from "../events/EventDispatcher";
 import { NetConnection } from "./NetConnection";
 
@@ -32,7 +32,7 @@ interface IStorage {
 var _sharedObjectStorage: IStorage;
 
 function getSharedObjectStorage(): IStorage  {
-  if (!_sharedObjectStorage) {
+  /*if (!_sharedObjectStorage) {
     if (typeof ShumwayCom !== 'undefined' && ShumwayCom.createSpecialStorage) {
       _sharedObjectStorage = ShumwayCom.createSpecialStorage();
     } else {
@@ -40,6 +40,7 @@ function getSharedObjectStorage(): IStorage  {
     }
   }
   release || assert(_sharedObjectStorage, "SharedObjectStorage is not available.");
+  */
   return _sharedObjectStorage;
 }
 
@@ -72,7 +73,7 @@ export class SharedObject extends EventDispatcher {
     obj._path = path;
     obj._data = data;
     obj._objectEncoding = encoding;
-    Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.SHAREDOBJECT_FEATURE});
+    //Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.SHAREDOBJECT_FEATURE});
     return obj;
   }
 

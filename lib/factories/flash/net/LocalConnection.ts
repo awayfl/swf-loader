@@ -1,7 +1,12 @@
 import { EventDispatcher } from "../events/EventDispatcher";
 import { ILocalConnectionReceiver, LocalConnectionService, LocalConnectionConnectResult } from "../../base/utilities/LocalConnectionService";
-import { getCurrentABC, axCoerceString, axIsCallable, axIsTypeString } from "../../avm2/run";
-import { ASObject, ASError, ASArray } from "../../avm2/nat";
+import { getCurrentABC } from "../../avm2/run/getCurrentABC";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { axIsCallable } from "../../avm2/run/axIsCallable";
+import { axIsTypeString } from "../../avm2/run/axIsTypeString";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { ASError } from "../../avm2/nat/ASError";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { Errors } from "../../avm2/errors";
 import { assert, release, warning } from "../../base/utilities/Debug";
 import { ByteArray } from "../../avm2/natives/byteArray";

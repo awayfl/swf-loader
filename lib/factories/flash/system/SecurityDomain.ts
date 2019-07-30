@@ -1,6 +1,6 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { Errors } from "../../avm2/errors";
-import { getCurrentABC } from "../../avm2/run";
+import { getCurrentABC } from "../../avm2/run/getCurrentABC";
 
 /**
  * Copyright 2014 Mozilla Foundation

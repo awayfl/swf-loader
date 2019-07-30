@@ -15,7 +15,8 @@
  */
 
 import { XMLParserErrorCode, XMLParserBase } from "./xml";
-import { ASObject, ISecurityDomain } from "../nat";
+import { ASObject  } from "../nat/ASObject";
+import { ISecurityDomain } from "../nat/ISecurityDomain";
 import { warning } from "../../base/utilities/Debug";
 import { axCoerceString } from '../run/axCoerceString';
 

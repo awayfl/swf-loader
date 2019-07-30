@@ -6,7 +6,9 @@ import { VideoControlEvent, VideoPlaybackEvent } from "../../base/remoting";
 import { SoundTransform } from "../media/SoundTransform";
 import { ISoundSource, SoundMixer } from "../media/SoundMixer";
 import { NetStreamInfo } from "./NetStreamInfo";
-import { ASObject, ASArray, ISecurityDomain } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { notImplemented, release, somewhatImplemented, assert, warning } from "../../base/utilities/Debug";
 import { NetStreamPlayOptions } from "./NetStreamPlayOptions";
 import { NetStreamMulticastInfo } from "./NetStreamMulticastInfo";
@@ -247,7 +249,7 @@ export class NetStream extends EventDispatcher implements ISoundSource {
   }
   set soundTransform(sndTransform: SoundTransform) {
     this._soundTransform = sndTransform;
-    flash.media.SoundMixer._updateSoundSource(this);
+    SoundMixer._updateSoundSource(this);
   }
   get checkPolicyFile(): boolean {
     return this._checkPolicyFile;
@@ -496,7 +498,7 @@ export class NetStream extends EventDispatcher implements ISoundSource {
 
     switch (eventType) {
       case VideoPlaybackEvent.Initialized:
-        flash.media.SoundMixer._updateSoundSource(this);
+        SoundMixer._updateSoundSource(this);
         break;
       case VideoPlaybackEvent.PlayStart:
         this.dispatchEvent(new NetStatusEvent(NetStatusEvent.NET_STATUS,
@@ -643,6 +645,8 @@ class VideoStream {
   }
 
   play(url: string, checkPolicyFile: boolean) {
+    console.log("todo: NetStream.play");
+    /*
     release || assert(this._state === VideoStreamState.CLOSED);
 
     var isMediaSourceEnabled = mediaSourceOption.value;
@@ -699,9 +703,12 @@ class VideoStream {
       this.appendBytesAction('endSequence'); // NetStreamAppendBytesAction.END_SEQUENCE
     }.bind(this));
     stream.load(request);
+    */
   }
 
   playInConnection(connection: NetConnection, streamPath: string) {
+    console.log("todo: NetStream.playInConnection");
+    /*
     this.openInDataGenerationMode();
 
     var self = this;
@@ -727,6 +734,7 @@ class VideoStream {
       generate: function () {
         mux.flush();
       }
+
     };
 
     connection._createRtmpStream((ns: RtmpJs.INetStream, streamId: number) => {
@@ -747,6 +755,7 @@ class VideoStream {
       };
       ns.play(streamPath);
     });
+    */
   }
 
   openInDataGenerationMode() {
@@ -949,24 +958,27 @@ class FlvMp4Decoder implements IDataDecoder {
   public onError: (e) => void;
   public onHeader: (contentType: string) => void;
 
-  private _flvParser: RtmpJs.FLV.FLVParser;
-  private _mp4Mux: RtmpJs.MP4.MP4Mux;
+  //private _flvParser: RtmpJs.FLV.FLVParser;
+  //private _mp4Mux: RtmpJs.MP4.MP4Mux;
 
   constructor(private sec: ISecurityDomain) {
+    console.log("TODO: FlvMp4Decoder");
+    /*
     this._flvParser = new RtmpJs.FLV.FLVParser();
     this._flvParser.onHeader = this._onFlvHeader.bind(this);
     this._flvParser.onTag = this._onFlvTag.bind(this);
     this._flvParser.onClose = this._onFlvClose.bind(this);
     this._flvParser.onError = this._onFlvError.bind(this);
-    this._mp4Mux = null;
+    this._mp4Mux = null;*/
   }
 
-  private _onFlvHeader(header: RtmpJs.FLV.FLVHeader) {
+
+  private _onFlvHeader(header: any/*RtmpJs.FLV.FLVHeader*/) {
     //
   }
 
-  private _onFlvTag(tag: RtmpJs.FLV.FLVTag)  {
-    if (tag.type === 18) {
+  private _onFlvTag(tag: any/*RtmpJs.FLV.FLVTag*/)  {
+   /* if (tag.type === 18) {
       var ba = new this.sec.flash.utils.ByteArray();
       ba.writeRawBytes(tag.data);
       ba.position = 0;
@@ -986,10 +998,11 @@ class FlvMp4Decoder implements IDataDecoder {
       return;
     }
     this._mp4Mux.pushPacket(tag.type, new Uint8Array(tag.data), tag.timestamp);
+    */
   }
 
   private _onFlvClose() {
-    this._mp4Mux.flush();
+    //this._mp4Mux.flush();
   }
 
   private _onFlvError(e) {
@@ -999,22 +1012,22 @@ class FlvMp4Decoder implements IDataDecoder {
   }
 
   public push(bytes: Uint8Array) {
-    try {
+    /*try {
       this._flvParser.push(bytes);
     } catch (e)  {
       if (this.onError) {
         this.onError(e);
       }
-    }
+    }*/
   }
 
   public close() {
-    try {
+    /*try {
       this._flvParser.close();
     } catch (e)  {
       if (this.onError) {
         this.onError(e);
       }
-    }
+    }*/
   }
 }

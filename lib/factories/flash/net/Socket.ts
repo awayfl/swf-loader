@@ -1,5 +1,5 @@
 import { release, somewhatImplemented, notImplemented } from "../../base/utilities/Debug";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { ByteArray, IDataInput, IDataOutput } from "../../avm2/natives/byteArray";
 import { Errors } from "../../avm2/errors";
 import { EventDispatcher } from "../events/EventDispatcher";

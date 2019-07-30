@@ -1,13 +1,15 @@
 import { Point } from "../geom/Point";
 import { notImplemented, release, somewhatImplemented, assert } from "../../base/utilities/Debug";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { HitTestingType, DisplayObject } from "../display/DisplayObject";
 import { InteractiveObject } from "../display/InteractiveObject";
 import { MouseEvent } from "../events/MouseEvent";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { MouseCursor } from "./MouseCursor";
 import { Errors } from "../../avm2/errors";
 import { MouseCursorData } from "./MouseCursorData";
+import { Stage } from '../display/Stage';
+import { Sprite } from '../display/Sprite';
 
 /**
  * Copyright 2014 Mozilla Foundation

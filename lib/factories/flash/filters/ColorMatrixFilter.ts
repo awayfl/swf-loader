@@ -1,7 +1,7 @@
 import { BitmapFilter } from "./BitmapFilter";
 import { toNumber, isNullOrUndefined } from "../../base/utilities";
 import { Errors } from "../../avm2/errors";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 
 /**
  * Copyright 2014 Mozilla Foundation

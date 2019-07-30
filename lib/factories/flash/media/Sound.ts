@@ -1,5 +1,5 @@
 import { LoaderInfo } from "../display/LoaderInfo";
-import { ISecurityDomain } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { SymbolData, Symbol } from "../symbol";
 import { EventDispatcher } from "../events/EventDispatcher";
 import { assert, release, somewhatImplemented, notImplemented, warning } from "../../base/utilities/Debug";
@@ -124,7 +124,7 @@ export class Sound extends EventDispatcher {
     }
 
 
-    Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.SOUND_FEATURE});
+    //Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.SOUND_FEATURE});
 
     this._playQueue = [];
     this._url = null;
@@ -181,7 +181,8 @@ export class Sound extends EventDispatcher {
     release || notImplemented("public flash.media.Sound::loadPCMFromByteArray"); return;
   }
   play(startTime: number = 0, loops: number /*int*/ = 0, sndTransform: SoundTransform = null): SoundChannel {
-    startTime = +startTime; loops = loops | 0;
+    console.log("TODO: Sound.play");
+    /*startTime = +startTime; loops = loops | 0;
     var channel = new SoundChannel();
     channel._sound = this;
     channel._soundTransform = isNullOrUndefined(sndTransform) ?
@@ -212,8 +213,8 @@ export class Sound extends EventDispatcher {
       } else {
         channel._playSoundDataViaChannel(this._soundData, startTime, loops);
       }
-    }
-    return channel;
+    }*/
+    return null;//channel;
   }
   close(): void {
     release || somewhatImplemented("public flash.media.Sound::close");
@@ -226,7 +227,8 @@ export class Sound extends EventDispatcher {
     if (!request) {
       return;
     }
-
+    console.log("TODO:Sound.load");
+/*
     var checkPolicyFile: boolean = context ? context.checkPolicyFile : false;
     var bufferTime: number = context ? context.bufferTime : 1000;
 
@@ -294,6 +296,7 @@ export class Sound extends EventDispatcher {
     });
 
     stream.load(request);
+      */
   }
 }
 

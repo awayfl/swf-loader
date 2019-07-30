@@ -19,7 +19,7 @@ import { assert } from "@awayjs/graphics";
 import { warning, release } from "../../base/utilities/Debug";
 import { MapObject, isNullOrUndefined } from "../../base/utilities";
 import { Event } from "./Event";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { IEventDispatcher, EventHandler } from "./IEventDispatcher";
 import { Errors } from "../../avm2/errors";
 import { axCoerceString  } from "../../avm2/run/axCoerceString";
@@ -167,10 +167,11 @@ export class BroadcastEventDispatchQueue {
     if (!queue) {
       return;
     }
+    /*
     if (!release && traceEventsOption.value) {
       console.log('Broadcast event of type ' + event._type + ' to ' + queue.length +
                   ' listeners');
-    }
+    }*/
     var nullCount = 0;
     for (var i = 0; i < queue.length; i++) {
       var target = queue[i];
@@ -372,7 +373,7 @@ export class EventDispatcher extends ASObject implements IEventDispatcher {
       return true;
     }
     if (DisplayObject.axIsType(this)) {
-      var node: DisplayObject = (<DisplayObject>this)._parent;
+      var node: DisplayObject = (<DisplayObject><any>this)._parent;
       do {
         if (node._hasEventListener(type)) {
           return true;
@@ -414,9 +415,9 @@ export class EventDispatcher extends ASObject implements IEventDispatcher {
       return true;
     }
 
-    if (!release && traceEventsOption.value) {
+    /*if (!release && traceEventsOption.value) {
       console.log('Dispatch event of type ' + event._type);
-    }
+    }*/
 
     release || counter.count("EventDispatcher::dispatchEvent");
 
@@ -432,7 +433,7 @@ export class EventDispatcher extends ASObject implements IEventDispatcher {
     var ancestors: DisplayObject [] = [];
 
     if (!event.isBroadcastEvent() && DisplayObject.axIsType(this)) {
-      var node: DisplayObject = (<DisplayObject>this)._parent;
+      var node: DisplayObject = (<DisplayObject><any>this)._parent;
 
       // Gather all parent display objects that have event listeners for this event type.
       while (node) {
@@ -505,7 +506,7 @@ export class EventDispatcher extends ASObject implements IEventDispatcher {
         event._eventPhase = eventPhase;
         typeof entry.listener === 'function' ?
                                               entry.listener(event) :
-                                              entry.listener.call(entry.listener, event);
+                                              (<any>entry.listener).call(entry.listener, event);
         if (event._stopImmediatePropagation) {
           break;
         }

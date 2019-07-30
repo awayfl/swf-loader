@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { clampS8U8, toS16 } from "../../base/utilities/IntegerUtilities";
 
 /**

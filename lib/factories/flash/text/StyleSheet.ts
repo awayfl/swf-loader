@@ -1,6 +1,9 @@
 import { assert, release } from "../../base/utilities/Debug";
-import { ASObject, transformASValueToJS, transformJSValueToAS, ASArray } from "../../avm2/nat";
-import { axCoerceString } from "../../avm2/run";
+import { ASObject} from "../../avm2/nat/ASObject";
+import { transformASValueToJS } from "../../avm2/nat/transformASValueToJS";
+import { transformJSValueToAS } from "../../avm2/nat/transformJSValueToAS";
+import { ASArray } from "../../avm2/nat/ASArray";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { EventDispatcher } from "../events/EventDispatcher";
 import { TextFormat } from "./TextFormat";
 
@@ -186,7 +189,9 @@ function parseStyle(css: string, index: number, length: number, names: string[],
         sawWhitespace = false;
         upperCase = false;
         // Inner loop parsing property values.
-        valueLoop: while (index < length) {
+        //80pro todo: this was like this: 
+        //valueLoop: while (index < length) {
+        while (index < length) {
           char = css[index];
           switch (char) {
             case ';':

@@ -18,20 +18,25 @@ import { JPEGLoaderContext } from "../system/JPEGLoaderContext";
 import { LoaderContext } from "../system/LoaderContext";
 import { CrossDomainSWFLoadingWhitelistResult, ICrossDomainSWFLoadingWhitelist } from "../system/Security";
 import { ByteArray } from "../../avm2/natives/byteArray";
-import { transformASValueToJS } from "../../avm2/nat";
+import { transformASValueToJS } from "../../avm2/nat/transformASValueToJS";
 import { ApplicationDomain } from "../system/ApplicationDomain";
 import { IOErrorEvent } from "../events/IOErrorEvent";
 import { SecurityErrorEvent } from "../events/SecurityErrorEvent";
 import { EagerlyParsedDictionaryEntry } from "@awayjs/graphics";
 import { Bitmap } from "./Bitmap";
-import { ABCFile, Multiname, NamespaceType } from "../../avm2/abc/lazy";
+import { NamespaceType } from "../../avm2/abc/lazy/NamespaceType";
+import { ABCFile } from "../../avm2/abc/lazy/ABCFile";
+import { Multiname } from "../../avm2/abc/lazy/Multiname";
 import { Font } from "../text/Font";
 import { Sprite, SpriteSymbol } from "./Sprite";
 import { MovieClip, FrameNavigationModel } from "./MovieClip";
 import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';
 import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
 import { getCurrentABC } from "../../avm2/run/getCurrentABC";
+import { AVM1Context } from '../../avm1/context';
 
+declare var SWFFile:any;
+declare var ImageFile:any;
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -139,7 +144,7 @@ export class Loader extends DisplayObjectContainer
       if (instance._loadStatus === LoadStatus.Opened && instance._content) {
         enterTimeline("Loader.INIT");
         try {
-          loaderInfo.dispatchEvent(this.sec.flash.events.Event.axClass.getInstance(events.Event.INIT));
+          loaderInfo.dispatchEvent(this.sec.flash.events.Event.axClass.getInstance(Event.INIT));
         } catch (e) {
           warning('caught error under loaderInfo INIT event:', e);
         }
@@ -169,9 +174,9 @@ export class Loader extends DisplayObjectContainer
         instance._loadStatus = LoadStatus.Complete;
         enterTimeline("Loader.Complete");
         try {
-          loaderInfo.dispatchEvent(this.sec.flash.events.Event.axClass.getInstance(events.Event.COMPLETE));
+          loaderInfo.dispatchEvent(this.sec.flash.events.Event.axClass.getInstance(Event.COMPLETE));
         } catch (e) {
-          Debug.warning('caught error under loaderInfo COMPLETE event: ', e);
+          warning('caught error under loaderInfo COMPLETE event: ', e);
         }
         leaveTimeline();
       }
@@ -199,7 +204,7 @@ export class Loader extends DisplayObjectContainer
           try {
             loaderInfo.dispatchEvent(Event.axClass.getInstance(Event.OPEN));
           } catch (e) {
-            Debug.warning('caught error under loaderInfo OPEN event: ', e);
+            warning('caught error under loaderInfo OPEN event: ', e);
           }
           leaveTimeline();
         }
@@ -311,11 +316,11 @@ export class Loader extends DisplayObjectContainer
   private _contentLoaderInfo: LoaderInfo;
   private _uncaughtErrorEvents: UncaughtErrorEvents;
 
-  private _fileLoader: FileLoader;
+  private _fileLoader: any/*FileLoader*/;
   private _imageSymbol: BitmapSymbol;
   private _loadStatus: LoadStatus;
   private _loadingType: LoadingType;
-  private _queuedLoadUpdate: LoadProgressUpdate;
+  private _queuedLoadUpdate: any/*LoadProgressUpdate*/;
 
   /**
    * No way of knowing what's in |data|, so do a best effort to print out some meaninfgul debug
@@ -363,7 +368,9 @@ export class Loader extends DisplayObjectContainer
 
   load(request: URLRequest, context?: LoaderContext): void {
     this.close();
+    console.log("80pro: TODO:loader.load");
     // TODO: clean up contentloaderInfo.
+    /*
     var resolvedURL = FileLoadingService.resolveUrl(request.url);
     this._contentLoaderInfo._url = resolvedURL;
     this._applyLoaderContext(context);
@@ -378,10 +385,13 @@ export class Loader extends DisplayObjectContainer
     var loaderClass = Loader.axClass;
     release || assert(loaderClass._loadQueue.indexOf(this) === -1);
     loaderClass._loadQueue.push(this);
+    */
   }
 
   loadBytes(data: ByteArray, context?: LoaderContext) {
     this.close();
+    console.log("80pro todo: loader.loadBytes");
+    /*
     // TODO: properly coerce object arguments to their types.
     var loaderClass = Loader.axClass;
     // In case this is the initial root loader, we won't have a loaderInfo object. That should
@@ -400,6 +410,7 @@ export class Loader extends DisplayObjectContainer
 
     release || assert(loaderClass._loadQueue.indexOf(this) === -1);
     loaderClass._loadQueue.push(this);
+    */
   }
 
   close(): void {
@@ -476,6 +487,8 @@ export class Loader extends DisplayObjectContainer
     // operation to continue.
     //
     // Additionally, all the normal cross-domain checks apply as per usual.
+    console.log("80pro todo: loader.onLoadOpen");
+    /*
     if (file._file instanceof SWFFile) {
       var whitelistResult = this._canLoadSWFFromDomain(this._fileLoader._url);
       var resultType: Telemetry.LoadResource;
@@ -530,9 +543,10 @@ export class Loader extends DisplayObjectContainer
     }
 
     this._contentLoaderInfo.setFile(file);
+    */
   }
 
-  onLoadProgress(update: LoadProgressUpdate) {
+  onLoadProgress(update: any/*LoadProgressUpdate*/) {
     release || assert(update);
     this._queuedLoadUpdate = update;
   }
@@ -580,7 +594,7 @@ export class Loader extends DisplayObjectContainer
     this.addTimelineObjectAtDepth(this._content, 0);
   }
 
-  private _applyLoadUpdate(update: LoadProgressUpdate) {
+  private _applyLoadUpdate(update: any/*LoadProgressUpdate*/) {
     var loaderInfo = this._contentLoaderInfo;
     loaderInfo._bytesLoaded = update.bytesLoaded;
     var file = loaderInfo._file;
@@ -631,7 +645,8 @@ export class Loader extends DisplayObjectContainer
 
     // In browsers that can't synchronously decode fonts, we have already registered all
     // embedded fonts at this point.
-    if (inFirefox) {
+    console.log("80pro: todo: font loading in firefox");
+    /*if (inFirefox)) {
       var fontsLoaded = file.fonts.length;
       var fontsLoadedDelta = fontsLoaded - loaderInfo._fontsLoaded;
       if (fontsLoadedDelta > 0) {
@@ -640,7 +655,7 @@ export class Loader extends DisplayObjectContainer
         }
         loaderInfo._fontsLoaded = fontsLoaded;
       }
-    }
+    }*/
 
     var rootSymbol = loaderInfo.getRootSymbol();
     var framesLoadedDelta = file.framesLoaded - rootSymbol.frames.length;
@@ -759,8 +774,10 @@ export class Loader extends DisplayObjectContainer
   }
 
   private _createAVM1Context(): void {
+    console.log("80pro todo: _createAVM1Context");
+    /*
     var contentLoaderInfo: LoaderInfo = this._contentLoaderInfo;
-    var avm1Context = Shumway.AVM1.AVM1Context.create(contentLoaderInfo);
+    var avm1Context = AVM1Context.create(contentLoaderInfo);
     var rootLoader = Loader.axClass.getRootLoader();
     avm1Context.setStage(rootLoader._stage);
 
@@ -769,7 +786,9 @@ export class Loader extends DisplayObjectContainer
       MovieClip.axClass.frameNavigationModel = FrameNavigationModel.SWF1;
     }
 
+
     contentLoaderInfo._avm1Context = avm1Context;
+    */
   }
 
   /**
@@ -778,6 +797,8 @@ export class Loader extends DisplayObjectContainer
    * including potential nested SWFs.
    */
   private _createAVM1Movie(root: DisplayObject): AVM1Movie {
+    console.log("80pro: todo: _createAVM1Movie");
+    /*
     var contentLoaderInfo = this._contentLoaderInfo;
     release || assert(contentLoaderInfo);
 
@@ -789,8 +810,8 @@ export class Loader extends DisplayObjectContainer
 
     var avm1Movie = new AVM1Movie(root);
     release || assert(!avm1Context.levelsContainer, "One levels container per context");
-    avm1Context.levelsContainer = avm1Movie;
-
-    return avm1Movie;
+    //80pro todo avm1Context.levelsContainer = avm1Movie;
+*/
+    return null;//avm1Movie;
   }
 }

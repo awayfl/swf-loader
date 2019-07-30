@@ -1,12 +1,13 @@
 import { EventDispatcher } from "../events/EventDispatcher";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
-import { ASObject, ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { somewhatImplemented, release, notImplemented } from "../../base/utilities/Debug";
 import { NetStatusEvent } from "../events/NetStatusEvent";
 import { Capabilities } from "../system/Capabilities";
 import { IRootElementService } from "../display/LoaderInfo";
 import { Responder } from "./Responder";
 import { Telemetry } from '../../base/utilities/Telemetry';
+import { ASObject } from '../../avm2/nat/ASObject';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -40,7 +41,7 @@ export class NetConnection extends EventDispatcher {
     this._usingTLS = false;
     this._protocol = null;
 
-    Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.NETCONNECTION_FEATURE});
+    //Telemetry.instance.reportTelemetry({topic: 'feature', feature: Telemetry.Feature.NETCONNECTION_FEATURE});
   }
   
   // JS -> AS Bindings
@@ -81,7 +82,7 @@ export class NetConnection extends EventDispatcher {
   // _farNonce: string;
   // _unconnectedPeerStreams: any [];
 
-  private _rtmpConnection: RtmpJs.BaseTransport;
+  private _rtmpConnection: any;//RtmpJs.BaseTransport;
   private _rtmpCreateStreamCallbacks: Function[];
 
   get connected(): boolean {
@@ -91,6 +92,7 @@ export class NetConnection extends EventDispatcher {
     return this._uri;
   }
   connect(command: string): void {
+    /*
     command = axCoerceString(command);
 
     release || somewhatImplemented("public flash.net.NetConnection::connect");
@@ -153,7 +155,7 @@ export class NetConnection extends EventDispatcher {
         callback(e.stream, e.streamId);
       }.bind(this);
       rtmpConnection.connect(rtmpProps);
-    }
+    }*/
   }
   _createRtmpStream(callback) {
     var transactionId = this._rtmpCreateStreamCallbacks.length;

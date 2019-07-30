@@ -1,9 +1,12 @@
-import { ASObject } from "../../avm2/nat";
-import { AXApplicationDomain, getCurrentABC, axCoerceString } from "../../avm2/run";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { getCurrentABC } from "../../avm2/run/getCurrentABC";
+import { AXApplicationDomain } from "../../avm2/run/AXApplicationDomain";
 import { assert, release, notImplemented } from "../../base/utilities/Debug";
 import { ByteArray } from "../../avm2/natives/byteArray";
 import { Errors } from "../../avm2/errors";
-import { Multiname, NamespaceType } from "../../avm2/abc/lazy";
+import { Multiname } from "../../avm2/abc/lazy/Multiname";
+import { NamespaceType } from "../../avm2/abc/lazy/NamespaceType";
 import { GenericVector } from "../../avm2/natives/GenericVector";
 
 /**

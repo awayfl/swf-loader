@@ -1,5 +1,5 @@
 import { release, notImplemented } from "../../base/utilities/Debug";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { EventDispatcher } from "../events/EventDispatcher";
 import { KeyboardEvent } from "../events/KeyboardEvent";
 

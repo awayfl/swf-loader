@@ -1,5 +1,5 @@
-import { ASClass } from "../nat";
-import { Errors } from "../errors";
+import { ASClass } from "../nat/ASClass";
+import { Errors } from '../errors';
 
 // REDUX: check if we need this now that we do arg checking at callsites.
 export function checkParameterType(argument: any, name: string, type: ASClass) {

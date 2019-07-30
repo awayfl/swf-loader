@@ -1,9 +1,9 @@
 import { somewhatImplemented, release, notImplemented } from "../../base/utilities/Debug";
 import { ByteArray } from "../../avm2/natives/byteArray";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { isNullOrUndefined } from "../../base/utilities";
 import { SoundTransform } from "./SoundTransform";
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -105,7 +105,7 @@ export class SoundMixer extends ASObject {
     for (var i = 0; i < 1024; i++) {
       data[i] = Math.random();
     }
-    outputArray.writeRawBytes(data);
+    outputArray.writeRawBytes(<any>data);
     outputArray.position = 0;
   }
   static areSoundsInaccessible(): boolean {

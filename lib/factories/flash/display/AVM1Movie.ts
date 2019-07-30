@@ -2,7 +2,7 @@ import { assert, Bounds } from "@awayjs/graphics";
 import { release, notImplemented } from "../../base/utilities/Debug";
 import { DisplayObject, IAdvancable, DisplayObjectDirtyFlags, DisplayObjectFlags, HitTestingType, HitTestingResult } from "./DisplayObject";
 import { Sprite } from './Sprite';
-import { ASFunction } from '../../avm2/nat';
+import { ASFunction } from '../../avm2/nat/ASFunction';
 import { SWFFrame } from '../../../parsers/SWFParser';
 import { MovieClip } from './MovieClip';
 

@@ -9,7 +9,7 @@ import { Errors } from "../../avm2/errors";
 import { clamp } from "@awayjs/graphics";
 import { assert } from "@awayjs/graphics";
 import { Bounds } from "../../base/utilities";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { Point } from "../geom/Point";
 import { AVM1Movie } from "./AVM1Movie";
 import { TextSnapshot } from "../text/TextSnapshot";

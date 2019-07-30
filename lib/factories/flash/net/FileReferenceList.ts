@@ -1,5 +1,5 @@
 import { release, notImplemented } from "../../base/utilities/Debug";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { EventDispatcher } from "../events/EventDispatcher";
 
 /**

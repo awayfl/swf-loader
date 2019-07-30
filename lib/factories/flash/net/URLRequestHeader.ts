@@ -1,5 +1,5 @@
-import { ASObject } from "../../avm2/nat";
-import { axCoerceString } from "../../avm2/run";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 
 /**
  * Copyright 2014 Mozilla Foundation

@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { GradientInterpolationMethod } from "@awayjs/graphics";
 
 /**

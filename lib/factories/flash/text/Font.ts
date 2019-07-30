@@ -1,5 +1,8 @@
 import { release, assert, somewhatImplemented, warning } from "../../base/utilities/Debug";
-import { ASObject, ISecurityDomain, ASClass, ASArray } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
+import { ASClass } from "../../avm2/nat/ASClass";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { MapObject } from "../../base/utilities";
 import { ObjectUtilities } from "../../base/utilities/ObjectUtilities";
 import { DisplayObject } from "../display/DisplayObject";
@@ -7,7 +10,8 @@ import { FontStyle } from "./FontStyle";
 import { FontType } from "./FontType";
 import { Symbol, EagerlyResolvedSymbol, SymbolData } from "../symbol";
 import { LoaderInfo } from "../display/LoaderInfo";
-import { axCoerceString } from "../../avm2/run";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { IRemotable } from '../../base/remoting';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -26,7 +30,7 @@ import { axCoerceString } from "../../avm2/run";
  */
 // Class: Font
 
-export class Font extends ASObject implements Shumway.Remoting.IRemotable {
+export class Font extends ASObject implements IRemotable {
 
   static axClass: typeof Font;
 

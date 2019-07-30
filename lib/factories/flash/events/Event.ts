@@ -1,4 +1,4 @@
-import { ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { MapObject } from "../../base/utilities";
 import { ObjectUtilities } from "../../base/utilities/ObjectUtilities";
 import { assert } from "@awayjs/graphics";

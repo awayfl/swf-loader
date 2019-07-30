@@ -335,7 +335,8 @@ export class ButtonSymbol extends DisplaySymbol {
         };
         character = new SpriteSymbol({id: -1, className: null, env: null},
                                                     loaderInfo);
-        (<SpriteSymbol>character).frames.push(new Shumway.SWF.SWFFrame(controlTags));
+      console.log("80pro todo: SWFFrame");
+        //(<SpriteSymbol>character).frames.push(new SWFFrame(controlTags));
       }
       symbol[stateName + 'State'] = new ButtonState(character, placeObjectTag);
     }

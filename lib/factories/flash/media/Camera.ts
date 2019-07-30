@@ -3,8 +3,8 @@ import { Rectangle } from "../geom/Rectangle";
 import { Float64Vector } from "../../avm2/natives/float64Vector";
 import { ByteArray } from "../../avm2/natives/byteArray";
 import { BitmapData } from "../display/BitmapData";
-import { axCoerceString } from "../../avm2/run";
-import { ASArray } from "../../avm2/nat";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { EventDispatcher } from "../events/EventDispatcher";
 
 /**

@@ -1,4 +1,4 @@
-import { ASError } from "../../avm2/nat";
+import { ASError } from "../../avm2/nat/ASError";
 import { ErrorEvent } from "./ErrorEvent";
 import { Event } from "./Event";
 

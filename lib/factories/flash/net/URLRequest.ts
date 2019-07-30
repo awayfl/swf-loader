@@ -1,7 +1,8 @@
-import { ASObject, ASArray } from "../../avm2/nat";
-import { axCoerceString } from "../../avm2/run";
+import { ASArray } from "../../avm2/nat/ASArray";
+import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
 import { ByteArray } from "../../avm2/natives/byteArray";
+import { ASObject } from '../../avm2/nat/ASObject';
 
 /**
  * Copyright 2014 Mozilla Foundation

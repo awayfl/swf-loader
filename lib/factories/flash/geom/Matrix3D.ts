@@ -1,9 +1,11 @@
 import { Vector3D } from "./Vector3D";
-import { ISecurityDomain, ASObject } from "../../avm2/nat";
+import { ASObject } from "../../avm2/nat/ASObject";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { notImplemented, release } from "../../base/utilities/Debug";
 import { Errors } from "../../avm2/errors";
 import { axCoerceString, assert } from "@awayjs/graphics";
 import { Float64Vector } from "../../avm2/natives/float64Vector";
+import { DisplayObject } from '../display/DisplayObject';
 
 /**
  * Copyright 2014 Mozilla Foundation

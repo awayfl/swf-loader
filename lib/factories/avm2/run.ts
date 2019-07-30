@@ -78,11 +78,6 @@ var $: AXSecurityDomain = null;
 
 
 
-// Add the |axApply| and |axCall| methods on the function prototype so that we can treat
-// Functions as AXCallables.
-(<any> Function.prototype).axApply = Function.prototype.apply;
-(<any> Function.prototype).axCall = Function.prototype.call;
-
 
 
 

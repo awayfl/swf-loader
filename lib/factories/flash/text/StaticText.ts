@@ -42,11 +42,11 @@ export class StaticText extends DisplayObject {
     return true;
   }
 
-  _getTextContent(): Shumway.TextContent {
+  _getTextContent(): any/*TextContent*/ {
     return this._textContent;
   }
 
-  _textContent: Shumway.TextContent;
+  _textContent: any/*TextContent*/;
 
   get text(): string {
     return this._textContent.plainText;

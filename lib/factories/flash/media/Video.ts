@@ -2,7 +2,7 @@ import { DisplayObject, DisplayObjectDirtyFlags } from "../display/DisplayObject
 import { release, assert, somewhatImplemented, notImplemented } from "../../base/utilities/Debug";
 import { NetStreamAppendBytesAction } from "../net/NetStreamAppendBytesAction";
 import { DisplaySymbol, SymbolData } from "../symbol";
-import { ISecurityDomain } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { LoaderInfo } from "../display/LoaderInfo";
 import { Camera } from "./Camera";
 import { NetStream } from "../net/NetStream";
@@ -49,10 +49,10 @@ export class Video extends DisplayObject {
   constructor (width: number /*int*/ = 320, height: number /*int*/ = 240) {
     width |= 0;
     height |= 0;
+    super();
     if (this._symbol && !this._fieldsInitialized) {
       this.applySymbol();
     }
-    super();
     if (!this._fieldsInitialized) {
       this._initializeFields();
     }
@@ -108,6 +108,8 @@ export class Video extends DisplayObject {
   }
 
   attachNetStream(netStream: NetStreamAppendBytesAction): void {
+    console.log("80pro: todo: attachNetStream");
+    /*
     if (this._netStream === netStream) {
       return;
     }
@@ -118,7 +120,7 @@ export class Video extends DisplayObject {
     if (this._netStream) {
       netStream._videoReferrer = this;
     }
-    this._setDirtyFlags(DisplayObjectDirtyFlags.DirtyNetStream);
+    this._setDirtyFlags(DisplayObjectDirtyFlags.DirtyNetStream);*/
   }
 
   attachCamera(camera: Camera): void {

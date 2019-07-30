@@ -5,7 +5,7 @@ import { Sprite, SpriteSymbol } from "./Sprite";
 import { assert, release, assertUnreachable } from "../../base/utilities/Debug";
 import { InitActionBlock, ActionBlock } from "@awayjs/graphics";
 import { Scene } from "./Scene";
-import { ASArray } from "../../avm2/nat";
+import { ASArray } from "../../avm2/nat/ASArray";
 import { FrameLabel } from "./FrameLabel";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
@@ -16,6 +16,7 @@ import { MovieClipSoundStream } from "./MovieClipSoundStream";
 import { constructClassFromSymbol } from "../link";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
 import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
+import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -325,12 +326,13 @@ export class MovieClip extends Sprite implements IAdvancable {
     function executeInitActions() {
       var symbol = self._symbol;
       var avm1Context = symbol.avm1Context;
-      var as2MovieClip = AVM1.Lib.getAVM1Object(self, avm1Context);
+      // 80pro: todo
+      /*var as2MovieClip = AVM1.Lib.getAVM1Object(self, avm1Context);
       for (var i = 0; i < actionsBlocks.length; i++) {
         var actionsData = avm1Context.actionsDataFactory.createActionsData(
           actionsBlocks[i].actionsData, 's' + symbol.id + 'f' + frameIndex + 'i' + i);
         avm1Context.executeActions(actionsData, as2MovieClip);
-      }
+      }*/
     }
 
     var self = this;
@@ -354,14 +356,14 @@ export class MovieClip extends Sprite implements IAdvancable {
    * This field is only ever populated by the AVM1 runtime, so can only be used for MovieClips
    * used in the implementation of an AVM1 display list.
    */
-  private _as2Object: AVM1.Lib.AVM1MovieClip;
+  private _as2Object: AVM1MovieClip;
 
   removeChildAt(index: number): DisplayObject {
     var child = super.removeChildAt(index);
     if (this._as2Object && child._name) {
-      var avm1Child = AVM1.Lib.getAVM1Object(child, this._as2Object.context);
+      var avm1Child = getAVM1Object(<any>child, this._as2Object.context);
       // Not all display objects are reflected in AVM1, so not all need to be removed.
-      avm1Child && this._as2Object._removeChildName(avm1Child, child._name);
+      avm1Child && this._as2Object._removeChildName(<any>avm1Child, child._name);
     }
     return child;
   }
@@ -478,7 +480,7 @@ export class MovieClip extends Sprite implements IAdvancable {
   private _currentFrame: number;
   private _nextFrame: number;
   private _totalFrames: number;
-  private _frames: Shumway.SWF.SWFFrame[];
+  private _frames: any[];//80pro SWFFrame[];
   private _frameScripts: any;
   private _scenes: Scene[];
 
@@ -854,7 +856,7 @@ export class MovieClip extends Sprite implements IAdvancable {
       try {
         script.call(this); // REDUX ? why it was frameScript.$Bgcall(thisArg);
       } catch (e) {
-        Telemetry.instance.reportTelemetry({ topic: 'error', error: Telemetry.ErrorTypes.AVM2_ERROR });
+       // Telemetry.instance.reportTelemetry({ topic: 'error', error: Telemetry.ErrorTypes.AVM2_ERROR });
 
         //if ($DEBUG) {
         //  console.error('error ' + e + ', stack: \n' + e.stack);

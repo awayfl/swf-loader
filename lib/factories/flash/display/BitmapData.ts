@@ -17,7 +17,8 @@
 import { release, error, assert, notImplemented, somewhatImplemented } from "../../base/utilities/Debug";
 import { DisplaySymbol, EagerlyResolvedSymbol, SymbolData } from "../symbol";
 import { ImageType, Bounds } from "../../base/utilities";
-import { ISecurityDomain, ASObject } from "../../avm2/nat";
+import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
+import { ASObject } from "../../avm2/nat/ASObject";
 import { Matrix } from "../geom/Matrix";
 import { Rectangle } from "../geom/Rectangle";
 import { ColorTransform } from "../geom/ColorTransform";
@@ -805,11 +806,13 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IRemotable 
   }
 
   setPixels(rect: Rectangle, inputByteArray: ByteArray): void {
-    this._putPixelData(rect, new Int32Array(inputByteArray.readRawBytes()));
+    console.log("todo: BitmapData.setPixels");
+    //this._putPixelData(rect, new Int32Array(inputByteArray.readRawBytes()));
   }
 
   setVector(rect: Rectangle, inputVector: Uint32Vector): void {
-    this._putPixelData(rect, inputVector._view());
+    console.log("todo: BitmapData.setVector");
+    //this._putPixelData(rect, inputVector._view());
   }
 
   threshold(sourceBitmapData: BitmapData, sourceRect: Rectangle,
