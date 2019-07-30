@@ -9,9 +9,13 @@ import {ASClass} from "../../avm2/nat/ASClass";
 */
 export class EventDispatcherBase extends ASClass
 {
+	static axClass: typeof EventDispatcherBase;
 	private _listenerObjects:Array<ListenerObject> = new Array<ListenerObject>();
 	private _t:any;
 
+    public toString():string{
+        return "";
+    }
 	constructor(target:any = null)
 	{
         super();

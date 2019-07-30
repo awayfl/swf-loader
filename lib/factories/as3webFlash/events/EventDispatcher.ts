@@ -23,6 +23,21 @@ import { ClassInfo } from '../../avm2/abc/lazy/ClassInfo';
 export class EventDispatcher extends EventDispatcherBase
 {
 
+    public toString():string{
+        return "";
+	}
+	public hasEventListener(type:string, listener?:(event:EventBase) => void):boolean
+	{
+		return super.hasEventListener(type, listener);
+
+	}
+	public willTrigger(){
+
+	}
+	public dispatchEvent(event:EventBase):void{
+		
+		super.dispatchEvent(event);
+	}
 	protected eventMapping:Object;
 	protected eventMappingDummys:Object;
 	protected eventMappingExtern:Object;

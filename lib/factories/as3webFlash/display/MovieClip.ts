@@ -28,6 +28,9 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 {
 	private static _movieClips:Array<MovieClip> = new Array<MovieClip>();
 
+	public applySymbol(){
+		
+	}
 	public static getNewMovieClip(adaptee:AwayMovieClip):MovieClip
 	{
 		if (MovieClip._movieClips.length) {

@@ -107,7 +107,9 @@ export class Player {
 		}
 		
 		var root = constructClassFromSymbol(symbol, (<any>this._sec).flash.display.MovieClip.axClass);
-		new (<any>this._sec).flash.display.Scene("name",[], 0, 1)
+		root.axInitializer();
+		var scene=new (<any>this._sec).flash.display.Scene("name",[], 0, 1);
+		scene.axInitializer();
 		// 
 		//var fun = this._sec.createInitializerFunction();
 
