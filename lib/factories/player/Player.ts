@@ -1,7 +1,7 @@
 import { SWFParser } from "../../parsers/SWFParser";
 export { BaseVector } from "../avm2/natives/GenericVector";
 import { createSecurityDomain, AVM2LoadLibrariesFlags } from "./avmLoader";
-import { System } from "../avm2/natives/system";
+import { initSystem } from "../avm2/natives/system";
 import {
 	Sprite,
 	DisplayObjectContainer,
@@ -16,14 +16,15 @@ import { Event } from "@as3web/flash";
 import { RequestAnimationFrame } from '@awayjs/core';
 import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
-import { constructClassFromSymbol } from '../flash/link';
+import { initLink } from '../flash/link';
+import { constructClassFromSymbol } from '../flash/constructClassFromSymbol';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
 	}
 }
-console.log("System", System);
-console.log("constructClassFromSymbol", constructClassFromSymbol);
+initSystem();
+initLink();
 
 // Add the |axApply| and |axCall| methods on the function prototype so that we can treat
 // Functions as AXCallables.
@@ -83,18 +84,30 @@ export class Player {
 /*
 		var symbol = <SpriteSymbol><any>this._parser.dictionary[0];
 		if (!symbol) {
-		  var data = {
-			id: 0,
-			className: this._parser.symbolClassesMap[0],
-			env: this
-		  };
-		  /*symbol = new SpriteSymbol(data, this);
-		  symbol.isRoot = true;
-		  symbol.numFrames = this._file.frameCount;
-		  this._syncAVM1Attributes(symbol);
-		  this._dictionary[0] = symbol;
-	}*/
-		//new this._sec.flash.display.Scene(name, labels, offset, numFrames)
+			//var loaderInfo:LoaderInfo=new LoaderInfo(null);
+			var data = {
+				id: 0,
+				className: this._parser.symbolClassesMap[0],
+				env: this
+			};
+			symbol = new SpriteSymbol(<any>data, <any>this);
+			symbol.isRoot = true;
+			symbol.numFrames = 1;//this._file.frameCount;*/
+			/*this._syncAVM1Attributes(symbol);
+			this._dictionary[0] = symbol;*/
+		//}
+		var symbol = <any>this._parser.dictionary[0];
+		if (!symbol) {
+			//var loaderInfo:LoaderInfo=new LoaderInfo(null);
+			symbol = {
+				id: 0,
+				className: this._parser.symbolClassesMap[0],
+				//env: this
+			};
+		}
+		
+		var root = constructClassFromSymbol(symbol, symbol.symbolClass);
+		new (<any>this._sec).flash.display.Scene("name",[], 0, 1)
 		// 
 		//var fun = this._sec.createInitializerFunction();
 

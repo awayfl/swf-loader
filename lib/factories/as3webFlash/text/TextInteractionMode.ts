@@ -1,0 +1,1 @@
+export {TextInteractionMode} from "@awayjs/scene";

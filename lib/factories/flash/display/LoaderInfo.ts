@@ -8,7 +8,7 @@ import { transformJSValueToAS  } from "../../avm2/nat/transformJSValueToAS";
 import { ASClass } from "../../avm2/nat/ASClass";
 import { UncaughtErrorEvents } from "../events/UncaughtErrorEvents";
 import { AXClass } from "../../avm2/run/AXClass";
-import { constructClassFromSymbol } from "../link";
+import { constructClassFromSymbol } from "../constructClassFromSymbol";
 import { ActionScriptVersion } from "./ActionScriptVersion";
 import { ApplicationDomain } from "../system/ApplicationDomain";
 import { Symbol, EagerlyResolvedSymbol, BinarySymbol } from "../symbol";

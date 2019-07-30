@@ -13,7 +13,7 @@ import { SoundStart } from "../symbol";
 import { Event } from "../events/Event";
 import { SoundSymbol, Sound } from "../media/Sound";
 import { MovieClipSoundStream } from "./MovieClipSoundStream";
-import { constructClassFromSymbol } from "../link";
+import { constructClassFromSymbol } from "../constructClassFromSymbol";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
 import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
 import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';

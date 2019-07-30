@@ -1,0 +1,1 @@
+export {ByteArray} from "@awayjs/core";

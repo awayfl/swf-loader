@@ -1,0 +1,1 @@
+export {URLLoaderDataFormat} from "@awayjs/core";

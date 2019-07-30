@@ -1,0 +1,1 @@
+export {AntiAliasType} from "@awayjs/scene";

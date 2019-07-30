@@ -21,8 +21,8 @@ import { IBitmapDrawable } from "./IBitmapDrawable";
 import { IRemotable } from "../../base/remoting";
 import { PlaceObjectTag, PlaceObjectFlags } from "../../../utils/SWFTags";
 import { BitmapData } from "./BitmapData";
-import { Bitmap } from "./Bitmap";
-import { constructClassFromSymbol } from "../link";
+//import { Bitmap } from "./Bitmap";
+import { constructClassFromSymbol } from "../constructClassFromSymbol";
 import { Stage } from "./Stage";
 import { MovieClip, FrameNavigationModel } from "./MovieClip";
 import { BlendMode } from "./BlendMode";
@@ -425,7 +425,8 @@ export class DisplayObject extends EventDispatcher implements IBitmapDrawable, I
     var bitmapDataClass = BitmapData.axClass;
     if (symbolClass === bitmapDataClass ||
         bitmapDataClass.dPrototype.isPrototypeOf(symbolClass.dPrototype)) {
-      symbolClass = Bitmap.axClass;
+          console.log("80pro todo circular dependency in DisplayObject <-> Bitmap");
+      //symbolClass = Bitmap.axClass;
     }
     var instance: DisplayObject = constructClassFromSymbol(symbol, symbolClass);
     if (placeObjectTag.flags & PlaceObjectFlags.HasName) {

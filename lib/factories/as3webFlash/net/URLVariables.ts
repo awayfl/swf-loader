@@ -1,0 +1,1 @@
+export {URLVariables} from "@awayjs/core";

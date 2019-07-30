@@ -1,32 +1,39 @@
 
+import { EventDispatcher } from "../as3webFlash/events/EventDispatcher";
+import { DisplayObject } from "../as3webFlash/display/DisplayObject";
+import { DisplayObjectContainer } from "../as3webFlash/display/DisplayObjectContainer";
+import { InteractiveObject } from "../as3webFlash/display/InteractiveObject";
+import { Stage } from "../as3webFlash/display/Stage";
+import { Loader } from "../as3webFlash/display/Loader";
+import { LoaderInfo } from "../as3webFlash/display/LoaderInfo";
+import { MovieClip } from "../as3webFlash/display/MovieClip";
+import { Sprite } from "../as3webFlash/display/Sprite";
+import { Shape } from "../as3webFlash/display/Shape";
+import { Bitmap } from "../as3webFlash/display/Bitmap";
+import { BitmapData } from "../as3webFlash/display/BitmapData";
+import { SimpleButton } from "../as3webFlash/display/SimpleButton";
+
+import { Scene } from "./display/Scene";
+
+/*
+import { URLRequest } from "./net/URLRequest";
+import { Graphics } from "./display/Graphics";
+import { ApplicationDomain } from "./system/ApplicationDomain";
+import { SharedObject } from "./net/SharedObject";
+import { URLVariables } from "./net/URLVariables";
+import { Capabilities } from "./system/Capabilities";
+import { SecurityDomain } from "./system/SecurityDomain";
 import { Symbol } from "./symbol";
+import { Timer } from "./utils/Timer";
 import { XMLDocument, XMLNode } from "../avm2/natives/xml-document";
 import { ByteArray, ObjectEncoding } from "../avm2/natives/byteArray";
-import { Timer } from "./utils/Timer";
 import { AccessibilityProperties } from "./accessibility/AccessibilityProperties";
 import { Accessibility } from "./accessibility/Accessibility";
 import { LoaderContext } from "./system/LoaderContext";
 import { JPEGLoaderContext } from "./system/JPEGLoaderContext";
-import { ApplicationDomain } from "./system/ApplicationDomain";
-import { SecurityDomain } from "./system/SecurityDomain";
 import { System } from "../avm2/natives/system";
-import { EventDispatcher } from "./events/EventDispatcher";
-import { DisplayObject } from "./display/DisplayObject";
-import { DisplayObjectContainer } from "./display/DisplayObjectContainer";
-import { InteractiveObject } from "./display/InteractiveObject";
 import { AVM1Movie } from "./display/AVM1Movie";
-import { Stage } from "./display/Stage";
-import { Loader } from "./display/Loader";
-import { LoaderInfo } from "./display/LoaderInfo";
-import { MovieClip } from "./display/MovieClip";
-import { Sprite } from "./display/Sprite";
-import { Shape } from "./display/Shape";
 import { MorphShape } from "./display/MorphShape";
-import { Graphics } from "./display/Graphics";
-import { Bitmap } from "./display/Bitmap";
-import { BitmapData } from "./display/BitmapData";
-import { SimpleButton } from "./display/SimpleButton";
-import { Scene } from "./display/Scene";
 import { NativeMenu } from "./display/NativeMenu";
 import { NativeMenuItem } from "./display/NativeMenuItem";
 import { FrameLabel } from "./display/FrameLabel";
@@ -109,22 +116,18 @@ import { NetConnection } from "./net/NetConnection";
 import { NetStream } from "./net/NetStream";
 import { NetStreamInfo } from "./net/NetStreamInfo";
 import { Responder } from "./net/Responder";
-import { URLRequest } from "./net/URLRequest";
 import { URLRequestHeader } from "./net/URLRequestHeader";
 import { URLStream } from "./net/URLStream";
 import { FileReferenceList } from "./net/FileReferenceList";
 import { URLLoader } from "./net/URLLoader";
-import { SharedObject } from "./net/SharedObject";
 import { LocalConnection } from "./net/LocalConnection";
-import { URLVariables } from "./net/URLVariables";
 import { Socket } from "./net/Socket";
-import { Capabilities } from "./system/Capabilities";
 import { Security } from "./system/Security";
+*/
 import { fscommand } from "./system/FSCommand";
 import { release, assert } from "../base/utilities/Debug";
 import { ASClass } from '../avm2/nat/ASClass';
 import { registerNativeClass, registerNativeFunction } from '../avm2/nat/initializeBuiltins';
-
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -144,6 +147,7 @@ import { registerNativeClass, registerNativeFunction } from '../avm2/nat/initial
 function M(name: string, asClass: ASClass) {
   registerNativeClass(name, asClass);
 }
+M("flash.events.EventDispatcher", EventDispatcher);
 M("flash.display.DisplayObject", DisplayObject);
 M("flash.display.InteractiveObject", InteractiveObject);
 M("flash.display.DisplayObjectContainer", DisplayObjectContainer);
@@ -155,13 +159,13 @@ M("flash.display.BitmapData", BitmapData);
 M("flash.display.Stage", Stage);
 M("flash.display.Loader", Loader);
 M("flash.display.LoaderInfo", LoaderInfo);
-M("flash.display.Graphics", Graphics);
+//M("flash.display.Graphics", Graphics);
 M("flash.display.SimpleButton", SimpleButton);
-M("flash.display.MorphShape", MorphShape);
+M("flash.display.Scene", Scene);
+/*M("flash.display.MorphShape", MorphShape);
 M("flash.display.NativeMenu", NativeMenu);
 M("flash.display.NativeMenuItem", NativeMenuItem);
 M("flash.display.FrameLabel", FrameLabel);
-M("flash.display.Scene", Scene);
 M("flash.display.AVM1Movie", AVM1Movie);
 
 M("flash.display.GradientType", GradientType);
@@ -191,7 +195,6 @@ M("flash.geom.Transform", Transform);
 M("flash.geom.ColorTransform", ColorTransform);
 M("flash.geom.PerspectiveProjection", PerspectiveProjection);
 
-M("flash.events.EventDispatcher", EventDispatcher);
 M("flash.events.Event", Event);
 M("flash.events.ErrorEvent", ErrorEvent);
 M("flash.events.IOErrorEvent", IOErrorEvent);
@@ -279,17 +282,10 @@ M("flash.utils.Timer", Timer);
 M("flash.utils.ByteArray", ByteArray);
 
 M("flash.xml.XMLNode", XMLNode);
-M("flash.xml.XMLDocument", XMLDocument);
+M("flash.xml.XMLDocument", XMLDocument);*/
 
 registerNativeFunction('flash.system.fscommand', fscommand);
 
-export function constructClassFromSymbol(symbol: Symbol, axClass: ASClass) {
-  var instance = Object.create(axClass.tPrototype);
-  if (instance._symbol) {
-    release || assert(instance._symbol === symbol);
-  } else {
-    instance._symbol = symbol;
-  }
-  instance.applySymbol();
-  return instance;
+export function initLink(){
+  console.log("init link");
 }

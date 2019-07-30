@@ -1,0 +1,1 @@
+export {Vector3D} from "@awayjs/core";

@@ -153,6 +153,7 @@ export class System extends ASObject {
 }
 
 export var OriginalSystem = System;
-
-// Do this here temporarily until we find a nicer place.
-initializeBuiltins();
+export function initSystem(){
+  // Do this here temporarily until we find a nicer place.
+  initializeBuiltins();
+}

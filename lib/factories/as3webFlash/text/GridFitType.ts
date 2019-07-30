@@ -1,0 +1,1 @@
+export {GridFitType} from "@awayjs/scene";

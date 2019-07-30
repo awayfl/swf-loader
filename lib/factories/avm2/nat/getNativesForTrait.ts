@@ -4,8 +4,7 @@ import { assert } from '@awayjs/graphics';
 import { release, assertUnreachable } from '../../base/utilities/Debug';
 import { ClassInfo } from '../abc/lazy/ClassInfo';
 import { pushMany } from '../../base/utilities/ArrayUtilities';
-import { nativeClasses} from "./nativeClasses";
-import { builtinNativeClasses} from "./builtinNativeClasses";
+import { builtinNativeClasses, nativeClasses} from "./builtinNativeClasses";
 export function getNativesForTrait(trait: TraitInfo): Object [] {
     var className = null;
     var natives: Object [];

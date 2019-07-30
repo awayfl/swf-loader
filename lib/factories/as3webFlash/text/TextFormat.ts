@@ -1,0 +1,1 @@
+export {TextFormat} from "@awayjs/scene";

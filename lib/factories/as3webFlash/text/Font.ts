@@ -1,0 +1,1 @@
+export {Font} from "@awayjs/scene";

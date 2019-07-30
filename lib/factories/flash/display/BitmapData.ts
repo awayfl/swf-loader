@@ -38,7 +38,7 @@ import { swap32 } from "../../base/utilities/IntegerUtilities";
 import { BitmapFilter } from "../filters/BitmapFilter";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { LoaderInfo } from "./LoaderInfo";
-import { constructClassFromSymbol } from "../link";
+import { constructClassFromSymbol } from "../constructClassFromSymbol";
 
 /**
  * Holds blobs of bitmap data in various formats and lets you do basic pixel operations. When

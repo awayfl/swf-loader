@@ -1,0 +1,1 @@
+export {TextFieldType} from "@awayjs/scene";

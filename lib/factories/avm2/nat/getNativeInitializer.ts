@@ -1,7 +1,6 @@
 import { ClassInfo } from "../abc/lazy/ClassInfo";
 import { AXCallable } from "../run/AXCallable";
-import { nativeClasses } from "./nativeClasses";
-import { builtinNativeClasses } from './builtinNativeClasses';
+import { builtinNativeClasses , nativeClasses} from './builtinNativeClasses';
 
 export function getNativeInitializer(classInfo: ClassInfo): AXCallable {
     var methodInfo = classInfo.instanceInfo.getInitializer();
