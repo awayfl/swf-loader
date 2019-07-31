@@ -20,10 +20,10 @@ export var Natives = {
     print: function(sec: AXSecurityDomain, expression: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) {
         var args = Array.prototype.slice.call(arguments, 1);
         if(args.length==1){
-          console.log("Trace from SWF:", args[0]);
+          console.log("%c Trace from SWF:", "color: DodgerBlue", args[0]);
         }
         else{
-          console.log("Trace from SWF:", args);
+          console.log("%c Trace from SWF:", "color: DodgerBlue", args);
         }
         //jsGlobal.print.apply(null, args);
       },
