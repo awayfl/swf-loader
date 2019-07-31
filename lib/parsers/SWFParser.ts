@@ -99,7 +99,7 @@ export class SWFParser extends ParserBase
 	private env: any;
 
 	public symbolClassesMap: string[];
-	private symbolClassesList: {id: number; className: string}[];
+	public symbolClassesList: {id: number; className: string}[];
 	private eagerlyParsedSymbolsMap: EagerlyParsedDictionaryEntry[];
 	private eagerlyParsedSymbolsList: EagerlyParsedDictionaryEntry[];
 

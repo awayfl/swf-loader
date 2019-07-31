@@ -18,6 +18,8 @@ import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 import { initLink } from '../flash/link';
 import { constructClassFromSymbol } from '../flash/constructClassFromSymbol';
+import { Multiname } from '../avm2/abc/lazy/Multiname';
+import { NamespaceType } from '../avm2/abc/lazy/NamespaceType';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
@@ -96,16 +98,28 @@ export class Player {
 			/*this._syncAVM1Attributes(symbol);
 			this._dictionary[0] = symbol;*/
 		//}
-		var symbol = <any>this._parser.dictionary[0];
-		if (!symbol) {
-			//var loaderInfo:LoaderInfo=new LoaderInfo(null);
-			symbol = {
-				id: 0,
-				className: this._parser.symbolClassesMap[0],
-				//env: this
-			};
-		}
 		
+		var mappedSymbolsLoaded = this._parser.symbolClassesList.length;
+		for (var i = 0; i < mappedSymbolsLoaded; i++) {
+			var symbolMapping = this._parser.symbolClassesList[i];
+			var symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbolMapping.className,
+																	NamespaceType.Public));
+			/*Object.defineProperty(symbolClass.tPrototype, "_symbol",
+								  {get: loaderInfo.getSymbolResolver(symbolClass, symbolMapping.id),
+									configurable: true});*/
+		}
+		  //loaderInfo._mappedSymbolsLoaded = mappedSymbolsLoaded;
+		
+
+		  var symbol = <any>this._parser.dictionary[0];
+		  if (!symbol) {
+			  //var loaderInfo:LoaderInfo=new LoaderInfo(null);
+			  symbol = {
+				  id: 0,
+				  className: this._parser.symbolClassesMap[0],
+				  //env: this
+			  };
+		  }
 		var root = constructClassFromSymbol(symbol, (<any>this._sec).flash.display.MovieClip.axClass);
 		root.axInitializer();
 		var sceneData=(<any>this._parser).sceneAndFrameLabelData;
@@ -114,6 +128,7 @@ export class Player {
 			var scene=new (<any>this._sec).flash.display.Scene(sceneData.scenes[0].name,[], sceneData.scenes[0].offset, 1);
 			scene.axInitializer();
 		}
+		
 		// 
 		//var fun = this._sec.createInitializerFunction();
 
