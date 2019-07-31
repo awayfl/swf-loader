@@ -67,7 +67,7 @@ export class Player {
 		).then((sec) => {
 			this._sec = sec;
 			console.log("builtins are loaded fine, start parsing SWF");
-			this._parser = new SWFParser(new FlashSceneGraphFactory());
+			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
 			this._loader = new Loader(this._parser);
 			var loaderContext: LoaderContext = new LoaderContext(false, new ApplicationDomain());
 			this._loader.loaderInfo.addEventListener(Event.COMPLETE, this._onLoadCompleteDelegate);
@@ -78,68 +78,7 @@ export class Player {
 	private _onLoadCompleteDelegate: (event: Event) => void;
 	public onLoadComplete(buffer) {
 		this._stage = new Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
-
-
-		// get the abc bytes from the parser and load / execute them on the ApplicationDomain:
-
-		for (var i = 0; i < this._parser.abcBlocks.length; i++) {
-			var abcBlock = this._parser.abcBlocks[i];
-			var abc = new ABCFile({ app: this._sec.application, url: "" }, abcBlock.data);
-			if (abcBlock.flags) {
-				// kDoAbcLazyInitializeFlag = 1 Indicates that the ABC block should not be executed
-				// immediately.
-				this._sec.application.loadABC(abc);
-			} else {
-				// TODO: probably delay execution until playhead reaches the frame.
-				this._sec.application.loadAndExecuteABC(abc);
-			}
-		}
-
-
-		// process Symbols that are loaded from swf:
-
-		var mappedSymbolsLoaded = this._parser.symbolClassesList.length;
-		for (var i = 0; i < mappedSymbolsLoaded; i++) {
-			var symbolMapping = this._parser.symbolClassesList[i];
-			var symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbolMapping.className,
-				NamespaceType.Public));
-			//symbolClass.axInitializer();
-			/*Object.defineProperty(symbolClass.tPrototype, "_symbol",
-								  {get: loaderInfo.getSymbolResolver(symbolClass, symbolMapping.id),
-									configurable: true});*/
-		}
-		//loaderInfo._mappedSymbolsLoaded = mappedSymbolsLoaded;
-
-
-		// get the root-symbol from the parser:
-		var rootSymbol = <any>this._parser.dictionary[0];
-		if (!rootSymbol) {
-			rootSymbol = {
-				id: 0,
-				className: this._parser.symbolClassesMap[0],
-				//env: this
-			};
-		}
-
-		// create the root for the root-symbol
-		var root = constructClassFromSymbol(rootSymbol, <any>symbolClass);
-		// manually call the axInitializer for now:
-		root.axInitializer();
-
-		//  right now creating the root creates a empty timeline
-		//	axInitializer registers a framescript on the empty timeline
-
-		// 	get the framescript that was registered:
-		var script = root.adaptee.timeline._framescripts[1];
-
-		// 	exchange the adaptee of the newly created root, with the one that has been created by our loader/SWFParser
-		//	the adaptee that has been created by SWFparser / loader will have a valid timeline set
-		root.adaptee = (<any>this._loader.getChildAt(0).adaptee);
-		// 	register the framescript on the timeline that did come from SWFparser / loader
-		root.adaptee.timeline.add_framescript(script, 0);
-
-		// add the root to the stage:
-		this._stage.addChild(root);
+		this._stage.addChild(this._loader);
 
 		/*
 		This will be needed later to support multiple scenes

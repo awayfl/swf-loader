@@ -12,41 +12,94 @@ import {BitmapData} from "../display/BitmapData";
 import {DisplayObjectContainer} from "../display/DisplayObjectContainer";
 import {TextField} from "../text/TextField";
 import { Graphics } from '@awayjs/graphics';
+import { AXSecurityDomain } from '../../avm2/run/AXSecurityDomain';
+import { Multiname } from '../../avm2/abc/lazy/Multiname';
+import { NamespaceType } from '../../avm2/abc/lazy/NamespaceType';
+import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { ABCFile } from '../../avm2/abc/lazy/ABCFile';
 
 export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements ISceneGraphFactory
 {
 	public imageStore:Object = {};
+	private _sec:AXSecurityDomain;
 
-	public creatematerial():MaterialBase
+	constructor(sec:AXSecurityDomain){
+		super();
+		this._sec=sec;
+	}
+	public executeABCBytes(abcBlocks:any[])
 	{
+		for (var i = 0; i < abcBlocks.length; i++) {
+			var abcBlock = abcBlocks[i];
+			var abc = new ABCFile({ app: this._sec.application, url: "" }, abcBlock.data);
+			if (abcBlock.flags) {
+				// kDoAbcLazyInitializeFlag = 1 Indicates that the ABC block should not be executed
+				// immediately.
+				this._sec.application.loadABC(abc);
+			} else {
+				// TODO: probably delay execution until playhead reaches the frame.
+				this._sec.application.loadAndExecuteABC(abc);
+			}
+		}
 		return null;
 	}
-	public createSprite(prefab:PrefabBase = null, graphics:Graphics = null):AwaySprite
+	public createSprite(prefab:PrefabBase = null, graphics:Graphics = null, symbol:any=null):AwaySprite
 	{
-		return <AwaySprite> new Sprite(AwaySprite.getNewSprite(graphics)).adaptee;
+		if(!symbol || !this._sec)
+			throw("no symbol provided");
+
+		var symbolClass = (<any>this._sec).flash.display.Sprite;
+		if(symbol.className)
+			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
+
+		// create the root for the root-symbol
+		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);
+		// manually call the axInitializer for now:
+		asObj.axInitializer();
+		asObj.adaptee.graphics=graphics;
+		return asObj.adaptee;
 	}
 
-	public createDisplayObjectContainer():AwayDisplayObjectContainer
+	public createDisplayObjectContainer(symbol:any=null):AwayDisplayObjectContainer
 	{
 		return <AwayDisplayObjectContainer> new DisplayObjectContainer().adaptee;
 	}
 
-	public createMovieClip(timeline:Timeline = null):AwayMovieClip
+	public createMovieClip(timeline:Timeline = null, symbol:any=null):AwayMovieClip
 	{
-		return <AwayMovieClip> new MovieClip(new AwayMovieClip(timeline)).adaptee;
+		if(!symbol || !this._sec)
+			throw("no symbol provided");
+
+		var symbolClass = null;
+		if(symbol.className)
+			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
+		else
+			symbolClass = (<any>this._sec).flash.display.MovieClip.axClass;
+
+		// create the root for the root-symbol
+		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);
+		// 	manually call the axInitializer - this will run the constructor
+		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
+		asObj.axInitializer();
+
+		// 	get the framescripts that was registered, and set them on the new timeline
+		timeline._framescripts = asObj.adaptee.timeline._framescripts;
+		// assign the new timeline
+		asObj.adaptee.timeline=timeline;
+		return asObj.adaptee;
 	}
 
-	public createTextField():AwayTextField
+	public createTextField(symbol:any=null):AwayTextField
 	{
 		return <AwayTextField> new TextField().adaptee;
 	}
 
-	public createBillboard(material:MaterialBase):Billboard
+	public createBillboard(material:MaterialBase, symbol:any=null):Billboard
 	{
 		return <Billboard> new Bitmap(<BitmapData> material.style.image.adapter).adaptee;
 	}
 
-	public createImage2D(width:number, height:number, transparent:boolean = true, fillColor:number = null, powerOfTwo:boolean = true):Image2D
+	public createImage2D(width:number, height:number, transparent:boolean = true, fillColor:number = null, powerOfTwo:boolean = true, symbol:any=null):Image2D
 	{
 		return <SceneImage2D> new BitmapData(width, height, transparent, fillColor).adaptee;
 	}

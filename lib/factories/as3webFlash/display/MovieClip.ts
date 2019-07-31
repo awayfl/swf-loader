@@ -267,7 +267,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		for (var i = 0; i < numArgs; i += 2) {
 			var frameNum = (arguments[i] | 0) + 1;
 			var fn = arguments[i + 1];
-			(<AwayMovieClip>this.adaptee).timeline.add_framescript(fn, frameNum);
+			(<AwayMovieClip>this.adaptee).timeline.add_framescript(fn, frameNum-1);
 		}
 	}
 

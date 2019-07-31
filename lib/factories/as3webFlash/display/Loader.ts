@@ -45,7 +45,7 @@ export class Loader extends DisplayObjectContainer
 		this._parser = parser;
 
 		this._loaderInfo=new LoaderInfo();
-		this._factory = new FlashSceneGraphFactory();
+		this._factory = new FlashSceneGraphFactory(null);
 	}
 
 	private _onLoaderProgressDelegate:(event:URLLoaderEvent) => void;

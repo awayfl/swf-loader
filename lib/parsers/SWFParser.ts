@@ -54,6 +54,7 @@ import {
 	TextFlags,
 	getSwfTagCodeName} from "../utils/SWFTags";
 import {__extends} from "tslib";
+import { ABCFile } from '../factories/avm2/abc/lazy/ABCFile';
 
 var noTimelineDebug=true;
 var noExportsDebug=true;
@@ -293,6 +294,11 @@ export class SWFParser extends ParserBase
 			this._awaySymbols={};
 			this._mapMatsForBitmaps={};
 
+
+			if(this.abcBlocks.length && (<any>this._factory).executeABCBytes){
+				(<any>this._factory).executeABCBytes(this.abcBlocks);
+			}
+
 			// this.eagerlyParsedSymbolsList can contain image/font data,
 			// that must be resolved externally before we can start creating assets for symbols
 			this.externalDependenciesCount=0;
@@ -399,7 +405,7 @@ export class SWFParser extends ParserBase
 						break;
 					case "sprite":
 						noTimelineDebug || console.log("start parsing timeline: ", symbol);
-						var awayMc = this.framesToTimeline(symbol.frames, null, null);
+						var awayMc = this.framesToTimeline(symbol, symbol.frames, null, null);
 						(<any>awayMc).className=symbol.className;
 						if(awayMc.buttonMode){							
 							this._buttonIds[symbol.id]=true;
@@ -412,7 +418,7 @@ export class SWFParser extends ParserBase
                         assetsToFinalize[dictionary[i].id] = awayMc;
 						break;
 					case "text":
-						var awayText = this._factory.createTextField();
+						var awayText = this._factory.createTextField(symbol);
 						awayText._symbol=symbol;
 						awayText.textFormat=new TextFormat();
 						(<any>awayText).className=symbol.className;
@@ -479,7 +485,7 @@ export class SWFParser extends ParserBase
                         }
 						break;
                     case "button":
-						var awayMc = this.framesToTimeline(null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
+						var awayMc = this.framesToTimeline(symbol, null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
 						//awayMc._symbol=symbol;
                         awayMc.name="AwayJS_button_"+symbol.id.toString();
 						(<any>awayMc).className=symbol.className;
@@ -496,7 +502,7 @@ export class SWFParser extends ParserBase
 						*/
 						break;
 					case "label":
-						var awayText = this._factory.createTextField();
+						var awayText = this._factory.createTextField(symbol);
                         var font=null;
                         var invalid_font:boolean=false;
 						(<any>awayText).className=symbol.className;
@@ -554,7 +560,15 @@ export class SWFParser extends ParserBase
 				}
 			}
 		}
-		var awayMc:MovieClip=this.framesToTimeline(this.frames, null, null);
+
+		var rootSymbol:any = this.dictionary[0];
+        if (!rootSymbol) {
+            rootSymbol = {
+                id: 0,
+                className: this.symbolClassesMap[0]
+            };
+        }
+		var awayMc:MovieClip=this.framesToTimeline(rootSymbol, this.frames, null, null);
 
         for(var key in assetsToFinalize){     
 			assetsToFinalize[key]["fileurl"]=this._iFileName;
@@ -572,7 +586,7 @@ export class SWFParser extends ParserBase
 
 	public textFormatAlignMap:string[]=[TextFormatAlign.LEFT, TextFormatAlign.RIGHT, TextFormatAlign.CENTER, TextFormatAlign.JUSTIFY];
 
-	public framesToTimeline(swfFrames:SWFFrame[], states:any, buttonActions:any, buttonSound:any=null):MovieClip{
+	public framesToTimeline(symbol:any, swfFrames:SWFFrame[], states:any, buttonActions:any, buttonSound:any=null):MovieClip{
 		if(!states && !swfFrames)
 			throw("error when creating timeline - neither movieclip frames nor button-states present");
 		
@@ -1321,7 +1335,7 @@ export class SWFParser extends ParserBase
 
 		awayTimeline.init();
 
-		var awayMc:MovieClip=this._factory.createMovieClip(awayTimeline);
+		var awayMc:MovieClip=this._factory.createMovieClip(awayTimeline, symbol);
 		if(isButton){
 			// this is a button - set ButtonActions and also get the hitArea from the last frame
 			awayMc.buttonMode=true;
