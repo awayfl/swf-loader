@@ -121,7 +121,7 @@ export class Player {
 				  //env: this
 			  };
 		  }
-		var root = constructClassFromSymbol(symbol, (<any>this._sec).flash.display.MovieClip.axClass);
+		var root = constructClassFromSymbol(symbol, <any>symbolClass);//(<any>this._sec).flash.display.MovieClip.axClass);
 		root.axInitializer();
 		var sceneData=(<any>this._parser).sceneAndFrameLabelData;
 		if(sceneData && sceneData.scenes && sceneData.scenes.length>0){
