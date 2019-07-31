@@ -19,7 +19,13 @@ import { describeType } from '@as3web/flash/dist/lib/utils/describeType';
 export var Natives = {
     print: function(sec: AXSecurityDomain, expression: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) {
         var args = Array.prototype.slice.call(arguments, 1);
-        jsGlobal.print.apply(null, args);
+        if(args.length==1){
+          console.log("Trace from SWF:", args[0]);
+        }
+        else{
+          console.log("Trace from SWF:", args);
+        }
+        //jsGlobal.print.apply(null, args);
       },
     debugBreak: function(v: any) {
         /* tslint:disable */

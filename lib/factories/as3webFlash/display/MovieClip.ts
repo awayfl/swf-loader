@@ -1,7 +1,7 @@
-import {IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition} from "@awayjs/scene";
-import {Sprite} from "./Sprite";
+import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition } from "@awayjs/scene";
+import { Sprite } from "./Sprite";
 
-var includeString:string= '';//TODO
+var includeString: string = '';//TODO
 
 declare var __framescript__;
 /**
@@ -24,43 +24,43 @@ declare var __framescript__;
  * FEATURE_BITMAPCACHE is defined. The default configuration of Flash Lite 4 does not define
  * FEATURE_BITMAPCACHE. To enable the MovieClip.opaqueBackground property for a suitable device,
  * define FEATURE_BITMAPCACHE in your project.</p>*/
-export class MovieClip extends Sprite implements IMovieClipAdapter
-{
-	private static _movieClips:Array<MovieClip> = new Array<MovieClip>();
+export class MovieClip extends Sprite implements IMovieClipAdapter {
+	private static _movieClips: Array<MovieClip> = new Array<MovieClip>();
 
-	public applySymbol(){
-		
+	public applySymbol() {
+
 	}
-	public static getNewMovieClip(adaptee:AwayMovieClip):MovieClip
-	{
+	public static getNewMovieClip(adaptee: AwayMovieClip): MovieClip {
 		if (MovieClip._movieClips.length) {
-			var movieClip:MovieClip = MovieClip._movieClips.pop();
+			var movieClip: MovieClip = MovieClip._movieClips.pop();
 			movieClip.adaptee = adaptee;
 			return movieClip;
 		}
 
 		return new MovieClip(adaptee);
 	}
-	
+
 
 	//forAVM1:
-	public _getAbsFrameNumber(param1:any, param2:any):number{
+	public _getAbsFrameNumber(param1: any, param2: any): number {
 		return 0;
 	}
-	public callFrame(param1:any){
+	public callFrame(param1: any) {
 	}
-	public _callFrame(param1:any){
+	public _callFrame(param1: any) {
 	}
-	public addScript(param1:any){
+	public addScript(param1: any) {
 		return param1;
 	}
 
-	public executeScript(scriptsFN:any){
-		for (let k = 0; k < scriptsFN.length; k++) {
+	public executeScript(scriptsFN: any) {
+		/*for (let k = 0; k < scriptsFN.length; k++) {
 			scriptsFN[k].apply(this);
+		}*/
+		if(scriptsFN.length==0){
+			scriptsFN.axCall();
 
 		}
-		// used in AVM1. we just need a stub here to implement IMovieClipAdapter
 	}
 
 	/**
@@ -68,48 +68,44 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * addChild() or addChildAt() method of a
 	 * display object container that is onstage.
 	 */
-	constructor(adaptee:AwayMovieClip = null)
-	{
+	constructor(adaptee: AwayMovieClip = null) {
 		super(adaptee || AwayMovieClip.getNewMovieClip());
 	}
-	
+
 	// --------------------- stuff needed because of implementing the existing IMovieClipAdapter
-	
-	public evalScript(str:string):Function{
-		var tag:HTMLScriptElement = document.createElement('script');
+
+	public evalScript(str: string): Function {
+		var tag: HTMLScriptElement = document.createElement('script');
 		tag.text = 'var __framescript__ = function() {\n' + includeString + str + '\n}';
 
 		//add and remove script tag to dom to trigger compilation
 		var sibling = document.scripts[0];
 		sibling.parentNode.insertBefore(tag, sibling).parentNode.removeChild(tag);
 
-		var script =  __framescript__;
+		var script = __framescript__;
 		window['__framescript__'] = null;
 
 		return script;
 	}
 
-	public registerScriptObject(child:AwayDisplayObject):void
-	{
+	public registerScriptObject(child: AwayDisplayObject): void {
 		if (child.name)
-			this[child.name] = child._adapter ? child.adapter:child;
+			this[child.name] = child._adapter ? child.adapter : child;
 	}
 
-	public unregisterScriptObject(child:AwayDisplayObject):void
-	{
+	public unregisterScriptObject(child: AwayDisplayObject): void {
 		delete this[child.name];
 
-		if(child.isAsset(AwayMovieClip))
+		if (child.isAsset(AwayMovieClip))
 			(<AwayMovieClip>child).removeButtonListeners();
 	}
-	public freeFromScript():void{
-        //this.stopAllSounds();
-        super.freeFromScript();
+	public freeFromScript(): void {
+		//this.stopAllSounds();
+		super.freeFromScript();
 
 	}
-	public clone():MovieClip
-	{
-		var clone:MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip> this.adaptee).timeline));
+	public clone(): MovieClip {
+		var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
 
 		this.adaptee.copyTo(clone.adaptee);
 
@@ -119,8 +115,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	/**
 	 * @inheritDoc
 	 */
-	public dispose():void
-	{
+	public dispose(): void {
 		this.disposeValues();
 
 		MovieClip._movieClips.push(this);
@@ -133,16 +128,15 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * the MovieClip instance. If the movie clip has multiple scenes, this value is the
 	 * frame number in the current scene.
 	 */
-	public get currentFrame () : number
-	{
-		return (<AwayMovieClip> this._adaptee).currentFrameIndex+1;
+	public get currentFrame(): number {
+		return (<AwayMovieClip>this._adaptee).currentFrameIndex + 1;
 	}
 
 	/**
 	 * The label at the current frame in the timeline of the MovieClip instance.
 	 * If the current frame has no label, currentLabel is null.
 	 */
-	public get currentFrameLabel () : string{
+	public get currentFrameLabel(): string {
 		//todo
 		console.log("currentFrameLabel not implemented yet in flash/MovieClip");
 		return null;
@@ -154,7 +148,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * that includes a label. If the current frame and previous frames do not include a label,
 	 * currentLabel returns null.
 	 */
-	public get currentLabel () : string{
+	public get currentLabel(): string {
 		//todo
 		console.log("currentLabel not implemented yet in flash/MovieClip");
 		return null;
@@ -164,7 +158,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * Returns an array of FrameLabel objects from the current scene. If the MovieClip instance does
 	 * not use scenes, the array includes all frame labels from the entire MovieClip instance.
 	 */
-	public get currentLabels () : any[]{
+	public get currentLabels(): any[] {
 		//todo
 		console.log("currentFrameLabel not implemented yet in flash/MovieClip");
 		return [];
@@ -173,7 +167,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	/**
 	 * The current scene in which the playhead is located in the timeline of the MovieClip instance.
 	 */
-	public get currentScene () : any{
+	public get currentScene(): any {
 		//todo
 		console.log("currentScene not implemented yet in flash/MovieClip");
 		return null;
@@ -191,12 +185,12 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * enabled or disabled. If enabled is set to false, the object is not
 	 * included in automatic tab ordering.
 	 */
-	public get enabled () : boolean{
+	public get enabled(): boolean {
 		//todo
 		//console.log("enabled not implemented yet in flash/MovieClip");
 		return false;
 	}
-	public set enabled (value:boolean) {
+	public set enabled(value: boolean) {
 		//todo
 		//console.log("enabled not implemented yet in flash/MovieClip");
 	}
@@ -211,13 +205,13 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 *   If the movie clip contains multiple scenes, the framesLoaded property returns the number
 	 * of frames loaded for all scenes in the movie clip.
 	 */
-	public get framesLoaded () : number{
+	public get framesLoaded(): number {
 		//todo
 		console.log("framesLoaded not implemented yet in flash/MovieClip");
 		return 0;
 	}
 
-	public get isPlaying () : boolean{
+	public get isPlaying(): boolean {
 		//todo
 		console.log("isPlaying not implemented yet in flash/MovieClip");
 		return false;
@@ -227,7 +221,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * An array of Scene objects, each listing the name, the number of frames,
 	 * and the frame labels for a scene in the MovieClip instance.
 	 */
-	public get scenes () : any[]{
+	public get scenes(): any[] {
 		//todo
 		console.log("scenes not implemented yet in flash/MovieClip");
 		return [];
@@ -239,8 +233,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 *   If the movie clip contains multiple frames, the totalFrames property returns
 	 * the total number of frames in all scenes in the movie clip.
 	 */
-	public get totalFrames () : number{
-		return (<AwayMovieClip> this._adaptee).numFrames;
+	public get totalFrames(): number {
+		return (<AwayMovieClip>this._adaptee).numFrames;
 	}
 
 	/**
@@ -252,19 +246,29 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 *   You can change the trackAsMenu property at any time; the modified movie
 	 * clip immediately uses the new behavior.
 	 */
-	public get trackAsMenu () : boolean{
+	public get trackAsMenu(): boolean {
 		//todo
 		console.log("trackAsMenu not implemented yet in flash/MovieClip");
 		return false;
 	}
-	public set trackAsMenu (value:boolean) {
+	public set trackAsMenu(value: boolean) {
 		//todo
 		console.log("trackAsMenu not implemented yet in flash/MovieClip");
 	}
 
-	public addFrameScript (...args){
-		//todo
-		console.log("addFrameScript not implemented yet in flash/MovieClip");
+	public addFrameScript(...args) {
+		// arguments are pairs of frameIndex and script/function
+		// frameIndex is in range 0..totalFrames-1
+		var numArgs = arguments.length;
+		if (numArgs & 1) {
+			this.sec.throwError('ArgumentError TooFewArgumentsError', numArgs,
+				numArgs + 1);
+		}
+		for (var i = 0; i < numArgs; i += 2) {
+			var frameNum = (arguments[i] | 0) + 1;
+			var fn = arguments[i + 1];
+			(<AwayMovieClip>this.adaptee).timeline.add_framescript(fn, frameNum);
+		}
 	}
 
 	/**
@@ -277,23 +281,23 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 *   jumps to the frame number in the specified scene.
 	 * @param	scene	The name of the scene to play. This parameter is optional.
 	 */
-	public gotoAndPlay (frame:any, scene:string=null){
+	public gotoAndPlay(frame: any, scene: string = null) {
 
 		if (frame == null)
 			return;
 
 
-		if (typeof frame === "string"){
-			if((<AwayMovieClip>this.adaptee).timeline._labels[frame.toLowerCase()]==null){
-				frame=parseInt(frame);
-				if(!isNaN(frame)){
-					(<AwayMovieClip>this.adaptee).currentFrameIndex = (<number>frame)-1;
+		if (typeof frame === "string") {
+			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame.toLowerCase()] == null) {
+				frame = parseInt(frame);
+				if (!isNaN(frame)) {
+					(<AwayMovieClip>this.adaptee).currentFrameIndex = (<number>frame) - 1;
 					(<AwayMovieClip>this.adaptee).play();
 				}
 				return;
 			}
 		}
-		if(typeof frame ==="number" && frame<=0)
+		if (typeof frame === "number" && frame <= 0)
 			return;
 		this.play();
 		this._gotoFrame(frame);
@@ -311,44 +315,43 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * @throws	ArgumentError If the scene or frame specified are
 	 *   not found in this movie clip.
 	 */
-	public gotoAndStop (frame:any, scene:string=null){
+	public gotoAndStop(frame: any, scene: string = null) {
 
 		if (frame == null)
 			return;
-	
-		if (typeof frame === "string"){
-			if((<AwayMovieClip>this.adaptee).timeline._labels[frame.toLowerCase()]==null){
-				frame=parseInt(frame);
-				if(!isNaN(frame)){
-					(<AwayMovieClip>this.adaptee).currentFrameIndex = (<number>frame)-1;
+
+		if (typeof frame === "string") {
+			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame.toLowerCase()] == null) {
+				frame = parseInt(frame);
+				if (!isNaN(frame)) {
+					(<AwayMovieClip>this.adaptee).currentFrameIndex = (<number>frame) - 1;
 					(<AwayMovieClip>this.adaptee).stop();
 				}
 				return;
 			}
 		}
-		if(typeof frame ==="number" && frame<=0)
+		if (typeof frame === "number" && frame <= 0)
 			return;
 		this.stop();
 		this._gotoFrame(frame);
 	}
 
 
-	private _gotoFrame(frame:any):void
-	{
-		if (typeof frame === "string"){
-			(<AwayMovieClip> this._adaptee).jumpToLabel(<string>frame);
+	private _gotoFrame(frame: any): void {
+		if (typeof frame === "string") {
+			(<AwayMovieClip>this._adaptee).jumpToLabel(<string>frame);
 			return;
 
 		}
-		if(typeof frame ==="number" && frame<=0)
+		if (typeof frame === "number" && frame <= 0)
 			return;
-		(<AwayMovieClip> this._adaptee).currentFrameIndex = (<number>frame) - 1;
+		(<AwayMovieClip>this._adaptee).currentFrameIndex = (<number>frame) - 1;
 	}
 	/**
 	 * Sends the playhead to the next frame and stops it.  This happens after all
 	 * remaining actions in the frame have finished executing.
 	 */
-	public nextFrame (){
+	public nextFrame() {
 		//todo
 		console.log("nextFrame not implemented yet in flash/MovieClip");
 	}
@@ -357,7 +360,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * Moves the playhead to the next scene of the MovieClip instance.  This happens after all
 	 * remaining actions in the frame have finished executing.
 	 */
-	public nextScene (){
+	public nextScene() {
 		//todo
 		console.log("nextScene not implemented yet in flash/MovieClip");
 	}
@@ -365,17 +368,17 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	/**
 	 * Moves the playhead in the timeline of the movie clip.
 	 */
-	public play (){
-		return (<AwayMovieClip> this._adaptee).play();
+	public play() {
+		return (<AwayMovieClip>this._adaptee).play();
 	}
 
 	/**
 	 * Sends the playhead to the previous frame and stops it.  This happens after all
 	 * remaining actions in the frame have finished executing.
 	 */
-	public prevFrame (){
-		if((<AwayMovieClip> this._adaptee).currentFrameIndex>0){
-			(<AwayMovieClip> this._adaptee).currentFrameIndex=(<AwayMovieClip> this._adaptee).currentFrameIndex-1;
+	public prevFrame() {
+		if ((<AwayMovieClip>this._adaptee).currentFrameIndex > 0) {
+			(<AwayMovieClip>this._adaptee).currentFrameIndex = (<AwayMovieClip>this._adaptee).currentFrameIndex - 1;
 		}
 	}
 
@@ -383,7 +386,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	 * Moves the playhead to the previous scene of the MovieClip instance.  This happens after all
 	 * remaining actions in the frame have finished executing.
 	 */
-	public prevScene () {
+	public prevScene() {
 		//todo
 		console.log("prevScene not implemented yet in flash/MovieClip");
 	}
@@ -391,8 +394,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter
 	/**
 	 * Stops the playhead in the movie clip.
 	 */
-	public stop (){
-		return (<AwayMovieClip> this._adaptee).stop();
+	public stop() {
+		return (<AwayMovieClip>this._adaptee).stop();
 	}
 
 }
