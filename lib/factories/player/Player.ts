@@ -73,7 +73,7 @@ export class Player {
 		
 		for (var i = 0; i < this._parser.abcBlocks.length; i++) {
 			var abcBlock = this._parser.abcBlocks[i];
-            var abc = new ABCFile({app:null, url:""}, abcBlock.data);
+            var abc = new ABCFile({app:this._sec.application, url:""}, abcBlock.data);
             if (abcBlock.flags) {
               // kDoAbcLazyInitializeFlag = 1 Indicates that the ABC block should not be executed
               // immediately.
@@ -104,6 +104,7 @@ export class Player {
 			var symbolMapping = this._parser.symbolClassesList[i];
 			var symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbolMapping.className,
 																	NamespaceType.Public));
+			symbolClass.axInitializer();
 			/*Object.defineProperty(symbolClass.tPrototype, "_symbol",
 								  {get: loaderInfo.getSymbolResolver(symbolClass, symbolMapping.id),
 									configurable: true});*/
