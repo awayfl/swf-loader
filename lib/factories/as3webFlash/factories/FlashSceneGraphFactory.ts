@@ -48,9 +48,11 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		if(!symbol || !this._sec)
 			throw("no symbol provided");
 
-		var symbolClass = (<any>this._sec).flash.display.Sprite;
+		var symbolClass = null; 
 		if(symbol.className)
 			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
+		else
+			symbolClass=(<any>this._sec).flash.display.Sprite.axClass;
 
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);

@@ -21,6 +21,9 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
     //public protoTypeChanged:boolean;
     protected _visibilityByScript:boolean;
 
+	public applySymbol(){
+		
+	}
 	protected _adaptee:AwayDisplayObject;
 	/**
 	 *

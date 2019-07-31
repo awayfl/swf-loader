@@ -865,7 +865,7 @@ export class SWFParser extends ParserBase
 										}
 										
 										// register a new instance for this object
-										var graphicsSprite:Sprite=new Sprite(<Graphics> awaySymbol);
+										var graphicsSprite:Sprite=this._factory.createSprite(null, <Graphics> awaySymbol, symbol);
 										graphicsSprite.mouseEnabled = false;
 
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds

@@ -76,7 +76,7 @@ export class Player {
 		});
 	}
 	private _onLoadCompleteDelegate: (event: Event) => void;
-	public onLoadComplete(buffer) {
+	public onLoadComplete(event) {
 		this._stage = new Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 		this._stage.addChild(this._loader);
 
