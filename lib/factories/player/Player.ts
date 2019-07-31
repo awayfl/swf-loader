@@ -108,8 +108,12 @@ export class Player {
 		
 		var root = constructClassFromSymbol(symbol, (<any>this._sec).flash.display.MovieClip.axClass);
 		root.axInitializer();
-		var scene=new (<any>this._sec).flash.display.Scene("name",[], 0, 1);
-		scene.axInitializer();
+		var sceneData=(<any>this._parser).sceneAndFrameLabelData;
+		if(sceneData && sceneData.scenes && sceneData.scenes.length>0){
+
+			var scene=new (<any>this._sec).flash.display.Scene(sceneData.scenes[0].name,[], sceneData.scenes[0].offset, 1);
+			scene.axInitializer();
+		}
 		// 
 		//var fun = this._sec.createInitializerFunction();
 
