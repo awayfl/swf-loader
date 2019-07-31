@@ -101,7 +101,7 @@ export class ASObject implements IMetaobjectProtocol {
     constructor() {
         // To prevent accidental instantiation of template classes, make sure that we throw
         // right during construction.
-        release || checkValue(this);
+        release;// 80pro: this errors when instancing our Loader class: || checkValue(this);
     }
 
     static _init() {

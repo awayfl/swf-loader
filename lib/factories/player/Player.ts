@@ -2,17 +2,15 @@ import { SWFParser } from "../../parsers/SWFParser";
 export { BaseVector } from "../avm2/natives/GenericVector";
 import { createSecurityDomain, AVM2LoadLibrariesFlags } from "./avmLoader";
 import { initSystem } from "../avm2/natives/system";
-import {
-	Sprite,
-	DisplayObjectContainer,
-	FlashSceneGraphFactory,
-	MovieClip
-} from "@as3web/flash";
-import { Loader } from "@as3web/flash";
-import { Stage } from "@as3web/flash";
-import { LoaderContext } from "@as3web/flash";
-import { ApplicationDomain } from "@as3web/flash";
-import { Event } from "@as3web/flash";
+
+import { Sprite } from "../as3webFlash/display/Sprite";
+import { MovieClip } from "../as3webFlash/display/MovieClip";
+import { FlashSceneGraphFactory } from "../as3webFlash/factories/FlashSceneGraphFactory";
+import { Loader } from "../as3webFlash/display/Loader";
+import { Stage } from "../as3webFlash/display/Stage";
+import { LoaderContext } from "../as3webFlash/system/LoaderContext";
+import { ApplicationDomain } from "../as3webFlash/system/ApplicationDomain";
+import { Event } from "../as3webFlash/events/Event";
 import { RequestAnimationFrame } from '@awayjs/core';
 import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
@@ -170,7 +168,7 @@ export class Player {
 
 			// advance the stage
 			this._stage.advanceFrame(this._events);
-			
+
 			/*var displayGraph={};
 			this._stage.debugDisplayGraph(displayGraph);
 			console.log("SceneGraph frame :", displayGraph);*/
