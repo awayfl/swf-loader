@@ -1,5 +1,6 @@
 import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition } from "@awayjs/scene";
 import { Sprite } from "./Sprite";
+import { constructClassFromSymbol } from '../../link';
 
 var includeString: string = '';//TODO
 
@@ -89,8 +90,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	}
 
 	public registerScriptObject(child: AwayDisplayObject): void {
-		if (child.name)
+		if (child.name){
 			this[child.name] = child._adapter ? child.adapter : child;
+			
+			this.axSetPublicProperty(child.name, child.adapter);
+		}
 	}
 
 	public unregisterScriptObject(child: AwayDisplayObject): void {
@@ -105,10 +109,14 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 
 	}
 	public clone(): MovieClip {
-		var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
-
+		if(!(<any>this)._symbol){
+			throw("_symbol not defined when cloning movieclip")
+		}
+		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
+		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		clone.axInitializer();
 		this.adaptee.copyTo(clone.adaptee);
-
+		clone.adaptee.timeline=(<AwayMovieClip>this.adaptee).timeline;
 		return clone;
 	}
 

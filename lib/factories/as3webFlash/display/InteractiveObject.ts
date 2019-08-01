@@ -3,7 +3,7 @@ import {Rectangle, EventBase} from "@awayjs/core";
 import {DisplayObject} from "./DisplayObject";
 import {DisplayObject as AwayDisplayObject, MouseEvent as MouseEventAway} from "@awayjs/scene";
 import {MouseEvent} from "../events/MouseEvent";
-import {KeyboardEvent} from "../events/KeyboardEvent";
+import {KeyboardEvent} from "../../flash/events/KeyboardEvent";
 
 import {IEventMapper} from "../events/IEventMapper"
 export class InteractiveObject extends DisplayObject{
@@ -482,12 +482,21 @@ export class InteractiveObject extends DisplayObject{
 			window.event.returnValue = false;
 		}
 		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-		var newkeyBoardEvent:KeyboardEvent=new KeyboardEvent(KeyboardEvent.KEY_UP);
+		var newkeyBoardEvent:KeyboardEvent=new this.sec.flash.events.KeyboardEvent(KeyboardEvent.KEY_UP,
+			true,
+			false,
+			event.charCode,
+			event.keyCode,
+			event.location,
+			event.ctrlKey,
+			event.altKey,
+			event.shiftKey);
+		/*(<any>newkeyBoardEvent).axInitializer(KeyboardEvent.KEY_UP);
 		newkeyBoardEvent.keyCode = event.keyCode;
 		newkeyBoardEvent.charCode = event.charCode;
 		newkeyBoardEvent.shiftKey = event.shiftKey;
 		newkeyBoardEvent.ctrlKey = event.ctrlKey;
-		newkeyBoardEvent.altKey = event.altKey;
+		newkeyBoardEvent.altKey = event.altKey;*/
 		this.dispatchEvent(newkeyBoardEvent);
 		return false;
 	}
@@ -511,7 +520,9 @@ export class InteractiveObject extends DisplayObject{
 			window.event.returnValue = false;
 		}
 		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-		var newkeyBoardEvent:KeyboardEvent=new KeyboardEvent(KeyboardEvent.KEY_DOWN);
+		var newkeyBoardEvent:KeyboardEvent=new this.sec.flash.events.KeyboardEvent(KeyboardEvent.KEY_DOWN);
+		(<any>newkeyBoardEvent).axInitializer(KeyboardEvent.KEY_DOWN);
+		//newkeyBoardEvent.type=KeyboardEvent.KEY_DOWN;
 		newkeyBoardEvent.keyCode = event.keyCode;
 		newkeyBoardEvent.charCode = event.charCode;
 		newkeyBoardEvent.shiftKey = event.shiftKey;

@@ -15,5 +15,7 @@ import {Namespace} from "./lazy/Namespace"
 import {NamespaceType} from "./lazy/NamespaceType"
 import {internNamespace} from "./lazy/internNamespace"
 
-Namespace.PUBLIC = internNamespace(NamespaceType.Public, "");
+export function initlazy(){
+    Namespace.PUBLIC = internNamespace(NamespaceType.Public, "");
+}
 

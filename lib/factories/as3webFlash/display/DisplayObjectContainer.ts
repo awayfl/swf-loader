@@ -4,6 +4,7 @@ import {DisplayObject} from "./DisplayObject";
 import {InteractiveObject} from "./InteractiveObject";
 import {Event} from "../events/Event";
 import {PickGroup} from "@awayjs/view";
+import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
 
 export class DisplayObjectContainer extends InteractiveObject{
 
@@ -58,7 +59,14 @@ export class DisplayObjectContainer extends InteractiveObject{
 
 	public clone():DisplayObjectContainer
 	{
-		return new DisplayObjectContainer(<AwayDisplayObjectContainer> this._adaptee.clone());
+		if(!(<any>this)._symbol){
+			throw("_symbol not defined when cloning movieclip")
+		}
+		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
+		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		clone.axInitializer();
+		this.adaptee.copyTo(clone.adaptee);
+		return clone;
 	}
 
 	/* gets called from stage in order to move the playhead of the root-movieclips to next frame.
@@ -90,7 +98,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 	}
 	public debugDisplayGraph(obj:any) {
 		obj.object=this;
-		obj.rectangle="x:"+this.x+", y:"+this.y+", width:"+this.width+", height:"+this.height;
+		//obj.rectangle="x:"+this.x+", y:"+this.y+", width:"+this.width+", height:"+this.height;
 		obj.children={};
 		var i:number=0;
 		for(i=0;i<(<AwayDisplayObjectContainer> this._adaptee).numChildren;i++){
@@ -108,9 +116,9 @@ export class DisplayObjectContainer extends InteractiveObject{
 				obj.children[childname].name=oneChild.name;
 				obj.children[childname].rectangle="x:"+oneChild.x+", y:"+oneChild.y;//+", width:"+oneChild.width+", height:"+oneChild.height;
 				
-				var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(oneChild.partition).getBoxBounds(oneChild);				
+				/*var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(oneChild.partition).getBoxBounds(oneChild);				
 				obj.children[childname].width=(box == null)? 0 : box.width;		
-				obj.children[childname].height=(box == null)? 0 : box.height;
+				obj.children[childname].height=(box == null)? 0 : box.height;*/
 				//(<AwayMovieClip>oneChild).graphics.endFill();
 				//console.log("Reached MC", oneChild);
 				//(<AwayMovieClip>oneChild).update();
@@ -120,9 +128,9 @@ export class DisplayObjectContainer extends InteractiveObject{
 				obj.children[childname].object=oneChild.adapter;
 				obj.children[childname].name=oneChild.name;
 				obj.children[childname].rectangle="x:"+oneChild.x+", y:"+oneChild.y;//+", width:"+oneChild.width+", height:"+oneChild.height;
-				var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(oneChild.partition).getBoxBounds(oneChild);				
+				/*var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(oneChild.partition).getBoxBounds(oneChild);				
 				obj.children[childname].width=(box == null)? 0 : box.width;		
-				obj.children[childname].height=(box == null)? 0 : box.height;
+				obj.children[childname].height=(box == null)? 0 : box.height;*/
 				//(<AwayMovieClip>oneChild).graphics.endFill();
 				//console.log("Reached MC", oneChild);
 				//(<AwayMovieClip>oneChild).update();

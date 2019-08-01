@@ -3,7 +3,8 @@ import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {DisplayObject} from "./DisplayObject";
 import {Rectangle} from "@awayjs/core";
 import {Graphics} from "./Graphics";
-export class Sprite extends DisplayObjectContainer
+import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+export class  Sprite extends DisplayObjectContainer
 {
 
 	private static _sprites:Array<Sprite> = new Array<Sprite>();
@@ -43,10 +44,15 @@ export class Sprite extends DisplayObjectContainer
 
 	public clone():Sprite
 	{
-		var clone:Sprite = Sprite.getNewSprite(AwaySprite.getNewSprite(null, this.adaptee.material));
 
+		if(!(<any>this)._symbol){
+			throw("_symbol not defined when cloning movieclip")
+		}
+		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
+		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		clone.axInitializer();
 		this.adaptee.copyTo(clone.adaptee);
-
+		clone.adaptee.graphics=this.graphics;
 		return clone;
 	}
 

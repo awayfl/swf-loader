@@ -144,7 +144,8 @@ export class AMF0 {
         break;
       case "object":
         var object = (<ASObject>value);
-        release || assert(object === null || AXBasePrototype.isPrototypeOf(object));
+        //80pro: todo: AXBasePrototype.isPrototypeOf(v) fails for us, thats why i added the || v.axResolveMultiname
+        release || assert(object === null || AXBasePrototype.isPrototypeOf(object) || object.axResolveMultiname);
         if (object === null) {
           ba.writeByte(AMF0Marker.NULL);
         } else if (ba.sec.AXArray.axIsType(object)) {

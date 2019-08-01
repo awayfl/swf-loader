@@ -20,7 +20,8 @@ var D = defineNonEnumerableProperty;
 export var AXBasePrototype = null;
 
 export function isValidASValue(value: any) {
-    return AXBasePrototype.isPrototypeOf(value) || isPrimitiveJSValue(value);
+  //80pro: todo: AXBasePrototype.isPrototypeOf(v) fails for us, thats why i added the || v.axResolveMultiname
+    return AXBasePrototype.isPrototypeOf(value) || isPrimitiveJSValue(value) || value.axResolveMultiname;
   }
   
 /**

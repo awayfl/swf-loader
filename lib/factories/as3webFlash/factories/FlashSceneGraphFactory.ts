@@ -54,6 +54,7 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		else
 			symbolClass=(<any>this._sec).flash.display.Sprite.axClass;
 
+		symbol.symbolClass=symbolClass;
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);
 		// manually call the axInitializer for now:
@@ -78,6 +79,7 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		else
 			symbolClass = (<any>this._sec).flash.display.MovieClip.axClass;
 
+		symbol.symbolClass=symbolClass;
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);
 		// 	manually call the axInitializer - this will run the constructor
@@ -88,6 +90,7 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		timeline._framescripts = asObj.adaptee.timeline._framescripts;
 		// assign the new timeline
 		asObj.adaptee.timeline=timeline;
+		
 		return asObj.adaptee;
 	}
 

@@ -7,6 +7,7 @@ import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {Stage} from "./Stage";
 import { PickGroup, BasicPartition } from '@awayjs/view';
 import { SceneGraphPartition } from '@awayjs/scene';
+import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
 
 export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter
 {
@@ -22,7 +23,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
     protected _visibilityByScript:boolean;
 
 	public applySymbol(){
-		
+
 	}
 	protected _adaptee:AwayDisplayObject;
 	/**
@@ -214,7 +215,14 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	public clone():DisplayObject
 	{
-		return new DisplayObject(this._adaptee.clone());
+		if(!(<any>this)._symbol){
+			throw("_symbol not defined when cloning movieclip")
+		}
+		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
+		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		clone.axInitializer();
+		this.adaptee.copyTo(clone.adaptee);
+		return clone;
 	}
 
 	public dispose():void
@@ -938,6 +946,10 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public get stage () : Stage{
 		return this._stage;
+
+	}
+	public set stage (value: Stage) {
+		this._stage=value;
 
 	}
 

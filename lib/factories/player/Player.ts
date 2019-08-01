@@ -18,7 +18,9 @@ import { initLink } from '../flash/link';
 import { constructClassFromSymbol } from '../flash/constructClassFromSymbol';
 import { Multiname } from '../avm2/abc/lazy/Multiname';
 import { NamespaceType } from '../avm2/abc/lazy/NamespaceType';
+import { initlazy } from '../avm2/abc/lazy';
 import { FrameScriptManager } from '@awayjs/scene';
+import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
@@ -26,7 +28,8 @@ class EntryClass extends Sprite {
 }
 initSystem();
 initLink();
-
+initializeAXBasePrototype();
+initlazy();
 // Add the |axApply| and |axCall| methods on the function prototype so that we can treat
 // Functions as AXCallables.
 (<any>Function.prototype).axApply = Function.prototype.apply;
@@ -46,13 +49,14 @@ export class Player {
 	private _eventFrameConstructed: Event;
 	private _eventExitFrame: Event;
 	private _eventRender: Event;
+	private _renderStarted: boolean;
 	constructor() {
-		window["hidePokiProgressBar"]();
 
 		this._eventOnEnter = new Event(Event.ENTER_FRAME);
 		this._eventFrameConstructed = new Event(Event.FRAME_CONSTRUCTED);
 		this._eventExitFrame = new Event(Event.EXIT_FRAME);
 		this._eventRender = new Event(Event.RENDER);
+		this._renderStarted=false;
 
 		this._events = [this._eventOnEnter, this._eventExitFrame];
 		this._onLoadCompleteDelegate = (event: Event) => this.onLoadComplete(event);
@@ -61,12 +65,13 @@ export class Player {
 		if (this._loader || this._parser) {
 			throw "Only playing of 1 SWF file is supported at the moment";
 		}
-		// for now just try to load and init the builtin.abc and playerglobal.abcs
 		createSecurityDomain(
 			AVM2LoadLibrariesFlags.Builtin | AVM2LoadLibrariesFlags.Playerglobal
 		).then((sec) => {
-			this._sec = sec;
 			console.log("builtins are loaded fine, start parsing SWF");
+			this._sec = sec;
+			var _sprite = new (<any>this._sec).flash.display.Sprite();
+			this._stage = new (<any>this._sec).flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
 			this._loader = new Loader(this._parser);
 			var loaderContext: LoaderContext = new LoaderContext(false, new ApplicationDomain());
@@ -77,7 +82,7 @@ export class Player {
 	}
 	private _onLoadCompleteDelegate: (event: Event) => void;
 	public onLoadComplete(event) {
-		this._stage = new Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
+		
 		this._stage.addChild(this._loader);
 
 		/*
@@ -102,7 +107,11 @@ export class Player {
 		var frameMarker: number = Math.floor(1000 / this._frameRate);
 		this._time += Math.min(dt, frameMarker);
 
-		if (this._time >= frameMarker) {
+		if (this._time >= frameMarker || !this._renderStarted) {
+			
+			if(!this._renderStarted)
+				window["hidePokiProgressBar"]();
+			this._renderStarted=true;
 			this._time -= frameMarker;
 
 			// advance the stage

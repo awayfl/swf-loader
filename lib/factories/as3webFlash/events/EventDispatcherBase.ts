@@ -1,5 +1,6 @@
 import {EventBase}					from "@awayjs/core";
 import {ASClass} from "../../avm2/nat/ASClass";
+import { ASObject } from '../../avm2/nat/ASObject';
 
 /**
  * Base export class for dispatching events
@@ -129,7 +130,7 @@ export class ListenerObject
 	{
 		var len:number = this.numListeners;
 		for (this._index = 0; this._index < len && this._index < this.numListeners; this._index++)
-			this._listeners[this._index](event);
+			(<any>this._listeners[this._index]).call(this._listeners[this._index], event);
 	}
 
 	/**

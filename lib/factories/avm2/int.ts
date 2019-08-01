@@ -541,6 +541,7 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           argCount = frame.u30();
           popManyInto(stack, argCount, args);
           popNameInto(stack, abc.getMultiname(index), rn);
+          //console.log("stack[stack.length - 1]", stack[stack.length - 1]);
           receiver = sec.box(stack[stack.length - 1]);
           result = receiver.axCallProperty(rn, args, bc === Bytecode.CALLPROPLEX);
           if (bc === Bytecode.CALLPROPVOID) {
@@ -633,7 +634,11 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
         case Bytecode.SETPROPERTY:
           value = stack.pop();
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
+          //console.log("reciever not found", stack)
           receiver = sec.box(stack.pop());
+          //if(!receiver)
+          //  console.log("reciever not found")
+          //else
           receiver.axSetProperty(rn, value, Bytecode.INITPROPERTY, methodInfo);
           break;
         case Bytecode.GETPROPERTY:

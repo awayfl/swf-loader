@@ -14,6 +14,9 @@ import { BitmapData } from "../as3webFlash/display/BitmapData";
 import { SimpleButton } from "../as3webFlash/display/SimpleButton";
 
 import { Scene } from "./display/Scene";
+import { Event } from "./events/Event";
+import { Keyboard } from "./ui/Keyboard";
+import { KeyboardEvent } from "./events/KeyboardEvent";
 
 /*
 import { URLRequest } from "./net/URLRequest";
@@ -61,7 +64,6 @@ import { Vector3D } from "./geom/Vector3D";
 import { Transform } from "./geom/Transform";
 import { ColorTransform } from "./geom/ColorTransform";
 import { PerspectiveProjection } from "./geom/PerspectiveProjection";
-import { Event } from "./events/Event";
 import { ErrorEvent } from "./events/ErrorEvent";
 import { IOErrorEvent } from "./events/IOErrorEvent";
 import { KeyboardEvent } from "./events/KeyboardEvent";
@@ -147,6 +149,7 @@ import { registerNativeClass, registerNativeFunction } from '../avm2/nat/initial
 function M(name: string, asClass: ASClass) {
   registerNativeClass(name, asClass);
 }
+M("flash.display.Stage", Stage);
 M("flash.events.EventDispatcher", EventDispatcher);
 M("flash.display.DisplayObject", DisplayObject);
 M("flash.display.InteractiveObject", InteractiveObject);
@@ -156,12 +159,15 @@ M("flash.display.MovieClip", MovieClip);
 M("flash.display.Shape", Shape);
 M("flash.display.Bitmap", Bitmap);
 M("flash.display.BitmapData", BitmapData);
-M("flash.display.Stage", Stage);
 M("flash.display.Loader", Loader);
 M("flash.display.LoaderInfo", LoaderInfo);
 //M("flash.display.Graphics", Graphics);
 M("flash.display.SimpleButton", SimpleButton);
 M("flash.display.Scene", Scene);
+
+M("flash.events.Event", Event);
+M("flash.ui.Keyboard", Keyboard);
+M("flash.events.KeyboardEvent", KeyboardEvent);
 /*M("flash.display.MorphShape", MorphShape);
 M("flash.display.NativeMenu", NativeMenu);
 M("flash.display.NativeMenuItem", NativeMenuItem);
@@ -195,10 +201,8 @@ M("flash.geom.Transform", Transform);
 M("flash.geom.ColorTransform", ColorTransform);
 M("flash.geom.PerspectiveProjection", PerspectiveProjection);
 
-M("flash.events.Event", Event);
 M("flash.events.ErrorEvent", ErrorEvent);
 M("flash.events.IOErrorEvent", IOErrorEvent);
-M("flash.events.KeyboardEvent", KeyboardEvent);
 M("flash.events.MouseEvent", MouseEvent);
 M("flash.events.GestureEvent", GestureEvent);
 M("flash.events.TextEvent", TextEvent);
@@ -216,7 +220,6 @@ M("flash.ui.ContextMenu", ContextMenu);
 M("flash.ui.ContextMenuItem", ContextMenuItem);
 M("flash.ui.ContextMenuBuiltInItems", ContextMenuBuiltInItems);
 M("flash.ui.ContextMenuClipboardItems", ContextMenuClipboardItems);
-M("flash.ui.Keyboard", Keyboard);
 M("flash.ui.Mouse", Mouse);
 M("flash.ui.MouseCursorData", MouseCursorData);
 

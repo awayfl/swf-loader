@@ -19,6 +19,7 @@ import {Stage as AwayStage, StageManager} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, DisplayObject as AwayDisplayObject, Sprite as AwaySprite, Scene, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
 import {MouseEvent} from "../events/MouseEvent";
+import { EventHandler } from '../../flash/events/IEventDispatcher';
 
 
 /**
@@ -1213,7 +1214,16 @@ export class Stage extends Sprite{
 	public set focusRect (value:any) {};
 	public set loaderInfo (value:any) {};
 	public set mask (value:DisplayObject){};
-	//public set mouseEnabled (value:boolean){};
+	public set mouseChildren (value:boolean){};
+	public get mouseChildren():boolean{return false;};
+	public set mouseEnabled (value:boolean){};
+	public get mouseEnabled():boolean{return false;};
+	public set numChildren (value:number){};
+	public get numChildren():number{return 0;};
+	public set width (value:number){};
+	public get width():number{return 0;};
+	public set height (value:number){};
+	public get height():number{return 0;};
 	public set opaqueBackground (value:number){};
 	public set name (value:string){};
 	public set rotation (value:number){};
@@ -1234,6 +1244,29 @@ export class Stage extends Sprite{
 	public set z (value:number){};
 
 	public set tabChildren (value:boolean){}
+	
+
+	// 80pro: todo: this was added because otherwise avm2 cant find these on Stage
+	//	but it should find them anyway, because its inheriting from Sprite...
+	//____________________________________
+	public addChild (child:DisplayObject) : DisplayObject {return super.addChild(child);}
+	public addChildAt (child:DisplayObject, index:number) : DisplayObject {return super.addChildAt(child, index);}
+	public removeChildAt (index:number) : DisplayObject {return super.removeChildAt(index);}
+	public swapChildrenAt (index:number,index2:number) : void {return super.swapChildrenAt(index, index2);}
+	
+	public setChildIndex (child:DisplayObject, index:number) : DisplayObject {return null;}
+	public addEventListener(type: string, listener: any, useCapture: boolean = false,
+		priority: number = 0, useWeakReference: boolean = false): void{
+			super.addEventListener(type, listener, useCapture = false, priority, useWeakReference);
+		}
+	public hasEventListener(type: string): boolean {
+		return super.hasEventListener(type);}
+	public willTrigger(){return super.willTrigger();}
+	public dispatchEvent(event: Event): void {
+		return super.dispatchEvent(event);}
+	//____________________________________
+		
+
 	/**
 	 * Calling the invalidate() method signals Flash runtimes to alert display objects
 	 * on the next opportunity it has to render the display list (for example, when the playhead

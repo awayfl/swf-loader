@@ -174,6 +174,9 @@ export class Event extends ASObject {
   get target(): Object {
     return this._target;
   }
+  set target(value: Object) {
+    this._target=value;
+  }
 
   get currentTarget(): Object {
     return this._currentTarget;

@@ -175,6 +175,8 @@ export class ASObject implements IMetaobjectProtocol {
     }
 
     axSetProperty(mn: Multiname, value: any, bc: Bytecode) {
+        //if(typeof value == "number" && isNaN(value))
+        //    console.log("try to set NaN", mn);
         release || checkValue(value);
         var name = mn.name;
         if (typeof name === 'number' || isNumeric(name = axCoerceName(name))) {
@@ -226,6 +228,8 @@ export class ASObject implements IMetaobjectProtocol {
     axGetProperty(mn: Multiname): any {
         var name = this.axResolveMultiname(mn);
         var value = this[name];
+
+        //console.log("axGetProperty", name, value);
         if (typeof value === 'function') {
             return this.axGetMethod(name);
         }
