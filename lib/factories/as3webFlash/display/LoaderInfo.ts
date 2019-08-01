@@ -121,6 +121,8 @@ import {ByteArray} from "../utils/ByteArray";
  */
 export class LoaderInfo extends EventDispatcher
 {
+	public _loader:Loader;
+
 	private _applicationDomain:ApplicationDomain;
 	/**
 	 * The ActionScript version of the loaded SWF file.
@@ -276,7 +278,10 @@ export class LoaderInfo extends EventDispatcher
 	 *     For more information related to security, see the Flash Player Developer Center Topic:
 	 *   Security.
 	 */
-	public content : DisplayObject;
+	public get content() : DisplayObject
+	{
+		return this._loader && this._loader.content;
+	}
 	
 
 	/**

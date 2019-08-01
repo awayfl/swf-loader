@@ -1,7 +1,8 @@
 
 import {ApplicationDomain} from "../system/ApplicationDomain";
 import {SecurityDomain} from "../system/SecurityDomain";
-export class LoaderContext{
+import { ASObject } from '../../avm2/nat/ASObject';
+export class LoaderContext extends ASObject {
 
 	//for AVM1:
 	public _avm1Context:any;
@@ -9,6 +10,7 @@ export class LoaderContext{
 	private _applicationDomain:ApplicationDomain;
 
 	constructor(checkPolicyFile:boolean = false, applicationDomain:ApplicationDomain = null, securityDomain:SecurityDomain = null) {
+		super();
 		this._applicationDomain=applicationDomain;
 	}
 

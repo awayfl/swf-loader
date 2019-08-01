@@ -446,8 +446,7 @@ export class AXSecurityDomain {
       if (v == undefined) {
         return v;
       }
-      //80pro: todo: AXBasePrototype.isPrototypeOf(v) fails for us, thats why i added the || v.axResolveMultiname
-      if (AXBasePrototype.isPrototypeOf(v) || v.axResolveMultiname) {
+      if (AXBasePrototype.isPrototypeOf(v)) {
         return v;
       }
       if (v instanceof Array) {

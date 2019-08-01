@@ -20,6 +20,10 @@ import {Image2DParser} from "@awayjs/stage";
 import {Sound} from "../media/Sound";
 import {FlashSceneGraphFactory} from "../factories/FlashSceneGraphFactory";
 import {URLLoaderEvent} from "@awayjs/core";
+import { release, somewhatImplemented } from '../../base/utilities/Debug';
+import { UncaughtErrorEvents } from '../events/UncaughtErrorEvents';
+import { Errors } from '../../avm2/errors';
+import { ByteArray } from '../../avm2/natives/byteArray';
 
 // todo: define all methods (start new with converting as3-Loader to ts ?)
 
@@ -29,12 +33,25 @@ export class Loader extends DisplayObjectContainer
 	private _loader:AwayLoader;
 	private _isImage:boolean;
 	private _parser:ParserBase;
+	private _uncaughtErrorEvents: UncaughtErrorEvents;
 
 	private _loaderContext:LoaderContext;
 
+	public _content:DisplayObject;
+
 	// for AVM1:
-	public content:any;
-	public _content:any;
+	public get content():DisplayObject
+	{
+		return this._content;
+	}
+
+	public get uncaughtErrorEvents(): UncaughtErrorEvents {
+		release || somewhatImplemented("public flash.display.Loader::uncaughtErrorEvents");
+		if (!this._uncaughtErrorEvents) {
+			this._uncaughtErrorEvents = new UncaughtErrorEvents();
+		}
+		return this._uncaughtErrorEvents;
+	}
 
 	constructor(parser:ParserBase){
 		super();
@@ -44,7 +61,8 @@ export class Loader extends DisplayObjectContainer
 
 		this._parser = parser;
 
-		this._loaderInfo=new LoaderInfo();
+		this._loaderInfo=new this.sec.flash.display.LoaderInfo();
+		this._loaderInfo._loader = this;
 		this._factory = new FlashSceneGraphFactory(null);
 	}
 
@@ -87,7 +105,8 @@ export class Loader extends DisplayObjectContainer
 
 			// we should only do this for bitmaps loaded from jpg or png
 			if (this._isImage)
-				this.addChild(this._loaderInfo.content = new Bitmap(<BitmapData> (<SceneImage2D> asset).adapter));
+				(<AwayDisplayObjectContainer> this._adaptee).addChild(new Bitmap(<BitmapData> (<SceneImage2D> asset).adapter).adaptee);
+				//this.addChild(this._loaderInfo.content = new Bitmap(<BitmapData> (<SceneImage2D> asset).adapter));
 		} else if (asset.isAsset(WaveAudio)) {
 			this._loaderContext.applicationDomain.addAudioDefinition(asset.name, (<WaveAudio>asset));
 		} else if (asset.isAsset(Font)) {
@@ -101,11 +120,36 @@ export class Loader extends DisplayObjectContainer
 			
 			// if this is the "Scene 1", we make it a child of the loader
 			if (asset.name=="Scene 1" || (asset.name=="scene")){// "Scene 1" when AWDParser, "scene" when using SWFParser
-				this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
+				(<AwayDisplayObjectContainer> this._adaptee).addChild(<AwayMovieClip>asset);
+				//this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
 			}
 		}
 	}
 
+	addChild(child: DisplayObject): DisplayObject {
+		this.sec.throwError('IllegalOperationError', Errors.InvalidLoaderMethodError);
+		return null;
+	}
+
+	addChildAt(child: DisplayObject, index: number): DisplayObject {
+		this.sec.throwError('IllegalOperationError', Errors.InvalidLoaderMethodError);
+		return null;
+	}
+
+	removeChild(child: DisplayObject): DisplayObject {
+		this.sec.throwError('IllegalOperationError', Errors.InvalidLoaderMethodError);
+		return null;
+	}
+
+	removeChildAt(index: number): DisplayObject {
+		this.sec.throwError('IllegalOperationError', Errors.InvalidLoaderMethodError);
+		return null;
+	}
+
+	setChildIndex(child: DisplayObject, index: number): void {
+		this.sec.throwError('IllegalOperationError', Errors.InvalidLoaderMethodError);
+	}
+	
 	public load(url:URLRequest, context:LoaderContext=null)
 	{
 		console.log("start loading the url:"+url.url);
@@ -134,6 +178,65 @@ export class Loader extends DisplayObjectContainer
 		this._loader.addEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
 		
 		this._loader.loadData(buffer, null, null, null, this._parser);
+	}
+
+	public loadBytes(data: ByteArray, context?: LoaderContext) {
+		this.close();
+		console.log("80pro todo: loader.loadBytes");
+		/*
+		// TODO: properly coerce object arguments to their types.
+		var loaderClass = Loader.axClass;
+		// In case this is the initial root loader, we won't have a loaderInfo object. That should
+		// only happen in the inspector when a file is loaded from a Blob, though.
+		this._contentLoaderInfo._url = (this.loaderInfo ? this.loaderInfo._url : '') +
+										'/[[DYNAMIC]]/' + (++loaderClass._embeddedContentLoadCount);
+		this._applyLoaderContext(context);
+		this._loadingType = LoadingType.Bytes;
+		this._fileLoader = new FileLoader(this, this._contentLoaderInfo);
+		this._queuedLoadUpdate = null;
+		if (!release && traceLoaderOption.value) {
+			console.log("Loading embedded symbol " + this._contentLoaderInfo._url);
+		}
+		// Just passing in the bytes won't do, because the buffer can contain slop at the end.
+		this._fileLoader.loadBytes(new Uint8Array((<any>data).bytes, 0, data.length));
+
+		release || assert(loaderClass._loadQueue.indexOf(this) === -1);
+		loaderClass._loadQueue.push(this);
+		*/
+	}
+
+	close(): void {
+		console.log("80pro todo: loader.close");
+		// var queueIndex = Loader.axClass._loadQueue.indexOf(this);
+		// if (queueIndex > -1) {
+		//   Loader.axClass._loadQueue.splice(queueIndex, 1);
+		// }
+		// this._contentLoaderInfo.reset();
+		// if (!this._fileLoader) {
+		//   return;
+		// }
+		// this._fileLoader.abortLoad();
+		// this._fileLoader = null;
+	}
+
+	_unload(stopExecution: boolean, gc: boolean): void {
+		// if (this._loadStatus < LoadStatus.Initialized) {
+		//   this._loadStatus = LoadStatus.Unloaded;
+		//   return;
+		// }
+		// this.close();
+		// this._content = null;
+		// this._contentLoaderInfo._loader = null;
+		// this._loadStatus = LoadStatus.Unloaded;
+		// this.dispatchEvent(Event.axClass.getInstance(Event.UNLOAD));
+	}
+	unload() {
+		this._unload(false, false);
+	}
+	unloadAndStop(gc: boolean) {
+		// TODO: remove all DisplayObjects originating from the unloaded SWF from all lists and stop
+		// them.
+		this._unload(true, !!gc);
 	}
 
 	public get contentLoaderInfo():LoaderInfo

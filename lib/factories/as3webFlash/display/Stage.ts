@@ -120,7 +120,7 @@ import { EventHandler } from '../../flash/events/IEventDispatcher';
 
 
 
-export class Stage extends Sprite{
+export class Stage extends DisplayObjectContainer{
 
 	private static _colorMaterials:any={};
 	private static _textureMaterials:any={};

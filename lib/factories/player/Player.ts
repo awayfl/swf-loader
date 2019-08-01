@@ -73,8 +73,8 @@ export class Player {
 			var _sprite = new (<any>this._sec).flash.display.Sprite();
 			this._stage = new (<any>this._sec).flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
-			this._loader = new Loader(this._parser);
-			var loaderContext: LoaderContext = new LoaderContext(false, new ApplicationDomain());
+			this._loader = new this._sec.flash.display.Loader(this._parser);
+			var loaderContext: LoaderContext = new this._sec.flash.system.LoaderContext(false, new this._sec.flash.system.ApplicationDomain());
 			this._loader.loaderInfo.addEventListener(Event.COMPLETE, this._onLoadCompleteDelegate);
 			this._loader.loadData(buffer, loaderContext);
 
