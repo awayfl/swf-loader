@@ -67,7 +67,7 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 
 	public createDisplayObjectContainer(symbol:any=null):AwayDisplayObjectContainer
 	{
-		return <AwayDisplayObjectContainer> new DisplayObjectContainer().adaptee;
+		return <AwayDisplayObjectContainer> new this._sec.flash.display.DisplayObjectContainer().adaptee;
 	}
 
 	public createMovieClip(timeline:Timeline = null, symbol:any=null):AwayMovieClip

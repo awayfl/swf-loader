@@ -261,7 +261,7 @@ export class Stage extends DisplayObjectContainer{
 		// set this as active stage.
 		// this makes sure all DisplayObject.constructor can set a reference to stage,
 		// befor constructors of Sprite or MovieClips are processed
-		DisplayObject.activeStage=this;
+		this.sec.flash.display.DisplayObject._activeStage=this;
 		this._stage=this;
 
 		// init awayengine

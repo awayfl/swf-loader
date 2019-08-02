@@ -73,7 +73,7 @@ export function linkClass(axClass: AXClass, asClass: ASClass) {
     if (asClass.classInitializer) {
       asClass.classInitializer.call(axClass, asClass);
       if (!release) {
-        //Object.freeze(asClass); //robnet: causes some static variables to error when updated.
+        Object.freeze(asClass);
       }
     }
   

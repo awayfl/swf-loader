@@ -8,9 +8,12 @@ import {Stage} from "./Stage";
 import { PickGroup, BasicPartition } from '@awayjs/view';
 import { SceneGraphPartition } from '@awayjs/scene';
 import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { AXClass } from '../../avm2/run/AXClass';
 
 export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter
 {
+	static axClass: typeof DisplayObject & AXClass;
+
 	//for AVM1:
 	public _parent:any;
 	public _depth:number;
@@ -107,7 +110,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		this.adaptee = adaptee || new AwayDisplayObject();
 
 		// needed, because `this.stage` must already be available when constructor of extending classes are executed
-		this._stage=DisplayObject.activeStage;
+		this._stage=this.activeStage;
 
 		// no eventMapping needed for the DisplayObject-events.
 		// they can all be dispatched without listening on other objects
@@ -131,17 +134,14 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	protected _stage:Stage;
 
 
-	private static _activeStage:Stage=null;
-	public static set activeStage(value:any)
+	public static _activeStage:Stage=null;
+
+	public get activeStage():any
 	{
-		DisplayObject._activeStage=value;
-	}
-	public static get activeStage():any
-	{
-		if(DisplayObject._activeStage==null){
+		if(this.sec.flash.display.DisplayObject._activeStage==null){
 			//console.log("ERROR: a Stage must have been created before any Sprite can be created!")
 		}
-		return DisplayObject._activeStage;
+		return this.sec.flash.display.DisplayObject._activeStage;
 	}
 
 	//		use to dispatch events on a object and all its childs

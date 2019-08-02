@@ -76,7 +76,7 @@ export interface ISecurityDomain {
 		display: {
 			EventDispatcher: typeof EventDispatcher;
 			DisplayObject: typeof DisplayObject;
-			DisplayObjectContainer: DisplayObjectContainer;
+			DisplayObjectContainer: typeof DisplayObjectContainer;
 			AVM1Movie: typeof AVM1Movie;
 			Stage: typeof Stage;
 			Loader: typeof Loader;
