@@ -17,6 +17,7 @@ import { constructClassFromSymbol } from "../constructClassFromSymbol";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
 import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
 import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -150,7 +151,7 @@ export class MovieClip extends Sprite implements IAdvancable {
 
   static frameNavigationModel: FrameNavigationModel;
 
-  static axClass: typeof MovieClip;
+  static axClass: typeof MovieClip & AXClass;
 
   private static _callQueue: MovieClip [];
 

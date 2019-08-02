@@ -34,6 +34,7 @@ import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';
 import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
 import { getCurrentABC } from "../../avm2/run/getCurrentABC";
 import { AVM1Context } from '../../avm1/context';
+import { AXClass } from '../../avm2/run/AXClass';
 
 declare var SWFFile:any;
 declare var ImageFile:any;
@@ -68,7 +69,7 @@ enum LoadingType {
 export class Loader extends DisplayObjectContainer
                     implements IAdvancable { // 80pro:}, ILoadListener {
 
-  static axClass: typeof Loader;
+  static axClass: typeof Loader & AXClass;
 
   static runtimeStartTime: number;
   private static _rootLoader: Loader;

@@ -1,7 +1,6 @@
 import { release, assert, somewhatImplemented, warning } from "../../base/utilities/Debug";
 import { ASObject } from "../../avm2/nat/ASObject";
 import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
-import { ASClass } from "../../avm2/nat/ASClass";
 import { ASArray } from "../../avm2/nat/ASArray";
 import { MapObject } from "../../base/utilities";
 import { ObjectUtilities } from "../../base/utilities/ObjectUtilities";
@@ -12,6 +11,7 @@ import { Symbol, EagerlyResolvedSymbol, SymbolData } from "../symbol";
 import { LoaderInfo } from "../display/LoaderInfo";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { IRemotable } from '../../base/remoting';
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -32,7 +32,7 @@ import { IRemotable } from '../../base/remoting';
 
 export class Font extends ASObject implements IRemotable {
 
-  static axClass: typeof Font;
+  static axClass: typeof Font & AXClass;
 
   private static _fonts: Font[];
   private static _fontsBySymbolId: MapObject<Font>;
@@ -911,7 +911,7 @@ export class Font extends ASObject implements IRemotable {
     return this.sec.createArrayUnsafe(this._fonts.slice());
   }
 
-  static registerFont(font: ASClass): void {
+  static registerFont(font: AXClass): void {
     somewhatImplemented('Font.registerFont');
   }
 

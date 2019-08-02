@@ -3,9 +3,6 @@ import {IEventMapper} from "./IEventMapper";
 import {EventDispatcherBase} from "./EventDispatcherBase";
 
 import {EventBase} from "@awayjs/core";
-import { ASObject } from '../../avm2/nat/ASObject';
-import { ASClass } from '../../avm2/nat/ASClass';
-import { ClassInfo } from '../../avm2/abc/lazy/ClassInfo';
 
 /**
 	 * [broadcast event] Dispatched when the Flash Player or AIR application operating

@@ -13,9 +13,9 @@ import { IBitmapDrawable } from "./IBitmapDrawable"
 import { SceneImage2D } from "@awayjs/scene"
 
 import {IBitmapDataOwner} from "./IBitmapDataOwner";
-import { ASClass } from '../../avm2/nat/ASClass';
+import { ASObject } from '../../avm2/nat/ASObject';
 
-export class BitmapData extends ASClass implements IBitmapDrawable, IAssetAdapter
+export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapter
 {
 	private _adaptee:SceneImage2D;
 	private _owners:Array<IBitmapDataOwner> = new Array<IBitmapDataOwner>();

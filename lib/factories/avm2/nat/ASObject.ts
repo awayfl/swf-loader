@@ -26,7 +26,7 @@ import { AXObject } from '../run/AXObject';
 
 export class ASObject implements IMetaobjectProtocol {
     traits: RuntimeTraits;
-    sec: any;//80pro: todo: ISecurityDomain;
+    sec: ISecurityDomain;
 
     // Declare all instance ASObject fields as statics here so that the TS
     // compiler can convert ASClass class objects to ASObject instances.
@@ -37,7 +37,7 @@ export class ASObject implements IMetaobjectProtocol {
     protected static _methodClosureCache: any;
     static classNatives: Object[];
     static instanceNatives: Object[];
-    static sec: any/*ISecurityDomain*/;
+    static sec: ISecurityDomain;
     static classSymbols = null;
     static instanceSymbols = null;
     static classInfo: ClassInfo;

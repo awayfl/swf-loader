@@ -1,12 +1,12 @@
 import { PromiseWrapper, isInteger, Bounds, ImageType } from "../base/utilities";
 import { ISecurityDomain } from "../avm2/nat/ISecurityDomain";
-import { ASClass } from "../avm2/nat/ASClass";
 import { release, warning, assert } from "../base/utilities/Debug";
 import { Multiname } from "../avm2/abc/lazy/Multiname";
 import { NamespaceType } from "../avm2/abc/lazy/NamespaceType";
 import { LoaderInfo } from "./display/LoaderInfo";
 import { ByteArray } from "../avm2/natives/byteArray";
 import { AXApplicationDomain } from "../avm2/run/AXApplicationDomain";
+import { AXClass } from '../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -48,9 +48,9 @@ export class Symbol {
   data: any;
   isAVM1Object: boolean;
   avm1Context: any;//80pro: todo: AVM1Context;
-  symbolClass: ASClass;
+  symbolClass: AXClass;
 
-  constructor(data: SymbolData, symbolDefaultClass: ASClass) {
+  constructor(data: SymbolData, symbolDefaultClass: AXClass) {
     release || assert(isInteger(data.id));
     this.data = data;
     if (data.className) {
@@ -58,7 +58,7 @@ export class Symbol {
       try {
         var symbolClass = app.getClass(Multiname.FromFQNString(data.className,
                                                                     NamespaceType.Public));
-        this.symbolClass = <ASClass><any>symbolClass;
+        this.symbolClass = symbolClass;
         // The symbolClass should have received a lazy symbol resolver in Loader#_applyLoadUpdate.
         release || assert(symbolClass.tPrototype.hasOwnProperty('_symbol'));
         // Replace it by this symbol without triggering the resolver and causing an infinite
@@ -85,7 +85,7 @@ export class DisplaySymbol extends Symbol {
   scale9Grid: Bounds;
   dynamic: boolean;
 
-  constructor(data: SymbolData, symbolClass: ASClass, dynamic: boolean) {
+  constructor(data: SymbolData, symbolClass: AXClass, dynamic: boolean) {
     super(data, symbolClass);
     this.dynamic = dynamic;
   }

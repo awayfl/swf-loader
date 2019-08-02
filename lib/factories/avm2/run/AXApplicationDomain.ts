@@ -26,7 +26,7 @@ export class AXApplicationDomain {
      */
     public parent: AXApplicationDomain;
   
-    public sec: any;//80pro todo: ISecurityDomain;
+    public sec:ISecurityDomain;
   
     private _abcs: ABCFile [];
   
@@ -78,7 +78,7 @@ export class AXApplicationDomain {
   
     public findProperty(mn: Multiname, strict: boolean, execute: boolean): AXGlobal {
       release || assert(mn instanceof Multiname);
-      var script = this.findDefiningScript(mn, execute);
+      var script:ScriptInfo = this.findDefiningScript(mn, execute);
       if (script) {
         return script.global;
       }
@@ -87,12 +87,12 @@ export class AXApplicationDomain {
   
     public getClass(mn: Multiname): AXClass {
       release || assert(mn instanceof Multiname);
-      return <any>this.getProperty(mn, true, true);
+      return <AXClass> this.getProperty(mn, true, true);
     }
   
     public getProperty(mn: Multiname, strict: boolean, execute: boolean): AXObject {
       release || assert(mn instanceof Multiname);
-      var global: any = this.findProperty(mn, strict, execute);
+      var global: AXGlobal = this.findProperty(mn, strict, execute);
       if (global) {
         return global.axGetProperty(mn);
       }

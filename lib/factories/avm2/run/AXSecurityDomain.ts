@@ -74,11 +74,12 @@ import { axConstructObject } from "./axConstructObject";
 import { axCoerceObject } from "./axCoerceObject";
 
 import { initializeAXBasePrototype, AXBasePrototype } from "./initializeAXBasePrototype";
+import { ISecurityDomain } from '../../ISecurityDomain';
 
 /**
  * Provides security isolation between application domains.
  */
-export class AXSecurityDomain {
+export class AXSecurityDomain implements ISecurityDomain{
     public system: AXApplicationDomain;
     public application: AXApplicationDomain;
     public classAliases: ClassAliases;
@@ -131,6 +132,8 @@ export class AXSecurityDomain {
   
     private _catalogs: ABCCatalog [];
   
+    public flash:any;
+    public player:any;
     constructor() {
       initializeAXBasePrototype();
       this.system = new AXApplicationDomain(this, null);
@@ -167,7 +170,7 @@ export class AXSecurityDomain {
                 replacement2?: any, replacement3?: any, replacement4?: any) {
       var message = formatErrorMessage.apply(null, sliceArguments(arguments, 1));
       var mn = Multiname.FromFQNString(className, NamespaceType.Public);
-      var axClass: AXClass = <any>this.system.getProperty(mn, true, true);
+      var axClass: AXClass = <AXClass> this.system.getProperty(mn, true, true);
       return axClass.axConstruct([message, error.code]);
     }
   

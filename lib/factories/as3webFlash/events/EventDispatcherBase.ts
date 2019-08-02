@@ -1,6 +1,6 @@
 import {EventBase}					from "@awayjs/core";
-import {ASClass} from "../../avm2/nat/ASClass";
 import { ASObject } from '../../avm2/nat/ASObject';
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Base export class for dispatching events
@@ -8,9 +8,9 @@ import { ASObject } from '../../avm2/nat/ASObject';
 * @export class away.events.EventDispatcher
 *
 */
-export class EventDispatcherBase extends ASClass
+export class EventDispatcherBase extends ASObject
 {
-	static axClass: typeof EventDispatcherBase;
+	static axClass: typeof EventDispatcherBase & AXClass;
 	private _listenerObjects:Array<ListenerObject> = new Array<ListenerObject>();
 	private _t:any;
 

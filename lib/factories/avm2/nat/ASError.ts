@@ -1,13 +1,13 @@
 import { ASObject } from "./ASObject";
 import { getErrorInfo, formatErrorMessage, getErrorMessage } from "../errors";
-import { ASClass } from "./ASClass";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
+import { AXClass } from '../run/AXClass';
 
 export class ASError extends ASObject {
 
   public static getErrorMessage = getErrorMessage;
 
-    public static throwError(type: ASClass, id: number /*, ...rest */) {
+    public static throwError(type: AXClass, id: number /*, ...rest */) {
       var info = getErrorInfo(id);
       var args = [info];
       for (var i = 2; i < arguments.length; i++) {

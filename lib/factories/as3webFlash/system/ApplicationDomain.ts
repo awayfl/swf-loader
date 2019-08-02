@@ -5,7 +5,7 @@ import {MovieClip as AwayMovieClip} from "@awayjs/scene";
 import {WaveAudio} from "@awayjs/core";
 import {MovieClip} from "../display/MovieClip";
 import {Sound} from "../media/Sound";
-import { ASClass } from '../../avm2/nat/ASClass';
+import { ASObject } from '../../avm2/nat/ASObject';
 
 /**
  * The ApplicationDomain class is a container for discrete groups of class definitions.
@@ -28,7 +28,7 @@ import { ASClass } from '../../avm2/nat/ASClass';
  * @internal	Security considerations for application domains are discussed in the
  *   applicationDomain property entries of URLRequest and LoaderInfo.
  */
-export class ApplicationDomain extends ASClass
+export class ApplicationDomain extends ASObject
 {
 	private static _systemDomain:ApplicationDomain;
 	private static getSystemDomain():ApplicationDomain{

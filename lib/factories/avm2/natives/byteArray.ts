@@ -25,6 +25,7 @@ import { ASObject } from "../nat/ASObject";
 import { ObjectUtilities } from "../../base/utilities/ObjectUtilities";
 import { AMF0, AMF3 } from "../amf";
 import { Bytecode } from "../abc/ops";
+import { AXClass } from '../run/AXClass';
 
 export enum AMFEncoding {
   AMF0 = 0,
@@ -84,7 +85,7 @@ export interface IDataOutput {
 
 export class ByteArray extends ASObject implements IDataInput, IDataOutput {
 
-  static axClass: typeof ByteArray;
+  static axClass: typeof ByteArray & AXClass;
 
   public static classNatives: any [] = [DataBuffer];
   public static instanceNatives: any [] = [DataBuffer.prototype];

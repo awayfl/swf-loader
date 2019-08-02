@@ -39,6 +39,7 @@ import { BitmapFilter } from "../filters/BitmapFilter";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { LoaderInfo } from "./LoaderInfo";
 import { constructClassFromSymbol } from "../constructClassFromSymbol";
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Holds blobs of bitmap data in various formats and lets you do basic pixel operations. When
@@ -47,7 +48,7 @@ import { constructClassFromSymbol } from "../constructClassFromSymbol";
  */
 export class BitmapData extends ASObject implements IBitmapDrawable, IRemotable {
 
-  static axClass: typeof BitmapData;
+  static axClass: typeof BitmapData & AXClass;
 
   static classInitializer() {
     this._temporaryRectangle = new Rectangle();

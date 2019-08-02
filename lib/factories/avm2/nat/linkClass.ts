@@ -1,5 +1,4 @@
 import { AXClass } from '../run/AXClass';
-import { ASClass } from './ASClass';
 import { linkSymbols } from './linkSymbols';
 import { filter } from './filter';
 import { copyOwnPropertyDescriptors, copyPropertiesByList } from '../../base/utilities/ObjectUtilities';
@@ -7,6 +6,8 @@ import { release } from '../../base/utilities/Debug';
 import { runtimeWriter } from '../run/writers';
 import { traceASClass } from './traceASClass';
 import { axTrapNames } from './axTrapNames';
+import { ASObject } from './ASObject';
+import { ASClass } from './ASClass';
 
 
 export function linkClass(axClass: AXClass, asClass: ASClass) {

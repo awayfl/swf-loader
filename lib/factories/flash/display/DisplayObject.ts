@@ -46,6 +46,7 @@ import { StaticText } from "../text/StaticText";
 import { InteractiveObject } from "./InteractiveObject";
 import { Mouse } from "../ui/Mouse";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -379,7 +380,7 @@ var displayObjectSyncID = 0;
 
 export class DisplayObject extends EventDispatcher implements IBitmapDrawable, IRemotable {
 
-  static axClass: typeof DisplayObject;
+  static axClass: typeof DisplayObject & AXClass;
 
   /**
    * Every displayObject is assigned an unique integer ID.

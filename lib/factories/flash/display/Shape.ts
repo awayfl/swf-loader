@@ -2,9 +2,9 @@ import { DisplayObject } from "./DisplayObject";
 import { assert, release, warning } from "../../base/utilities/Debug";
 import { Graphics } from "./Graphics";
 import { DisplaySymbol, SymbolData } from "../symbol";
-import { ASClass } from "../../avm2/nat/ASClass";
 import { LoaderInfo } from "./LoaderInfo";
 import { BitmapSymbol } from "./BitmapData";
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -25,7 +25,7 @@ import { BitmapSymbol } from "./BitmapData";
 
 export class Shape extends DisplayObject {
 
-  static axClass: typeof Shape;
+  static axClass: typeof Shape & AXClass;
 
 
   static classInitializer = null;
@@ -75,7 +75,7 @@ export class Shape extends DisplayObject {
 export class ShapeSymbol extends DisplaySymbol {
   graphics: Graphics = null;
 
-  constructor(data: SymbolData, symbolClass: ASClass) {
+  constructor(data: SymbolData, symbolClass: AXClass) {
     super(data, symbolClass, false);
   }
 

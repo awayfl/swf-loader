@@ -5,7 +5,6 @@ import { Loader } from "./Loader";
 import { DisplayObject } from "./DisplayObject";
 import { ByteArray } from "../../avm2/natives/byteArray";
 import { transformJSValueToAS  } from "../../avm2/nat/transformJSValueToAS";
-import { ASClass } from "../../avm2/nat/ASClass";
 import { UncaughtErrorEvents } from "../events/UncaughtErrorEvents";
 import { AXClass } from "../../avm2/run/AXClass";
 import { constructClassFromSymbol } from "../constructClassFromSymbol";
@@ -47,7 +46,7 @@ declare var ImageFile:any;
 export class LoaderInfo extends EventDispatcher {
 
   static classInitializer = null;
-  static axClass: typeof LoaderInfo;
+  static axClass: typeof LoaderInfo & AXClass;
 
   // Constructing LoaderInfo without providing this token throws, preventing it from AS3.
   static CtorToken = {};
@@ -437,7 +436,7 @@ export class LoaderInfo extends EventDispatcher {
 
   // TODO: To prevent leaking LoaderInfo instances, those instances should be stored weakly,
   // with support for retrieving the instances based on a numeric id, which would be passed here.
-  private resolveClassSymbol(classDefinition: ASClass, symbolId: number) {
+  private resolveClassSymbol(classDefinition: AXClass, symbolId: number) {
     var symbol = this.getSymbolById(symbolId);
     if (!symbol) {
       warning("Attempt to resolve symbol for AVM2 class failed: Symbol " +

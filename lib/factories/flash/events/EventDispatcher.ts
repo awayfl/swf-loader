@@ -27,6 +27,7 @@ import { axIsCallable } from "../../avm2/run/axIsCallable";
 import { EventPhase } from "./EventPhase";
 import { DisplayObject } from "../display/DisplayObject";
 import { counter } from '../../avm2/module';
+import { AXClass } from '../../avm2/run/AXClass';
 
 class EventListenerEntry {
   constructor(public listener: EventHandler, public useCapture: boolean, public priority: number) {
@@ -206,7 +207,7 @@ export class BroadcastEventDispatchQueue {
  */
 export class EventDispatcher extends ASObject implements IEventDispatcher {
 
-  static axClass: typeof EventDispatcher;
+  static axClass: typeof EventDispatcher & AXClass;
 
   public static broadcastEventDispatchQueue: BroadcastEventDispatchQueue;
 

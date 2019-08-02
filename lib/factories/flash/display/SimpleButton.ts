@@ -8,6 +8,7 @@ import { DisplayObjectDirtyFlags, DisplayObjectFlags, HitTestingResult, HitTesti
 import { Bounds } from "../../base/utilities";
 import { SoundTransform } from "../media/SoundTransform";
 import { ActionScriptVersion } from "./ActionScriptVersion";
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -27,7 +28,7 @@ import { ActionScriptVersion } from "./ActionScriptVersion";
 // Class: SimpleButton
 export class SimpleButton extends InteractiveObject {
 
-  static axClass: typeof SimpleButton;
+  static axClass: typeof SimpleButton & AXClass;
 
   // Called whenever the class is initialized.
   static classInitializer: any = null;

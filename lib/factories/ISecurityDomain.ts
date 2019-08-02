@@ -13,24 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {Matrix, Loader, LoaderContext, EventDispatcher, EventBase as Event, ColorTransform, ByteArray, Transform, URLLoader, URLRequest, URLVariables, Point, Rectangle, WaveAudio as Sound} from "@awayjs/core"
-import {MouseEvent, SimpleButton, DisplayObject, Billboard as Bitmap, DisplayObjectContainer, MovieClip, TextField, TextFormat} from "@awayjs/scene"
-import {Graphics} from "@awayjs/graphics"
+import { DisplayObject as AwayDisplayObject } from "@awayjs/scene"
 //import {BitmapImage2D as BitmapData} from "@awayjs/stage"
-import {SceneImage2D as BitmapData} from "@awayjs/scene"
-import {LoaderInfo} from "./customAway/LoaderInfo"
-import {ProgressEvent} from "./customAway/events/ProgressEvent"
-import {KeyboardEvent} from "./customAway/events/KeyboardEvent"
-import {SharedObject} from "./customAway/SharedObject"
-import {AVMAwayStage} from "./AVMAwayStage"
-import {XMLNode} from "./customAway/xml/XMLNode"
 import {XMLDocumentAway} from "./customAway/xml/XMLDocumentAway"
 
-export class AVM1Movie extends DisplayObject {
-	_getLevelForRoot(root: DisplayObject): number{return 0;};
-	_getRootForLevel(level: number): DisplayObject{return null;};
-	_addRoot(level: number, root: DisplayObject): void{};
+import { EventDispatcher } from './as3webFlash/events/EventDispatcher';
+import { DisplayObject } from './as3webFlash/display/DisplayObject';
+import { DisplayObjectContainer } from './as3webFlash/display/DisplayObjectContainer';
+import { Stage } from './as3webFlash/display/Stage';
+import { Loader } from './as3webFlash/display/Loader';
+import { LoaderInfo } from './as3webFlash/display/LoaderInfo';
+import { MovieClip } from './as3webFlash/display/MovieClip';
+import { Graphics } from './as3webFlash/display/Graphics';
+import { Bitmap } from './as3webFlash/display/Bitmap';
+import { BitmapData } from './as3webFlash/display/BitmapData';
+import { SimpleButton } from './as3webFlash/display/SimpleButton';
+import { TextField } from './as3webFlash/text/TextField';
+import { ISecurityDomain } from './ISecurityDomain';
+import { Point } from './as3webFlash/geom/Point';
+import { Event } from './as3webFlash/events/Event';
+import { KeyboardEvent } from './as3webFlash/events/KeyboardEvent';
+import { MouseEvent } from './as3webFlash/events/MouseEvent';
+import { ProgressEvent } from './as3webFlash/events/ProgressEvent';
+import { Rectangle } from './as3webFlash/geom/Rectangle';
+import { Matrix } from './as3webFlash/geom/Matrix';
+import { ColorTransform } from './as3webFlash/geom/ColorTransform';
+import { Transform } from './as3webFlash/geom/Transform';
+import { URLRequest } from './as3webFlash/net/URLRequest';
+import { URLLoader } from './as3webFlash/net/URLLoader';
+import { URLVariables } from './as3webFlash/net/URLVariables';
+import { SharedObject } from './as3webFlash/net/SharedObject';
+import { LoaderContext } from './as3webFlash/system/LoaderContext';
+import { ByteArray } from './avm2/natives/byteArray';
+import { Sound } from './as3webFlash/media/Sound';
+import { XMLDocument, XMLNode } from './avm2/natives/xml-document';
+import { TextFormat } from './flash/text/TextFormat';
+import { AVMAwayStage } from './AVMAwayStage';
+import { AXApplicationDomain } from './avm2/run/AXApplicationDomain';
+import { Sprite } from './as3webFlash/display/Sprite';
+import { ApplicationDomain } from './as3webFlash/system/ApplicationDomain';
+
+export class AVM1Movie extends AwayDisplayObject {
+	_getLevelForRoot(root: AwayDisplayObject): number{return 0;};
+	_getRootForLevel(level: number): AwayDisplayObject{return null;};
+	_addRoot(level: number, root: AwayDisplayObject): void{};
 	_removeRoot(level: number): void{};
 }
 export class ContextMenu{}
@@ -52,7 +78,7 @@ export interface ISecurityDomain {
 			DisplayObject: typeof DisplayObject;
 			DisplayObjectContainer: DisplayObjectContainer;
 			AVM1Movie: typeof AVM1Movie;
-			Stage: typeof AVMAwayStage;
+			Stage: typeof Stage;
 			Loader: typeof Loader;
 			LoaderInfo: typeof LoaderInfo;
 			MovieClip: typeof MovieClip;
@@ -60,6 +86,7 @@ export interface ISecurityDomain {
 			Bitmap: typeof Bitmap;
 			BitmapData: typeof BitmapData;
 			SimpleButton: typeof SimpleButton;
+			Sprite: typeof Sprite;
 		};
 		events: {
 			EventDispatcher: typeof EventDispatcher;
@@ -90,6 +117,7 @@ export interface ISecurityDomain {
 			SharedObject: typeof SharedObject;
 		}
 		system: {
+			ApplicationDomain: typeof ApplicationDomain
 			Capabilities: typeof Capabilities;
 			LoaderContext: typeof LoaderContext;
 			Security: typeof Security;
@@ -115,6 +143,7 @@ export interface ISecurityDomain {
 		}
 	};
 	player: any;//80pro Shumway.Player.Player;
+	application: AXApplicationDomain;
 }
 
 export class SecurityDomain{

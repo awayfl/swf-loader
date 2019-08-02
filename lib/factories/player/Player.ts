@@ -21,6 +21,7 @@ import { NamespaceType } from '../avm2/abc/lazy/NamespaceType';
 import { initlazy } from '../avm2/abc/lazy';
 import { FrameScriptManager } from '@awayjs/scene';
 import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
+import { ISecurityDomain } from '../ISecurityDomain';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
@@ -43,7 +44,7 @@ export class Player {
 	private _frameRate: number = 30;
 	private _currentFps: number = 0;
 	private _time: number = 0;
-	private _sec: AXSecurityDomain;
+	private _sec: ISecurityDomain;
 	private _events: any[];
 	private _eventOnEnter: Event;
 	private _eventFrameConstructed: Event;
@@ -67,7 +68,7 @@ export class Player {
 		}
 		createSecurityDomain(
 			AVM2LoadLibrariesFlags.Builtin | AVM2LoadLibrariesFlags.Playerglobal
-		).then((sec) => {
+		).then((sec:ISecurityDomain) => {
 			console.log("builtins are loaded fine, start parsing SWF");
 			this._sec = sec;
 			var _sprite = new (<any>this._sec).flash.display.Sprite();

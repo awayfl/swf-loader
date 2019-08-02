@@ -17,13 +17,15 @@ import { Multiname } from '../../avm2/abc/lazy/Multiname';
 import { NamespaceType } from '../../avm2/abc/lazy/NamespaceType';
 import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
 import { ABCFile } from '../../avm2/abc/lazy/ABCFile';
+import { ISecurityDomain } from '../../ISecurityDomain';
+import { AXClass } from '../../avm2/run/AXClass';
 
 export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements ISceneGraphFactory
 {
 	public imageStore:Object = {};
-	private _sec:AXSecurityDomain;
+	private _sec:ISecurityDomain;
 
-	constructor(sec:AXSecurityDomain){
+	constructor(sec:ISecurityDomain){
 		super();
 		this._sec=sec;
 	}
@@ -52,11 +54,11 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		if(symbol.className)
 			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
 		else
-			symbolClass=(<any>this._sec).flash.display.Sprite.axClass;
+			symbolClass=this._sec.flash.display.Sprite.axClass;
 
 		symbol.symbolClass=symbolClass;
 		// create the root for the root-symbol
-		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);
+		var asObj = constructClassFromSymbol(symbol, symbolClass);
 		// manually call the axInitializer for now:
 		asObj.axInitializer();
 		asObj.adaptee.graphics=graphics;
@@ -73,15 +75,15 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		if(!symbol || !this._sec)
 			throw("no symbol provided");
 
-		var symbolClass = null;
+		var symbolClass:AXClass = null;
 		if(symbol.className)
 			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
 		else
-			symbolClass = (<any>this._sec).flash.display.MovieClip.axClass;
+			symbolClass = this._sec.flash.display.MovieClip.axClass;
 
 		symbol.symbolClass=symbolClass;
 		// create the root for the root-symbol
-		var asObj = constructClassFromSymbol(symbol, <any>symbolClass);
+		var asObj = constructClassFromSymbol(symbol, symbolClass);
 		// 	manually call the axInitializer - this will run the constructor
 		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
 		asObj.axInitializer();

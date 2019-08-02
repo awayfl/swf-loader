@@ -6,6 +6,7 @@ import { ShapeSymbol } from "./Shape";
 import { LoaderInfo } from "./LoaderInfo";
 import { DisplayObject, DisplayObjectFlags } from "./DisplayObject";
 import { assert, release } from "../../base/utilities/Debug";
+import { AXClass } from '../../avm2/run/AXClass';
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -27,7 +28,7 @@ export class MorphShape extends DisplayObject {
   static classSymbols: string [] = null; // [];
   static instanceSymbols: string [] = null; // [];
 
-  static axClass: typeof MorphShape;
+  static axClass: typeof MorphShape & AXClass;
 
   static classInitializer: any = null;
   _symbol: MorphShapeSymbol;
