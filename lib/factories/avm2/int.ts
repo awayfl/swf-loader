@@ -634,12 +634,13 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
         case Bytecode.SETPROPERTY:
           value = stack.pop();
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
+          
           //console.log("reciever not found", stack)
           receiver = sec.box(stack.pop());
-          //if(!receiver)
-          //  console.log("reciever not found")
-          //else
-          receiver.axSetProperty(rn, value, Bytecode.INITPROPERTY, methodInfo);
+          if(!receiver)
+            console.log("reciever not found", rn, value, Bytecode.INITPROPERTY, methodInfo)
+          else
+            receiver.axSetProperty(rn, value, Bytecode.INITPROPERTY, methodInfo);
           break;
         case Bytecode.GETPROPERTY:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
