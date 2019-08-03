@@ -28,9 +28,8 @@ declare var __framescript__;
 export class MovieClip extends Sprite implements IMovieClipAdapter {
 	private static _movieClips: Array<MovieClip> = new Array<MovieClip>();
 
-	public applySymbol() {
-
-	}
+	private _tmpScripts:any;
+	public applySymbol() {}
 	public static getNewMovieClip(adaptee: AwayMovieClip): MovieClip {
 		if (MovieClip._movieClips.length) {
 			var movieClip: MovieClip = MovieClip._movieClips.pop();
@@ -54,13 +53,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		return param1;
 	}
 
-	public executeScript(scriptsFN: any) {
-		/*for (let k = 0; k < scriptsFN.length; k++) {
-			scriptsFN[k].apply(this);
-		}*/
-		if (scriptsFN.length == 0) {
-			scriptsFN.axCall();
-
+	public executeScript(scripts: any) {
+		if (scripts){
+			for (let k = 0; k < scripts.length; k++) {
+				scripts[k].axCall(this);
+			}
 		}
 	}
 
@@ -70,7 +67,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 * display object container that is onstage.
 	 */
 	constructor(adaptee: AwayMovieClip = null) {
-		super(adaptee || AwayMovieClip.getNewMovieClip());
+		super(adaptee || AwayMovieClip.getNewMovieClip());	
+		this._tmpScripts={};
 	}
 
 	// --------------------- stuff needed because of implementing the existing IMovieClipAdapter
@@ -261,9 +259,13 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	}
 	public set trackAsMenu(value: boolean) {
 		//todo
+		
 		console.log("trackAsMenu not implemented yet in flash/MovieClip");
 	}
 
+	public getScripts() {
+		return this._tmpScripts;
+	}
 	public addFrameScript(...args) {
 		// arguments are pairs of frameIndex and script/function
 		// frameIndex is in range 0..totalFrames-1
@@ -273,9 +275,12 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 				numArgs + 1);
 		}
 		for (var i = 0; i < numArgs; i += 2) {
-			var frameNum = (arguments[i] | 0) + 1;
+			var frameNum = (arguments[i] | 0);
 			var fn = arguments[i + 1];
-			(<AwayMovieClip>this.adaptee).timeline.add_framescript(fn, frameNum-1);
+			if(!this._tmpScripts[frameNum])
+				this._tmpScripts[frameNum]=[];
+			this._tmpScripts[frameNum-1].push(fn);
+			
 		}
 	}
 

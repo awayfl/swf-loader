@@ -568,7 +568,7 @@ export class SWFParser extends ParserBase
                 className: this.symbolClassesMap[0]
             };
         }
-		var awayMc:MovieClip=this.framesToTimeline(rootSymbol, this.frames, null, null);
+		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
 
         for(var key in assetsToFinalize){     
 			assetsToFinalize[key]["fileurl"]=this._iFileName;
@@ -590,7 +590,16 @@ export class SWFParser extends ParserBase
 		if(!states && !swfFrames)
 			throw("error when creating timeline - neither movieclip frames nor button-states present");
 		
-		var awayTimeline:Timeline=new Timeline();
+			
+		var avm2scripts={};		
+		var awayMc:MovieClip=this._factory.createMovieClip(null, symbol);
+		if(awayMc._adapter != awayMc && (<any>awayMc._adapter).getScripts){
+			avm2scripts = (<any>awayMc._adapter).getScripts();
+		}		
+		var awayTimeline:Timeline=awayMc.timeline;
+
+		
+
 		var isButton:boolean=false;
 		var key:string;
 		if(states && !swfFrames){
@@ -687,7 +696,10 @@ export class SWFParser extends ParserBase
 			// check if this is a empty frame
 			var isEmpty:boolean=((!swfFrames[i].controlTags || swfFrames[i].controlTags.length==0) &&
 								(!swfFrames[i].labelNames || swfFrames[i].labelNames.length==0) &&
-								(!swfFrames[i].actionBlocks || swfFrames[i].actionBlocks.length==0));
+								(!swfFrames[i].actionBlocks || swfFrames[i].actionBlocks.length==0) && !avm2scripts[i]);
+			
+			
+				
 			
             noTimelineDebug || console.log("	process frame:", i+1, "/", isEmpty, swfFrames[i]);
 			if((keyframe_durations.length!=0) && isEmpty){
@@ -751,6 +763,9 @@ export class SWFParser extends ParserBase
 				}
 				if(!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length>0){
 					awayTimeline._framescripts[keyFrameCount]=swfFrames[i].actionBlocks;
+                }
+				if(!isEmpty && avm2scripts[i]){
+					awayTimeline._framescripts[keyFrameCount]=avm2scripts[i];
                 }
                 if(buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id!=0){
                     awaySymbol = this._awaySymbols[buttonSound[keyFrameCount].id];
@@ -856,6 +871,7 @@ export class SWFParser extends ParserBase
 								if(hasCharacter) {
 									//console.log("placeTag symbol id",placeObjectTag.symbolId )
 									awaySymbol = this._awaySymbols[placeObjectTag.symbolId];
+									var flashSymbol = this.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if(awaySymbol.isAsset(Graphics)){
 
@@ -865,7 +881,7 @@ export class SWFParser extends ParserBase
 										}
 										
 										// register a new instance for this object
-										var graphicsSprite:Sprite=this._factory.createSprite(null, <Graphics> awaySymbol, symbol);
+										var graphicsSprite:Sprite=this._factory.createSprite(null, <Graphics> awaySymbol, flashSymbol);
 										graphicsSprite.mouseEnabled = false;
 
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds

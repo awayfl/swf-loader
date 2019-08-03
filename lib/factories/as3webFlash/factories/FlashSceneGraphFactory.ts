@@ -87,11 +87,6 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		// 	manually call the axInitializer - this will run the constructor
 		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
 		asObj.axInitializer();
-
-		// 	get the framescripts that was registered, and set them on the new timeline
-		timeline._framescripts = asObj.adaptee.timeline._framescripts;
-		// assign the new timeline
-		asObj.adaptee.timeline=timeline;
 		
 		return asObj.adaptee;
 	}
