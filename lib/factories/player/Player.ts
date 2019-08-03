@@ -11,7 +11,7 @@ import { Stage } from "../as3webFlash/display/Stage";
 import { LoaderContext } from "../as3webFlash/system/LoaderContext";
 import { ApplicationDomain } from "../as3webFlash/system/ApplicationDomain";
 import { Event } from "../as3webFlash/events/Event";
-import { RequestAnimationFrame } from '@awayjs/core';
+import { RequestAnimationFrame, ColorUtils } from '@awayjs/core';
 import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 import { initLink } from '../flash/link';
@@ -53,7 +53,7 @@ export class Player {
 	private _renderStarted: boolean;
 	constructor() {
 		this._renderStarted=false;
-
+		
 		this._onLoadCompleteDelegate = (event: Event) => this.onLoadComplete(event);
 	}
 	public playSWF(buffer) {
@@ -84,6 +84,9 @@ export class Player {
 	private _onLoadCompleteDelegate: (event: Event) => void;
 	public onLoadComplete(event) {
 		
+		console.log("loaded a SWFFile", this._parser.swfFile);
+		this._stage.color=ColorUtils.f32_RGBA_To_f32_ARGB(this._parser.swfFile.backgroundColor);
+		this._stage.frameRate=this._parser.swfFile.frameRate;
 		this._stage.addChild(this._loader);
 
 		/*
