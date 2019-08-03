@@ -12,6 +12,7 @@ import {BitmapData} from "../display/BitmapData";
 import {DisplayObjectContainer} from "../display/DisplayObjectContainer";
 import {TextField} from "../text/TextField";
 import { Graphics } from '@awayjs/graphics';
+import { Graphics as Graphicsadapter} from '../display/graphics';
 import { AXSecurityDomain } from '../../avm2/run/AXSecurityDomain';
 import { Multiname } from '../../avm2/abc/lazy/Multiname';
 import { NamespaceType } from '../../avm2/abc/lazy/NamespaceType';
@@ -57,11 +58,12 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 			symbolClass=this._sec.flash.display.Sprite.axClass;
 
 		symbol.symbolClass=symbolClass;
+		//Graphicsadapter.currentAwayGraphics=graphics;
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, symbolClass);
 		// manually call the axInitializer for now:
-		asObj.axInitializer();
-		asObj.adaptee.graphics=graphics;
+		asObj.axInitializer(AwaySprite.getNewSprite(new this._sec.flash.display.Graphics(graphics).adaptee));
+
 		return asObj.adaptee;
 	}
 

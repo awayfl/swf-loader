@@ -15,6 +15,7 @@ import { SimpleButton } from "../as3webFlash/display/SimpleButton";
 import { LoaderContext } from '../as3webFlash/system/LoaderContext';
 import { ApplicationDomain } from '../as3webFlash/system/ApplicationDomain';
 
+import { Graphics } from "../as3webFlash/display/Graphics";
 import { Scene } from "./display/Scene";
 import { Event } from "./events/Event";
 import { Keyboard } from "./ui/Keyboard";
@@ -22,7 +23,6 @@ import { KeyboardEvent } from "./events/KeyboardEvent";
 
 /*
 import { URLRequest } from "./net/URLRequest";
-import { Graphics } from "./display/Graphics";
 import { ApplicationDomain } from "./system/ApplicationDomain";
 import { SharedObject } from "./net/SharedObject";
 import { URLVariables } from "./net/URLVariables";
@@ -163,7 +163,7 @@ M("flash.display.Bitmap", Bitmap);
 M("flash.display.BitmapData", BitmapData);
 M("flash.display.Loader", Loader);
 M("flash.display.LoaderInfo", LoaderInfo);
-//M("flash.display.Graphics", Graphics);
+M("flash.display.Graphics", Graphics);
 M("flash.display.SimpleButton", SimpleButton);
 M("flash.display.Scene", Scene);
 

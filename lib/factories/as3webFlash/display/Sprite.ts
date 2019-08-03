@@ -4,6 +4,8 @@ import {DisplayObject} from "./DisplayObject";
 import {Rectangle} from "@awayjs/core";
 import {Graphics} from "./Graphics";
 import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { ASObject } from '../../avm2/nat/ASObject';
+import { AXSecurityDomain } from '../../avm2/run/AXSecurityDomain';
 export class  Sprite extends DisplayObjectContainer
 {
 
@@ -36,7 +38,10 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	constructor(adaptee:AwaySprite = null)
 	{
-		super(adaptee || AwaySprite.getNewSprite());
+		if(adaptee.graphics.adapter==adaptee.graphics){
+			adaptee.graphics.adapter=new AXSecurityDomain.instance.flash.display.Graphics(adaptee.graphics);
+		}
+		super(adaptee || AwaySprite.getNewSprite(new AXSecurityDomain.instance.flash.display.Graphics().adaptee));
 	}
 
 	//---------------------------stuff added to make it work:
@@ -123,7 +128,7 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	public get graphics () : Graphics
 	{
-		return (<AwaySprite> this._adaptee).graphics;
+		return <Graphics>(<AwaySprite>this._adaptee).graphics.adapter;
 	}
 
 	/**

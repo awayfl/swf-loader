@@ -80,6 +80,7 @@ import { ISecurityDomain } from '../../ISecurityDomain';
  * Provides security isolation between application domains.
  */
 export class AXSecurityDomain implements ISecurityDomain{
+    public static instance:ISecurityDomain;
     public system: AXApplicationDomain;
     public application: AXApplicationDomain;
     public classAliases: ClassAliases;
@@ -105,6 +106,7 @@ export class AXSecurityDomain implements ISecurityDomain{
     public Int32Vector: typeof Int32Vector;
     public Uint32Vector: typeof Uint32Vector;
     public Float64Vector: typeof Float64Vector;
+	static AXSecurityDomain: ISecurityDomain;
   
     public get xmlParser(): XMLParser {
       return this._xmlParser || (this._xmlParser = new XMLParser(this));

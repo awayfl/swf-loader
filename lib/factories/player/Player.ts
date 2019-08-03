@@ -65,13 +65,13 @@ export class Player {
 		).then((sec:ISecurityDomain) => {
 			console.log("builtins are loaded fine, start parsing SWF");
 			this._sec = sec;
+			AXSecurityDomain.instance=sec;
 
 			this._eventOnEnter = new this._sec.flash.events.Event(Event.ENTER_FRAME);
 			this._eventFrameConstructed = new this._sec.flash.events.Event(Event.FRAME_CONSTRUCTED);
 			this._eventExitFrame = new this._sec.flash.events.Event(Event.EXIT_FRAME);
 			this._eventRender = new this._sec.flash.events.Event(Event.RENDER);
 			this._events = [this._eventOnEnter, this._eventExitFrame];
-
 			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
 			this._loader = new this._sec.flash.display.Loader(this._parser);
