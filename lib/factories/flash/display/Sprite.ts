@@ -13,7 +13,7 @@ import { Graphics } from "./Graphics";
 import { ActionScriptVersion } from "./ActionScriptVersion";
 import { MovieClip } from "./MovieClip";
 import { SwfTagCode, PlaceObjectTag, PlaceObjectFlags } from "../../../utils/SWFTags";
-import { SWFFrame } from '../../../parsers/SWFParser';
+import { SWFFrame } from '../../../parsers/SWFFrame';
 
 /**
  * Copyright 2014 Mozilla Foundation

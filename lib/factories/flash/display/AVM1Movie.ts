@@ -3,7 +3,7 @@ import { release, notImplemented } from "../../base/utilities/Debug";
 import { DisplayObject, IAdvancable, DisplayObjectDirtyFlags, DisplayObjectFlags, HitTestingType, HitTestingResult } from "./DisplayObject";
 import { Sprite } from './Sprite';
 import { ASFunction } from '../../avm2/nat/ASFunction';
-import { SWFFrame } from '../../../parsers/SWFParser';
+import { SWFFrame } from '../../../parsers/SWFFrame';
 import { MovieClip } from './MovieClip';
 
 /**

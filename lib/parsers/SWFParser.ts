@@ -41,6 +41,8 @@ import {defineButton} from "../utils/parser/button";
 import {defineBitmap} from "../utils/parser/bitmap";
 import {defineImage} from "../utils/parser/image";
 import {defineLabel} from "../utils/parser/label";
+import {SWFFrame} from "./SWFFrame";
+import {SWFFile} from "./SWFFile";
 
 import {
     SoundInfoFlags,
@@ -55,16 +57,12 @@ import {
 	getSwfTagCodeName} from "../utils/SWFTags";
 import {__extends} from "tslib";
 import { ABCFile } from '../factories/avm2/abc/lazy/ABCFile';
-
+import { FlashSceneGraphFactory } from '../factories/as3webFlash/factories/FlashSceneGraphFactory';
+import { CompressionMethod } from "./CompressionMethod";
 var noTimelineDebug=true;
 var noExportsDebug=true;
 var noSceneGraphDebug=true;
 
-export const enum CompressionMethod {
-	None,
-	Deflate,
-	LZMA
-}
 
 
 /**
@@ -75,24 +73,10 @@ export class SWFParser extends ParserBase
 {
 
 
-	private compression: CompressionMethod;
-	private swfVersion: number;
-	private useAVM1: boolean;
-	private backgroundColor: number;
-	private bounds: Bounds;
-	private frameRate: number;
-	private frameCount: number;
-	private attributes: any; // TODO: type strongly
-	private sceneAndFrameLabelData: any; // TODO: type strongly
-
-	private bytesLoaded: number;
-	private bytesTotal: number;
 	private pendingUpdateDelays: number;
 	// Might be lower than frames.length if eagerly parsed assets pending resolution are blocking
 	// us from reporting the given frame as loaded.
-	private framesLoaded: number;
 
-	private frames: SWFFrame[];
 	public abcBlocks: ABCBlock[];
 	public dictionary: DictionaryEntry[];
 	private fonts: {name: string; style: string; id: number}[];
@@ -135,7 +119,10 @@ export class SWFParser extends ParserBase
 	private _debug:boolean = false;
 	private _startedParsing:boolean = false;
 
-	
+	private _swfFile:SWFFile;
+	public get swfFile():SWFFile{
+		return this._swfFile;
+	}
 
 	public soundExports:any={};
 
@@ -148,6 +135,7 @@ export class SWFParser extends ParserBase
 	{
 		super(URLLoaderDataFormat.ARRAY_BUFFER);
 
+		this._swfFile=new SWFFile();
 
 		this._factory = factory || new DefaultSceneGraphFactory();
 
@@ -569,6 +557,7 @@ export class SWFParser extends ParserBase
             };
         }
 		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
+		var awayMc:MovieClip=this.framesToTimeline(rootSymbol, this._swfFile.frames, null, null);
 
         for(var key in assetsToFinalize){     
 			assetsToFinalize[key]["fileurl"]=this._iFileName;
@@ -577,7 +566,7 @@ export class SWFParser extends ParserBase
         this._pFinalizeAsset(awayMc, "scene");
         DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);
-		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this.sceneAndFrameLabelData);
+		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);
 
 	}
 	// helper for handling buttons
@@ -1311,7 +1300,6 @@ export class SWFParser extends ParserBase
 
 		}
 
-		
 		var buttonFrameNames:string[]=["_up", "_over", "_down", "_hit"];
 		if(framesLen==4){
 			var isButtonFrames:number=0;
@@ -1350,8 +1338,7 @@ export class SWFParser extends ParserBase
 		awayTimeline.properties_stream_strings=properties_stream_strings;
 
 		awayTimeline.init();
-
-		var awayMc:MovieClip=this._factory.createMovieClip(awayTimeline, symbol);
+		
 		if(isButton){
 			// this is a button - set ButtonActions and also get the hitArea from the last frame
 			awayMc.buttonMode=true;
@@ -1406,22 +1393,8 @@ export class SWFParser extends ParserBase
 		}*/
 
 
-		this.compression = CompressionMethod.None;
-		this.swfVersion = 0;
-		this.useAVM1 = true;
-		this.backgroundColor = 0xffffffff;
-		this.bounds = null;
-		this.frameRate = 0;
-		this.frameCount = 0;
-		this.attributes = null;
-		this.sceneAndFrameLabelData = null;
 
-		this.bytesLoaded = 0;
-		this.bytesTotal = length;
-		this.pendingUpdateDelays = 0;
-		this.framesLoaded = 0;
-
-		this.frames = [];
+		this._swfFile.frames = [];
 		this.abcBlocks = [];
 		this.dictionary = [];
 		this.fonts = [];
@@ -1445,7 +1418,7 @@ export class SWFParser extends ParserBase
 	}
 
 	finishLoading() {
-		if (this.compression !== CompressionMethod.None) {
+		if (this._swfFile.compression !== CompressionMethod.None) {
 			this._decompressor.close();
 			this._decompressor = null;
 			this.scanLoadedData();
@@ -1481,7 +1454,7 @@ export class SWFParser extends ParserBase
 		var handler = tagHandlers[unparsed.tagCode];
 		//  release || Debug.assert(handler, 'handler shall exists here');
 		var tagEnd = Math.min(unparsed.byteOffset + unparsed.byteLength, this._dataStream.end);
-		var tag = handler(this._dataStream, this.swfVersion, unparsed.tagCode, tagEnd, this._jpegTables);
+		var tag = handler(this._dataStream, this._swfFile.swfVersion, unparsed.tagCode, tagEnd, this._jpegTables);
 		tag.fileURL=this._iFileName;
 		var finalPos = this._dataStream.pos;
 		if (finalPos !== tagEnd) {
@@ -1497,22 +1470,23 @@ export class SWFParser extends ParserBase
 		var isDeflateCompressed = initialBytes[0] === 67;
 		var isLzmaCompressed = initialBytes[0] === 90;
 		if (isDeflateCompressed) {
-			this.compression = CompressionMethod.Deflate;
+			this._swfFile.compression = CompressionMethod.Deflate;
 		} else if (isLzmaCompressed) {
-			this.compression = CompressionMethod.LZMA;
+			this._swfFile.compression = CompressionMethod.LZMA;
 		}
-		this.swfVersion = initialBytes[3];
-		if(this.swfVersion != 6){
-			//console.log("WARNING: SWF VERSION IS NOT 6", this.swfVersion)
+		this._swfFile.swfVersion = initialBytes[3];
+		
+		if(this._swfFile.swfVersion != 6){
+			//console.log("WARNING: SWF VERSION IS NOT 6", this._swfFile.swfVersion)
 		}
 		this._loadStarted = Date.now();
 		this._uncompressedLength = readSWFLength(initialBytes);
-		this.bytesLoaded = initialBytes.length;
+		this._swfFile.bytesLoaded = initialBytes.length;
 		// In some malformed SWFs, the parsed length in the header doesn't exactly match the actual size of the file. For
 		// uncompressed files it seems to be safer to make the buffer large enough from the beginning to fit the entire
 		// file than having to resize it later or risking an exception when reading out of bounds.
-		this.swfData = new Uint8Array(this.compression === CompressionMethod.None ?
-			this.bytesTotal : this._uncompressedLength);
+		this.swfData = new Uint8Array(this._swfFile.compression === CompressionMethod.None ?
+			this._swfFile.bytesTotal : this._uncompressedLength);
 		this._dataStream = new Stream(this.swfData.buffer);
 		this._dataStream.pos = 8;
 		this._dataView = this._dataStream.view;
@@ -1553,14 +1527,14 @@ export class SWFParser extends ParserBase
 
 	private parseHeaderContents() {
 		var obj = parseHeader(this._dataStream);
-		this.bounds = obj.bounds;
-		this.frameRate = obj.frameRate;
-		this.frameCount = obj.frameCount;
+		this._swfFile.bounds = this._swfFile.bounds = obj.bounds;
+		this._swfFile.frameRate =this._swfFile.frameRate = obj.frameRate;
+		this._swfFile.frameCount = this._swfFile.frameCount = obj.frameCount;
 		//var str = String.fromCharCode.apply(null, data);
 		//console.log(obj);
-		//console.log("parseHeaderContents this.bounds", this.bounds);
-		//console.log("parseHeaderContents this.frameRate", this.frameRate);
-		//console.log("parseHeaderContents this.frameCount", this.frameCount);
+		//console.log("parseHeaderContents this._swfFile.bounds", this._swfFile.bounds);
+		//console.log("parseHeaderContents this._swfFile.frameRate", this._swfFile.frameRate);
+		//console.log("parseHeaderContents this._swfFile.frameCount", this._swfFile.frameCount);
 	}
 
 	private processFirstBatchOfDecompressedData(data: Uint8Array) {
@@ -1753,7 +1727,7 @@ export class SWFParser extends ParserBase
 				this.setSceneAndFrameLabelData(tagLength);
 				break;
 			case SwfTagCode.CODE_SET_BACKGROUND_COLOR:
-				this.backgroundColor = parseRgb(this._dataStream);
+				this._swfFile.backgroundColor=this._swfFile.backgroundColor = parseRgb(this._dataStream);
 				break;
 			case SwfTagCode.CODE_JPEG_TABLES:
 				// Only use the first JpegTables tag, ignore any following.
@@ -1767,7 +1741,7 @@ export class SWFParser extends ParserBase
 				break;
 			case SwfTagCode.CODE_DO_ABC:
 			case SwfTagCode.CODE_DO_ABC_DEFINE:
-				if (!this.useAVM1) {
+				if (!this._swfFile.useAVM1) {
 					var tagEnd = byteOffset + tagLength;
 					var abcBlock = new ABCBlock();
 					if (tagCode === SwfTagCode.CODE_DO_ABC) {
@@ -1803,7 +1777,7 @@ export class SWFParser extends ParserBase
 				stream.pos = tagEnd;
 				break;
 			case SwfTagCode.CODE_DO_INIT_ACTION:
-				if (this.useAVM1) {
+				if (this._swfFile.useAVM1) {
 					var initActionBlocks = this._currentInitActionBlocks ||
 						(this._currentInitActionBlocks = []);
 					var spriteId = this._dataView.getUint16(stream.pos, true);
@@ -1813,7 +1787,7 @@ export class SWFParser extends ParserBase
 				this.jumpToNextTag(tagLength);
 				break;
 			case SwfTagCode.CODE_DO_ACTION:
-				if (this.useAVM1) {
+				if (this._swfFile.useAVM1) {
 					var actionBlocks = this._currentActionBlocks || (this._currentActionBlocks = []);
 					var actionsData = this.swfData.subarray(stream.pos, stream.pos + tagLength);
 					actionBlocks.push({actionsData: actionsData, precedence: stream.pos});
@@ -1974,7 +1948,7 @@ export class SWFParser extends ParserBase
 
 			switch (tagCode) {
 				case SwfTagCode.CODE_DO_ACTION:
-					if (this.useAVM1) {
+					if (this._swfFile.useAVM1) {
 						if (!actionBlocks) {
 							actionBlocks = [];
 						}
@@ -1983,7 +1957,7 @@ export class SWFParser extends ParserBase
 					}
 					break;
 				case SwfTagCode.CODE_DO_INIT_ACTION:
-					if (this.useAVM1) {
+					if (this._swfFile.useAVM1) {
 						if (!initActionBlocks) {
 							initActionBlocks = [];
 						}
@@ -2052,9 +2026,9 @@ export class SWFParser extends ParserBase
 
 	private finishFrame() {
 		if (this.pendingUpdateDelays === 0) {
-			this.framesLoaded++;
+			this._swfFile.framesLoaded++;
 		}
-		this.frames.push(new SWFFrame(this._currentControlTags,
+		this._swfFile.frames.push(new SWFFrame(this._currentControlTags,
 			this._currentFrameLabels.concat(),
 			this._currentSoundStreamHead,
 			this._currentSoundStreamBlock,
@@ -2072,12 +2046,12 @@ export class SWFParser extends ParserBase
 
 	private setFileAttributes(tagLength: number) {
 		// TODO: check what happens to attributes tags that aren't the first tag.
-		if (this.attributes) {
+		if (this._swfFile.attributes) {
 			this.jumpToNextTag(tagLength);
 		}
 		var bits = this.swfData[this._dataStream.pos];
 		this._dataStream.pos += 4;
-		this.attributes = {
+		this._swfFile.attributes = {
 			network: bits & 0x1,
 			relativeUrls: bits & 0x2,
 			noCrossDomainCaching: bits & 0x4,
@@ -2086,16 +2060,16 @@ export class SWFParser extends ParserBase
 			useGpu: bits & 0x20,
 			useDirectBlit : bits & 0x40
 		};
-		this.useAVM1 = !this.attributes.doAbc;
-		//console.log("use AVM1: ", this.useAVM1)
+		this._swfFile.useAVM1 = !this._swfFile.attributes.doAbc;
+		//console.log("use AVM1: ", this._swfFile.useAVM1)
 	}
 
 	private setSceneAndFrameLabelData(tagLength: number) {
-		if (this.sceneAndFrameLabelData) {
+		if (this._swfFile.sceneAndFrameLabelData) {
 			this.jumpToNextTag(tagLength);
 			return;
 		}
-		this.sceneAndFrameLabelData = parseDefineSceneTag(this._dataStream, SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA);
+		this._swfFile.sceneAndFrameLabelData = this._swfFile.sceneAndFrameLabelData = parseDefineSceneTag(this._dataStream, SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA);
 	}
 
 	private addControlTag(tagCode: number, byteOffset: number, tagLength: number) {
@@ -2188,35 +2162,6 @@ function flagsToFontStyle(bold: boolean, italic: boolean) {
 	return 'regular';
 }
 
-export class SWFFrame {
-	controlTags: UnparsedTag[];
-	labelNames: string[];
-	soundStreamHead: SoundStream;
-	soundStreamBlock: Uint8Array;
-	actionBlocks: ActionBlock[];
-	initActionBlocks: InitActionBlock[];
-	exports: SymbolExport[];
-	buttonStateName: string;
-	constructor(controlTags?: UnparsedTag[], labelNames?: string[],
-				soundStreamHead?: SoundStream,
-				soundStreamBlock?: Uint8Array,
-				actionBlocks?: ActionBlock[],
-				initActionBlocks?: InitActionBlock[],
-				exports?: SymbolExport[]) {
-		controlTags && Object.freeze(controlTags);
-		this.controlTags = controlTags;
-		this.labelNames = labelNames;
-		actionBlocks && Object.freeze(actionBlocks);
-		this.soundStreamHead = soundStreamHead;
-		this.soundStreamBlock = soundStreamBlock;
-		this.actionBlocks = actionBlocks;
-		initActionBlocks && Object.freeze(initActionBlocks);
-		this.initActionBlocks = initActionBlocks;
-		this.buttonStateName="";
-		exports && Object.freeze(exports);
-		this.exports = exports;
-	}
-}
 
 
 function readSWFLength(bytes: Uint8Array) {
