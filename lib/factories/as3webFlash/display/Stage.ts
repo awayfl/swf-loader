@@ -572,9 +572,8 @@ export class Stage extends DisplayObjectContainer{
 		}
 	}
 	public render()
-	{
+	{		
 		this._rendererStage.clear();
-		this.advanceFrame(this._events);
 		this._scene.render();
 	}
 
