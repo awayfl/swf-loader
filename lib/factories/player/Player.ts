@@ -52,14 +52,8 @@ export class Player {
 	private _eventRender: Event;
 	private _renderStarted: boolean;
 	constructor() {
-
-		this._eventOnEnter = new Event(Event.ENTER_FRAME);
-		this._eventFrameConstructed = new Event(Event.FRAME_CONSTRUCTED);
-		this._eventExitFrame = new Event(Event.EXIT_FRAME);
-		this._eventRender = new Event(Event.RENDER);
 		this._renderStarted=false;
 
-		this._events = [this._eventOnEnter, this._eventExitFrame];
 		this._onLoadCompleteDelegate = (event: Event) => this.onLoadComplete(event);
 	}
 	public playSWF(buffer) {
@@ -71,11 +65,17 @@ export class Player {
 		).then((sec:ISecurityDomain) => {
 			console.log("builtins are loaded fine, start parsing SWF");
 			this._sec = sec;
-			var _sprite = new (<any>this._sec).flash.display.Sprite();
-			this._stage = new (<any>this._sec).flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
+
+			this._eventOnEnter = new this._sec.flash.events.Event(Event.ENTER_FRAME);
+			this._eventFrameConstructed = new this._sec.flash.events.Event(Event.FRAME_CONSTRUCTED);
+			this._eventExitFrame = new this._sec.flash.events.Event(Event.EXIT_FRAME);
+			this._eventRender = new this._sec.flash.events.Event(Event.RENDER);
+			this._events = [this._eventOnEnter, this._eventExitFrame];
+
+			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
 			this._loader = new this._sec.flash.display.Loader(this._parser);
-			var loaderContext: LoaderContext = new this._sec.flash.system.LoaderContext(false, new this._sec.flash.system.ApplicationDomain());
+			var loaderContext: LoaderContext = new this._sec.flash.system.LoaderContext(false, new (<any>this._sec).flash.system.ApplicationDomain());
 			this._loader.loaderInfo.addEventListener(Event.COMPLETE, this._onLoadCompleteDelegate);
 			this._loader.loadData(buffer, loaderContext);
 
