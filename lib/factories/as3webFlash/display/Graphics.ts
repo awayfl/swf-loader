@@ -3,11 +3,12 @@ import { Graphics as AwayGraphics } from "@awayjs/graphics";
 import { notImplemented } from '../../base/utilities/Debug';
 import { ASObject } from '../../avm2/nat/ASObject';
 import { IAssetAdapter, Matrix } from '@awayjs/core';
-import { LoaderInfo } from '../../../..';
+
 import { ASArray } from '../../avm2/nat/ASArray';
 import { BitmapData } from './BitmapData';
 import { GenericVector } from '../../avm2/natives/GenericVector';
 import { AXClass } from '../../avm2/run/AXClass';
+import { LoaderInfo } from './LoaderInfo';
 
 
 export class Graphics extends ASObject implements IAssetAdapter {
