@@ -19,7 +19,7 @@ import { addPrototypeFunctionAlias } from "../nat/addPrototypeFunctionAlias";
 export class ASDate extends ASObject {
   value: Date;
 
-  static classInitializer: any = function() {
+  static classInitializer() {
     var proto: any = this.dPrototype;
     var asProto: any = ASDate.prototype;
     addPrototypeFunctionAlias(proto, '$BgtoString', asProto.toString);

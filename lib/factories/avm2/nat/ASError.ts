@@ -2,6 +2,7 @@ import { ASObject } from "./ASObject";
 import { getErrorInfo, formatErrorMessage, getErrorMessage } from "../errors";
 import { defineNonEnumerableProperty } from "../../base/utilities/ObjectUtilities";
 import { AXClass } from '../run/AXClass';
+import { ASClass } from './ASClass';
 
 export class ASError extends ASObject {
 
@@ -17,7 +18,7 @@ export class ASError extends ASObject {
       throw type.axConstruct([message, id]);
     }
   
-    static classInitializer(asClass?: any) {
+    static classInitializer(asClass?: ASClass) {
       defineNonEnumerableProperty(this, '$Bglength', 1);
       defineNonEnumerableProperty(this.dPrototype, '$Bgname',
                                   this.classInfo.instanceInfo.getName().name);

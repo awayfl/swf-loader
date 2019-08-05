@@ -7,7 +7,7 @@ import { ASArray } from "./ASArray";
 export class ASRegExp extends ASObject {
     private static UNMATCHABLE_PATTERN = '^(?!)$';
   
-    static classInitializer: any = function() {
+    static classInitializer() {
       var proto: any = this.dPrototype;
       var asProto: any = ASRegExp.prototype;
       addPrototypeFunctionAlias(proto, '$BgtoString', asProto.ecmaToString);
