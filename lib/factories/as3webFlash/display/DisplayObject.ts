@@ -138,10 +138,10 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	public get activeStage():any
 	{
-		if(this.sec.flash.display.DisplayObject._activeStage==null){
+		if(this.sec.flash.display.DisplayObject.axClass._activeStage==null){
 			//console.log("ERROR: a Stage must have been created before any Sprite can be created!")
 		}
-		return this.sec.flash.display.DisplayObject._activeStage;
+		return this.sec.flash.display.DisplayObject.axClass._activeStage;
 	}
 
 	//		use to dispatch events on a object and all its childs
