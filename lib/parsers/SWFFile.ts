@@ -1,8 +1,7 @@
 import { CompressionMethod } from "./CompressionMethod";
 import { SWFFrame } from "./SWFFrame";
-import { ABCBlock, DictionaryEntry } from "@awayjs/graphics/dist/lib/data/utilities";
 import { EagerlyParsedDictionaryEntry } from "./EagerlyParsedDictionaryEntry";
-import { Bounds } from "@awayjs/graphics";
+import { Bounds, DictionaryEntry, ABCBlock } from "@awayjs/graphics";
 
   export class SWFFile {
     public compression: number;//CompressionMethod;

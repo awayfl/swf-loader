@@ -89,13 +89,24 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		// 	manually call the axInitializer - this will run the constructor
 		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
 		asObj.axInitializer();
-		
+		asObj.adaptee.timelineMC=true;
 		return asObj.adaptee;
 	}
 
 	public createTextField(symbol:any=null):AwayTextField
 	{
-		return <AwayTextField> new TextField().adaptee;
+		var symbolClass:AXClass = null;
+		if(symbol.className)
+			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
+		else
+			symbolClass = this._sec.flash.text.TextField.axClass;
+		symbol.symbolClass=symbolClass;
+		// create the root for the root-symbol
+		var asObj = constructClassFromSymbol(symbol, symbolClass);
+		// 	manually call the axInitializer - this will run the constructor
+		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
+		asObj.axInitializer();
+		return asObj.adaptee;
 	}
 
 	public createBillboard(material:MaterialBase, symbol:any=null):Billboard

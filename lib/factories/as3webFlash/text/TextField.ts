@@ -96,7 +96,7 @@ export class TextField extends InteractiveObject
 	}
 	public clone():TextField
 	{
-		var clone:TextField = TextField.getNewTextField(AwayTextField.getNewTextField());
+		var clone:TextField = new this.sec.flash.text.TextField();
 
 		this.adaptee.copyTo(clone.adaptee);
 
