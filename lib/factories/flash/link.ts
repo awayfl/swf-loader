@@ -20,6 +20,7 @@ import { Scene } from "./display/Scene";
 import { Event } from "./events/Event";
 import { Keyboard } from "./ui/Keyboard";
 import { KeyboardEvent } from "./events/KeyboardEvent";
+import { MouseEvent } from "./events/MouseEvent";
 
 /*
 import { URLRequest } from "./net/URLRequest";
@@ -132,6 +133,7 @@ import { fscommand } from "./system/FSCommand";
 import { release, assert } from "../base/utilities/Debug";
 import { ASClass } from '../avm2/nat/ASClass';
 import { registerNativeClass, registerNativeFunction } from '../avm2/nat/initializeBuiltins';
+import { TextField } from '../as3webFlash/text/TextField';
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -152,7 +154,6 @@ function M(name: string, asClass: ASClass) {
   registerNativeClass(name, asClass);
 }
 M("flash.display.Stage", Stage);
-M("flash.events.EventDispatcher", EventDispatcher);
 M("flash.display.DisplayObject", DisplayObject);
 M("flash.display.InteractiveObject", InteractiveObject);
 M("flash.display.DisplayObjectContainer", DisplayObjectContainer);
@@ -170,6 +171,7 @@ M("flash.display.Scene", Scene);
 M("flash.events.Event", Event);
 M("flash.ui.Keyboard", Keyboard);
 M("flash.events.KeyboardEvent", KeyboardEvent);
+M("flash.text.TextField", TextField);
 // M("flash.display.MorphShape", MorphShape);
 // M("flash.display.NativeMenu", NativeMenu);
 // M("flash.display.NativeMenuItem", NativeMenuItem);
@@ -203,9 +205,10 @@ M("flash.events.KeyboardEvent", KeyboardEvent);
 // M("flash.geom.ColorTransform", ColorTransform);
 // M("flash.geom.PerspectiveProjection", PerspectiveProjection);
 
+M("flash.events.EventDispatcher", EventDispatcher);
+M("flash.events.MouseEvent", MouseEvent);
 // M("flash.events.ErrorEvent", ErrorEvent);
 // M("flash.events.IOErrorEvent", IOErrorEvent);
-// M("flash.events.MouseEvent", MouseEvent);
 // M("flash.events.GestureEvent", GestureEvent);
 // M("flash.events.TextEvent", TextEvent);
 // M("flash.events.TimerEvent", TimerEvent);
@@ -237,7 +240,6 @@ M("flash.events.KeyboardEvent", KeyboardEvent);
 // M("flash.events.TouchEvent", TouchEvent);
 
 // M("flash.text.Font", Font);
-// M("flash.text.TextField", TextField);
 // M("flash.text.StaticText", StaticText);
 // M("flash.text.StyleSheet", StyleSheet);
 // M("flash.text.TextFormat", TextFormat);
