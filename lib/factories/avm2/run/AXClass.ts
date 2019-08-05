@@ -2,11 +2,11 @@ import { AXObject } from "./AXObject";
 import { Scope } from "./Scope";
 import { ClassInfo } from "../abc/lazy/ClassInfo";
 import { Multiname } from "../abc/lazy/Multiname";
-import { ASObject } from '../nat/ASObject';
+import { ASClass } from '../nat/ASClass';
 
 export interface AXClass extends AXObject {
     scope: Scope;
-    asClass: ASObject;
+    asClass: ASClass;
     superClass: AXClass;
     classInfo: ClassInfo;
     name: Multiname;
