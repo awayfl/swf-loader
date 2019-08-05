@@ -10,7 +10,6 @@ import { axCoerceString } from '../run/axCoerceString';
 import { getCurrentABC } from '../run/getCurrentABC';
 import { NamespaceType } from '../abc/lazy/NamespaceType';
 import { Multiname } from '../abc/lazy/Multiname';
-import { describeType } from '@as3web/flash/dist/lib/utils/describeType';
 
 /**
  * Other natives can live in this module
