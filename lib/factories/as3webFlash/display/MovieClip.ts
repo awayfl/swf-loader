@@ -158,9 +158,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 * If the current frame has no label, currentLabel is null.
 	 */
 	public get currentFrameLabel(): string {
-		//todo
-		console.log("currentFrameLabel not implemented yet in flash/MovieClip");
-		return null;
+		return (<AwayMovieClip>this.adaptee).timeline.getCurretFrameLabel(<AwayMovieClip>this.adaptee);
 	}
 
 	/**
@@ -170,9 +168,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 * currentLabel returns null.
 	 */
 	public get currentLabel(): string {
-		//todo
-		console.log("currentLabel not implemented yet in flash/MovieClip");
-		return null;
+		return (<AwayMovieClip>this.adaptee).timeline.getCurretLabel(<AwayMovieClip>this.adaptee);
 	}
 
 	/**
