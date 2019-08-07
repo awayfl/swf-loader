@@ -98,15 +98,15 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 		return 0;
 	}
 	public colorTransform(rect:Rectangle, colorTransform:ColorTransform){
-		this._adaptee.colorTransform(rect, colorTransform);
+		this._adaptee.colorTransform(rect, colorTransform.adaptee);
 	}
 	public copyChannel(sourceBitmap:BitmapData, sourceRect:Rectangle,
 					   destPoint:Point, sourceChannel:number, destChannel:number){
-		this._adaptee.copyChannel(sourceBitmap.adaptee, sourceRect, destPoint, sourceChannel, destChannel);
+		this._adaptee.copyChannel(sourceBitmap.adaptee, sourceRect, destPoint.adaptee, sourceChannel, destChannel);
 
 	}
 	public copyPixels(sourceBitmap:any, sourceRect:Rectangle, destPoint:Point, alphaBitmapData:BitmapData = null, alphaPoint:Point = null, mergeAlpha:boolean = false){
-		this._adaptee.copyPixels(sourceBitmap.adaptee, sourceRect, destPoint);
+		this._adaptee.copyPixels(sourceBitmap.adaptee, sourceRect, destPoint.adaptee);
 	}
 	public dispose()
 	{
@@ -116,7 +116,7 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 
 	public draw(source:any, matrix:Matrix, colorTransform:ColorTransform = null, blendMode:any = "", clipRect:Rectangle = null, smooth:boolean = false)
 	{
-		this._adaptee.draw(source.adaptee, matrix, colorTransform, blendMode, clipRect, smooth);
+		this._adaptee.draw(source.adaptee, matrix.adaptee, colorTransform.adaptee, blendMode, clipRect, smooth);
 	}
 	public fillRect (rect:Rectangle, color:number)
 	{
@@ -159,7 +159,7 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 				 greenMult:number,
 				 blueMult:number,
 				 alphaMult:number){
-		this._adaptee.merge(sourceBitmap.adaptee, sourceBitmap.rect, destPoint, redMult, greenMult, blueMult, alphaMult)
+		this._adaptee.merge(sourceBitmap.adaptee, sourceBitmap.rect, destPoint.adaptee, redMult, greenMult, blueMult, alphaMult)
 
 	}
 	public noise(randomSeed:number, low:number, high:number,
