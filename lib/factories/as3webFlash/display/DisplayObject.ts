@@ -771,7 +771,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		return this.adaptee.rotationZ;
 	}
 	public set rotation (value:number) {
-		this.adaptee.rotationZ=value;
+		this.adaptee.rotationZ=isNaN(value)? 0 : isFinite(value)? value : -8;
 	}
 
 	/**
