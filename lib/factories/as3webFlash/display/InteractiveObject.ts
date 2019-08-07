@@ -389,12 +389,6 @@ export class InteractiveObject extends DisplayObject{
 			 callback:this._keyDownCallbackDelegate});
 
 			 
-		 this._keyDownCallbackDelegate = (event:any) => this.keyDownCallback(event);
-		 this.eventMapping[Event.AD]=(<IEventMapper>{
-			 adaptedType:"",
-			 addListener:this.initKeyDownListener,
-			 removeListener:this.removeKeyDownListener,
-			 callback:this._keyDownCallbackDelegate});
 
 		 // MouseEvent events adapt to awayjs-MouseEvents. they listen on adapter:
 		 // these mapping share the same callback, thats why we need the setup the eventMappingInvert to
