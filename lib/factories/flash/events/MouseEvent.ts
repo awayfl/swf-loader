@@ -1,3 +1,4 @@
+import {MouseEvent as MouseEventAway} from "@awayjs/scene"
 import { Event } from "./Event";
 import { notImplemented } from "../../base/utilities/Debug";
 import { InteractiveObject } from "../display/InteractiveObject";
@@ -96,6 +97,40 @@ export class MouseEvent extends Event {
     }
   }
 
+	/* added to clone events from away to as3web. */
+	public fillFromAway (awayEvent:MouseEventAway){
+		//console.log("cloneFromAway not implemented yet in flash/MouseEvent");
+
+		// todo: set targets correctly
+		this.target = awayEvent.target;
+		//this.currentTarget = awayEvent.currentTarget;
+
+		this.delta = awayEvent.delta;
+
+		this.ctrlKey = awayEvent.ctrlKey;
+		this.shiftKey = awayEvent.shiftKey;
+
+		//this._stageX = awayEvent.screenX;
+		//this._stageY = awayEvent.screenY;
+
+		//todo: translate more stuff from awayjs to as3
+		
+		//result.screenX = this.screenX;
+		//result.screenY = this.screenY;
+/*
+		result.view = awayEvent.view;
+		result.entity = awayEvent.entity;
+		result.renderable = awayEvent.renderable;
+		result.material = awayEvent.material;
+		result.uv = awayEvent.uv;
+		result.position = awayEvent.position;
+		result.normal = awayEvent.normal;
+		result.elementIndex = awayEvent.elementIndex;
+*/
+		//result._iParentEvent = awayEvent;
+		//result._iAllowedToPropagate = awayEvent._iAllowedToPropagate;
+
+	}
   // AS -> JS Bindings
   private _localX: number;
   private _localY: number;
