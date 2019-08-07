@@ -78,12 +78,15 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 			throw("no symbol provided");
 
 		var symbolClass:AXClass = null;
-		if(symbol.className)
+		if(symbol.className){
 			symbolClass = this._sec.application.getClass(Multiname.FromFQNString(symbol.className, NamespaceType.Public));
+			(<any>symbolClass)._symbol=symbol;
+		}
 		else
 			symbolClass = this._sec.flash.display.MovieClip.axClass;
-
+		//console.log("parsed symbolClass", symbolClass, symbol);
 		symbol.symbolClass=symbolClass;
+		
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, this._sec.flash.display.MovieClip.axClass);
 		// 	manually call the axInitializer - this will run the constructor
@@ -92,6 +95,7 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 			
 			AwayMovieClip.mcForConstructor=null;
 			asObj.axInitializer();
+			symbol.timeline=asObj.adaptee.timeline;
 
 		}
 		catch{};

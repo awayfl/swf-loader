@@ -83,7 +83,7 @@ export class EventDispatcher extends EventDispatcherBase
 	private _activateCallbackDelegate:(event:any) => void;
 	private activateCallback(event:any=null):void
 	{
-		this.dispatchEvent(new Event(Event.ACTIVATE));
+		this.dispatchEvent(new this.sec.flash.events.Event(Event.ACTIVATE));
 	}
 
 
@@ -100,7 +100,7 @@ export class EventDispatcher extends EventDispatcherBase
 	private _deactivateCallbackDelegate:(event:any) => void;
 	private deactivateCallback(event:any=null):void
 	{
-		this.dispatchEvent(new Event(Event.DEACTIVATE));
+		this.dispatchEvent(new this.sec.flash.events.Event(Event.DEACTIVATE));
 	}
 
 

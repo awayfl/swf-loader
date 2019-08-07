@@ -20,6 +20,7 @@ export function FlashNetScript_navigateToURL(sec: AXSecurityDomain, request, win
       return;
     }
     // TODO handle other methods than GET
-    console.log("TODO: FlashNetScript_navigateToURL: FileLoadingService")
+    //console.log("TODO: FlashNetScript_navigateToURL: FileLoadingService")
+    window.open(request.url, '_blank');
     //FileLoadingService.navigateTo(url, window_);
   }

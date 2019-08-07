@@ -212,8 +212,8 @@ export class LoaderInfo extends EventDispatcher
 	 * the value of bytesTotal, all of the bytes are loaded.
 	 */
 	public get bytesLoaded () : number{
-		console.log("bytesLoaded not implemented yet in flash/LoaderInfo");
-		return 0;
+		//console.log("bytesLoaded not implemented yet in flash/LoaderInfo");
+		return 1024;
 		
 	}
 
@@ -226,8 +226,8 @@ export class LoaderInfo extends EventDispatcher
 	 * reflects the actual number of bytes to be downloaded.
 	 */
 	public get bytesTotal () : number{
-		console.log("bytesTotal not implemented yet in flash/LoaderInfo");
-		return 0;
+		//console.log("bytesTotal not implemented yet in flash/LoaderInfo");
+		return 1024;
 		
 	}
 

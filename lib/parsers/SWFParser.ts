@@ -925,7 +925,7 @@ export class SWFParser extends ParserBase
                                                 sessionID = awayTimeline.registerPotentialChild(graphicsSprite);
                                             }
                                             
-											if((<any>placeObjectTag).variableName || (placeObjectTag.events && placeObjectTag.events.length>0)){
+											if((<any>placeObjectTag).name || (<any>placeObjectTag).variableName || (placeObjectTag.events && placeObjectTag.events.length>0)){
 												awayTimeline.potentialPrototypesInitEventsMap[sessionID+"#"+i]=placeObjectTag;
 											}
 											
@@ -970,7 +970,7 @@ export class SWFParser extends ParserBase
                                             sessionID = awayTimeline.registerPotentialChild(awaySymbol);
                                         }
 
-										if((<any>placeObjectTag).variableName || (placeObjectTag.events && placeObjectTag.events.length>0)){
+										if((<any>placeObjectTag).name || (<any>placeObjectTag).variableName || (placeObjectTag.events && placeObjectTag.events.length>0)){
 											awayTimeline.potentialPrototypesInitEventsMap[sessionID+"#"+i]=placeObjectTag;
 										}
 										
@@ -1254,6 +1254,12 @@ export class SWFParser extends ParserBase
 							}
 
 							if (placeObjectTag!=null && placeObjectTag.flags & PlaceObjectFlags.HasFilterList) {}
+
+							if (placeObjectTag!=null && placeObjectTag.flags & PlaceObjectFlags.HasVisible) {
+								num_updated_props++;
+								property_type_stream.push(6);
+								property_index_stream.push(placeObjectTag.visibility?1:0);
+							}
 
 							if(num_updated_props>0){
 								updateCnt++;

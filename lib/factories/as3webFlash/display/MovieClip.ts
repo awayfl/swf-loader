@@ -1,4 +1,4 @@
-import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition } from "@awayjs/scene";
+import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline } from "@awayjs/scene";
 import { Sprite } from "./Sprite";
 import { constructClassFromSymbol } from '../../link';
 
@@ -119,6 +119,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
 		var adaptee=new AwayMovieClip((<AwayMovieClip>this.adaptee).timeline);
 		this.adaptee.copyTo(adaptee);
+		
+		if(Timeline.currentInstanceName){
+			adaptee.name=Timeline.currentInstanceName;
+			Timeline.currentInstanceName=null;
+		};
 		AwayMovieClip.mcForConstructor=adaptee;
 		clone.axInitializer();
 		clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
