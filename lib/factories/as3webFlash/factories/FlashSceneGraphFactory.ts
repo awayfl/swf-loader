@@ -85,10 +85,16 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 
 		symbol.symbolClass=symbolClass;
 		// create the root for the root-symbol
-		var asObj = constructClassFromSymbol(symbol, symbolClass);
+		var asObj = constructClassFromSymbol(symbol, this._sec.flash.display.MovieClip.axClass);
 		// 	manually call the axInitializer - this will run the constructor
 		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
-		asObj.axInitializer();
+		try{
+			
+			AwayMovieClip.mcForConstructor=null;
+			asObj.axInitializer();
+
+		}
+		catch{};
 		asObj.adaptee.timelineMC=true;
 		return asObj.adaptee;
 	}

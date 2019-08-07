@@ -746,8 +746,8 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * root property is set.
 	 */
 	public get root () : DisplayObject{
-		console.log("root not implemented yet in flash/DisplayObject");
-		return null;
+		//console.log("root not implemented yet in flash/DisplayObject");
+		return this.stage.getChildAt(0);
 	}
 
 	/**

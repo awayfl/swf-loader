@@ -98,7 +98,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 	}
 	public debugDisplayGraph(obj:any) {
 		obj.object=this;
-		//obj.rectangle="x:"+this.x+", y:"+this.y+", width:"+this.width+", height:"+this.height;
+		obj.rectangle="x:"+this.x+", y:"+this.y+", width:"+this.width+", height:"+this.height;
 		obj.children={};
 		var i:number=0;
 		for(i=0;i<(<AwayDisplayObjectContainer> this._adaptee).numChildren;i++){

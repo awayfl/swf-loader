@@ -377,6 +377,10 @@ export class Sound extends EventDispatcher
 	 * @refpath
 	 */
 	public play (startTime:number=0, loops:number=0, sndTransform:SoundTransform=null) : any{
+		if(!this.adaptee){
+			console.log("Sound.play : no adaptee exists!");
+			return;
+		}
 		if(loops>1){
 			//console.log("TODO: as3web/flash: loop property")
 		}
