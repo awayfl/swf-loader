@@ -1,6 +1,7 @@
-import { XML } from "../xml/XML";
+//import { XML } from "../xml/XML";
 
 import { IME } from "./IME";
+import { ASObject } from "../../avm2/nat/ASObject";
 
 /**
  * The System class contains properties related to local settings and operations. Among these are <ph class="- topic/ph ">
@@ -11,9 +12,11 @@ import { IME } from "./IME";
  * Security class.</p><p class="- topic/p ">This class contains only static methods and properties. You cannot
  * create new instances of the System class.</p>
  */
-export class System
+export class System extends ASObject
 {
-	constructor (){		
+	static axClass: typeof System;
+	constructor (){	
+		super();	
 	}
 	/**
 	 * The amount of memory (in bytes) that is allocated to
@@ -131,7 +134,7 @@ export class System
 	 * for the specified XML node.
 	 * @param	node	XML reference that should be made available for garbage collection.
 	 */
-	public static disposeXML (node:XML){
+	public static disposeXML (node:any/*XML*/){
 		console.log("disposeXML not implemented yet in flash/System");
 	}
 

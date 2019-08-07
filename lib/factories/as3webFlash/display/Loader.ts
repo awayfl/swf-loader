@@ -121,15 +121,16 @@ export class Loader extends DisplayObjectContainer
 			// if this is the "Scene 1", we make it a child of the loader
 			if (asset.name=="Scene 1" || (asset.name=="scene")){// "Scene 1" when AWDParser, "scene" when using SWFParser
 
-				(<AwayDisplayObjectContainer> this._adaptee).addChild(<AwayMovieClip>(<IDisplayObjectAdapter> asset.adapter).clone().adaptee);
+				var newClone=<DisplayObject>(<IDisplayObjectAdapter> asset.adapter).clone();
+				newClone.loaderInfo=this.loaderInfo;
+				this.addChild(newClone);
 				//this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
 			}
 		}
 	}
 
 	addChild(child: DisplayObject): DisplayObject {
-		this.sec.throwError('IllegalOperationError', Errors.InvalidLoaderMethodError);
-		return null;
+		return super.addChild(child);
 	}
 
 	addChildAt(child: DisplayObject, index: number): DisplayObject {
@@ -165,7 +166,7 @@ export class Loader extends DisplayObjectContainer
 		this._loader.addEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoaderCompleteDelegate);
 		this._loader.addEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
 		
-		this._loader.load(url, null, null, (this._isImage)? new Image2DParser(this._factory) : this._parser);
+		this._loader.load(url.adaptee, null, null, (this._isImage)? new Image2DParser(this._factory) : this._parser);
 	}
 	public loadData(buffer:Uint8Array, context:LoaderContext=null)
 	{

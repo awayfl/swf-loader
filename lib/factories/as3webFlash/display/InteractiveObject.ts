@@ -3,6 +3,7 @@ import {Rectangle, EventBase} from "@awayjs/core";
 import {DisplayObject} from "./DisplayObject";
 import {DisplayObject as AwayDisplayObject, MouseEvent as MouseEventAway} from "@awayjs/scene";
 import {MouseEvent} from "../events/MouseEvent";
+import {Event} from "../events/Event";
 import {KeyboardEvent} from "../../flash/events/KeyboardEvent";
 
 import {IEventMapper} from "../events/IEventMapper"
@@ -382,6 +383,14 @@ export class InteractiveObject extends DisplayObject{
 
 		 this._keyDownCallbackDelegate = (event:any) => this.keyDownCallback(event);
 		 this.eventMapping[KeyboardEvent.KEY_DOWN]=(<IEventMapper>{
+			 adaptedType:"",
+			 addListener:this.initKeyDownListener,
+			 removeListener:this.removeKeyDownListener,
+			 callback:this._keyDownCallbackDelegate});
+
+			 
+		 this._keyDownCallbackDelegate = (event:any) => this.keyDownCallback(event);
+		 this.eventMapping[Event.AD]=(<IEventMapper>{
 			 adaptedType:"",
 			 addListener:this.initKeyDownListener,
 			 removeListener:this.removeKeyDownListener,

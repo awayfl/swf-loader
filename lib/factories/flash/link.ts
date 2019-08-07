@@ -14,10 +14,11 @@ import { BitmapData } from "../as3webFlash/display/BitmapData";
 import { SimpleButton } from "../as3webFlash/display/SimpleButton";
 import { LoaderContext } from '../as3webFlash/system/LoaderContext';
 import { ApplicationDomain } from '../as3webFlash/system/ApplicationDomain';
-
+import { System } from '../as3webFlash/system/System';
 import { Graphics } from "../as3webFlash/display/Graphics";
+import { Event } from "../as3webFlash/events/Event";
+
 import { Scene } from "./display/Scene";
-import { Event } from "./events/Event";
 import { Keyboard } from "./ui/Keyboard";
 import { KeyboardEvent } from "./events/KeyboardEvent";
 import { MouseEvent } from "./events/MouseEvent";
@@ -138,6 +139,10 @@ import { TextFormat } from '../as3webFlash/text/TextFormat';
 import { Sound } from '../as3webFlash/media/Sound';
 import { SoundChannel } from '../as3webFlash/media/SoundChannel';
 import { SoundTransform } from '../as3webFlash/media/SoundTransform';
+import { ColorTransform } from '../as3webFlash/geom/ColorTransform';
+import { SharedObject } from '../as3webFlash/net/SharedObject';
+import { URLRequest } from '../as3webFlash/net/URLRequest';
+import { Security } from './system/Security';
 /**
  * Copyright 2014 Mozilla Foundation
  *
@@ -206,7 +211,7 @@ M("flash.text.TextField", TextField);
 // M("flash.geom.Matrix3D", Matrix3D);
 // M("flash.geom.Vector3D", Vector3D);
 // M("flash.geom.Transform", Transform);
-// M("flash.geom.ColorTransform", ColorTransform);
+ M("flash.geom.ColorTransform", ColorTransform);
 // M("flash.geom.PerspectiveProjection", PerspectiveProjection);
 
 M("flash.events.EventDispatcher", EventDispatcher);
@@ -268,19 +273,19 @@ M("flash.events.MouseEvent", MouseEvent);
 // M("flash.net.NetStream", NetStream);
 // M("flash.net.NetStreamInfo", NetStreamInfo);
 // M("flash.net.Responder", Responder);
-// M("flash.net.URLRequest", URLRequest);
+ M("flash.net.URLRequest", URLRequest);
 // M("flash.net.URLRequestHeader", URLRequestHeader);
 // M("flash.net.URLStream", URLStream);
 // M("flash.net.URLLoader", URLLoader);
-// M("flash.net.SharedObject", SharedObject);
+ M("flash.net.SharedObject", SharedObject);
 // M("flash.net.ObjectEncoding", ObjectEncoding);
 // M("flash.net.LocalConnection", LocalConnection);
 // M("flash.net.Socket", Socket);
 // M("flash.net.URLVariables", URLVariables);
 
 // M("flash.system.Capabilities", Capabilities);
-// M("flash.system.Security", Security);
-// M("flash.system.System", System);
+ M("flash.system.Security", Security);
+ M("flash.system.System", System);
 // M("flash.system.SecurityDomain", SecurityDomain);
 M("flash.system.ApplicationDomain", ApplicationDomain);
 // M("flash.system.JPEGLoaderContext", JPEGLoaderContext);

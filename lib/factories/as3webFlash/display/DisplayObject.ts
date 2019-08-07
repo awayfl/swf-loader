@@ -126,7 +126,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		this.eventMappingExtern[Event.RENDER]="";
 		//this.eventMappingExtern[Event.REMOVED_FROM_STAGE]="";
 		this.eventMappingExtern[Event.REMOVED]="";
-		//this.eventMappingExtern[Event.ADDED_TO_STAGE]="";
+		this.eventMappingExtern[Event.ADDED_TO_STAGE]="";
 		this.eventMappingExtern[Event.ADDED]="";
 
 		this._transform = new Transform(this.adaptee.transform);
@@ -606,6 +606,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		//console.log("loaderInfo not implemented yet in flash/DisplayObject");
 		//this._adaptee.loaderInfo
 		return this._loaderInfo;
+	}
+	public set loaderInfo (value:LoaderInfo){
+		//console.log("loaderInfo not implemented yet in flash/DisplayObject");
+		//this._adaptee.loaderInfo
+		this._loaderInfo=value;
 	}
 
 	/**

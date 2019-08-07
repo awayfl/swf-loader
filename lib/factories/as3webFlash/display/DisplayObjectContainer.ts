@@ -25,6 +25,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 
 	private _eventRemoved:Event;
 	private _eventAdded:Event;
+	private _eventAddedToStage:Event;
 	/**
 	 * The DisplayObjectContainer class is the base class for all objects that can serve as display object containers on
 	 * the display list. The display list manages all objects displayed in the Flash runtimes.
@@ -52,8 +53,9 @@ export class DisplayObjectContainer extends InteractiveObject{
 	constructor(adaptee:AwayDisplayObjectContainer = null)
 	{
 		super(adaptee || new AwayDisplayObjectContainer());
-		this._eventRemoved=new Event(Event.REMOVED);
-		this._eventAdded=new Event(Event.ADDED);
+		this._eventRemoved=new this.sec.flash.events.Event(Event.REMOVED);
+		this._eventAdded=new this.sec.flash.events.Event(Event.ADDED);
+		this._eventAddedToStage=new this.sec.flash.events.Event(Event.ADDED_TO_STAGE);
 	}
 	//---------------------------stuff added to make it work:
 
@@ -260,9 +262,11 @@ export class DisplayObjectContainer extends InteractiveObject{
 	public addChild (child:DisplayObject) : DisplayObject {
 		
 		//child.dispatchEventRecursive(new Event(Event.ADDED_TO_STAGE));
-		child.dispatchEvent(this._eventAdded);
 
 		(<AwayDisplayObjectContainer> this._adaptee).addChild((<DisplayObject>child).adaptee);
+		child.dispatchEvent(this._eventAdded);
+		child.dispatchEvent(this._eventAddedToStage);
+		
 		return child;
 	}
 
@@ -291,7 +295,6 @@ export class DisplayObjectContainer extends InteractiveObject{
 	 */
 	public addChildAt (child:DisplayObject, index:number) : DisplayObject {
 		//child.dispatchEventRecursive(new Event(Event.ADDED_TO_STAGE));
-		child.dispatchEvent(this._eventAdded);
 		// todo: this should be done much more efficient (in awayjs)
 		var allChildren=[];
 		for(var i:number /*uint*/ = 0; i < (<AwayDisplayObjectContainer> this._adaptee).numChildren; i++){
@@ -312,6 +315,8 @@ export class DisplayObjectContainer extends InteractiveObject{
 				(<AwayDisplayObjectContainer> this._adaptee).addChild(allChildren[newChildCnt++]);
 			}
 		}
+		child.dispatchEvent(this._eventAdded);
+		child.dispatchEvent(this._eventAddedToStage);
 		//(<AwayDisplayObjectContainer>(<AwayDisplayObjectContainer> this._adaptee)).addChildAt(child.adaptee, index);
 		return child;
 	}
