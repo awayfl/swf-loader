@@ -6,7 +6,6 @@ import {IEventMapper} from "../events/IEventMapper"
 import {DisplayObjectContainer} from "./DisplayObjectContainer"
 import {DisplayObject} from "./DisplayObject"
 import {StageScaleMode} from "./StageScaleMode"
-import {EventDispatcher, Transform, Point, Vector3D,Box, Rectangle} from "@awayjs/core";
 
 import {AssetEvent, LoaderEvent, ParserEvent, AudioManager, URLRequest, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas} from "@awayjs/graphics";
@@ -20,6 +19,8 @@ import {MouseEvent as MouseEventAway, DisplayObject as AwayDisplayObject, Sprite
 
 import {MouseEvent} from "../events/MouseEvent";
 import { EventHandler } from '../../flash/events/IEventDispatcher';
+import { Transform } from '../geom/Transform';
+import { Rectangle } from '../geom/Rectangle';
 
 
 /**
@@ -873,12 +874,14 @@ export class Stage extends DisplayObjectContainer{
 	 * The end user also can select within Flash Player Display Settings to turn off hardware scaling, which is enabled by default.
 	 * For more information, see www.adobe.com/go/display_settings.
 	 */
-	public get fullScreenSourceRect () : Rectangle{
+	public get fullScreenSourceRect () : Rectangle
+	{
 		//todo
 		console.log("fullScreenSourceRect not implemented yet in flash/Stage");
 		return null;
 	}
-	public set fullScreenSourceRect (Rectangle){
+	public set fullScreenSourceRect (value: Rectangle)
+	{
 		//todo
 		console.log("fullScreenSourceRect not implemented yet in flash/Stage");
 	}
@@ -1027,7 +1030,8 @@ export class Stage extends DisplayObjectContainer{
 	 * area. This problem occurs in fullscreen mode and also when the keyboard opens in response to
 	 * an InteractiveObject receiving focus or invoking the requestSoftKeyboard() method.
 	 */
-	public get softKeyboardRect () : Rectangle{
+	public get softKeyboardRect () : Rectangle
+	{
 		//todo
 		console.log("softKeyboardRect not implemented yet in flash/Stage");
 		return null;

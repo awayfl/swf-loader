@@ -1,4 +1,4 @@
-import {Transform, Point, Box, ColorTransform, Vector3D, Rectangle, AbstractMethodError} from "@awayjs/core";
+import {Transform as AwayTransform, Point, Box, ColorTransform, Vector3D, AbstractMethodError} from "@awayjs/core";
 import {EventDispatcher} from "../events/EventDispatcher";
 import {Event} from "../events/Event";
 import {DisplayObject as AwayDisplayObject, IDisplayObjectAdapter} from "@awayjs/scene";
@@ -9,6 +9,8 @@ import { PickGroup, BasicPartition } from '@awayjs/view';
 import { SceneGraphPartition } from '@awayjs/scene';
 import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
 import { AXClass } from '../../avm2/run/AXClass';
+import { Transform } from '../geom/Transform';
+import { Rectangle } from '../geom/Rectangle';
 
 export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter
 {
@@ -23,7 +25,9 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	public _blockedByScript:boolean;
     public _ctBlockedByScript:boolean;
     //public protoTypeChanged:boolean;
-    protected _visibilityByScript:boolean;
+	protected _visibilityByScript:boolean;
+	
+	private _transform:Transform;
 
 	public applySymbol(){
 
@@ -124,6 +128,8 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		this.eventMappingExtern[Event.REMOVED]="";
 		//this.eventMappingExtern[Event.ADDED_TO_STAGE]="";
 		this.eventMappingExtern[Event.ADDED]="";
+
+		this._transform = new Transform(this.adaptee.transform);
 	}
 
 
@@ -862,12 +868,13 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   </listing>
 	 * @console.logs	ArgumentError If you pass an invalid argument to the method.
 	 */
-	public get scale9Grid () : Rectangle{
-		return this.adaptee.scale9Grid;
+	public get scale9Grid () : Rectangle
+	{
+		return new Rectangle(this.adaptee.scale9Grid);
 	}
-	public set scale9Grid (innerRectangle:Rectangle) {
-
-		this.adaptee.scale9Grid=innerRectangle;
+	public set scale9Grid (innerRectangle:Rectangle)
+	{
+		this.adaptee.scale9Grid = innerRectangle.adaptee;
 	}
 
 	/**
@@ -927,12 +934,14 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * the y property of the scrollRect Rectangle any. If the displayobject
 	 * is rotated 90° and you scroll it left and right, the displayobject actually scrolls up and down.
 	 */
-	public get scrollRect () : Rectangle{
-		return this.adaptee.scrollRect;
+	public get scrollRect () : Rectangle
+	{
+		return new Rectangle(this.adaptee.scrollRect);
 
 	}
-	public set scrollRect (value:Rectangle) {
-		this.adaptee.scrollRect=value;
+	public set scrollRect (value:Rectangle)
+	{
+		this.adaptee.scrollRect = value.adaptee;
 	}
 
 	/**
@@ -976,9 +985,10 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * myNewDisplayObj:myNewDisplayObj.transform = myOldDisplayObj.transform;The resulting displayobject, myNewDisplayObj, now has the same values for its
 	 * matrix, color transform, and pixel bounds as the old displayobject, myOldDisplayObj.Note that AIR for TV devices use hardware acceleration, if it is available, for color transforms.
 	 */
-	public get transform () : Transform{
+	public get transform () : Transform
+	{
 		this._ctBlockedByScript=true;
-		return this.adaptee.transform;
+		return this._transform;
 
 	}
 	public set transform (value:Transform) {
