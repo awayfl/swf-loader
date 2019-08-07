@@ -38,7 +38,7 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	constructor(adaptee:AwaySprite = null)
 	{
-		if(adaptee.graphics.adapter==adaptee.graphics){
+		if(adaptee && adaptee.graphics.adapter==adaptee.graphics){
 			adaptee.graphics.adapter=new AXSecurityDomain.instance.flash.display.Graphics(adaptee.graphics);
 		}
 		super(adaptee || AwaySprite.getNewSprite(new AXSecurityDomain.instance.flash.display.Graphics().adaptee));

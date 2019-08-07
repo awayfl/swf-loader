@@ -1,6 +1,6 @@
 
 import {Loader as AwayLoader, Point, IAsset, ParserBase} from "@awayjs/core";
-import {LoaderContainer as AwayLoaderContainer} from "@awayjs/scene";
+import {LoaderContainer as AwayLoaderContainer, IDisplayObjectAdapter} from "@awayjs/scene";
 import {LoaderInfo} from "./LoaderInfo";
 import {Bitmap} from "./Bitmap";
 import {BitmapData} from "./BitmapData";
@@ -120,7 +120,8 @@ export class Loader extends DisplayObjectContainer
 			
 			// if this is the "Scene 1", we make it a child of the loader
 			if (asset.name=="Scene 1" || (asset.name=="scene")){// "Scene 1" when AWDParser, "scene" when using SWFParser
-				(<AwayDisplayObjectContainer> this._adaptee).addChild(<AwayMovieClip>asset);
+
+				(<AwayDisplayObjectContainer> this._adaptee).addChild(<AwayMovieClip>(<IDisplayObjectAdapter> asset.adapter).clone().adaptee);
 				//this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
 			}
 		}

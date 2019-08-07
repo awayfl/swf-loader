@@ -473,6 +473,7 @@ export class SWFParser extends ParserBase
                         }
 						break;
                     case "button":
+						noTimelineDebug || console.log("start parsing button: ", symbol);
 						var awayMc = this.framesToTimeline(symbol, null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
 						//awayMc._symbol=symbol;
                         awayMc.name="AwayJS_button_"+symbol.id.toString();
@@ -555,7 +556,8 @@ export class SWFParser extends ParserBase
                 id: 0,
                 className: this.symbolClassesMap[0]
             };
-        }
+		}
+		rootSymbol.isRoot=true;
 		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
 		var awayMc:MovieClip=this.framesToTimeline(rootSymbol, this._swfFile.frames, null, null);
 
@@ -582,8 +584,8 @@ export class SWFParser extends ParserBase
 			
 		var avm2scripts={};		
 		var awayMc:MovieClip=this._factory.createMovieClip(null, symbol);
-		if(awayMc._adapter != awayMc && (<any>awayMc._adapter).getScripts){
-			avm2scripts = (<any>awayMc._adapter).getScripts();
+		if(awayMc.adapter != awayMc && (<any>awayMc.adapter).getScripts){
+			avm2scripts = (<any>awayMc.adapter).getScripts();
 		}		
 		var awayTimeline:Timeline=awayMc.timeline;
 

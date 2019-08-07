@@ -543,11 +543,16 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           popNameInto(stack, abc.getMultiname(index), rn);
           //console.log("stack[stack.length - 1]", stack[stack.length - 1]);
           receiver = sec.box(stack[stack.length - 1]);
-          result = receiver.axCallProperty(rn, args, bc === Bytecode.CALLPROPLEX);
-          if (bc === Bytecode.CALLPROPVOID) {
-            stack.length--;
-          } else {
-            stack[stack.length - 1] = result;
+          if(!receiver){
+            console.log("could not find reciever for property", stack[stack.length - 1], rn);
+          }
+          else{
+            result = receiver.axCallProperty(rn, args, bc === Bytecode.CALLPROPLEX);
+            if (bc === Bytecode.CALLPROPVOID) {
+              stack.length--;
+            } else {
+              stack[stack.length - 1] = result;
+            }
           }
           break;
         case Bytecode.CALLSUPER:
@@ -645,9 +650,14 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
         case Bytecode.GETPROPERTY:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
           receiver = sec.box(frame.peekStack());
-          result = receiver.axGetProperty(rn);
-          release || checkValue(result);
-          stack[stack.length - 1] = result;
+          
+          if(!receiver)
+            console.log("GETPROPERTY - reciever not found", rn, value, Bytecode.INITPROPERTY, methodInfo)
+          else{
+            result = receiver.axGetProperty(rn);
+            release || checkValue(result);
+            stack[stack.length - 1] = result;            
+          }
           break;
         case Bytecode.DELETEPROPERTY:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);

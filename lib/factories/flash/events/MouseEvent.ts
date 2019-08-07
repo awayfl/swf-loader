@@ -2,7 +2,8 @@ import { Event } from "./Event";
 import { notImplemented } from "../../base/utilities/Debug";
 import { InteractiveObject } from "../display/InteractiveObject";
 import { Point } from "../geom/Point";
-import { DisplayObject } from "../display/DisplayObject";
+import { DisplayObject } from "../../as3webflash/display/DisplayObject";
+import { MouseEvent as MouseEventAway} from "@awayjs/scene";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -113,6 +114,39 @@ export class MouseEvent extends Event {
   private _relatedObject: InteractiveObject;
   private _isRelatedObjectInaccessible: boolean;
 
+	/* added to clone events from away to as3web. */
+	public fillFromAway (awayEvent:MouseEventAway){
+		//console.log("cloneFromAway not implemented yet in flash/MouseEvent");
+
+		// todo: set targets correctly
+		this.target = awayEvent.target;
+		//this.currentTarget = awayEvent.currentTarget;
+
+		this.delta = awayEvent.delta;
+
+		this.ctrlKey = awayEvent.ctrlKey;
+		this.shiftKey = awayEvent.shiftKey;
+
+		//this._position = new Point(awayEvent.screenX, awayEvent.screenY);
+
+		//todo: translate more stuff from awayjs to as3
+		
+		//result.screenX = this.screenX;
+		//result.screenY = this.screenY;
+/*
+		result.view = awayEvent.view;
+		result.entity = awayEvent.entity;
+		result.renderable = awayEvent.renderable;
+		result.material = awayEvent.material;
+		result.uv = awayEvent.uv;
+		result.position = awayEvent.position;
+		result.normal = awayEvent.normal;
+		result.elementIndex = awayEvent.elementIndex;
+*/
+		//result._iParentEvent = awayEvent;
+		//result._iAllowedToPropagate = awayEvent._iAllowedToPropagate;
+
+	}
 
   get localX(): number {
     return (this._localX / 20) | 0;
@@ -216,8 +250,9 @@ export class MouseEvent extends Event {
     }
     if (this.target) {
       point.setTo(this._localX, this._localY);
-      var m = (<DisplayObject>this._target)._getConcatenatedMatrix();
-      m.transformPointInPlace(point);
+      console.log("80pro: todo: MouseEvent _getGlobalPoint");
+      //var m = (<DisplayObject>this._target)._getConcatenatedMatrix();
+      //m.transformPointInPlace(point);
     } else {
       point.setTo(0, 0);
     }

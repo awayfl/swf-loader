@@ -15,6 +15,12 @@ import { SimpleButton } from "../as3webFlash/display/SimpleButton";
 import { LoaderContext } from '../as3webFlash/system/LoaderContext';
 import { ApplicationDomain } from '../as3webFlash/system/ApplicationDomain';
 
+import { TextFormat } from "../as3webFlash/text/TextFormat";
+import { Sound } from "../as3webFlash/media/Sound";
+import { SoundChannel } from "../as3webFlash/media/SoundChannel";
+//import { SoundMixer } from "../as3webFlash/media/SoundMixer";
+import { SoundTransform } from "../as3webFlash/media/SoundTransform";
+
 import { Graphics } from "../as3webFlash/display/Graphics";
 import { Scene } from "./display/Scene";
 import { Event } from "./events/Event";
@@ -242,15 +248,15 @@ M("flash.events.MouseEvent", MouseEvent);
 // M("flash.text.Font", Font);
 // M("flash.text.StaticText", StaticText);
 // M("flash.text.StyleSheet", StyleSheet);
-// M("flash.text.TextFormat", TextFormat);
+ M("flash.text.TextFormat", TextFormat);
 // M("flash.text.TextRun", TextRun);
 // M("flash.text.TextSnapshot", TextSnapshot);
 // M("flash.text.TextLineMetrics", TextLineMetrics);
 
-// M("flash.media.Sound", Sound);
-// M("flash.media.SoundChannel", SoundChannel);
+ M("flash.media.Sound", Sound);
+ M("flash.media.SoundChannel", SoundChannel);
 // M("flash.media.SoundMixer", SoundMixer);
-// M("flash.media.SoundTransform", SoundTransform);
+ M("flash.media.SoundTransform", SoundTransform);
 // M("flash.media.Video", Video);
 // M("flash.media.StageVideo", StageVideo);
 // M("flash.media.ID3Info", ID3Info);

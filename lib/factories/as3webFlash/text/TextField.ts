@@ -294,10 +294,11 @@ export class TextField extends InteractiveObject
 	 * @throws	Error This method cannot be used on a text field with a style sheet.
 	 */
 	public get defaultTextFormat () : TextFormat{
-		return (<AwayTextField> this._adaptee).textFormat;
+		return <TextFormat><any>((<AwayTextField> this._adaptee).textFormat.adapter);
 	}
 	public set defaultTextFormat (format:TextFormat){
-		(<AwayTextField> this._adaptee).textFormat=format;
+		console.log("todo TextFormat");
+		//<TextFormat><any>(<AwayTextField> this._adaptee).textFormat.adapter=format;
 	}
 
 	/**
@@ -1119,7 +1120,8 @@ export class TextField extends InteractiveObject
 	 */
 	public getTextFormat (beginIndex:number=-1, endIndex:number=-1) : TextFormat{
 		// todo: support multiple formats
-		return (<AwayTextField> this._adaptee).textFormat;
+		console.log("todo: textformats");
+		return null;//(<AwayTextField> this._adaptee).textFormat;
 	}
 
 	public getTextRuns (beginIndex:number=0, endIndex:number=2147483647) : any[]{
@@ -1256,7 +1258,7 @@ export class TextField extends InteractiveObject
 	 */
 	public setTextFormat (format:TextFormat, beginIndex:number=-1, endIndex:number=-1) {
 		//todo implement for multi-formats
-		(<AwayTextField> this._adaptee).setTextFormat(format, beginIndex, endIndex);
+		(<AwayTextField> this._adaptee).setTextFormat(format.adaptee, beginIndex, endIndex);
 	}
 
 }

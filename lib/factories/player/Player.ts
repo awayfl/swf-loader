@@ -121,9 +121,9 @@ export class Player {
 			// advance the stage
 			this._stage.advanceFrame(this._events);
 
-			/*var displayGraph={};
+			var displayGraph={};
 			this._stage.debugDisplayGraph(displayGraph);
-			console.log("SceneGraph frame :", displayGraph);*/
+			console.log("SceneGraph frame :", displayGraph);
 			
 			// execute queued scripts
 			FrameScriptManager.execute_queue();

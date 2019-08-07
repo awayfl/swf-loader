@@ -546,10 +546,10 @@ export class InteractiveObject extends DisplayObject{
 	private _mouseCallbackDelegate:(event:MouseEventAway) => void;
 	private mouseCallback(event:MouseEventAway):void
 	{
-		var adaptedEvent:MouseEvent=new MouseEvent(this.eventMappingInvert[event.type]);
+		var adaptedEvent:MouseEvent=new this.sec.flash.events.MouseEvent(this.eventMappingInvert[event.type]);
 		adaptedEvent.fillFromAway(event);
 		adaptedEvent.target=this;
-		adaptedEvent.currentTarget=this;
+		//adaptedEvent.currentTarget=this;
 		
 		this.dispatchEvent(adaptedEvent);
 	}

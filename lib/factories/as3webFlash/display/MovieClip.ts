@@ -67,7 +67,12 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 * display object container that is onstage.
 	 */
 	constructor(adaptee: AwayMovieClip = null) {
+		if(!adaptee && AwayMovieClip.mcForConstructor){
+			adaptee=AwayMovieClip.mcForConstructor;
+			AwayMovieClip.mcForConstructor=null;
+		}
 		super(adaptee || AwayMovieClip.getNewMovieClip());	
+		this.adaptee.reset();
 		this._tmpScripts={};
 	}
 
@@ -112,9 +117,14 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		}
 		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
 		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		var adaptee=new AwayMovieClip((<AwayMovieClip>this.adaptee).timeline);
+		this.adaptee.copyTo(adaptee);
+		AwayMovieClip.mcForConstructor=adaptee;
 		clone.axInitializer();
-		this.adaptee.copyTo(clone.adaptee);
-		clone.adaptee.timeline=(<AwayMovieClip>this.adaptee).timeline;
+		clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
+		(<any>clone).noReset=true;
+		//clone.adaptee.timeline=(<AwayMovieClip>this.adaptee).timeline;
+		//clone.gotoAndPlay(1);
 		return clone;
 	}
 
@@ -277,9 +287,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		for (var i = 0; i < numArgs; i += 2) {
 			var frameNum = (arguments[i] | 0);
 			var fn = arguments[i + 1];
+			(<AwayMovieClip>this.adaptee).timeline.add_avm2framescript(fn, frameNum);
+			/*
 			if(!this._tmpScripts[frameNum])
 				this._tmpScripts[frameNum]=[];
-			this._tmpScripts[frameNum].push(fn);
+			this._tmpScripts[frameNum].push(fn);*/
 			
 		}
 	}
