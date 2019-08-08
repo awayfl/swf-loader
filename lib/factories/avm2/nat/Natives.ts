@@ -10,6 +10,7 @@ import { axCoerceString } from '../run/axCoerceString';
 import { getCurrentABC } from '../run/getCurrentABC';
 import { NamespaceType } from '../abc/lazy/NamespaceType';
 import { Multiname } from '../abc/lazy/Multiname';
+import { describeType as describeTypeIntern} from '../natives/describeType';
 
 /**
  * Other natives can live in this module
@@ -125,9 +126,9 @@ export var Natives = {
       var mn = Multiname.FromFQNString(name, NamespaceType.Public);
       return getCurrentABC().env.app.getClass(mn);
     },
-    describeType(sec: AXSecurityDomain, value: any, flags: number) {
+    describeType(sec: AXSecurityDomain, value: any, flags: number):any {
       console.log("describeType not implemented");
-      return null;//describeType(sec, value, flags);
+      return describeTypeIntern(sec, value, flags);
     },
     describeTypeJSON(sec: AXSecurityDomain, value: any, flags: number) {
       console.log("describeTypeJSON not implemented");

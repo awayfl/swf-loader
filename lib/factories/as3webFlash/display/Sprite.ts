@@ -128,6 +128,9 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	public get graphics () : Graphics
 	{
+		if(!(<AwaySprite>this._adaptee).graphics.adapter || (<AwaySprite>this._adaptee).graphics.adapter==(<AwaySprite>this._adaptee).graphics){
+			(<AwaySprite>this._adaptee).graphics.adapter=new this.sec.flash.display.Graphics((<AwaySprite>this._adaptee).graphics);
+		}
 		return <Graphics>(<AwaySprite>this._adaptee).graphics.adapter;
 	}
 

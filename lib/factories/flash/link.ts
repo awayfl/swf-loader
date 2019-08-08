@@ -23,6 +23,13 @@ import { Keyboard } from "./ui/Keyboard";
 import { KeyboardEvent } from "./events/KeyboardEvent";
 import { MouseEvent } from "./events/MouseEvent";
 
+import { Point } from "../as3webFlash/geom/Point";
+import { Rectangle } from "../as3webFlash/geom/Rectangle";
+import { Matrix } from "../as3webFlash/geom/Matrix";
+import { Matrix3D } from "../as3webFlash/geom/Matrix3D";
+import { Vector3D } from "../as3webFlash/geom/Vector3D";
+import { Transform } from "../as3webFlash/geom/Transform";
+import { XMLDocument, XMLNode } from "../avm2/natives/xml-document";
 /*
 import { URLRequest } from "./net/URLRequest";
 import { ApplicationDomain } from "./system/ApplicationDomain";
@@ -32,7 +39,6 @@ import { Capabilities } from "./system/Capabilities";
 import { SecurityDomain } from "./system/SecurityDomain";
 import { Symbol } from "./symbol";
 import { Timer } from "./utils/Timer";
-import { XMLDocument, XMLNode } from "../avm2/natives/xml-document";
 import { ByteArray, ObjectEncoding } from "../avm2/natives/byteArray";
 import { AccessibilityProperties } from "./accessibility/AccessibilityProperties";
 import { Accessibility } from "./accessibility/Accessibility";
@@ -205,12 +211,12 @@ M("flash.text.TextField", TextField);
 // M("flash.filters.GradientBevelFilter", GradientBevelFilter);
 // M("flash.filters.GradientGlowFilter", GradientGlowFilter);
 
-// M("flash.geom.Point", Point);
-// M("flash.geom.Rectangle", Rectangle);
-// M("flash.geom.Matrix", Matrix);
-// M("flash.geom.Matrix3D", Matrix3D);
-// M("flash.geom.Vector3D", Vector3D);
-// M("flash.geom.Transform", Transform);
+ M("flash.geom.Point", Point);
+ M("flash.geom.Rectangle", Rectangle);
+ M("flash.geom.Matrix", Matrix);
+ M("flash.geom.Matrix3D", Matrix3D);
+ M("flash.geom.Vector3D", Vector3D);
+ M("flash.geom.Transform", Transform);
  M("flash.geom.ColorTransform", ColorTransform);
 // M("flash.geom.PerspectiveProjection", PerspectiveProjection);
 
@@ -297,8 +303,8 @@ M("flash.system.LoaderContext", LoaderContext);
 // M("flash.utils.Timer", Timer);
 // M("flash.utils.ByteArray", ByteArray);
 
-// M("flash.xml.XMLNode", XMLNode);
-// M("flash.xml.XMLDocument", XMLDocument);
+ M("flash.xml.XMLNode", XMLNode);
+ M("flash.xml.XMLDocument", XMLDocument);
 
 registerNativeFunction('flash.system.fscommand', fscommand);
 

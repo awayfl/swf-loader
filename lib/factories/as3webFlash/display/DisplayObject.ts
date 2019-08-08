@@ -129,7 +129,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		this.eventMappingExtern[Event.ADDED_TO_STAGE]="";
 		this.eventMappingExtern[Event.ADDED]="";
 
-		this._transform = new Transform(this.adaptee.transform);
+		new this.sec.flash.geom.Transform(this.adaptee.transform);
 	}
 
 
@@ -733,7 +733,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   the parent movie call the Security.allowDomain() method.
 	 */
 	public get parent () : DisplayObjectContainer{
-		if(this.adaptee.parent==null){
+		if(this.adaptee.parent==null || this.adaptee.parent.adapter==null || this.adaptee.parent.adapter==this.adaptee.parent){
 			return null;
 		}
 		return (<DisplayObjectContainer>this.adaptee.parent.adapter);
@@ -993,7 +993,10 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	public get transform () : Transform
 	{
 		this._ctBlockedByScript=true;
-		return this._transform;
+		if(!this.adaptee.transform.avm2Adapter){
+			this.sec.flash.geom.Transform(this.adaptee.transform);
+		}
+		return this.adaptee.transform.avm2Adapter;
 
 	}
 	public set transform (value:Transform) {

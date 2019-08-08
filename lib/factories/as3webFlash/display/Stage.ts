@@ -169,7 +169,7 @@ export class Stage extends DisplayObjectContainer{
 
 		this._events=[this._eventOnEnter, this._eventExitFrame];
 
-		this._scaleMode=StageScaleMode.NO_SCALE;
+		this._scaleMode=StageScaleMode.SHOW_ALL;
 		this._align=StageAlign.TOP_LEFT;
 		this._stage3Ds=[];
 		//this._stage3Ds[this._stage3Ds.length]=new AwayStage(null, );
@@ -453,7 +453,7 @@ export class Stage extends DisplayObjectContainer{
 		*/
 		//this._projection.originX = (0.5 - 0.5*(window.innerHeight/newHeight)*(this._stageWidth/window.innerWidth));
 
-		this.dispatchEvent(new Event(Event.RESIZE));
+		this.dispatchEvent(new this.sec.flash.events.Event(Event.RESIZE));
 	}
 
 	public show (){
@@ -509,14 +509,14 @@ export class Stage extends DisplayObjectContainer{
 		//this._stageHeight=h;
 		this._scene.view.x         = x;
 		this._scene.view.y         = y;
-
-		this._rendererStage.x     = x;
-		this._rendererStage.y    = y;
-	//	this._rendererStage.container.style.zIndex="-100";
-		this._rendererStage.width     = w;
-		this._rendererStage.height    = h;
 		this._scene.view.width     = w;
 		this._scene.view.height    = h;
+
+		this._rendererStage.x     	= x;
+		this._rendererStage.y    	= y;
+		this._rendererStage.width   = w;
+		this._rendererStage.height  = h;
+
 		if(this._fpsTextField)
 			this._fpsTextField.style.left  =  window.innerWidth * 0.5 - 100 + 'px';
 	};
@@ -588,7 +588,7 @@ export class Stage extends DisplayObjectContainer{
 
 	public get mouseX () : number{
 		//console.log("mouseX not implemented yet in flash/DisplayObject");
-		return this._scene.mouseX;
+		return this._scene.getLocalMouseX(this.adaptee);
 	}
 
 	/**
@@ -599,7 +599,7 @@ export class Stage extends DisplayObjectContainer{
 	 */
 	public get mouseY () : number{
 		//console.log("mouseY not implemented yet in flash/DisplayObject");
-		return this._scene.mouseY;
+		return this._scene.getLocalMouseY(this.adaptee);
 	}
 
 	public set accessibilityImplementation (value:any){
@@ -1093,6 +1093,7 @@ export class Stage extends DisplayObjectContainer{
 	}
 	public set stageHeight (value:number){
 		this._stageHeight=value;
+		this.resizeCallback();
 	}
 
 	/**
@@ -1145,6 +1146,7 @@ export class Stage extends DisplayObjectContainer{
 	}
 	public set stageWidth (value:number){
 		this._stageWidth=value;
+		this.resizeCallback();
 	}
 
 	/**

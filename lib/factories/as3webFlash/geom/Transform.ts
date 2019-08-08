@@ -46,6 +46,7 @@ export class Transform extends ASObject
       this.sec.throwError("ArgumentError", Errors.NullPointerError, "displayObject");
 
     this._adaptee = (displayObjectAdaptee instanceof AwayTransform)? displayObjectAdaptee : new AwayTransform();
+    this._adaptee.avm2Adapter=this;
   }
 
   public get matrix(): Matrix

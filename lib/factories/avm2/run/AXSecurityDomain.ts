@@ -484,6 +484,7 @@ export class AXSecurityDomain implements ISecurityDomain{
       applyTraits(global, traits);
       return global;
     }
+
   
     /**
      * Prepares the dynamic Class prototype that all Class instances (including Class) have in

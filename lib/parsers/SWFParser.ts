@@ -266,6 +266,7 @@ export class SWFParser extends ParserBase
 		//console.log("SWFParser - _pProceedParsing");
 		if (!this._startedParsing) {
 
+			(<any>this._factory).url=this._iFileName;
 			this._startedParsing = true;
 			// get the bytedata
 

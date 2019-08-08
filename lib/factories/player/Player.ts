@@ -74,10 +74,13 @@ export class Player {
 			this._events = [this._eventOnEnter, this._eventExitFrame];
 			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
+			this._parser._iFileName="ToDO_UseRequestURLInsteadOfThis";
 			this._loader = new this._sec.flash.display.Loader(this._parser);
 			var loaderContext: LoaderContext = new this._sec.flash.system.LoaderContext(false, new (<any>this._sec).flash.system.ApplicationDomain());
 			this._loader.loaderInfo.addEventListener(Event.COMPLETE, this._onLoadCompleteDelegate);
 			this._loader.loadData(buffer, loaderContext);
+			this._stage.rendererStage.container.style.visibility="hidden";
+
 
 		});
 	}
@@ -87,6 +90,8 @@ export class Player {
 		console.log("loaded a SWFFile", this._parser.swfFile);
 		this._stage.color=ColorUtils.f32_RGBA_To_f32_ARGB(this._parser.swfFile.backgroundColor);
 		this._stage.frameRate=this._parser.swfFile.frameRate;
+		this._stage.stageWidth=this._parser.swfFile.bounds.width/20;
+		this._stage.stageHeight=this._parser.swfFile.bounds.height/20;
 		this._stage.addChild(this._loader);
 
 		/*
@@ -113,9 +118,6 @@ export class Player {
 
 		if (this._time >= frameMarker || !this._renderStarted) {
 			
-			if(!this._renderStarted)
-				window["hidePokiProgressBar"]();
-			this._renderStarted=true;
 			this._time -= frameMarker;
 
 			// advance the stage
@@ -130,6 +132,11 @@ export class Player {
 			
 			// render
 			this._stage.render();
+			if(!this._renderStarted){
+				window["hidePokiProgressBar"]();
+				this._stage.rendererStage.container.style.visibility="visible";
+			}
+			this._renderStarted=true;
 		}
 	}
 }

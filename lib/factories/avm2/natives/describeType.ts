@@ -15,14 +15,21 @@
  */
 
 import { release } from "../../base/utilities/Debug";
-import { ClassInfo, CONSTANT, Namespace, Multiname, MetadataInfo, TraitInfo, TRAIT, MethodTraitInfo, SlotTraitInfo } from "../abc/lazy";
 import { ASXML, escapeAttributeValue } from "./xml";
 import { assert } from "@awayjs/graphics";
-import { ASArray } from "../nat";
+import { ASArray } from "../nat/ASArray";
 import { AXSecurityDomain } from "../run/AXSecurityDomain";
 import { isNullOrUndefined } from "../../base/utilities";
 import { AXClass } from "../run/AXClass";
 import { AXXMLClass } from "../run/AXXMLClass";
+import { ClassInfo } from '../abc/lazy/ClassInfo';
+import { CONSTANT } from '../abc/lazy/CONSTANT';
+import { Namespace } from '../abc/lazy/Namespace';
+import { Multiname } from '../abc/lazy/Multiname';
+import { MethodTraitInfo } from '../abc/lazy/MethodTraitInfo';
+import { TRAIT } from '../abc/lazy/TRAIT';
+import { MetadataInfo } from '../abc/lazy/MetadataInfo';
+import { SlotTraitInfo } from '../abc/lazy/SlotTraitInfo';
 
 const enum DescribeTypeFlags {
   HIDE_NSURI_METHODS  = 0x0001,
@@ -252,7 +259,7 @@ function describeMetadataXML(x: ASXML, metadata_: ASArray): void {
   }
 }
 
-function describeMetadataList(sec: AXSecurityDomain, list: MetadataInfo[]) {
+function describeMetadataList(sec: AXSecurityDomain, list: any[]/*MetadataInfo[]*/) {
   if (!list) {
     return null;
   }
@@ -271,7 +278,7 @@ function describeMetadataList(sec: AXSecurityDomain, list: MetadataInfo[]) {
   return result;
 }
 
-function describeMetadata(sec: AXSecurityDomain, metadata: MetadataInfo) {
+function describeMetadata(sec: AXSecurityDomain, metadata: any/*MetadataInfo*/) {
   var result = sec.createObject();
   result.$Bgname = metadata.name;
   var values = [];
@@ -300,7 +307,7 @@ function addTraits(cls: AXClass, info: ClassInfo, describingClass: boolean,
   var metadataList: any[] = null;
   // Somewhat absurdly, class metadata is only included when describing instances.
   if (flags & DescribeTypeFlags.INCLUDE_METADATA && !describingClass) {
-    var metadata: MetadataInfo[] = info.trait.getMetadata();
+    var metadata: any[]/*MetadataInfo[]*/ = info.trait.getMetadata();
     if (metadata) {
       metadataList = describeMetadataList(sec, metadata);
     }
@@ -373,7 +380,7 @@ function addTraits(cls: AXClass, info: ClassInfo, describingClass: boolean,
 
   // Having a hot function closed over isn't all that great, but moving this out would involve
   // passing lots and lots of arguments. We might do that if performance becomes an issue.
-  function describeTraits(sec: AXSecurityDomain, traits: TraitInfo[], isInterface: boolean) {
+  function describeTraits(sec: AXSecurityDomain, traits: any[]/*TraitInfo[]*/, isInterface: boolean) {
     release || assert(traits, "No traits array found on class" + cls.name);
 
     // All types share some fields, but setting them in one place changes the order in which

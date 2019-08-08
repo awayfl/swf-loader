@@ -15,7 +15,9 @@ export class SharedObject extends ASObject {
 		super();
 		this._object_name = name;
 		if (typeof (Storage) !== "undefined") {
-			this._data = JSON.parse(localStorage.getItem(name));
+			var data=JSON.parse(localStorage.getItem(name));
+			if(data)
+				this._data = this.sec.createObjectFromJS(data);
 		}
 		if (this._data == null) {
 			console.log("no shared object found");
