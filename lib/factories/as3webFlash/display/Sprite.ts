@@ -22,6 +22,8 @@ export class  Sprite extends DisplayObjectContainer
 		return new Sprite(adaptee);
 	}
 
+	private _graphics:Graphics;
+
 	/**
 	 * The Sprite class is a basic display list building block: a display list node that can display
 	 * graphics and can also contain children.
@@ -38,10 +40,9 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	constructor(adaptee:AwaySprite = null)
 	{
-		if(adaptee && adaptee.graphics.adapter==adaptee.graphics){
-			adaptee.graphics.adapter=new AXSecurityDomain.instance.flash.display.Graphics(adaptee.graphics);
-		}
-		super(adaptee || AwaySprite.getNewSprite(new AXSecurityDomain.instance.flash.display.Graphics().adaptee));
+		super(adaptee || AwaySprite.getNewSprite());
+
+		this._graphics = new this.sec.flash.display.Graphics((<AwaySprite> this._adaptee).graphics);
 	}
 
 	//---------------------------stuff added to make it work:
@@ -128,10 +129,7 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	public get graphics () : Graphics
 	{
-		if(!(<AwaySprite>this._adaptee).graphics.adapter || (<AwaySprite>this._adaptee).graphics.adapter==(<AwaySprite>this._adaptee).graphics){
-			(<AwaySprite>this._adaptee).graphics.adapter=new this.sec.flash.display.Graphics((<AwaySprite>this._adaptee).graphics);
-		}
-		return <Graphics>(<AwaySprite>this._adaptee).graphics.adapter;
+		return this._graphics;
 	}
 
 	/**

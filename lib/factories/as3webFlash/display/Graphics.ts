@@ -23,7 +23,8 @@ export class Graphics extends ASObject implements IAssetAdapter {
 
     constructor(adaptee:AwayGraphics=null) {
         super();        
-        this._adaptee = adaptee ? adaptee : new AwayGraphics();
+        this._adaptee = adaptee || new AwayGraphics();
+        this._adaptee.adapter = this;
     }
 
     public dispose() {
