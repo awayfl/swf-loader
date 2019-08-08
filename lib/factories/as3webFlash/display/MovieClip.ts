@@ -1,4 +1,4 @@
-import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline } from "@awayjs/scene";
+import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline, FrameScriptManager } from "@awayjs/scene";
 import { Sprite } from "./Sprite";
 import { constructClassFromSymbol } from '../../link';
 
@@ -327,6 +327,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return;
 		this.play();
 		this._gotoFrame(frame);
+		FrameScriptManager.execute_queue();
 	}
 
 	/**
@@ -360,6 +361,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return;
 		this.stop();
 		this._gotoFrame(frame);
+		FrameScriptManager.execute_queue();
 	}
 
 

@@ -380,7 +380,13 @@ export class DisplayObjectContainer extends InteractiveObject{
 	 *   the child movie call Security.allowDomain().
 	 */
 	public getChildAt (index:number) : DisplayObject {
-		return (<DisplayObject>(<AwayDisplayObjectContainer>(<AwayDisplayObjectContainer> this._adaptee)).getChildAt(index).adapter);
+
+		var child=(<AwayDisplayObjectContainer> this._adaptee).getChildAt(index);
+		if(!child.adapter || child.adapter==child){
+			child.adapter=this.sec.flash.display.Sprite(child);
+		}
+
+		return <DisplayObject>child.adapter;
 	}
 
 	/**

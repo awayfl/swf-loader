@@ -21,7 +21,8 @@ export function axConstruct(argArray?: any[]) {
     if (this._symbol && this._symbol.timeline) {
         var newMC = new MovieClip(this._symbol.timeline);
         newMC.timelineMC = true;
-        //newMC.reset();
+        /*(<any>newMC).noReset=true;
+        newMC.reset();*/
         MovieClip.mcForConstructor = newMC;
     }
     if (this.superClass && this.superClass.classInfo && this.superClass.classInfo.instanceInfo && this.superClass.classInfo.instanceInfo.name.name == "Sound") {
