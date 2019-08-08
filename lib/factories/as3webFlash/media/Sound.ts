@@ -10,6 +10,7 @@ import { SoundTransform } from "./SoundTransform";
 import {ByteArray} from "../utils/ByteArray";
 import { ID3Info } from "./ID3Info";
 import { WaveAudio } from "@awayjs/core";
+import { ActiveLoaderContext } from '../../avm2/run/axConstruct';
 
 /**
  * Dispatched when data is received as a load operation progresses.
@@ -65,7 +66,6 @@ import { WaveAudio } from "@awayjs/core";
 export class Sound extends EventDispatcher
 {
 	private _adaptee:WaveAudio;
-
 	/**
 	 * Creates a new Sound object. If you pass a valid URLRequest object to the
 	 * Sound constructor, the constructor automatically calls the load() function
@@ -92,6 +92,10 @@ export class Sound extends EventDispatcher
 	 */
 	constructor (stream:URLRequest=null, context:SoundLoaderContext=null){
 		super();
+		if(ActiveLoaderContext.soundForConstructor){
+			this._adaptee=ActiveLoaderContext.soundForConstructor;
+			ActiveLoaderContext.soundForConstructor=null;
+		}
 		//console.log("sound is not implemented yet in flash/Sound");
 	}
 
@@ -393,8 +397,11 @@ export class Sound extends EventDispatcher
 		this.loopsToPlay=loops;
 		this._adaptee.onSoundComplete=()=>this.soundCompleteInternal();
 		this._adaptee.play(startTime, false);
-		var newSoundChannel:SoundChannel=new SoundChannel();
+		var newSoundChannel:SoundChannel= new this.sec.flash.media.SoundChannel();
 		newSoundChannel._sound=this;
+		if(!sndTransform){
+			sndTransform=new this.sec.flash.media.SoundTransform();
+		}
 		newSoundChannel.soundTransform=sndTransform;
 		//console.log("play not implemented yet in flash/Sound");
 

@@ -45,7 +45,26 @@ import {builtinNativeClasses} from"./builtinNativeClasses";
 import {nativeClasses} from"./builtinNativeClasses";
 import {nativeClassLoaderNames} from"./builtinNativeClasses";
 import { ASNamespace, ASQName, ASXML, ASXMLList } from '../natives/xml';
+import { XMLNode, XMLParser, XMLTag, XMLNodeType, XMLDocument } from '../natives/xml-document';
 
+
+class AVMPlusFile extends ASObject{
+  public static exists(){
+
+  }
+  public static read(){
+
+  }
+  public static write(){
+
+  }
+  public static readByteArray(){
+
+  }
+  public static writeByteArray(){
+
+  }
+}
 
 export function initializeBuiltins() {
   builtinNativeClasses["Object"]              = ASObject;
@@ -71,13 +90,13 @@ export function initializeBuiltins() {
   builtinNativeClasses["XML"]                 = ASXML;
   builtinNativeClasses["XMLList"]             = ASXMLList;
 
-/*
+
   builtinNativeClasses["flash.xml.XMLNode"] = XMLNode;
   builtinNativeClasses["flash.xml.XMLDocument"] = XMLDocument;
   builtinNativeClasses["flash.xml.XMLParser"] = XMLParser;
   builtinNativeClasses["flash.xml.XMLTag"] = XMLTag;
   builtinNativeClasses["flash.xml.XMLNodeType"] = XMLNodeType;
-  */
+  
 
   builtinNativeClasses["Math"]                = ASMath;
   builtinNativeClasses["Date"]                = ASDate;
@@ -89,6 +108,7 @@ export function initializeBuiltins() {
   builtinNativeClasses["flash.utils.ByteArray"]  = ByteArray;
 
   builtinNativeClasses["avmplus.System"]  = OriginalSystem;
+  builtinNativeClasses["avmplus.File"]  = AVMPlusFile;
 
   // Errors
   builtinNativeClasses["Error"]               = ASError;

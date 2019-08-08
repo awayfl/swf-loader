@@ -123,6 +123,7 @@ export class LoaderInfo extends EventDispatcher
 {
 	public _loader:Loader;
 
+	private _url:string;
 	private _applicationDomain:ApplicationDomain;
 	/**
 	 * The ActionScript version of the loaded SWF file.
@@ -506,8 +507,13 @@ export class LoaderInfo extends EventDispatcher
 	 * isURLInaccessible property for details.
 	 */
 	public get url () : string{
-		console.log("url not implemented yet in flash/LoaderInfo");
-		return "";
+		
+		return this._url;
+		
+	}
+	public set url (value:string){
+		
+		this._url=value;
 		
 	}
 

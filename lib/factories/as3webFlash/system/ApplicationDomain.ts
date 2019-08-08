@@ -144,6 +144,10 @@ export class ApplicationDomain extends ASObject
 	public getFontDefinition (name:string) : Font{
 		return this._font_definitions[name];
 	}
+	public getAwayJSAudio(name:string):WaveAudio{
+		return this._audio_definitions[name];
+
+	}
 	public getAudioDefinition (name:string) : Sound{
 		var sound:Sound=new Sound();
 		sound.adaptee=this._audio_definitions[name];

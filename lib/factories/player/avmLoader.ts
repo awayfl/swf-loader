@@ -78,7 +78,18 @@ export function createSecurityDomain(
           );
           console.log("add playerglobals as ABCCatalog");
           sec.addCatalog(catalog);
-          result.resolve(sec);
+
+          BrowserSystemResourcesLoadingService.getInstance()
+            .load("./assets/builtins/avmplus.abc", "arraybuffer")
+            .then(function(buffer) {
+              //var sec = new AXSecurityDomain();
+              var env = { url: "avmplus.File", app: sec.system };
+              var avmPlusABC = new ABCFile(env, new Uint8Array(buffer));
+              sec.system.loadABC(avmPlusABC);
+              //sec.initialize();
+              sec.system.executeABC(avmPlusABC);
+              result.resolve(sec);
+        }, result.reject);
         }, result.reject);
       }
 

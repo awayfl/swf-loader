@@ -133,6 +133,9 @@ export var Natives = {
     describeTypeJSON(sec: AXSecurityDomain, value: any, flags: number) {
       console.log("describeTypeJSON not implemented");
       return null;//describeTypeJSON(sec, value, flags);
+    },
+    getArgv(): any [] {
+      return null;
     }
 
   }

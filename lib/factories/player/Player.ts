@@ -11,7 +11,7 @@ import { Stage } from "../as3webFlash/display/Stage";
 import { LoaderContext } from "../as3webFlash/system/LoaderContext";
 import { ApplicationDomain } from "../as3webFlash/system/ApplicationDomain";
 import { Event } from "../as3webFlash/events/Event";
-import { RequestAnimationFrame, ColorUtils } from '@awayjs/core';
+import { RequestAnimationFrame, ColorUtils, AssetEvent } from '@awayjs/core';
 import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 import { initLink } from '../flash/link';
@@ -22,6 +22,7 @@ import { initlazy } from '../avm2/abc/lazy';
 import { FrameScriptManager } from '@awayjs/scene';
 import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
 import { ISecurityDomain } from '../ISecurityDomain';
+import { ActiveLoaderContext } from '../avm2/run/axConstruct';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
@@ -55,8 +56,9 @@ export class Player {
 		this._renderStarted=false;
 		
 		this._onLoadCompleteDelegate = (event: Event) => this.onLoadComplete(event);
+		this._onAssetCompleteDelegate = (event: AssetEvent) => this._onAssetComplete(event);
 	}
-	public playSWF(buffer) {
+	public playSWF(buffer, url) {
 		if (this._loader || this._parser) {
 			throw "Only playing of 1 SWF file is supported at the moment";
 		}
@@ -74,15 +76,21 @@ export class Player {
 			this._events = [this._eventOnEnter, this._eventExitFrame];
 			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
-			this._parser._iFileName="ToDO_UseRequestURLInsteadOfThis";
+			this._parser._iFileName=url;
 			this._loader = new this._sec.flash.display.Loader(this._parser);
+			this._loader.loaderInfo.url=url;
 			var loaderContext: LoaderContext = new this._sec.flash.system.LoaderContext(false, new (<any>this._sec).flash.system.ApplicationDomain());
+			ActiveLoaderContext.loaderContext=loaderContext;
 			this._loader.loaderInfo.addEventListener(Event.COMPLETE, this._onLoadCompleteDelegate);
+			this._loader.loaderInfo.addEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
 			this._loader.loadData(buffer, loaderContext);
 			this._stage.rendererStage.container.style.visibility="hidden";
 
 
 		});
+	}
+	private _onAssetCompleteDelegate: (event: AssetEvent) => void;
+	public _onAssetComplete(event) {
 	}
 	private _onLoadCompleteDelegate: (event: Event) => void;
 	public onLoadComplete(event) {
