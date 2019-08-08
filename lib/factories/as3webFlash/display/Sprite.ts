@@ -69,7 +69,7 @@ export class  Sprite extends DisplayObjectContainer
 	{
 		this.disposeValues();
 
-		Sprite._sprites.push(this);
+		//Sprite._sprites.push(this);
 	}
 
 	//---------------------------original as3 properties / methods:

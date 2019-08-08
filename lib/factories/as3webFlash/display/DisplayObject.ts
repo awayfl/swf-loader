@@ -1,4 +1,4 @@
-import {Transform as AwayTransform, Point, Box, ColorTransform, Vector3D, AbstractMethodError} from "@awayjs/core";
+import {Transform as AwayTransform, Point as AwayPoint, Box, Vector3D as AwayVector3D, AbstractMethodError} from "@awayjs/core";
 import {EventDispatcher} from "../events/EventDispatcher";
 import {Event} from "../events/Event";
 import {DisplayObject as AwayDisplayObject, IDisplayObjectAdapter} from "@awayjs/scene";
@@ -11,6 +11,8 @@ import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
 import { AXClass } from '../../avm2/run/AXClass';
 import { Transform } from '../geom/Transform';
 import { Rectangle } from '../geom/Rectangle';
+import { Point } from '../geom/Point';
+import { Vector3D } from '../geom/Vector3D';
 
 export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter
 {
@@ -129,7 +131,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		this.eventMappingExtern[Event.ADDED_TO_STAGE]="";
 		this.eventMappingExtern[Event.ADDED]="";
 
-		new this.sec.flash.geom.Transform(this.adaptee.transform);
+		this._transform = new this.sec.flash.geom.Transform(this.adaptee.transform);
 	}
 
 
@@ -670,7 +672,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	public get mouseX () : number{
 		//console.log("mouseX not implemented yet in flash/DisplayObject");
 		//todo: theres probably a faster option than this
-		return this.adaptee.transform.globalToLocal(new Point(this.stage.mouseX, 0)).x;
+		return this.adaptee.transform.globalToLocal(new AwayPoint(this.stage.mouseX, 0)).x;
 	}
 
 	/**
@@ -681,7 +683,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public get mouseY () : number{
 		//todo: theres probably a faster option than this
-		return this.adaptee.transform.globalToLocal(new Point(0, this.stage.mouseY)).y;
+		return this.adaptee.transform.globalToLocal(new AwayPoint(0, this.stage.mouseY)).y;
 	}
 
 	/**
@@ -875,7 +877,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public get scale9Grid () : Rectangle
 	{
-		return new Rectangle(this.adaptee.scale9Grid);
+		return new this.sec.flash.geom.Rectangle(this.adaptee.scale9Grid);
 	}
 	public set scale9Grid (innerRectangle:Rectangle)
 	{
@@ -941,7 +943,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public get scrollRect () : Rectangle
 	{
-		return new Rectangle(this.adaptee.scrollRect);
+		return new this.sec.flash.geom.Rectangle(this.adaptee.scrollRect);
 
 	}
 	public set scrollRect (value:Rectangle)
@@ -993,10 +995,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	public get transform () : Transform
 	{
 		this._ctBlockedByScript=true;
-		if(!this.adaptee.transform.avm2Adapter){
-			this.sec.flash.geom.Transform(this.adaptee.transform);
-		}
-		return this.adaptee.transform.avm2Adapter;
+		return this._transform;
 
 	}
 	public set transform (value:Transform) {
@@ -1155,7 +1154,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		//console.log("DisplayObject:getBounds not yet implemented");
 
 		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
-		return new Rectangle(box.x, box.y, box.width, box.height);
+		return new this.sec.flash.geom.Rectangle(box.x, box.y, box.width, box.height);
 
 	}
 
@@ -1174,7 +1173,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public getRect (targetCoordinateSpace:DisplayObject) : Rectangle{
 		console.log("DisplayObject:getRect not yet implemented");
-		return new Rectangle();//this._adaptee.getBounds();
+		return new this.sec.flash.geom.Rectangle();//this._adaptee.getBounds();
 
 	}
 
@@ -1194,7 +1193,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	A Point any with coordinates relative to the displayobject.
 	 */
 	public globalToLocal (point:Point) : Point{
-		return this.adaptee.transform.globalToLocal(point);
+		return new this.sec.flash.geom.Point(this.adaptee.transform.globalToLocal(point.adaptee));
 
 	}
 
@@ -1217,7 +1216,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public globalToLocal3D (point:Point) : Vector3D{
 		console.log("DisplayObject:globalToLocal3D not yet implemented");
-		return new Vector3D(); //todo: works with vector3D-input instead of pouibnt: this.adaptee.globalToLocal3D();
+		return new this.sec.flash.geom.Vector3D(); //todo: works with vector3D-input instead of pouibnt: this.adaptee.globalToLocal3D();
 
 	}
 
@@ -1276,7 +1275,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 */
 	public local3DToGlobal (point3d:Vector3D) : Point{
 		console.log("DisplayObject:local3DToGlobal not yet implemented");
-		return new Point();//this._adaptee.getBounds();
+		return new this.sec.flash.geom.Point();//this._adaptee.getBounds();
 
 	}
 
@@ -1297,7 +1296,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	A Point any with coordinates relative to the Stage.
 	 */
 	public localToGlobal (point:Point) : Point{
-		return this.adaptee.transform.localToGlobal(point);
+		return new this.sec.flash.geom.Point(this.adaptee.transform.localToGlobal(point.adaptee));
 	}
 }
 

@@ -139,7 +139,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	public dispose(): void {
 		this.disposeValues();
 
-		MovieClip._movieClips.push(this);
+		//MovieClip._movieClips.push(this);
 	}
 
 	//---------------------------original as3 properties / methods:

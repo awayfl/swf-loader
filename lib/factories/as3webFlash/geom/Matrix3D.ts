@@ -85,7 +85,7 @@ export class Matrix3D extends ASObject
 
   public get position(): Vector3D
   {
-    return new Vector3D(this._adaptee.position);
+    return new this.sec.flash.geom.Vector3D(this._adaptee.position);
   }
 
   public set position(pos: Vector3D)
@@ -100,7 +100,7 @@ export class Matrix3D extends ASObject
 
   public clone(): Matrix3D
   {
-    return new Matrix3D(this._adaptee.clone());
+    return new this.sec.flash.geom.Matrix3D(this._adaptee.clone());
   }
 
   public copyToMatrix3D(dest: Matrix3D): void
@@ -179,12 +179,12 @@ export class Matrix3D extends ASObject
 
   public transformVector(v: Vector3D): Vector3D
   {
-    return new Vector3D(this._adaptee.transformVector(v.adaptee));
+    return new this.sec.flash.geom.Vector3D(this._adaptee.transformVector(v.adaptee));
   }
 
   public deltaTransformVector(v: Vector3D): Vector3D
   {
-    return new Vector3D(this._adaptee.deltaTransformVector(v.adaptee));
+    return new this.sec.flash.geom.Vector3D(this._adaptee.deltaTransformVector(v.adaptee));
   }
 
   public transformVectors(vin: Float64Vector, vout: Float64Vector): void

@@ -213,7 +213,7 @@ export class ColorTransform extends ASObject
 
   public clone(): ColorTransform
   {
-    return new ColorTransform(
+    return new this.sec.flash.geom.ColorTransform(
       this._adaptee._rawData[0],
       this._adaptee._rawData[1],
       this._adaptee._rawData[2],

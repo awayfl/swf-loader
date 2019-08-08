@@ -131,7 +131,7 @@ export class Rectangle extends ASObject implements IExternalizable
 	 */
 	public get bottomRight():Point
 	{
-		return new Point(this._adaptee.bottomRight);
+		return new this.sec.flash.geom.Point(this._adaptee.bottomRight);
 	}
 
   public set bottomRight(value: Point)
@@ -179,7 +179,7 @@ export class Rectangle extends ASObject implements IExternalizable
 	 */
 	public get size():Point
 	{
-		return new Point(this._adaptee.size);
+		return new this.sec.flash.geom.Point(this._adaptee.size);
 	}
 
   public set size(value: Point)
@@ -214,7 +214,7 @@ export class Rectangle extends ASObject implements IExternalizable
 	 */
 	public get topLeft():Point
 	{
-    return new Point(this._adaptee.topLeft);
+    return new this.sec.flash.geom.Point(this._adaptee.topLeft);
 	}
 
   public set topLeft(value: Point)
@@ -253,7 +253,7 @@ export class Rectangle extends ASObject implements IExternalizable
   public static FromBounds(bounds: Bounds): Rectangle {
     var xMin = bounds.xMin;
     var yMin = bounds.yMin;
-    return new Rectangle(xMin / 20, yMin / 20,
+    return new this.sec.flash.geom.Rectangle(xMin / 20, yMin / 20,
                                               (bounds.xMax - xMin) / 20,
                                               (bounds.yMax - yMin) / 20);
   }
@@ -269,7 +269,7 @@ export class Rectangle extends ASObject implements IExternalizable
 	 */
   public clone(): Rectangle
   {
-    return new Rectangle(this._adaptee.clone());
+    return new this.sec.flash.geom.Rectangle(this._adaptee.clone());
   }
 
 	/**
@@ -419,7 +419,7 @@ export class Rectangle extends ASObject implements IExternalizable
 	 */
   public intersection(toIntersect: Rectangle): Rectangle
   {
-    return new Rectangle(this._adaptee.intersection(toIntersect.adaptee));
+    return new this.sec.flash.geom.Rectangle(this._adaptee.intersection(toIntersect.adaptee));
   }
 
 	/**
@@ -452,7 +452,7 @@ export class Rectangle extends ASObject implements IExternalizable
 	 */
   public union(toUnion: Rectangle): Rectangle
   {
-    return new Rectangle(this._adaptee.union(toUnion.adaptee));
+    return new this.sec.flash.geom.Rectangle(this._adaptee.union(toUnion.adaptee));
   }
 
   /**

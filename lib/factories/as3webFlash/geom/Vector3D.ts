@@ -247,7 +247,7 @@ export class Vector3D extends ASObject
    */
   public crossProduct(a: Vector3D): Vector3D
   {
-    return new Vector3D(this._adaptee.crossProduct(a.adaptee));
+    return new this.sec.flash.geom.Vector3D(this._adaptee.crossProduct(a.adaptee));
   }
 
   
@@ -324,7 +324,7 @@ export class Vector3D extends ASObject
    */
   public add(a: Vector3D): Vector3D
   {
-    return new Vector3D(this._adaptee.add(a.adaptee));
+    return new this.sec.flash.geom.Vector3D(this._adaptee.add(a.adaptee));
   }
 
   /**
@@ -341,7 +341,7 @@ export class Vector3D extends ASObject
    */
   public subtract(a: Vector3D): Vector3D
   {
-    return new Vector3D(this._adaptee.subtract(a.adaptee));
+    return new this.sec.flash.geom.Vector3D(this._adaptee.subtract(a.adaptee));
   }
 
   /**
@@ -458,7 +458,7 @@ export class Vector3D extends ASObject
    */
   public clone(): Vector3D
   {
-    return new Vector3D(this._adaptee.clone());
+    return new this.sec.flash.geom.Vector3D(this._adaptee.clone());
   }
 
   public toString(): string

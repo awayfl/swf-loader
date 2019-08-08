@@ -1,10 +1,11 @@
-import {Point, Box} from "@awayjs/core";
+import {Box} from "@awayjs/core";
 import {Billboard, TextField as AwayTextField, DisplayObjectContainer as AwayDisplayObjectContainer, Sprite as AwaySprite, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject} from "@awayjs/scene";
 import {DisplayObject} from "./DisplayObject";
 import {InteractiveObject} from "./InteractiveObject";
 import {Event} from "../events/Event";
 import {PickGroup} from "@awayjs/view";
 import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { Point } from '../geom/Point';
 
 export class DisplayObjectContainer extends InteractiveObject{
 

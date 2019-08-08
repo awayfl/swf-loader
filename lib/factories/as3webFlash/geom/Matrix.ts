@@ -158,13 +158,13 @@ export class Matrix extends ASObject
   }
 
   public static FromUntyped(object: any): Matrix {
-    return new Matrix(object.a, object.b, object.c, object.d,
+    return new this.sec.flash.geom.Matrix(object.a, object.b, object.c, object.d,
                                           object.tx, object.ty);
   }
 
   // Keep in sync with writeExternal below!
   public static FromDataBuffer(input: DataBuffer) {
-    return new Matrix(input.readFloat(), input.readFloat(),
+    return new this.sec.flash.geom.Matrix(input.readFloat(), input.readFloat(),
                                           input.readFloat(), input.readFloat(),
                                           input.readFloat(), input.readFloat());
   }
@@ -349,7 +349,7 @@ export class Matrix extends ASObject
    */
   public deltaTransformPoint(point: Point): Point
   {
-    return new Point(this._adaptee.deltaTransformPoint(point.adaptee));
+    return new this.sec.flash.geom.Point(this._adaptee.deltaTransformPoint(point.adaptee));
   }
 
   /**
@@ -362,7 +362,7 @@ export class Matrix extends ASObject
    */
   public transformPoint(point: Point): Point
   {
-    return new Point(this._adaptee.transformPoint(point.adaptee));
+    return new this.sec.flash.geom.Point(this._adaptee.transformPoint(point.adaptee));
   }
   
   /**
@@ -453,7 +453,7 @@ export class Matrix extends ASObject
 	 */
   public clone(): Matrix
   {
-    return new Matrix(this._adaptee.clone());
+    return new this.sec.flash.geom.Matrix(this._adaptee.clone());
   }
 
   public toString(): string

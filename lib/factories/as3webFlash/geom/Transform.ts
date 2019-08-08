@@ -46,12 +46,11 @@ export class Transform extends ASObject
       this.sec.throwError("ArgumentError", Errors.NullPointerError, "displayObject");
 
     this._adaptee = (displayObjectAdaptee instanceof AwayTransform)? displayObjectAdaptee : new AwayTransform();
-    this._adaptee.avm2Adapter=this;
   }
 
   public get matrix(): Matrix
   {
-    return new Matrix(this._adaptee.matrix);
+    return new this.sec.flash.geom.Matrix(this._adaptee.matrix);
   }
 
   public set matrix(value: Matrix)
@@ -61,7 +60,7 @@ export class Transform extends ASObject
 
   public get colorTransform(): ColorTransform
   {
-    return new ColorTransform(this._adaptee.colorTransform);
+    return new this.sec.flash.geom.ColorTransform(this._adaptee.colorTransform);
   }
 
   public set colorTransform(value: ColorTransform)
@@ -71,14 +70,14 @@ export class Transform extends ASObject
 
   public get concatenatedMatrix(): Matrix
   {
-    return new Matrix(this._adaptee.matrix);
+    return new this.sec.flash.geom.Matrix(this._adaptee.matrix);
   }
 
   public get concatenatedColorTransform(): ColorTransform
   {
     release || notImplemented("public flash.geom.Transform::get concatenatedColorTransform");
 
-    return new ColorTransform(this._adaptee.colorTransform);
+    return new this.sec.flash.geom.ColorTransform(this._adaptee.colorTransform);
   }
 
   public get pixelBounds(): Rectangle
@@ -86,12 +85,12 @@ export class Transform extends ASObject
     // Only somewhat implemented because this is largely untested.
     release || notImplemented("public flash.geom.Transform::get pixelBounds");
 
-    return new Rectangle(this._adaptee.pixelBounds);
+    return new this.sec.flash.geom.Rectangle(this._adaptee.pixelBounds);
   }
 
   public get matrix3D(): Matrix3D
   {
-    return new Matrix3D(this._adaptee.matrix3D);
+    return new this.sec.flash.geom.Matrix3D(this._adaptee.matrix3D);
   }
 
   public set matrix3D(m: Matrix3D)
@@ -105,7 +104,7 @@ export class Transform extends ASObject
     release || notImplemented("public flash.geom.Transform::getRelativeMatrix3D");
 
     // TODO: actually calculate the relative matrix.
-    return new Matrix3D(this._adaptee.matrix3D);
+    return new this.sec.flash.geom.Matrix3D(this._adaptee.matrix3D);
   }
 
   public get perspectiveProjection(): PerspectiveProjection

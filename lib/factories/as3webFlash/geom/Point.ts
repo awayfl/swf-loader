@@ -105,7 +105,7 @@ export class Point extends ASObject
    */
   public static interpolate(pt1: Point, pt2: Point, f: number): Point
   {
-    return new Point(AwayPoint.interpolate(pt1.adaptee, pt2.adaptee, f));
+    return new this.sec.flash.geom.Point(AwayPoint.interpolate(pt1.adaptee, pt2.adaptee, f));
   }
 
   /**
@@ -129,7 +129,7 @@ export class Point extends ASObject
    */
   public static polar(len: number, angle: number): Point
   {
-    return new Point(AwayPoint.polar(+len, +angle));
+    return new this.sec.flash.geom.Point(AwayPoint.polar(+len, +angle));
   }
 
   /**
@@ -139,7 +139,7 @@ export class Point extends ASObject
    */
   public clone(): Point
   {
-    return new Point(this._adaptee.clone());
+    return new this.sec.flash.geom.Point(this._adaptee.clone());
   }
 
   /**
@@ -179,7 +179,7 @@ export class Point extends ASObject
    */
   public subtract(v: Point): Point
   {
-    return new Point(this._adaptee.subtract(v.adaptee));
+    return new this.sec.flash.geom.Point(this._adaptee.subtract(v.adaptee));
   }
 
 
@@ -192,7 +192,7 @@ export class Point extends ASObject
    */
   public add(v: Point): Point
   {
-    return new Point(this._adaptee.add(v.adaptee));
+    return new this.sec.flash.geom.Point(this._adaptee.add(v.adaptee));
   }
 
   /**
