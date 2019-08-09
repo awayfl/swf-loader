@@ -20,9 +20,10 @@ export function axConstruct(argArray?: any[]) {
     var object = Object.create(this.tPrototype);
     if (this._symbol && this._symbol.timeline) {
         var newMC = new MovieClip(this._symbol.timeline);
+        //console.log("create mc via axConstruct");
         newMC.timelineMC = true;
-        /*(<any>newMC).noReset=true;
-        newMC.reset();*/
+        object.noReset=true;
+        
         MovieClip.mcForConstructor = newMC;
     }
     if (this.superClass && this.superClass.classInfo && this.superClass.classInfo.instanceInfo && this.superClass.classInfo.instanceInfo.name.name == "Sound") {
@@ -43,5 +44,8 @@ export function axConstruct(argArray?: any[]) {
     }
     //FrameScriptManager.execute_queue();
     object.axInitializer.apply(object, argArray);
+    if(this.classInfo && this.classInfo.instanceInfo && this.classInfo.instanceInfo.name.name){
+        object["aaa"]=this.classInfo.instanceInfo.name.name;
+    }
     return object;
 }
