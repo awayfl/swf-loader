@@ -1080,6 +1080,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	}
 	public set x (value:number) {
+		this._blockedByScript=true;
 		this.adaptee.x=value;
 
 	}
@@ -1096,6 +1097,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		return this.adaptee.y;
 	}
 	public set y (value:number) {
+		this._blockedByScript=true;
 		this.adaptee.y=value;
 	}
 
@@ -1116,6 +1118,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		return this.adaptee.z;
 	}
 	public set z (value:number) {
+		this._blockedByScript=true;
 		this.adaptee.z=value;
 	}
 
