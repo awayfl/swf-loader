@@ -88,7 +88,8 @@ export class DisplayObjectContainer extends InteractiveObject{
 				}
 			}
 			else if(oneChild.isAsset(AwaySprite)) {
-				if (oneChild.adapter) {
+				if (oneChild.adapter && (<any>oneChild.adapter).advanceFrame) {
+					// when Flash constructs Sprites for "Shape" it will not include the DispayObjectContainer in the inheritance chain
 					(<DisplayObjectContainer>oneChild.adapter).advanceFrame(events);
 				}
 			}
