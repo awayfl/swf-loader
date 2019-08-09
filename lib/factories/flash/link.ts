@@ -44,12 +44,13 @@ import { DropShadowFilter } from "./filters/DropShadowFilter";
 import { GlowFilter } from "./filters/GlowFilter";
 import { GradientBevelFilter } from "./filters/GradientBevelFilter";
 import { GradientGlowFilter } from "./filters/GradientGlowFilter";
+import { Capabilities } from "./system/Capabilities";
+import { ExternalInterface } from "./external/ExternalInterface";
 /*
 import { URLRequest } from "./net/URLRequest";
 import { ApplicationDomain } from "./system/ApplicationDomain";
 import { SharedObject } from "./net/SharedObject";
 import { URLVariables } from "./net/URLVariables";
-import { Capabilities } from "./system/Capabilities";
 import { SecurityDomain } from "./system/SecurityDomain";
 import { Symbol } from "./symbol";
 import { Timer } from "./utils/Timer";
@@ -87,7 +88,6 @@ import { TimerEvent } from "./events/TimerEvent";
 import { ProgressEvent } from "./events/ProgressEvent";
 import { HTTPStatusEvent } from "./events/HTTPStatusEvent";
 import { UncaughtErrorEvents } from "./events/UncaughtErrorEvents";
-import { ExternalInterface } from "./external/ExternalInterface";
 import { ContextMenu } from "./ui/ContextMenu";
 import { ContextMenuItem } from "./ui/ContextMenuItem";
 import { ContextMenuBuiltInItems } from "./ui/ContextMenuBuiltInItems";
@@ -237,7 +237,7 @@ M("flash.events.MouseEvent", MouseEvent);
 // M("flash.events.AsyncErrorEvent", AsyncErrorEvent);
 // M("flash.events.UncaughtErrorEvents", UncaughtErrorEvents);
 
-// M("flash.external.ExternalInterface", ExternalInterface);
+ M("flash.external.ExternalInterface", ExternalInterface);
 
 // M("flash.ui.ContextMenu", ContextMenu);
 // M("flash.ui.ContextMenuItem", ContextMenuItem);
@@ -292,7 +292,7 @@ M("flash.events.MouseEvent", MouseEvent);
 // M("flash.net.Socket", Socket);
 // M("flash.net.URLVariables", URLVariables);
 
-// M("flash.system.Capabilities", Capabilities);
+ M("flash.system.Capabilities", Capabilities);
  M("flash.system.Security", Security);
  M("flash.system.System", System);
 // M("flash.system.SecurityDomain", SecurityDomain);

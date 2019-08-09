@@ -44,8 +44,5 @@ export function axConstruct(argArray?: any[]) {
     }
     //FrameScriptManager.execute_queue();
     object.axInitializer.apply(object, argArray);
-    if(this.classInfo && this.classInfo.instanceInfo && this.classInfo.instanceInfo.name.name){
-        object["aaa"]=this.classInfo.instanceInfo.name.name;
-    }
     return object;
 }

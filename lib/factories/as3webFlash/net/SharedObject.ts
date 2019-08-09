@@ -15,9 +15,10 @@ export class SharedObject extends ASObject {
 		super();
 		this._object_name = name;
 		if (typeof (Storage) !== "undefined") {
-			var data=JSON.parse(localStorage.getItem(name));
+			console.log("80pro: todo: loading shared data errors in avm2");
+			/*var data=JSON.parse(localStorage.getItem(name));
 			if(data)
-				this._data = this.sec.createObjectFromJS(data);
+				this._data = this.sec.createObjectFromJS(data);*/
 		}
 		if (this._data == null) {
 			console.log("no shared object found");
