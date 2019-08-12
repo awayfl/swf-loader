@@ -42,8 +42,6 @@ export class Player {
 	private _loader: Loader;
 	private _parser: SWFParser;
 	private _timer: RequestAnimationFrame;
-	private _frameRate: number = 30;
-	private _currentFps: number = 0;
 	private _time: number = 0;
 	private _sec: ISecurityDomain;
 	private _events: any[];
@@ -52,6 +50,7 @@ export class Player {
 	private _eventExitFrame: Event;
 	private _eventRender: Event;
 	private _renderStarted: boolean;
+	private _debugtimer:number=0;
 	constructor() {
 		this._renderStarted=false;
 		
@@ -74,7 +73,7 @@ export class Player {
 			this._eventExitFrame = new this._sec.flash.events.Event(Event.EXIT_FRAME);
 			this._eventRender = new this._sec.flash.events.Event(Event.RENDER);
 			this._events = [this._eventOnEnter, this._eventExitFrame];
-			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff);
+			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff, 30, true);
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
 			this._parser._iFileName=url;
 			this._loader = new this._sec.flash.display.Loader(this._parser);
@@ -121,7 +120,7 @@ export class Player {
 	 * Main loop
 	 */
 	private main_loop(dt: number) {
-		var frameMarker: number = Math.floor(1000 / this._frameRate);
+		var frameMarker: number = Math.floor(1000 / this._stage.frameRate);
 		this._time += Math.min(dt, frameMarker);
 
 		if (this._time >= frameMarker || !this._renderStarted) {

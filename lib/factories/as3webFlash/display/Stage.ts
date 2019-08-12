@@ -152,6 +152,7 @@ export class Stage extends DisplayObjectContainer{
 	private _eventRender: Event;
 	private _scene: Scene;
 
+	private _debugtimer:number=0;
 	private SHOW_FRAME_RATE:boolean = false;
 
 	constructor(startClass:any, width:number = 550, height:number = 400, backgroundColor:number = null, frameRate:number = 30, showFPS:boolean=false) {
@@ -332,13 +333,14 @@ export class Stage extends DisplayObjectContainer{
 		if( this.SHOW_FRAME_RATE ) {
 			this._fpsTextField = <HTMLDivElement> document.createElement( 'div' ); // disable in RC
 			this._fpsTextField.style.cssFloat   = 'none';
+			this._fpsTextField.style.backgroundColor   = '#000';
 			this._fpsTextField.style.position   = 'fixed';
 			this._fpsTextField.style.top        = '5px';
 			this._fpsTextField.style.width      = '100px';
 			this._fpsTextField.style.height     = '20px';
 			this._fpsTextField.style.right       = '5px';
 			this._fpsTextField.style.textAlign  = 'center';
-			this._fpsTextField.style.color      = '#ff0000';
+			this._fpsTextField.style.color      = '#ffffff';
 			this._fpsTextField.style.fontSize   = '16';
 			this._fpsTextField.innerHTML        = "";
 			document.body.appendChild( this._fpsTextField );
@@ -368,7 +370,7 @@ export class Stage extends DisplayObjectContainer{
 	public get view(): View {
 		return this._scene.renderer.view;
 	}
-	private updateFPS(): void {
+	public updateFPS(): void {
 		this._fpsTextField.innerText = this._currentFps.toFixed(2) + '/' + this._frameRate + " fps";
 		this._currentFps = 0;
 	}
@@ -534,7 +536,6 @@ export class Stage extends DisplayObjectContainer{
 
 		this._resizeCallbackDelegate(null);
 	}
-	private _debugtimer:number=0;
 	/**
 	 * Render loop
 	 */
@@ -574,6 +575,7 @@ export class Stage extends DisplayObjectContainer{
 	}
 	public render()
 	{		
+		this._currentFps++;
 		this._rendererStage.clear();
 		this._scene.render();
 	}
