@@ -3,7 +3,7 @@ console.debug("AwayJS - SWF-viewer - 0.3.77");
 
 export {SWFParser} from "./lib/parsers/SWFParser";
 
-export {AVMAwayStage} from "./lib/factories/AVMAwayStage";
+export {AVMAwayStage} from "./lib/factories/avm1/AVMAwayStage";
 export {AVM1SceneGraphFactory} from "./lib/factories/AVM1SceneGraphFactory";
 export {AVM1ContextImpl} from "./lib/factories/avm1/interpreter";
 export {LoaderInfo} from "./lib/factories/customAway/LoaderInfo";

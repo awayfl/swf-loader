@@ -48,7 +48,7 @@ import { ByteArray } from './avm2/natives/byteArray';
 import { Sound } from './as3webFlash/media/Sound';
 import { XMLDocument, XMLNode } from './avm2/natives/xml-document';
 import { TextFormat } from './flash/text/TextFormat';
-import { AVMAwayStage } from './AVMAwayStage';
+import { AVMAwayStage } from './avm1/AVMAwayStage';
 import { AXApplicationDomain } from './avm2/run/AXApplicationDomain';
 import { Sprite } from './as3webFlash/display/Sprite';
 import { ApplicationDomain } from './as3webFlash/system/ApplicationDomain';

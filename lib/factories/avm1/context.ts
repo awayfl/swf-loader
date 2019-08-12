@@ -30,7 +30,7 @@ import {AVM1Stage} from "./lib/AVM1Stage";
 import {AVM1MovieClip} from "./lib/AVM1MovieClip";
 import {getAVM1Object} from "./lib/AVM1Utils";
 import {LoaderInfo} from "../customAway/LoaderInfo";
-import {AVMAwayStage} from "../AVMAwayStage";
+import {AVMAwayStage} from "./AVMAwayStage";
 import { AVM1Object } from "./runtime/AVM1Object";
 import { AVM1Function } from "./runtime/AVM1Function";
 import {AssetLibrary} from "@awayjs/core";

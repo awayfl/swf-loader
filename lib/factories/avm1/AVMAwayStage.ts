@@ -11,7 +11,7 @@ import {View, BasicPartition, PickGroup} from "@awayjs/view";
 import {StageManager, Stage, ImageUtils, BitmapImage2D} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, KeyboardEvent, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
-import { AVM1TextField } from './avm1/lib/AVM1TextField';
+import { AVM1TextField } from '../avm1/lib/AVM1TextField';
 
 
 export interface FrameScript {
@@ -296,7 +296,7 @@ export class AVMAwayStage extends Sprite{
 		//this._rendererStage = StageManager.getInstance().getStageAt(0);
 
 		StageManager.htmlCanvas=htmlCanvas;
-		this._scene = new Scene(new BasicPartition(new DisplayObjectContainer()));
+		this._scene = new Scene(new BasicPartition(new AwayDisplayObjectContainer()));
 		this._scene.renderer.renderableSorter = null;//new RenderableSort2D();
 		StageManager.htmlCanvas=null;
 
@@ -489,6 +489,7 @@ export class AVMAwayStage extends Sprite{
         FrameScriptManager.execute_queue();
         
         var enterFramesChilds=[];
+		len=this._layers.length;
 		// now dispatch the onEnterFrame
 		for(i=0;i<len;i++) {
 			myLayer=this._layers[i];
@@ -530,7 +531,7 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
-		if(!this._scene || !this._scene.renderer){
+		if(!this._stage || !this._scene || !this._scene.renderer){
 			this._timer.stop();
 			return;
 		} 
@@ -549,7 +550,7 @@ export class AVMAwayStage extends Sprite{
 			//this.dispatchEventRecursive(this._eventExitFrame);
 			//this.dispatchEventRecursive(this._eventRender);
 
-			if(!this._scene || !this._scene.renderer){
+			if(!this._stage || !this._scene || !this._scene.renderer){
 				this._timer.stop();
 				return;
 			} 
@@ -570,6 +571,7 @@ export class AVMAwayStage extends Sprite{
 
 			}
 			*/
+			
 		}
 	}
 

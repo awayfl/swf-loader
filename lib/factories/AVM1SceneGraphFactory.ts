@@ -49,18 +49,14 @@ export class AVM1SceneGraphFactory extends DefaultSceneGraphFactory implements I
 	{
 		//var avm1MovieClip:AVM1MovieClip=<AVM1MovieClip>AVM1MovieClip.createAVM1Class(this.avm1Context)._ownProperties["prototype"].value;
 		var awayMovieClip:MovieClip= new MovieClip(timeline || new Timeline());
+		awayMovieClip.timelineMC=true;
 		if(symbol.isButton){
 			var avm1Button:AVM1Button=<AVM1Button>getAVM1Object(awayMovieClip, this.avm1Context);
-			awayMovieClip.timelineMC=true;
-			return awayMovieClip;
-
 		}
 		else{
 			var avm1MovieClip:AVM1MovieClip=<AVM1MovieClip>getAVM1Object(awayMovieClip, this.avm1Context);
-
-			awayMovieClip.timelineMC=true;
-			return awayMovieClip;
 		}
+		return awayMovieClip;
 		/*
 		for(let key in timeline.avm1InitActions){
 			console.log("\n\nfound init actions\n\n", timeline.avm1InitActions[key]);

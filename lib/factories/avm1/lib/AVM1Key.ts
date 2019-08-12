@@ -18,7 +18,7 @@
 import {AVM1Context} from "../context";
 import {alCallProperty,} from "../runtime";
 import {wrapAVM1NativeClass} from "./AVM1Utils";
-import {AVMAwayStage} from "../../AVMAwayStage";
+import {AVMAwayStage} from "../AVMAwayStage";
 import {AVM1Object} from "../runtime/AVM1Object";
 
 export class AVM1Key extends AVM1Object {

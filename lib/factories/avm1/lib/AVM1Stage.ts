@@ -17,7 +17,7 @@
 import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Context} from "../context";
 import {wrapAVM1NativeMembers} from "./AVM1Utils";
-import {AVMAwayStage} from "../../AVMAwayStage";
+import {AVMAwayStage} from "../AVMAwayStage";
 import { Rectangle } from '@awayjs/core';
 
 export class AVM1Stage extends AVM1Object {
