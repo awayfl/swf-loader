@@ -1,4 +1,4 @@
-import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline, FrameScriptManager } from "@awayjs/scene";
+import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, Sprite as AwaySprite, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline, FrameScriptManager } from "@awayjs/scene";
 import { Sprite } from "./Sprite";
 import { constructClassFromSymbol } from '../../link';
 
@@ -92,20 +92,6 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		return script;
 	}
 
-	public registerScriptObject(child: AwayDisplayObject): void {
-		if (child.name){
-			this[child.name] = child._adapter ? child.adapter : child;
-			
-			this.axSetPublicProperty(child.name, child.adapter);
-		}
-	}
-
-	public unregisterScriptObject(child: AwayDisplayObject): void {
-		delete this[child.name];
-
-		if (child.isAsset(AwayMovieClip))
-			(<AwayMovieClip>child).removeButtonListeners();
-	}
 	public freeFromScript(): void {
 		//this.stopAllSounds();
 		super.freeFromScript();
@@ -126,10 +112,9 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		};
 		AwayMovieClip.mcForConstructor=adaptee;
 		clone.axInitializer();
-		clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
+		if(clone.adaptee.timeline)
+			clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
 		(<any>clone).noReset=true;
-		//clone.adaptee.timeline=(<AwayMovieClip>this.adaptee).timeline;
-		//clone.gotoAndPlay(1);
 		return clone;
 	}
 

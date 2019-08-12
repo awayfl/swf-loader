@@ -1,4 +1,4 @@
-import {Sprite as AwaySprite} from "@awayjs/scene";
+import {Sprite as AwaySprite, DisplayObject as AwayDisplayObject, MovieClip as AwayMovieClip} from "@awayjs/scene";
 import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {DisplayObject} from "./DisplayObject";
 import {Rectangle} from "@awayjs/core";
@@ -40,13 +40,37 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	constructor(adaptee:AwaySprite = null)
 	{
+		if(!adaptee && AwayMovieClip.mcForConstructor){
+			adaptee=AwayMovieClip.mcForConstructor;
+		}
 		super(adaptee || AwaySprite.getNewSprite());
+
+		// if the adaptee was passed in via AwayMovieClip.mcForConstructor, its actually a MovieClip, 
+		// not a Sprite, and we need to reset it after the adapter was constructed
+		if(AwayMovieClip.mcForConstructor){
+			adaptee.reset();
+			AwayMovieClip.mcForConstructor=null;
+		}
 
 		this._graphics = new this.sec.flash.display.Graphics((<AwaySprite> this._adaptee).graphics);
 	}
 
 	//---------------------------stuff added to make it work:
 
+	public registerScriptObject(child: AwayDisplayObject): void {
+		if (child.name){
+			this[child.name] = child._adapter ? child.adapter : child;
+			
+			this.axSetPublicProperty(child.name, child.adapter);
+		}
+	}
+
+	public unregisterScriptObject(child: AwayDisplayObject): void {
+		delete this[child.name];
+
+		if (child.isAsset(AwayMovieClip))
+			(<AwayMovieClip>child).removeButtonListeners();
+	}
 
 	public clone():Sprite
 	{
