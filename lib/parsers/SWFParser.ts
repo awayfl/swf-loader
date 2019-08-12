@@ -581,6 +581,21 @@ export class SWFParser extends ParserBase
 		if(!states && !swfFrames)
 			throw("error when creating timeline - neither movieclip frames nor button-states present");
 		
+		var isButton:boolean=false;
+		var key:string;
+		symbol.isButton=false;
+		if(states && !swfFrames){
+			isButton=true;
+			symbol.isButton=true;
+			swfFrames=[];
+			for (key in states) {
+				var newSWFFrame:SWFFrame=new SWFFrame();
+				newSWFFrame.controlTags=states[key];
+				newSWFFrame.buttonStateName=key;
+				swfFrames[swfFrames.length]=newSWFFrame;
+				//console.log("buttonSound ", buttonSound);
+			}
+		}
 			
 		var avm2scripts={};		
 		var awayMc:MovieClip=this._factory.createMovieClip(null, symbol);
@@ -591,19 +606,6 @@ export class SWFParser extends ParserBase
 
 		
 
-		var isButton:boolean=false;
-		var key:string;
-		if(states && !swfFrames){
-			isButton=true;
-			swfFrames=[];
-			for (key in states) {
-				var newSWFFrame:SWFFrame=new SWFFrame();
-				newSWFFrame.controlTags=states[key];
-				newSWFFrame.buttonStateName=key;
-                swfFrames[swfFrames.length]=newSWFFrame;
-                //console.log("buttonSound ", buttonSound);
-			}
-		}
 		
 		var keyframe_durations:number[]=[];
 		var frame_command_indices:number[]=[];
@@ -669,7 +671,6 @@ export class SWFParser extends ParserBase
 					let awayAsset=this._awaySymbols[asset.symbolId];
 					if(!awayAsset){
 						console.log("\n\nerror: no away-asset for export\n\n", swfFrames[i].exports[key]);
-
 					}
 					else{
 						if(awayAsset.isAsset){
