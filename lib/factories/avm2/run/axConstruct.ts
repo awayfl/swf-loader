@@ -18,8 +18,18 @@ export class ActiveLoaderContext {
  */
 export function axConstruct(argArray?: any[]) {
     var object = Object.create(this.tPrototype);
-    if (this._symbol && this._symbol.timeline) {
-        var newMC = new MovieClip(this._symbol.timeline);
+    var symbol=null;
+    var timeline=null;
+    var classToCheck=this;
+    // find the timline that shoiuld be used for this MC. might be on superclass...
+    while(classToCheck && !timeline){
+        symbol=classToCheck._symbol;
+        if(symbol && symbol.timeline)
+            timeline=symbol.timeline;
+        classToCheck=classToCheck.superClass;
+    }
+    if (timeline) {
+        var newMC = new MovieClip(timeline);
         //console.log("create mc via axConstruct");
         newMC.timelineMC = true;
         object.noReset=true;
