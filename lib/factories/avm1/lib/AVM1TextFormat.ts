@@ -84,7 +84,7 @@ export class AVM1TextFormat extends AVM1Object implements IHasAS3ObjectReference
 		rightMargin = (rightMargin == null) ? null : alToNumber(context, rightMargin);
 		indent = (indent == null) ? null : alToNumber(context, indent);
 		leading = (leading == null) ? null : alToNumber(context, leading);
-		var awayObject = new this.context.sec.flash.text.TextFormat(
+		var awayObject = new TextFormat(
 			font, size, color, bold, italic, underline, url, target,
 			align, leftMargin, rightMargin, indent, leading);
 		this.adaptee = awayObject;
@@ -94,7 +94,7 @@ export class AVM1TextFormat extends AVM1Object implements IHasAS3ObjectReference
 
 	static alInitStatic(context: AVM1Context): void {
 		// See _measureTextField usage in the getTextExtent() below.
-		var measureTextField = new context.sec.flash.text.TextField();
+		var measureTextField = new TextField();
 		measureTextField.multiline = true;
 		this._measureTextField = measureTextField;
 	}
