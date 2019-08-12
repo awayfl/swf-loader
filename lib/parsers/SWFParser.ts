@@ -475,6 +475,7 @@ export class SWFParser extends ParserBase
                         }
 						break;
                     case "button":
+						noTimelineDebug || console.log("start parsing button: ", symbol);
 						var awayMc = this.framesToTimeline(symbol, null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
 						//awayMc._symbol=symbol;
                         awayMc.name="AwayJS_button_"+symbol.id.toString();

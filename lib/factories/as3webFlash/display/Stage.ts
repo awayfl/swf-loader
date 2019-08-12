@@ -486,7 +486,7 @@ export class Stage extends DisplayObjectContainer{
 	private initEninge(){
 
 		//create the view
-		this._scene = new Scene((new BasicPartition(new AwayDisplayObjectContainer())));
+		this._scene = new Scene(new BasicPartition(new AwayDisplayObjectContainer()));
 		this._rendererStage = this._scene.view.stage;
 		this._rendererStage.container.style.visibility="hidden";
 		this._rendererStage.antiAlias=0;
