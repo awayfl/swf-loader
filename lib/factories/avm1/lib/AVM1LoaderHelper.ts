@@ -30,7 +30,7 @@ export class AVM1LoaderHelper {
 		this._onAssetCompleteDelegate = (event: AssetEvent) => this.onAssetComplete(event);
 		this._onLoadCompleteDelegate = (event: LoaderEvent) => this.onLoadComplete(event);
 		this._onLoadErrorDelegate = (event: URLLoaderEvent) => this.onLoadError(event);
-		this._loader = new context.sec.flash.display.Loader();
+		this._loader = new Loader();
 	}
 
 	private _onAssetCompleteDelegate: (event: AssetEvent) => void;

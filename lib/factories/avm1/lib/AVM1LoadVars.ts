@@ -23,7 +23,7 @@ import {
 } from "../runtime";
 import {avm1BroadcastEvent} from "./AVM1Utils";
 import {isNullOrUndefined} from "../../base/utilities";
-import {URLLoaderEvent as Event, URLLoader} from "@awayjs/core";
+import {URLLoaderEvent as Event, URLLoader, URLRequest} from "@awayjs/core";
 import {forEachPublicProperty} from "../../AVM2Dummys";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Function } from "../runtime/AVM1Function";
@@ -38,18 +38,18 @@ export interface IAVM1DataObject {
 export function loadAVM1DataObject(context: AVM1Context, url: string,
 								   method: string, contentType: string,
 								   data: any, target: IAVM1DataObject): void {
-	var request = new context.sec.flash.net.URLRequest(url);
+	var request = new URLRequest(url);
 	if (method) {
 		request.method = method;
 	}
 	if (contentType) {
-		request.contentType = contentType;
+		//request.contentType = contentType;
 	}
 	if (data) {
 		release || Debug.assert(typeof data === 'string');
 		request.data = data;
 	}
-	var loader = new context.sec.flash.net.URLLoader(request);
+	var loader = new URLLoader();
 	loader.dataFormat = 'text'; // flash.net.URLLoaderDataFormat.TEXT;
 	var completeHandler = function (event: Event): void {
 		loader.removeEventListener(Event.LOAD_COMPLETE, completeHandler);
@@ -147,7 +147,7 @@ export class AVM1LoadVarsPrototype extends AVM1Object implements IAVM1DataObject
 
 	decode(queryString: string): void {
 		queryString = alCoerceString(this.context, queryString);
-		var as3Variables = new this.context.sec.flash.net.URLVariables();
+		/*var as3Variables = new URLVariables();
 		as3Variables._ignoreDecodingErrors = true;
 		as3Variables.decode(queryString);
 		forEachPublicProperty(as3Variables, function (name, value) {
@@ -155,18 +155,19 @@ export class AVM1LoadVarsPrototype extends AVM1Object implements IAVM1DataObject
 			if (typeof value === 'string') {
 				this.alPut(name, value);
 			}
-		}, this);
+		}, this);*/
 	}
 
 	_toString(): string {
 		var context = this.context;
-		var as3Variables = new context.sec.flash.net.URLVariables();
+		/*var as3Variables = new context.sec.flash.net.URLVariables();
 		alForEachProperty(this, function (name) {
 			if (this.alHasOwnProperty(name)) {
 				as3Variables.axSetPublicProperty(name, alToString(context, this.alGet(name)));
 			}
 		}, this);
-		return as3Variables.axCallPublicProperty('toString', null);
+		return as3Variables.axCallPublicProperty('toString', null);*/
+		return "";
 	}
 
 	send(url: string, target: string, method?: string): boolean {

@@ -71,22 +71,22 @@ class AVM1Security extends AVM1Object {
 	}
 
 	getSandboxType(): string {
-		return this.context.sec.flash.system.Security.axClass.sandboxType;
+		return null;//this.context.sec.flash.system.Security.axClass.sandboxType;
 	}
 
 	allowDomain(domain: string): void {
 		domain = alCoerceString(this.context, domain);
-		this.context.sec.flash.system.Security.axClass.allowDomain(domain);
+		//this.context.sec.flash.system.Security.axClass.allowDomain(domain);
 	}
 
 	allowInsecureDomain(domain: string): void {
 		domain = alCoerceString(this.context, domain);
-		this.context.sec.flash.system.Security.axClass.allowInsecureDomain(domain);
+		//this.context.sec.flash.system.Security.axClass.allowInsecureDomain(domain);
 	}
 
 	loadPolicyFile(url: string): void {
 		url = alCoerceString(this.context, url);
-		this.context.sec.flash.system.Security.axClass.loadPolicyFile(url);
+		//this.context.sec.flash.system.Security.axClass.loadPolicyFile(url);
 	}
 }
 

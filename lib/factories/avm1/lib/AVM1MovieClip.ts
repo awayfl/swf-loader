@@ -35,7 +35,7 @@ import {FlashNetScript_navigateToURL} from "../../AVM2Dummys";
 import {copyAS3PointTo, toAS3Point} from "./AVM1Point";
 import {MovieClipProperties} from "../interpreter/MovieClipProperties";
 import {IMovieClipAdapter, DisplayObject, MovieClip, TextField, Billboard, TextFormat, MouseManager} from "@awayjs/scene";
-import {AssetLibrary, Matrix3D, Point, WaveAudio} from "@awayjs/core";
+import {AssetLibrary, Matrix3D, Point, WaveAudio, URLRequest, Rectangle} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
 import {Graphics, LineScaleMode, GradientType} from "@awayjs/graphics";
 import {BitmapImage2D as Bitmap} from "@awayjs/stage";
@@ -583,7 +583,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public get$version(): string {
-		return this.context.sec.flash.system.Capabilities.version;
+		return "";
+		//return Capabilities.version;
 	}
 
 	public rgbaToArgb(float32Color:number):number
@@ -753,7 +754,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
             //return existingObj;
         }
         if(!mc){
-            mc = new this.context.sec.flash.display.MovieClip();
+            mc = new MovieClip();
             mc.name = name;
             mc.assetNamespace=this.adaptee.assetNamespace;
             getAVM1Object(mc,  <AVM1Context>this._avm1Context);
@@ -769,7 +770,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public createTextField(name, depth, x, y, width, height): AVM1TextField {
 		name = alToString(this.context, name);
-		var text: TextField = new this.context.sec.flash.text.TextField();
+		var text: TextField = new TextField();
 		text.name = name;
 		text.textFormat = new TextFormat();
 		getAVM1Object(text,  <AVM1Context>this._avm1Context);
@@ -971,7 +972,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public getURL(url, window, method) {
-		var request = new this.context.sec.flash.net.URLRequest(url);
+		var request = new URLRequest(url);
 		if (method) {
 			request.method = method;
 		}
@@ -1234,7 +1235,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			right = alToNumber(this.context, right);
 			bottom = alToNumber(this.context, bottom);
 			//console.log("left", left,"top", top, "right", right, "bottom", bottom );
-			this._dragBounds = new this.context.sec.flash.geom.Rectangle(left, top, right - left, bottom - top);
+			this._dragBounds = new Rectangle(left, top, right - left, bottom - top);
 		}//todo: listen on stage
 		if(!this.isDragging){
 			this.isDragging=true;

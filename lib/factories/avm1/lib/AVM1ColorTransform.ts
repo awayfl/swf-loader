@@ -89,9 +89,9 @@
 	export function toAwayColorTransform(v: AVM1ColorTransform): ColorTransform {
 		var context = v.context;
 		if (!(v instanceof AVM1ColorTransform)) {
-			return new context.sec.flash.geom.ColorTransform(1, 1, 1, 1, 0, 0, 0, 0);
+			return new ColorTransform(1, 1, 1, 1, 0, 0, 0, 0);
 		}
-		return new context.sec.flash.geom.ColorTransform(
+		return new ColorTransform(
 			alCoerceNumber(context, defaultTo(v._rawData[0], 1)),
 			alCoerceNumber(context, defaultTo(v._rawData[1], 1)),
 			alCoerceNumber(context, defaultTo(v._rawData[2], 1)),

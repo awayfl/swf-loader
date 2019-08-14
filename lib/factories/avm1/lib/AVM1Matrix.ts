@@ -32,7 +32,7 @@ export function toAS3Matrix(v: AVM1Object): Matrix {
 		tx = alCoerceNumber(context, v.alGet('tx'));
 		ty = alCoerceNumber(context, v.alGet('ty'));
 	}
-	return new context.sec.flash.geom.Matrix(a, b, c, d, tx, ty);
+	return new Matrix(a, b, c, d, tx, ty);
 }
 
 export function copyAS3MatrixTo(m: Matrix, v: AVM1Object) {

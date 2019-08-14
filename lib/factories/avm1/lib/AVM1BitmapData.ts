@@ -65,7 +65,7 @@ export class AVM1BitmapData extends AVM1Object implements IHasAS3ObjectReference
 		height = alToNumber(this.context, height);
 		transparent = arguments.length < 3 ? true : alToBoolean(this.context, transparent);
 		fillColor = arguments.length < 4 ? 0xFFFFFFFF : alToInt32(this.context, fillColor);
-		var awayObject = new this.context.sec.flash.display.BitmapData(width, height, transparent, fillColor, false, AVM1Stage.stage.rendererStage);
+		var awayObject = new BitmapData(width, height, transparent, fillColor, false, AVM1Stage.stage.rendererStage);
 		this.adaptee = awayObject;
 	}
 

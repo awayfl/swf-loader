@@ -32,7 +32,7 @@ export function toAS3Rectangle(v: AVM1Object): Rectangle {
 		width = alCoerceNumber(context, v.alGet('width'));
 		height = alCoerceNumber(context, v.alGet('height'));
 	}
-	return new context.sec.flash.geom.Rectangle(x, y, width, height);
+	return new Rectangle(x, y, width, height);
 }
 
 export function copyAS3RectangleTo(r: Rectangle, v: AVM1Object) {

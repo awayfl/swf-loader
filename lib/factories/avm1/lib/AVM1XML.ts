@@ -261,7 +261,7 @@ class AVM1XMLNodePrototype extends AVM1Object {
 	}
 
 	initializeNode(type: number, value: string): void {
-		this.as3XMLNode = new this.context.sec.flash.xml.XMLNode(type, value);
+		this.as3XMLNode = new XMLNode(type, value);
 		this._attributes = undefined;
 		this._childNodes = undefined;
 		AVM1XMLNodePrototype.addMap(this.as3XMLNode, this);
@@ -482,9 +482,10 @@ class AVM1XMLPrototype extends AVM1Object implements IAVM1DataObject {
 
 	initializeDocument(text: string) {
 		text = alCoerceString(this.context, text) || null;
-		var as3Doc = new this.context.sec.flash.xml.XMLDocument(text);
+		var as3Doc = new XMLDocument();
+		as3Doc.body.innerHTML=text;
 		AVM1XMLNodePrototype.prototype.initializeFromAS3Node.call(this, as3Doc);
-		this.as3XMLDocument = as3Doc;
+		this.as3XMLDocument = <any>as3Doc;
 	}
 
 	addRequestHeader(headers: any, headerValue?: String): void {

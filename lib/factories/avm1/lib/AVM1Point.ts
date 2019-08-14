@@ -28,7 +28,7 @@ export function toAS3Point(v: AVM1Object): Point {
 		x = alCoerceNumber(context, v.alGet('x'));
 		y = alCoerceNumber(context, v.alGet('y'));
 	}
-	return new context.sec.flash.geom.Point(x, y);
+	return new Point(x, y);
 }
 
 export function copyAS3PointTo(p: Point, v: AVM1Object) {
@@ -80,12 +80,12 @@ export class AVM1PointFunction extends AVM1Function {
 	}
 
 	public distance(pt1: AVM1Point, pt2: AVM1Point): number {
-		return this.context.sec.flash.geom.Point.axClass.distance(toAS3Point(pt1), toAS3Point(pt2));
+		return Point.distance(toAS3Point(pt1), toAS3Point(pt2));
 	}
 
 	public interpolate(pt1: AVM1Point, pt2: AVM1Point, f: number): AVM1Point {
 		f = alToNumber(this.context, f);
-		var p = this.context.sec.flash.geom.Point.axClass.interpolate(toAS3Point(pt1), toAS3Point(pt2), f);
+		var p = Point.interpolate(toAS3Point(pt1), toAS3Point(pt2), f);
 		return AVM1Point.fromAS3Point(this.context, p);
 	}
 
@@ -93,7 +93,7 @@ export class AVM1PointFunction extends AVM1Function {
 		len = alToNumber(this.context, len);
 		angle = alToNumber(this.context, angle);
 		return AVM1Point.fromAS3Point(this.context,
-			this.context.sec.flash.geom.Point.axClass.polar(len, angle));
+			Point.polar(len, angle));
 	}
 }
 

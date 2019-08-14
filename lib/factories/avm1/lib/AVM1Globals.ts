@@ -49,7 +49,7 @@
 	import {AVM1ColorTransformFunction} from "./AVM1ColorTransform";
 	import {AVM1ExternalInterface} from "./AVM1ExternalInterface";
 	import {createFiltersClasses} from "./AVM1Filters";
-	import {URLLoaderEvent as Event, AudioManager} from "@awayjs/core";
+	import {URLLoaderEvent as Event, AudioManager, URLRequest, URLLoader} from "@awayjs/core";
 	import {MovieClip, FrameScriptManager} from "@awayjs/scene";
 	import {create, RandomSeed} from "random-seed";
 	
@@ -470,7 +470,7 @@
 	
 		public getURL(url, target?, method?) {
 			var sec = this.context.sec;
-			var request = new sec.flash.net.URLRequest(String(url));
+			var request = new URLRequest(String(url));
 			if (method) {
 				request.method = method;
 			}
@@ -621,12 +621,12 @@
 	
 		_loadVariables(nativeTarget: IAVM1SymbolBase, url: string, method: string): void {
 			var context = this.context;
-			var request = new context.sec.flash.net.URLRequest(url);
+			var request = new URLRequest(url);
 			if (method) {
 				request.method = method;
 			}
-			var loader = new context.sec.flash.net.URLLoader(request);
-			loader._ignoreDecodeErrors = true;
+			var loader = new URLLoader();
+			//loader._ignoreDecodeErrors = true;			
 			loader.dataFormat = 'variables'; // flash.net.URLLoaderDataFormat.VARIABLES;
 			var completeHandler = context.sec.boxFunction(function (event:Event): void {
 				loader.removeEventListener(Event.LOAD_COMPLETE, completeHandler);
@@ -642,6 +642,7 @@
 				}
 			});
 			loader.addEventListener(Event.LOAD_COMPLETE, completeHandler);
+			loader.load(request);
 		}
 	
 		public mbchr(code) {
