@@ -2034,10 +2034,18 @@ function avm1_0x52_ActionCallMethod(ectx: ExecutionContext) {
 
 	// AVM1 simply ignores attempts to invoke non-methods.
 	if (!alIsFunction(fn)) {
-		avm1Warn("AVM1 warning: method '" + methodName + "' on object", obj,
-			(isNullOrUndefined(fn) ?
-				"is undefined" :
-				"is not callable"));
+		// we might have injected js function here, so we call that
+		if (typeof fn === "function") {
+			// do something
+	        stack[sp] = (<any>fn)(args);
+		}
+		else{
+			avm1Warn("AVM1 warning: method '" + methodName + "' on object", obj,
+				(isNullOrUndefined(fn) ?
+					"is undefined" :
+					"is not callable"));
+
+		}		
 		return;
 	}
 	release || assert(stack.length === sp + 1);

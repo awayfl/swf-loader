@@ -1,3 +1,5 @@
+
+
 console.debug("AwayJS - SWF-viewer - 0.3.77");
 
 
@@ -15,6 +17,7 @@ export {ISoftKeyboardManager} from "./lib/factories/ISoftKeyboardManager";
 export { AVM1Object } from "./lib/factories/avm1/runtime/AVM1Object";
 
 export {AVM1PropertyFlags} from "./lib/factories/avm1/runtime";
+export {AVM1PropertyDescriptor} from "./lib/factories/avm1/runtime/AVM1PropertyDescriptor";
 export {wrapAVM1NativeClass} from "./lib/factories/avm1/lib/AVM1Utils";
 export {AVM1Context} from "./lib/factories/avm1/context";
 export {Debug, release} from "./lib/factories/base/utilities/Debug";
@@ -23,3 +26,9 @@ export {alIsFunction} from "./lib/factories/avm1/runtime";
 
 export {BaseVector} from "./lib/factories/avm2/natives/GenericVector";
 export {Player} from "./lib/factories/player/Player";
+
+export { alIsArray } from './lib/factories/avm1/runtime';
+
+export { alNewObject } from './lib/factories/avm1/runtime';
+
+export { AVM1ArrayNative } from './lib/factories/avm1/natives';
