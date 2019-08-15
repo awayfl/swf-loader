@@ -299,7 +299,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 
 
 		if (typeof frame === "string") {
-			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame.toLowerCase()] == null) {
+			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame] == null) {
 				frame = parseInt(frame);
 				if (!isNaN(frame)) {
 					(<AwayMovieClip>this.adaptee).currentFrameIndex = (<number>frame) - 1;
@@ -333,7 +333,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return;
 
 		if (typeof frame === "string") {
-			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame.toLowerCase()] == null) {
+			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame] == null) {
 				frame = parseInt(frame);
 				if (!isNaN(frame)) {
 					(<AwayMovieClip>this.adaptee).currentFrameIndex = (<number>frame) - 1;

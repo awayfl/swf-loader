@@ -1,8 +1,8 @@
 import { warning } from "../../base/utilities/Debug";
-import { EventDispatcher } from "../events/EventDispatcher";
+import { EventDispatcher } from "../../as3webFlash/events/EventDispatcher";
 import { Errors } from "../../avm2/errors";
 import { TimerEvent } from "../events/TimerEvent";
-import { leaveTimeline, enterTimeline } from "../../avm2/module";
+//import { leaveTimeline, enterTimeline } from "../../avm2/module";
 
 /**
  * Copyright 2014 Mozilla Foundation
@@ -98,24 +98,24 @@ export class Timer extends EventDispatcher {
       return;
     }
     if (Timer.dispatchingEnabled) {
-      enterTimeline("Timer.Timer");
+      //enterTimeline("Timer.Timer");
       try {
         this.dispatchEvent(new TimerEvent("timer", true, false));
       } catch (e) {
         warning('caught error under Timer TIMER event: ', e);
       }
-      leaveTimeline();
+      //leaveTimeline();
     }
     if (this._repeatCount !== 0 && this._iteration >= this._repeatCount) {
       this.stop();
-      enterTimeline("Timer.TimerComplete");
+      //enterTimeline("Timer.TimerComplete");
       try {
         this.dispatchEvent(new TimerEvent(TimerEvent.TIMER_COMPLETE,
                                                                             false, false));
       } catch (e) {
         warning('caught error under Timer COMPLETE event: ', e);
       }
-      leaveTimeline();
+      //leaveTimeline();
     }
   }
 }

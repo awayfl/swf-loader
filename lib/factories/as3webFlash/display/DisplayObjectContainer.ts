@@ -108,7 +108,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 		for(i=0;i<(<AwayDisplayObjectContainer> this._adaptee).numChildren;i++){
 			var oneChild:AwayDisplayObject=(<AwayDisplayObjectContainer> this._adaptee).getChildAt(i);
 			var childname="child_"+i+" "+(<any>oneChild.adapter).constructor.name;
-			if(oneChild.isAsset(AwaySprite)||oneChild.isAsset(AwayDisplayObjectContainer)){
+			if(oneChild.isAsset(AwaySprite) || oneChild.isAsset(AwayDisplayObjectContainer)){
 				if(oneChild.adapter){
 					obj.children[childname]={};
 					(<DisplayObjectContainer>oneChild.adapter).debugDisplayGraph(obj.children[childname]);
