@@ -1,10 +1,9 @@
 import { FrameScriptManager, MovieClip } from '@awayjs/scene';
 import { AssetLibrary, AssetBase, WaveAudio } from '@awayjs/core';
 import { Sound } from '../../as3webFlash/media/Sound';
-import { LoaderContext } from '../../as3webFlash/system/LoaderContext';
 
 export class ActiveLoaderContext {
-    public static loaderContext: LoaderContext;
+    public static loaderContext: any;
     public static soundForConstructor: WaveAudio;
 }
 
