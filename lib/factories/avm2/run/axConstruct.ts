@@ -51,6 +51,7 @@ export function axConstruct(argArray?: any[]) {
             console.log("error: ActiveLoaderContext.loaderContext not set. can not rerieve Sound");
         }
     }
+    object.noReset=true;
     //FrameScriptManager.execute_queue();
     object.axInitializer.apply(object, argArray);
     return object;
