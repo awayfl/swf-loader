@@ -747,7 +747,7 @@ export class SWFParser extends ParserBase
 						swfFrames[i].labelNames[fl]=scriptLabels.length>0?scriptLabels[0]:"";
 						var labelName=swfFrames[i].labelNames[fl];
 						if(this.swfFile.swfVersion<9){
-							//labelName=labelName.toLowerCase();
+							labelName=labelName.toLowerCase();
 						}
                         if(!awayTimeline._labels[labelName])
 						    awayTimeline._labels[labelName]=keyFrameCount;
