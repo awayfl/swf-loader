@@ -30,6 +30,9 @@ export class ASFunction extends ASObject {
     protected receiver: {scope: Scope};
     protected methodInfo: MethodInfo;
   
+    public setReceiver(receiver:any){
+      this.receiver=receiver;
+    }
     axConstruct(args: any[]) {
       var prototype = this.prototype;
       // AS3 allows setting null/undefined prototypes. In order to make our value checking work,
