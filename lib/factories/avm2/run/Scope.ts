@@ -10,10 +10,10 @@ export class Scope {
     global: Scope;
     object: AXObject;
     isWith: boolean;
-    cache: any;
+    cache: AXObject[];
     defaultNamespace: Namespace;
   
-    constructor(parent: Scope, object: any, isWith: boolean = false) {
+    constructor(parent: Scope, object: AXObject, isWith: boolean = false) {
       this.parent = parent;
       this.object = object;
       this.global = parent ? parent.global : this;
@@ -45,17 +45,17 @@ export class Scope {
       return objects;
     }
   
-    public getScopeProperty(mn: Multiname, strict: boolean, scopeOnly: boolean): any {
+    public getScopeProperty(mn: Multiname, strict: boolean, scopeOnly: boolean): AXObject {
       return this.findScopeProperty(mn, strict, scopeOnly).axGetProperty(mn);
     }
   
-    public findScopeProperty(mn: Multiname, strict: boolean, scopeOnly: boolean): any {
+    public findScopeProperty(mn: Multiname, strict: boolean, scopeOnly: boolean): AXObject {
       // Multinames with a `null` name are the any name, '*'. Need to catch those here, because
       // otherwise we'll get a failing assert in `RuntimeTraits#getTrait` below.
       if (mn.name === null) {
         this.global.object.sec.throwError('ReferenceError', Errors.UndefinedVarError, '*');
       }
-      var object;
+      var object:AXObject;
       if (!scopeOnly && !mn.isRuntime()) {
         if ((object = this.cache[mn.id])) {
           return object;
@@ -69,7 +69,7 @@ export class Scope {
         return (this.isWith || mn.isRuntime()) ? this.object : (this.cache[mn.id] = this.object);
       }
       if (this.parent) {
-        var object = this.parent.findScopeProperty(mn, strict, scopeOnly);
+        var object:AXObject = this.parent.findScopeProperty(mn, strict, scopeOnly);
         if (mn.kind === CONSTANT.QName) {
           this.cache[mn.id] = object;
         }
@@ -85,7 +85,7 @@ export class Scope {
       }
   
       // If we can't find the property look in the domain.
-      var globalObject = <AXGlobal><any>this.global.object;
+      var globalObject:AXGlobal = <AXGlobal> this.global.object;
       if ((object = globalObject.applicationDomain.findProperty(mn, strict, true))) {
         return object;
       }
