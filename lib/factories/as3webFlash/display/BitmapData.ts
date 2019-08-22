@@ -114,13 +114,13 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 	}
 
 	public clone(): BitmapData {
-		var clone: BitmapData = new BitmapData(this._adaptee.width, this._adaptee.height, this._adaptee.transparent, 0x0);
-		clone.copyPixels(this, this.rect, new Point());
+		var clone: BitmapData = new this.sec.flash.display.BitmapData(this._adaptee.width, this._adaptee.height, this._adaptee.transparent, 0x0);
+		clone.copyPixels(this, this.rect, new this.sec.flash.geom.Point());
 		return clone;
 	}
 
 	public get rect(): Rectangle {
-		return new Rectangle(this._adaptee.rect);
+		return new this.sec.flash.geom.Rectangle(this._adaptee.rect);
 	}
 	public getPixel(x: number, y: number): number {
 		return this._adaptee.getPixel(x, y);
@@ -179,7 +179,7 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 	public hitTest(firstPoint: Point,
 		firstAlphaThreshold: number,
 		secondObject: any,
-		secondBitmapPoint: Point = new Point(0, 0),
+		secondBitmapPoint: Point = new this.sec.flash.geom.Point(0, 0),
 		secondAlphaThreshold: number = 0): boolean {
 		console.log("hitTest not implemented yet in flash/BitmapData");
 		return false;
