@@ -32,6 +32,7 @@ import { escapeAttributeValue, escapeElementValue } from "./natives/xml";
 import { Errors } from "./errors";
 import { getPropertyDescriptor } from "../base/utilities/ObjectUtilities";
 import { isValidASValue } from './run/initializeAXBasePrototype';
+import { AXClass } from './run/AXClass';
 
 /**
  * Helps the interpreter allocate fewer Scope objects.
@@ -174,7 +175,7 @@ class InterpreterFrame {
       }
       var rn = p.getType();
       if (rn && !rn.isAnyName()) {
-        var type = parentScope.getScopeProperty(rn, true, false);
+        var type:AXClass = <AXClass> parentScope.getScopeProperty(rn, true, false);
         if (!type) {
           // During class initialization the class' constructor isn't in scope and can't be
           // resolved as a scope property: trying to do so yields `null`.
@@ -212,10 +213,6 @@ class InterpreterFrame {
 
   bc(): Bytecode {
     return this.code[this.pc++];
-  }
-
-  peekStack() {
-    return this.stack[this.stack.length - 1];
   }
 
   u30(): number {
@@ -271,7 +268,7 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
 
   var rn = new Multiname(abc, 0, null, null, null);
 
-  var value, object, receiver, type, a, b, offset, index, result;
+  var value, object, receiver, a, b, offset, index, result;
   var args = [];
   var argCount = 0;
 
@@ -295,66 +292,30 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           locals[frame.u30()] = undefined;
           break;
         case Bytecode.IFNLT:
-          b = stack.pop();
-          a = stack.pop();
-          offset = frame.s24();
-          if (!(a < b)) {
-            frame.pc += offset;
-          }
-          continue;
         case Bytecode.IFGE:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (a >= b) {
+          if (stack.pop() <= stack.pop()) {
             frame.pc += offset;
           }
           continue;
         case Bytecode.IFNLE:
-          b = stack.pop();
-          a = stack.pop();
-          offset = frame.s24();
-          if (!(a <= b)) {
-            frame.pc += offset;
-          }
-          continue;
         case Bytecode.IFGT:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (a > b) {
+          if (stack.pop() < stack.pop()) {
             frame.pc += offset;
           }
           continue;
         case Bytecode.IFNGT:
-          b = stack.pop();
-          a = stack.pop();
-          offset = frame.s24();
-          if (!(a > b)) {
-            frame.pc += offset;
-          }
-          continue;
         case Bytecode.IFLE:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (a <= b) {
+          if (stack.pop() >= stack.pop()) {
             frame.pc += offset;
           }
           continue;
         case Bytecode.IFNGE:
-          b = stack.pop();
-          a = stack.pop();
-          offset = frame.s24();
-          if (!(a >= b)) {
-            frame.pc += offset;
-          }
-          continue;
         case Bytecode.IFLT:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (a < b) {
+          if (stack.pop() > stack.pop()) {
             frame.pc += offset;
           }
           continue;
@@ -374,34 +335,26 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           }
           continue;
         case Bytecode.IFEQ:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (axEquals(a, b, sec)) {
+          if (axEquals(stack.pop(), stack.pop(), sec)) {
             frame.pc += offset;
           }
           continue;
         case Bytecode.IFNE:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (!axEquals(a, b, sec)) {
+          if (!axEquals(stack.pop(), stack.pop(), sec)) {
             frame.pc += offset;
           }
           continue;
         case Bytecode.IFSTRICTEQ:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (a === b) {
+          if (stack.pop() === stack.pop()) {
             frame.pc += offset;
           }
           continue;
         case Bytecode.IFSTRICTNE:
-          b = stack.pop();
-          a = stack.pop();
           offset = frame.s24();
-          if (a !== b) {
+          if (stack.pop() !== stack.pop()) {
             frame.pc += offset;
           }
           continue;
@@ -420,14 +373,10 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           scopes.pop();
           break;
         case Bytecode.NEXTNAME:
-          index = stack.pop();
-          receiver = sec.box(frame.peekStack());
-          stack[stack.length - 1] = receiver.axNextName(index);
+          stack[stack.length - 2] = sec.box(stack[stack.length - 2]).axNextName(stack.pop());
           break;
         case Bytecode.NEXTVALUE:
-          index = stack.pop();
-          receiver = sec.box(frame.peekStack());
-          stack[stack.length - 1] = receiver.axNextValue(index);
+          stack[stack.length - 2] = sec.box(stack[stack.length - 2]).axNextValue(stack.pop());
           break;
         case Bytecode.HASNEXT2:
           var hasNext2Info = frame.getHasNext2Info();
@@ -503,7 +452,7 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           break;
         case Bytecode.CONSTRUCT:
           popManyInto(stack, frame.u30(), args);
-          receiver = sec.box(frame.peekStack());
+          receiver = sec.box(stack[stack.length - 1]);
           validateConstruct(sec, receiver, args.length);
           stack[stack.length - 1] = receiver.axConstruct(args);
           break;
@@ -531,19 +480,15 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           index = frame.u30();
           popManyInto(stack, frame.u30(), args);
           popNameInto(stack, abc.getMultiname(index), rn);
-          receiver = sec.box(frame.peekStack());
-          stack[stack.length - 1] = receiver.axConstructProperty(rn, args);
+          stack[stack.length - 1] = sec.box(stack[stack.length - 1]).axConstructProperty(rn, args);
           break;
         case Bytecode.CALLPROPLEX:
         case Bytecode.CALLPROPERTY:
         case Bytecode.CALLPROPVOID:
           index = frame.u30();
-          argCount = frame.u30();
-          popManyInto(stack, argCount, args);
+          popManyInto(stack, frame.u30(), args);
           popNameInto(stack, abc.getMultiname(index), rn);
-          //console.log("stack[stack.length - 1]", stack[stack.length - 1]);
-          receiver = sec.box(stack[stack.length - 1]);
-          result = receiver.axCallProperty(rn, args, bc === Bytecode.CALLPROPLEX);
+          result = sec.box(stack[stack.length - 1]).axCallProperty(rn, args, bc === Bytecode.CALLPROPLEX);
           if (bc === Bytecode.CALLPROPVOID) {
             stack.length--;
           } else {
@@ -553,11 +498,9 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
         case Bytecode.CALLSUPER:
         case Bytecode.CALLSUPERVOID:
           index = frame.u30();
-          argCount = frame.u30();
-          popManyInto(stack, argCount, args);
+          popManyInto(stack, frame.u30(), args);
           popNameInto(stack, abc.getMultiname(index), rn);
-          receiver = sec.box(stack[stack.length - 1]);
-          result = receiver.axCallSuper(rn, savedScope, args);
+          result = sec.box(stack[stack.length - 1]).axCallSuper(rn, savedScope, args);
           if (bc === Bytecode.CALLSUPERVOID) {
             stack.length--;
           } else {
@@ -603,17 +546,13 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
         case Bytecode.NEWCLASS:
           // Storing super class in `value` to make exception handling easier.
           value = stack[stack.length - 1];
-          stack[stack.length - 1] = sec.createClass(abc.classes[frame.u30()], value,
-                                                    scopes.topScope());
+          stack[stack.length - 1] = sec.createClass(abc.classes[frame.u30()], value, scopes.topScope());
           break;
         case Bytecode.GETDESCENDANTS:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          if (rn.name === undefined) {
+          if (rn.name === undefined)
             rn.name = '*';
-          }
-          result = axGetDescendants(stack[stack.length - 1], rn, sec);
-          release || checkValue(result);
-          stack[stack.length - 1] = result;
+          stack[stack.length - 1] = axGetDescendants(stack[stack.length - 1], rn, sec);
           break;
         case Bytecode.NEWCATCH:
           stack.push(sec.createCatch(frame.body.catchBlocks[frame.u30()], scopes.topScope()));
@@ -625,47 +564,30 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           break;
         case Bytecode.GETLEX:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          object = scopes.topScope().findScopeProperty(rn, true, false);
-          result = object.axGetProperty(rn);
-          release || checkValue(result);
-          stack.push(result);
+          stack.push(scopes.topScope().findScopeProperty(rn, true, false).axGetProperty(rn));
           break;
         case Bytecode.INITPROPERTY:
         case Bytecode.SETPROPERTY:
           value = stack.pop();
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          
-          //console.log("reciever not found", stack)
-          receiver = sec.box(stack.pop());
-          if(!receiver)
-            console.log("reciever not found", rn, value, Bytecode.INITPROPERTY, methodInfo)
-          else
-            receiver.axSetProperty(rn, value, Bytecode.INITPROPERTY, methodInfo);
+          sec.box(stack.pop()).axSetProperty(rn, value, Bytecode.INITPROPERTY, methodInfo);
           break;
         case Bytecode.GETPROPERTY:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = sec.box(frame.peekStack());
-          result = receiver.axGetProperty(rn);
-          release || checkValue(result);
-          stack[stack.length - 1] = result;
+          stack[stack.length - 1] = sec.box(stack[stack.length - 1]).axGetProperty(rn);
           break;
         case Bytecode.DELETEPROPERTY:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = sec.box(frame.peekStack());
-          stack[stack.length - 1] = receiver.axDeleteProperty(rn);
+          stack[stack.length - 1] = sec.box(stack[stack.length - 1]).axDeleteProperty(rn);
           break;
         case Bytecode.GETSUPER:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = sec.box(frame.peekStack());
-          result = receiver.axGetSuper(rn, savedScope);
-          release || checkValue(result);
-          stack[stack.length - 1] = result;
+          stack[stack.length - 1] = sec.box(stack[stack.length - 1]).axGetSuper(rn, savedScope);
           break;
         case Bytecode.SETSUPER:
           value = stack.pop();
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = sec.box(stack.pop());
-          receiver.axSetSuper(rn, savedScope, value);
+          sec.box(stack.pop()).axSetSuper(rn, savedScope, value);
           break;
         case Bytecode.GETLOCAL:
           stack.push(locals[frame.u30()]);
@@ -680,20 +602,14 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           stack.push(scopes.get(frame.code[frame.pc++]));
           break;
         case Bytecode.GETSLOT:
-          receiver = sec.box(frame.peekStack());
-          result = receiver.axGetSlot(frame.u30());
-          release || checkValue(result);
-          stack[stack.length - 1] = result;
+          stack[stack.length - 1] = sec.box(stack[stack.length - 1]).axGetSlot(frame.u30());
           break;
         case Bytecode.SETSLOT:
           value = stack.pop();
-          receiver = sec.box(stack.pop());
-          receiver.axSetSlot(frame.u30(), value);
+          sec.box(stack.pop()).axSetSlot(frame.u30(), value);
           break;
         case Bytecode.GETGLOBALSLOT:
-          result = savedScope.global.object.axGetSlot(frame.u30());
-          release || checkValue(result);
-          stack[stack.length - 1] = result;
+          stack[stack.length - 1] = savedScope.global.object.axGetSlot(frame.u30());
           break;
         case Bytecode.SETGLOBALSLOT:
           value = stack.pop();
@@ -732,19 +648,16 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           break;
         case Bytecode.COERCE:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = scopes.topScope().getScopeProperty(rn, true, false);
-          stack[stack.length - 1] = receiver.axCoerce(stack[stack.length - 1]);
+          stack[stack.length - 1] = (<AXClass> scopes.topScope().getScopeProperty(rn, true, false)).axCoerce(stack[stack.length - 1]);
           break;
         case Bytecode.COERCE_A: /* NOP */
           break;
         case Bytecode.ASTYPE:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = scopes.topScope().getScopeProperty(rn, true, false);
-          stack[stack.length - 2] = receiver.axAsType(stack[stack.length - 1]);
+          stack[stack.length - 1] = (<AXClass> scopes.topScope().getScopeProperty(rn, true, false)).axAsType(stack[stack.length - 1]);
           break;
         case Bytecode.ASTYPELATE:
-          receiver = stack.pop();
-          stack[stack.length - 1] = receiver.axAsType(stack[stack.length - 1]);
+          stack[stack.length - 2] = stack.pop().axAsType(stack[stack.length - 1]);
           break;
         case Bytecode.COERCE_O:
           object = stack[stack.length - 1];
@@ -814,9 +727,7 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           stack[stack.length - 2] ^= stack.pop();
           break;
         case Bytecode.EQUALS:
-          a = stack[stack.length - 2];
-          b = stack.pop();
-          stack[stack.length - 1] = axEquals(a, b, sec);
+          stack[stack.length - 2] = axEquals(stack[stack.length - 2], stack.pop(), sec);
           break;
         case Bytecode.STRICTEQUALS:
           stack[stack.length - 2] = stack[stack.length - 2] === stack.pop();
@@ -834,26 +745,19 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           stack[stack.length - 2] = stack[stack.length - 2] >= stack.pop();
           break;
         case Bytecode.INSTANCEOF:
-          receiver = stack.pop();
-          stack[stack.length - 1] = receiver.axIsInstanceOf(stack[stack.length - 1]);
+          stack[stack.length - 2] = stack.pop().axIsInstanceOf(stack[stack.length - 1]);
           break;
         case Bytecode.ISTYPE:
           popNameInto(stack, abc.getMultiname(frame.u30()), rn);
-          receiver = scopes.topScope().findScopeProperty(rn, true, false);
-          stack[stack.length - 1] = receiver.axIsType(stack[stack.length - 1]);
+          stack[stack.length - 1] = (<AXClass> scopes.topScope().findScopeProperty(rn, true, false)).axIsType(stack[stack.length - 1]);
           break;
         case Bytecode.ISTYPELATE:
-          receiver = stack.pop();
-          stack[stack.length - 1] = receiver.axIsType(stack[stack.length - 1]);
+          stack[stack.length - 2] = stack.pop().axIsType(stack[stack.length - 1]);
           break;
         case Bytecode.IN:
           receiver = sec.box(stack.pop());
           var name = stack[stack.length - 1];
-          if (name && name.axClass === sec.AXQName) {
-            stack[stack.length - 1] = receiver.axHasProperty(name.name);
-          } else {
-            stack[stack.length - 1] = receiver.axHasPublicProperty(name);
-          }
+          stack[stack.length - 1] = (name && name.axClass === sec.AXQName)? receiver.axHasProperty(name.name) : receiver.axHasPublicProperty(name);
           break;
         case Bytecode.INCREMENT_I:
           stack[stack.length - 1] = (stack[stack.length - 1] | 0) + 1;
@@ -882,20 +786,31 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
           stack[stack.length - 2] = (stack[stack.length - 2]|0) * (stack.pop()|0) | 0;
           break;
         case Bytecode.GETLOCAL0:
+          stack.push(locals[0]);
+          break;
         case Bytecode.GETLOCAL1:
+          stack.push(locals[1]);
+          break;
         case Bytecode.GETLOCAL2:
+          stack.push(locals[2]);
+          break;
         case Bytecode.GETLOCAL3:
-          stack.push(locals[bc - Bytecode.GETLOCAL0]);
+          stack.push(locals[3]);
           break;
         case Bytecode.SETLOCAL0:
+          locals[0] = stack.pop();
+          break;
         case Bytecode.SETLOCAL1:
+          locals[1] = stack.pop();
+          break;
         case Bytecode.SETLOCAL2:
+          locals[2] = stack.pop();
+          break;
         case Bytecode.SETLOCAL3:
-          locals[bc - Bytecode.SETLOCAL0] = stack.pop();
+          locals[3] = stack.pop();
           break;
         case Bytecode.DXNS:
-          scopes.topScope().defaultNamespace = internNamespace(NamespaceType.Public,
-                                                                abc.getString(frame.u30()));
+          scopes.topScope().defaultNamespace = internNamespace(NamespaceType.Public, abc.getString(frame.u30()));
           break;
         case Bytecode.DXNSLATE:
           scopes.topScope().defaultNamespace = internNamespace(NamespaceType.Public, stack.pop());
