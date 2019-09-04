@@ -419,9 +419,11 @@ export class Stage extends DisplayObjectContainer{
 
 			case StageScaleMode.EXACT_FIT:
 			case StageScaleMode.NO_BORDER:
+				this._projection.fieldOfView = Math.atan(window.innerHeight/1000/2)*360/Math.PI;
+				break;
 			default:
-				throw("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
-				//break;
+				console.log("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
+				break;
 		}
 		// todo: correctly implement all alignModes;
 		switch(this.align){
@@ -430,8 +432,10 @@ export class Stage extends DisplayObjectContainer{
 				this._scene.renderer.view.x         = 0;
 				break;
 			default:
-				throw("Stage: only implemented StageAlign is TOP_LEFT");
-				//break;
+				this._scene.renderer.view.y         = 0;
+				this._scene.renderer.view.x         = 0;
+				console.log("Stage: only implemented StageAlign is TOP_LEFT");
+				break;
 		}
 		//console.log("test28");
 		

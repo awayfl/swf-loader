@@ -12,6 +12,8 @@ import {StageManager, Stage, ImageUtils, BitmapImage2D} from "@awayjs/stage";
 import {MouseEvent as MouseEventAway, KeyboardEvent, DisplayObject, Sprite, DisplayObjectContainer as AwayDisplayObjectContainer} from "@awayjs/scene";
 
 import { AVM1TextField } from '../avm1/lib/AVM1TextField';
+import { StageScaleMode } from '../as3webFlash/display/StageScaleMode';
+import { StageAlign } from '../as3webFlash/display/StageAlign';
 
 
 export interface FrameScript {
@@ -219,12 +221,61 @@ export class AVMAwayStage extends Sprite{
 	{
 		//window.removeEventListener("resize", callback);
 	}
+	private _resizeCallbackDelegate:(event:any) => void;
+	public resizeCallback(event:any=null):void
+	{
+		// todo: correctly implement all StageScaleModes;
 
+		var newWidth=window.innerWidth;
+		var newHeight=window.innerHeight;
+		var newX=0;
+		var newY=0;
+
+		switch(this.scaleMode){
+			case StageScaleMode.NO_SCALE:
+				this._projection.fieldOfView = Math.atan(this._stageHeight/1000/2)*360/Math.PI;
+				break;
+			case StageScaleMode.SHOW_ALL:
+				newHeight = window.innerHeight;
+				newWidth = (this._stageWidth / this._stageHeight) * newHeight;
+				if (newWidth > window.innerWidth) {
+					newWidth = window.innerWidth;
+					newHeight = newWidth * (this._stageHeight / this._stageWidth);
+				}
+				newX=(window.innerWidth - newWidth) / 2;
+				newY=(window.innerHeight - newHeight) / 2;
+				this._projection.fieldOfView = Math.atan(this._stageHeight/1000/2)*360/Math.PI;
+				break;
+
+			case StageScaleMode.EXACT_FIT:
+			case StageScaleMode.NO_BORDER:
+				this._projection.fieldOfView = Math.atan(window.innerHeight/1000/2)*360/Math.PI;
+				break;
+			default:
+				console.log("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
+				break;
+		}
+		// todo: correctly implement all alignModes;
+		switch(this.align){
+			case StageAlign.TOP_LEFT:
+				this._scene.renderer.view.y         = 0;
+				this._scene.renderer.view.x         = 0;
+				break;
+			default:
+				//this._scene.renderer.view.y         = 0;
+				//this._scene.renderer.view.x         = 0;
+				console.log("Stage: only implemented StageAlign is TOP_LEFT");
+				break;
+		}
+		//console.log("test28");
+		
+		this.updateSize(newX, newY, newWidth, newHeight);
+	}
 
 	public updateSize(x:number, y:number, w:number, h:number){
 		//this._stageWidth=w;
 		//this._stageHeight=h;
-		if(this._scene && this._scene.view && this._stage){
+		//if(this._scene && this._scene.view && this._stage){
 			this._scene.view.x         = x;
 			this._scene.view.y         = y;
 
@@ -237,7 +288,7 @@ export class AVMAwayStage extends Sprite{
 			this._scene.view.height    = h;
 			if(this._fpsTextField)
 				this._fpsTextField.style.left  =  window.innerWidth * 0.5 - 100 + 'px';
-		}
+		//}
 	};
 
 	public show (){

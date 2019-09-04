@@ -26,6 +26,7 @@ export {alIsFunction} from "./lib/factories/avm1/runtime";
 
 export {BaseVector} from "./lib/factories/avm2/natives/GenericVector";
 export {Player} from "./lib/factories/player/Player";
+export {PlayerAVM1} from "./lib/factories/player/PlayerAVM1";
 
 export { alIsArray } from './lib/factories/avm1/runtime';
 
