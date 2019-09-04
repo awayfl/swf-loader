@@ -1406,7 +1406,7 @@ export class SWFParser extends ParserBase
 		}*/
 
 
-
+		this._swfFile.bytesTotal=length;
 		this._swfFile.frames = [];
 		this.abcBlocks = [];
 		this.dictionary = [];
