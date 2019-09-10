@@ -981,7 +981,10 @@ export class SWFParser extends ParserBase
 											awayTimeline.potentialPrototypesInitEventsMap[sessionID+"#"+i]=placeObjectTag;
 										}
 										
-										noTimelineDebug || console.log("				add", "session-id", sessionID, "depth", tag.depth, tag, awaySymbol);
+										var doAdd=true;
+										if(virtualScenegraph[tag.depth] && virtualScenegraph[tag.depth].id==placeObjectTag.symbolId){
+											doAdd=false;
+										}
 										child=virtualScenegraph[tag.depth] = {
 											sessionID: sessionID,
 											id: placeObjectTag.symbolId, 
@@ -992,8 +995,10 @@ export class SWFParser extends ParserBase
 											awayChild:awaySymbol,
 											name:placeObjectTag.name?placeObjectTag.name:"noname"
 										}
-									
+										if(doAdd){											
+											noTimelineDebug || console.log("				add", "session-id", sessionID, "depth", tag.depth, tag, awaySymbol);
 										cmds_add[cmds_add.length] = {sessionID: sessionID, depth: tag.depth, id:placeObjectTag.symbolId, name:placeObjectTag.name};
+										}
 										
 
 									}
@@ -1035,7 +1040,11 @@ export class SWFParser extends ParserBase
 						command_recipe_flag |= 0x02;
 						command_length_stream.push(remove_child_stream.length-start_index);
 						command_index_stream.push(start_index);
-						noTimelineDebug || console.log("				removeCommands", cmds_removed);
+						if(!noTimelineDebug){
+							for(var iDebug:number=0; iDebug<cmds_removed.length; iDebug++){
+								console.log("				removeCmd", cmds_removed[iDebug]);
+							}
+						} 
 						
 					}
 					
@@ -1051,7 +1060,11 @@ export class SWFParser extends ParserBase
 						command_recipe_flag |= 0x04;
 						command_length_stream.push(command_cnt);
 						command_index_stream.push(start_index/2);
-						noTimelineDebug || console.log("				addCommands", cmds_add);
+						if(!noTimelineDebug){
+							for(var iDebug:number=0; iDebug<cmds_add.length; iDebug++){
+								console.log("				addCommands", cmds_add[iDebug]);
+							}
+						} 
 						
 					}
 
@@ -1138,7 +1151,11 @@ export class SWFParser extends ParserBase
 					if(command_cnt){
 
 						// process updated props
-						noTimelineDebug || console.log("				updateCommands", cmds_update);
+						if(!noTimelineDebug){
+							for(var iDebug:number=0; iDebug<cmds_update.length; iDebug++){
+								console.log("				cmds_update", cmds_update[iDebug]);
+							}
+						} 
 
 						start_index = update_child_stream.length;
 						var updateCnt=0;
