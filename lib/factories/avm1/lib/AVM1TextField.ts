@@ -635,7 +635,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 			if (hasPath) {
 				var targetPath = name.split(/[.:\/]/g);
 				this._textVarPropName = targetPath.pop();
-				if (targetPath[0] == '_root' || targetPath[0] === '') {
+				if (targetPath[0] == '_root' || targetPath[0] == '_level0' ||targetPath[0] === '') {
 					var parent=instance.parent;
 					this._textVarHolder=null;
 					while(parent){
