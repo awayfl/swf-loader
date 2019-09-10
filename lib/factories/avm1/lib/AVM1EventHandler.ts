@@ -11,13 +11,23 @@ export class AVM1EventHandler {
                 public isButton:boolean ) { }
 }
 
-
+export class AVM1EventProps {
+    public keyCode:number
+	constructor() { }
+}
+/**
+ * Key codes below 32 aren't interpreted as char codes, but are mapped to specific buttons instead.
+ * This array uses the key code as the index and KeyboardEvent.keyCode values matching the
+ * specific keys as the value.
+ * @type {number[]}
+ */
+export var AVM1KeyCodeMap = [-1, 37, 39, 36, 35, 45, 46, -1, 8, -1, -1, -1, -1, 13, 38, 40, 33, 34, 9, 27];
 export var ClipEventMappings = Object.create(null);
 
 ClipEventMappings[AVM1ClipEvents.Construct] = true;
 ClipEventMappings[AVM1ClipEvents.Initialize] = true;
 
-ClipEventMappings[AVM1ClipEvents.KeyPress] = new AVM1EventHandler('onKey', 'onkey', true, true, false, false);
+ClipEventMappings[AVM1ClipEvents.KeyPress] = new AVM1EventHandler('onKey', KeyboardEvent.KEYDOWN, true, true, false, false);
 
 ClipEventMappings[AVM1ClipEvents.Load] = new AVM1EventHandler('onLoad', 'load', false, false, false, false);
 ClipEventMappings[AVM1ClipEvents.Unload] = new AVM1EventHandler('onUnload', 'unload', false, false, false, false),

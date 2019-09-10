@@ -131,11 +131,11 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 		}
 	}
     
-	public _addOnClipEventListener(event: AVM1EventHandler, callback:()=>void=null) {
+	public _addOnClipEventListener(event: AVM1EventHandler, callback:()=>void=null, eventProps=null) {
         event.propertyName = this.context.normalizeName(event.propertyName);
         this._onClipEventsListeners.push({event:event, callback:callback});
 		if(this.enabled || !event.allowDisable)
-            this.addEventListenerOnAdapter(event, callback);
+            this.addEventListenerOnAdapter(event, callback, eventProps);
     }
 
 	public _addEventListener(event: AVM1EventHandler, callback:Function=null) {
@@ -163,10 +163,10 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 			this.addEventListenerOnAdapter(event, listener);
 		}
     }
-    public addEventListenerOnAdapter(event:AVM1EventHandler, callback:()=>void){
+    public addEventListenerOnAdapter(event:AVM1EventHandler, callback:()=>void, eventProps=null){
         if(event.stageEvent){
             var awayAVMStage = (<any>this.context.globals.Stage)._awayAVMStage;
-            awayAVMStage.addAVM1EventListener(this.adaptee, event.eventName, callback);
+            awayAVMStage.addAVM1EventListener(this.adaptee, event.eventName, callback, eventProps);
         }
         else{
             this.adaptee.addEventListener(event.eventName, callback);

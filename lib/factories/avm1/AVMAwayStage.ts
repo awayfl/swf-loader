@@ -14,6 +14,7 @@ import {MouseEvent as MouseEventAway, KeyboardEvent, DisplayObject, Sprite, Disp
 import { AVM1TextField } from '../avm1/lib/AVM1TextField';
 import { StageScaleMode } from '../as3webFlash/display/StageScaleMode';
 import { StageAlign } from '../as3webFlash/display/StageAlign';
+import { AVM1EventProps } from './lib/AVM1EventHandler';
 
 
 export interface FrameScript {
@@ -403,7 +404,7 @@ export class AVMAwayStage extends Sprite{
     private onKeyEvent(event): void {
         
         if(!this.avm1Listener[event.type])
-            return;
+			return;
         // the correct order for stage-event on childs is children first, highest depth first
         this._collectedDispatcher.length=0;
 		var i:number=0;
@@ -427,15 +428,21 @@ export class AVMAwayStage extends Sprite{
         len=this._collectedDispatcher.length;
 		for(i=0;i<len;i++) {
             if(this.avm1Listener[event.type] && this.avm1Listener[event.type][this._collectedDispatcher[i].id]){
-                this.avm1Listener[event.type][this._collectedDispatcher[i].id].callback();
+				if(typeof this.avm1Listener[event.type][this._collectedDispatcher[i].id].keyCode!=="number" ||
+					this.avm1Listener[event.type][this._collectedDispatcher[i].id].keyCode==event.keyCode)
+                	this.avm1Listener[event.type][this._collectedDispatcher[i].id].callback();
             }
         }
 		FrameScriptManager.execute_queue();
     }
-	public addAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
+	public addAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void, eventProps:AVM1EventProps){
         if(!this.avm1Listener[type])
             this.avm1Listener[type]={};
-        this.avm1Listener[type][asset.id]={type:type, callback:callback};
+		this.avm1Listener[type][asset.id]={type:type, callback:callback};
+		if(eventProps && typeof eventProps.keyCode === "number"){
+			this.avm1Listener[type][asset.id].keyCode=eventProps.keyCode;
+
+		}
 	}
 	public removeAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
         if(!this.avm1Listener[type])

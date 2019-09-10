@@ -35,7 +35,7 @@ import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Function } from "../runtime/AVM1Function";
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
-import { ClipEventMappings } from "./AVM1EventHandler";
+import { ClipEventMappings, AVM1EventProps, AVM1KeyCodeMap } from "./AVM1EventHandler";
 
 export var DEPTH_OFFSET = 16384;
 
@@ -374,12 +374,19 @@ export function initializeAVM1Object(awayObject: any,
 
 			var eventMapping = ClipEventMappings[eventFlag];
 			var eventName = eventMapping.eventName;
-            //console.log("eventName", eventName, eventMapping);
+            //console.log("eventName", eventName, eventMapping, eventFlag, swfEvent);
 			if (!eventName) {
 				Debug.warning("ClipEvent: " + eventFlag + ' not implemented');
 				continue;
-            }
-			instanceAVM1._addOnClipEventListener(eventMapping, handler);			
+			}
+			var eventProps=null;
+			if(swfEvent.keyCode){
+				eventProps=new AVM1EventProps();
+				eventProps.keyCode=swfEvent.keyCode;
+				if(swfEvent.keyCode < 32 &&	AVM1KeyCodeMap[swfEvent.keyCode])
+					eventProps.keyCode=AVM1KeyCodeMap[swfEvent.keyCode]
+			}
+			instanceAVM1._addOnClipEventListener(eventMapping, handler, eventProps);			
 		}
 	}
 }
