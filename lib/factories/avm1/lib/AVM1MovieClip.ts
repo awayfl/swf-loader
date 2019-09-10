@@ -1268,13 +1268,16 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		//console.log("mouseX", (<any>this.context.globals.Stage)._awayAVMStage.mouseX);
 		//console.log("mouseY", (<any>this.context.globals.Stage)._awayAVMStage.mouseY);
 
-		var tmpPoint=this.adaptee.parent.transform.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
+		if(this.adaptee.parent){
+			var tmpPoint=this.adaptee.parent.transform.globalToLocal(new Point((<any>this.context.globals.Stage)._awayAVMStage.mouseX, (<any>this.context.globals.Stage)._awayAVMStage.mouseY));
+	
+			this.adaptee.x=this.startDragMCPosition.x+(tmpPoint.x-this.startDragPoint.x);
+			this.adaptee.y=this.startDragMCPosition.y+(tmpPoint.y-this.startDragPoint.y);
+	
+			if(this._dragBounds)
+				this.checkBounds();
 
-		this.adaptee.x=this.startDragMCPosition.x+(tmpPoint.x-this.startDragPoint.x);
-		this.adaptee.y=this.startDragMCPosition.y+(tmpPoint.y-this.startDragPoint.y);
-
-		if(this._dragBounds)
-			this.checkBounds();
+		}
 			
 		
 	}
