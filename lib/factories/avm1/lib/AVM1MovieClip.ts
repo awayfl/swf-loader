@@ -597,6 +597,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 	public attachMovie(symbolId, name, depth, initObject) {
 		
+		if(!this._constructMovieClipSymbol)
+			return;
 		var mc = this._constructMovieClipSymbol(symbolId, name);
 		if (!mc) {
 			return undefined;
@@ -964,7 +966,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 
 	public getSWFVersion(): number {
 		var loaderInfo = <LoaderInfo>this.adaptee.loaderInfo;
-		return loaderInfo.swfVersion;
+		return 0;//loaderInfo.swfVersion;
 	}
 
 	public getTextSnapshot() {

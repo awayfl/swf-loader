@@ -997,7 +997,7 @@ export class SWFParser extends ParserBase
 										}
 										if(doAdd){											
 											noTimelineDebug || console.log("				add", "session-id", sessionID, "depth", tag.depth, tag, awaySymbol);
-										cmds_add[cmds_add.length] = {sessionID: sessionID, depth: tag.depth, id:placeObjectTag.symbolId, name:placeObjectTag.name};
+											cmds_add[cmds_add.length] = {sessionID: sessionID, depth: tag.depth, id:placeObjectTag.symbolId, name:placeObjectTag.name};
 										}
 										
 
