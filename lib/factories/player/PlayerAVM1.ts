@@ -35,6 +35,9 @@ export class PlayerAVM1 {
 		this._onLoadErrorDelegate = (event: URLLoaderEvent) => this._onLoadError(event);
 		window.addEventListener("resize", (e)=>this._stage.resizeCallback(e));
 	}
+	public get avm1SceneGraphFactory():any {
+		return this._avm1SceneGraphFactory;
+	}
 	public playSWF(buffer, url) {
 		AudioManager.setVolume(1);
 		(<AVM1ContextImpl>this._avm1SceneGraphFactory.avm1Context).executionProhibited=false;
