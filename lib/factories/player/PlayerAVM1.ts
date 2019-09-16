@@ -1,7 +1,7 @@
 import { SWFParser } from "../../parsers/SWFParser";
 import { AVMAwayStage } from "../avm1/AVMAwayStage";
 import { AVM1SceneGraphFactory } from "../AVM1SceneGraphFactory";
-import { AVM1Globals } from "../avm1/lib/AVM1Globals";
+import { AVM1Globals, TraceLevel } from "../avm1/lib/AVM1Globals";
 import { AVM1ContextImpl } from "../avm1/interpreter";
 import { SecurityDomain } from "../ISecurityDomain";
 import { LoaderInfo } from "../customAway/LoaderInfo";
@@ -28,6 +28,7 @@ export class PlayerAVM1 {
 		this._avm1SceneGraphFactory = new AVM1SceneGraphFactory(new AVM1ContextImpl(loaderInfo));
 		this._avm1SceneGraphFactory.avm1Context.sec = new SecurityDomain();
 		this._avm1SceneGraphFactory.avm1Context.setStage(this._stage, document);
+		AVM1Globals.tracelevel=TraceLevel.ALL;
 		AVM1Globals._scenegraphFactory=this._avm1SceneGraphFactory;
 		AssetLibrary.enableParser(SWFParser);
 		this._onAssetCompleteDelegate = (event: AssetEvent) => this._onAssetComplete(event);
