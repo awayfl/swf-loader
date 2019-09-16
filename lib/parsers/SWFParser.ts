@@ -729,7 +729,24 @@ export class SWFParser extends ParserBase
 			}
 			else{
 				// frame is not empty, or it is the first frame, or both
-				command_recipe_flag=0;
+				command_recipe_flag=0;	
+				if(isButton){
+					command_recipe_flag |= 0x01;
+                    for (var key in virtualScenegraph){
+                        child=virtualScenegraph[key];
+                        freeChildsForID = freeChilds[child.id];
+                        if(!freeChildsForID){
+                            freeChildsForID=freeChilds[child.id]={};
+                        }
+                        name=child.name;//+"#"+key;
+                        if(!freeChildsForID[name]){
+                            freeChildsForID[name]=[];
+                        }
+                        freeChildsForID[name].push(child.sessionID);
+
+                    }
+					virtualScenegraph={};
+				}
 				frame_command_indices.push(command_index_stream.length);
 				keyframe_durations[keyframe_durations.length]=1;
 				if(!isEmpty && (swfFrames[i].labelNames && swfFrames[i].labelNames.length>0)){
