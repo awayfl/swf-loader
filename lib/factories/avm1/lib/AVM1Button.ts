@@ -98,7 +98,7 @@ export class AVM1Button extends AVM1MovieClip {
 
 	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
 	{
-		if (this.adaptee.name != "scene") {
+		if (!this.adaptee.isAVMScene) {
             if(event.isMouse){
                 if (enabled) {
                     this._mouseListenerCount++;

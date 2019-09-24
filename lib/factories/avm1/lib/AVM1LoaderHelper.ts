@@ -41,7 +41,7 @@ export class AVM1LoaderHelper {
 			if(asset.assetNamespace!=this._url){
 				return;
 			}
-			if (asset.name == "scene") {
+			if ((<any>asset).isAVMScene) {
 				this._content=<MovieClip>asset;
                 this.result.resolve(<MovieClip>asset);
                 (<any>asset.adapter).doInitEvents();

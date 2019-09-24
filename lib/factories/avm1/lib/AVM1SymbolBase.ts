@@ -187,7 +187,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 
 	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
 	{
-		if (this.adaptee.name != "scene") {
+		if (!this.adaptee.isAVMScene) {
             if(event.isMouse){
                 if (enabled) {
                     this._mouseListenerCount++;
@@ -445,7 +445,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 	}
 	public get_root(): AVM1MovieClip {
 		var awayObject: DisplayObjectContainer = this.adaptee;
-		while (awayObject && awayObject.name!="scene") {
+		while (awayObject && !awayObject.isAVMScene) {
 			var avmObject = <AVM1MovieClip>getAVM1Object(awayObject, this.context);
 			if (avmObject && avmObject.get_lockroot()) {
 				return avmObject;
@@ -534,12 +534,12 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 			}
 			path = '/' + awayObject.name + path;
 			awayObject = awayObject.parent;
-		} while (awayObject && awayObject.name !== "scene");
+		} while (awayObject && !awayObject.isAVMScene);
 		return path;
 	}
 
 	public removeMovieClip() {
-		if (this.adaptee.name=="scene") {
+		if (this.adaptee.isAVMScene) {
 			return; // let's not remove root symbol
 		}
 		if(this.adaptee.parent && away2avmDepth(this.adaptee._depthID)>=0)
@@ -665,7 +665,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 		var mc:DisplayObjectContainer=this.adaptee;
 		var names:string[]=[];
 		while (mc){
-			if(mc.name=="scene"){
+			if(mc.isAVMScene){
 				names.push("_level0");
 				mc=null;
 			}

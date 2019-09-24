@@ -119,7 +119,7 @@ export class Loader extends DisplayObjectContainer
 			this._loaderContext.applicationDomain.addDefinition(asset.name, <AwayMovieClip> asset);
 			
 			// if this is the "Scene 1", we make it a child of the loader
-			if (asset.name=="Scene 1" || (asset.name=="scene")){// "Scene 1" when AWDParser, "scene" when using SWFParser
+			if (asset.name=="Scene 1" || (<any>asset).isAVMScene){// "Scene 1" when AWDParser, isAVMScene when using SWFParser
 
 				var newClone=<DisplayObject>(<IDisplayObjectAdapter> asset.adapter).clone();
 				newClone.loaderInfo=this.loaderInfo;

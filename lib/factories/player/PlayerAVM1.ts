@@ -58,7 +58,7 @@ export class PlayerAVM1 {
 	public _onAssetComplete(event) {		
 		var asset: IAsset = event.asset;
 		if (asset.isAsset(MovieClip)) {
-			if (asset.name == "scene") {				
+			if ((<any>asset).isAVMScene) {				
 				if(this._stage)
 					this._stage.getLayer(0).addChild(<MovieClip>asset);
 					

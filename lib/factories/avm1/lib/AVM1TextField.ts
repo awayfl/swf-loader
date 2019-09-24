@@ -639,7 +639,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 					var parent=instance.parent;
 					this._textVarHolder=null;
 					while(parent){
-						if(parent.name=="scene"){
+						if(parent.isAVMScene){
 							this._textVarHolder=parent.adapter;
 							parent=null;
 						}

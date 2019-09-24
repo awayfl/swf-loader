@@ -566,6 +566,7 @@ export class SWFParser extends ParserBase
 			assetsToFinalize[key]["fileurl"]=this._iFileName;
             this._pFinalizeAsset(assetsToFinalize[key]);
         }
+		awayMc.isAVMScene=true;
         this._pFinalizeAsset(awayMc, "scene");
         DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);

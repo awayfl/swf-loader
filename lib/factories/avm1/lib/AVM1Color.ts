@@ -39,7 +39,7 @@ export class AVM1Color extends AVM1Object {
 	public avm1Constructor(target_mc) {
 		if(target_mc){
 			this._target = this.context.resolveTarget(target_mc);
-			if(this._target && this._target.adaptee && this._target.adaptee.name!="scene"){
+			if(this._target && this._target.adaptee && !this._target.adaptee.isAVMScene){
 				(<any>this._target).avmColor=this;
 				this._targetAwayObject = <DisplayObject>getAwayJSAdaptee(this._target);
             }

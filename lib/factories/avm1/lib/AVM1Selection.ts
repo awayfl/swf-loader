@@ -67,7 +67,7 @@ export class AVM1Selection extends AVM1Object {
 		if(objectinFocus){
 			var names:string[]=[];
 			while (objectinFocus){
-				if(objectinFocus.name=="scene"){
+				if(objectinFocus.isAVMScene){
 					objectinFocus=null;
 				}
 				else{

@@ -131,7 +131,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	protected _mouseButtonListenerCount:number;
 	public _updateMouseEnabled(event:AVM1EventHandler, enabled:boolean):void
 	{
-		if (this.adaptee.name != "scene") {
+		if (!this.adaptee.isAVMScene) {
             if(event.isMouse){
                 if (enabled) {
                     this._mouseListenerCount++;
@@ -804,7 +804,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			//console.log((<AVMRaycastPicker>AVM1Stage.stage.view.mousePicker).getDropTarget().name);
 			var names:string[]=[];
 			while (dropTarget){
-				if(dropTarget.name=="scene"){
+				if(dropTarget.isAVMScene){
 					dropTarget=null;
 				}
 				else{
@@ -1315,7 +1315,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	public swapDepths(target: any): void {
         //return;
 		// if this is the scene, or if no parent exists, we do not want to do anything
-		if(this.adaptee.name=="scene" || !this.get_parent()){
+		if(this.adaptee.isAVMScene || !this.get_parent()){
 			return;
 		}
 		var parent:MovieClip = <MovieClip>getAwayJSAdaptee(this.get_parent());
