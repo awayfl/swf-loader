@@ -83,12 +83,16 @@ export interface IDataOutput {
   endian: string;
 }
 
+export class ByteArrayDataProvider {
+  public static symbolForConstructor: any;
+}
 export class ByteArray extends ASObject implements IDataInput, IDataOutput {
 
   static axClass: typeof ByteArray & AXClass;
 
   public static classNatives: any [] = [DataBuffer];
   public static instanceNatives: any [] = [DataBuffer.prototype];
+
 
   static classInitializer() {
     var proto: any = DataBuffer.prototype;
@@ -102,8 +106,9 @@ export class ByteArray extends ASObject implements IDataInput, IDataOutput {
 
   constructor(source?: any) {
     super();
-    if (this._symbol) {
-      source = this._symbol;
+    if (ByteArrayDataProvider.symbolForConstructor) {
+      source = ByteArrayDataProvider.symbolForConstructor;
+      ByteArrayDataProvider.symbolForConstructor=null;
     }
     var buffer: ArrayBuffer;
     var length = 0;

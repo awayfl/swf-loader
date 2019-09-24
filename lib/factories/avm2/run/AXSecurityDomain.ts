@@ -75,6 +75,7 @@ import { axCoerceObject } from "./axCoerceObject";
 
 import { initializeAXBasePrototype, AXBasePrototype } from "./initializeAXBasePrototype";
 import { ISecurityDomain } from '../../ISecurityDomain';
+import { ByteArray, ByteArrayDataProvider } from '../natives/byteArray';
 
 /**
  * Provides security isolation between application domains.
@@ -407,11 +408,23 @@ export class AXSecurityDomain implements ISecurityDomain{
       var fun = getNativeInitializer(classInfo);
       if (!fun) {
         release || assert(!methodInfo.isNative(), "Must provide a native initializer for " +
-                                                  classInfo.instanceInfo.getClassName());
-        fun = <any> function () {
-          release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
-          return interpret(this, methodInfo, scope, <any>arguments, null);
-        };
+                                                  classInfo.instanceInfo.getClassName());      
+        var binarySymbol=this.application.getBinarySymbol(classInfo.instanceInfo.getClassName());    
+        if(binarySymbol)   {   
+          binarySymbol.buffer=binarySymbol.data;                        
+          fun = <any> function () {
+            console.log("create instance for binary data:", classInfo.instanceInfo.getClassName());  
+            ByteArrayDataProvider.symbolForConstructor=binarySymbol;
+            release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
+            return interpret(this, methodInfo, scope, <any>arguments, null);
+          };
+        }    
+        else{            
+          fun = <any> function () {
+            release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
+            return interpret(this, methodInfo, scope, <any>arguments, null);
+          };
+        }       
         if (!release) {
           try {
             var className = classInfo.instanceInfo.getName().toFQNString(false);

@@ -74,6 +74,10 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		return <AwayDisplayObjectContainer> new this._sec.flash.display.DisplayObjectContainer().adaptee;
 	}
 
+	public createBinarySymbol(symbol:any=null):void
+	{
+		this._sec.application.addBinarySymbol(symbol);
+	}
 	public createMovieClip(timeline:Timeline = null, symbol:any=null):AwayMovieClip
 	{
 		if(!symbol || !this._sec)

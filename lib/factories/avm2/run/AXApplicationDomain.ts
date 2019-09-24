@@ -29,14 +29,22 @@ export class AXApplicationDomain {
     public sec:ISecurityDomain;
   
     private _abcs: ABCFile [];
+    private _binarySymbols: any;
   
     constructor(sec: AXSecurityDomain, parent: AXApplicationDomain) {
       this.sec = sec;
       this.parent = parent;
       this.system = parent ? parent.system : this;
       this._abcs = [];
+      this._binarySymbols={};
     }
   
+    public addBinarySymbol(symbol: any) {
+      this._binarySymbols[symbol.className]=symbol;
+    }
+    public getBinarySymbol(className: string):any {
+      return this._binarySymbols[className];
+    }
     public loadABC(abc: ABCFile) {
       assert (this._abcs.indexOf(abc) < 0);
       this._abcs.push(abc);

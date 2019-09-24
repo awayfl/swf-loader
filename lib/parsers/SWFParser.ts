@@ -543,6 +543,10 @@ export class SWFParser extends ParserBase
 							(<any>awayBitmap).className=symbol.className;
                         }
 						break;
+					case "binary":
+						if((<any>this._factory).createBinarySymbol)
+							(<any>this._factory).createBinarySymbol(symbol);
+						break;
 					default:
 						console.log("unknown symbol type:", symbol.type, symbol);
 						break;
@@ -565,7 +569,7 @@ export class SWFParser extends ParserBase
         for(var key in assetsToFinalize){     
 			assetsToFinalize[key]["fileurl"]=this._iFileName;
             this._pFinalizeAsset(assetsToFinalize[key]);
-        }
+		}
 		awayMc.isAVMScene=true;
         this._pFinalizeAsset(awayMc, "scene");
         DefaultFontManager.applySharedFonts(this._iFileName);
