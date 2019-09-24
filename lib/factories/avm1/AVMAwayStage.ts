@@ -428,9 +428,11 @@ export class AVMAwayStage extends Sprite{
         len=this._collectedDispatcher.length;
 		for(i=0;i<len;i++) {
             if(this.avm1Listener[event.type] && this.avm1Listener[event.type][this._collectedDispatcher[i].id]){
-				if(typeof this.avm1Listener[event.type][this._collectedDispatcher[i].id].keyCode!=="number" ||
-					this.avm1Listener[event.type][this._collectedDispatcher[i].id].keyCode==event.keyCode)
-                	this.avm1Listener[event.type][this._collectedDispatcher[i].id].callback();
+				for(var e:number=0; e<this.avm1Listener[event.type][this._collectedDispatcher[i].id].length; e++){
+					if(typeof this.avm1Listener[event.type][this._collectedDispatcher[i].id][e].keyCode!=="number" ||
+						this.avm1Listener[event.type][this._collectedDispatcher[i].id][e].keyCode==event.keyCode)
+						this.avm1Listener[event.type][this._collectedDispatcher[i].id][e].callback();
+				}
             }
         }
 		FrameScriptManager.execute_queue();
@@ -438,16 +440,18 @@ export class AVMAwayStage extends Sprite{
 	public addAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void, eventProps:AVM1EventProps){
         if(!this.avm1Listener[type])
             this.avm1Listener[type]={};
-		this.avm1Listener[type][asset.id]={type:type, callback:callback};
+		if(!this.avm1Listener[type][asset.id])
+			this.avm1Listener[type][asset.id]=[];
+		this.avm1Listener[type][asset.id].push({type:type, callback:callback});
 		if(eventProps && typeof eventProps.keyCode === "number"){
-			this.avm1Listener[type][asset.id].keyCode=eventProps.keyCode;
+			this.avm1Listener[type][asset.id][this.avm1Listener[type][asset.id].length-1].keyCode=eventProps.keyCode;
 
 		}
 	}
 	public removeAVM1EventListener(asset:IAsset, type:string, callback:(event:EventBase)=>void){
         if(!this.avm1Listener[type])
             return;
-		delete this.avm1Listener[type][asset.id+type];
+		delete this.avm1Listener[type][asset.id];
 	}
 	public clearAllAVM1Listener(){
         this.avm1Listener={};
@@ -495,7 +499,9 @@ export class AVMAwayStage extends Sprite{
         len=this._collectedDispatcher.length;
 		for(i=0;i<len;i++) {
             if(this.avm1Listener[mouseEvent.type] && this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id]){
-                this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id].callback();
+				for(var e:number=0; e<this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id].length; e++){
+					this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id][e].callback();
+				}
             }
         }
 		FrameScriptManager.execute_queue();
