@@ -21,7 +21,7 @@ export class PlayerAVM1 {
 	constructor() {
 		
 		// create the AwayStage for AVM1
-		this._stage = new AVMAwayStage(window.innerWidth / 2, window.innerHeight / 2, 0xffffff, 24, null, window.innerWidth / 2, window.innerHeight / 2, true);
+		this._stage = new AVMAwayStage(window.innerWidth / 2, window.innerHeight / 2, 0xffffff, 24, null, window.innerWidth / 2, window.innerHeight / 2, false);
 		this._stage.scene.mouseManager._stage=this._stage;
 		this._stage.rendererStageContainer.style.visibility="hidden";
 		var loaderInfo=new LoaderInfo();
