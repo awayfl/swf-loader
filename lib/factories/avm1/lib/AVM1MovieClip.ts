@@ -1251,8 +1251,8 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			this.startDragMCPosition.x=this.adaptee.x;
 			this.startDragMCPosition.y=this.adaptee.y;
 			AVM1Stage.stage.addEventListener("mouseMove3d", this.dragListenerDelegate);
-			window.addEventListener("mouseup", this.stopDragDelegate);
-			window.addEventListener("touchend", this.stopDragDelegate);
+			//window.addEventListener("mouseup", this.stopDragDelegate);
+			//window.addEventListener("touchend", this.stopDragDelegate);
 			AVM1Stage.stage.scene.mousePicker.dragEntity=this.adaptee;
 			MouseManager.getInstance(AVM1Stage.stage.scene.renderer.renderGroup.pickGroup).isAVM1Dragging=true;
 
