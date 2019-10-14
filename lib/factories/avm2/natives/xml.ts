@@ -428,6 +428,9 @@ function getDefaultNamespace(sec: AXSecurityDomain): Namespace {
     }
     scope = scope.parent;
   }
+  if(!sec.AXNamespace.defaultNamespace){
+    sec.AXNamespace.defaultNamespace=new Namespace(NamespaceType.Public, "default", "");
+  }
   // The outermost default xml namespace is stored in sec.AXNamespace.defaultNamespace.
   return sec.AXNamespace.defaultNamespace;
 }
