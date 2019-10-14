@@ -70,7 +70,7 @@ export class Loader extends DisplayObjectContainer
 	private onLoaderProgress(event: URLLoaderEvent){
 		var newEvent=new ProgressEvent(ProgressEvent.PROGRESS, null, null, event.urlLoader.bytesLoaded, event.urlLoader.bytesTotal);
 		newEvent.currentTarget=this._loaderInfo;
-		this._loaderInfo.dispatchEvent(newEvent);
+		this._loaderInfo.dispatchEventInternal(newEvent);
 	}
 
 	private _onLoaderCompleteDelegate:(event:LoaderEvent) => void;
@@ -78,7 +78,7 @@ export class Loader extends DisplayObjectContainer
 		var newEvent=new Event(Event.COMPLETE);
 		newEvent.currentTarget=this._loaderInfo;
 
-		this._loaderInfo.dispatchEvent(newEvent);
+		this._loaderInfo.dispatchEventInternal(newEvent);
 
 		this._loader.removeEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoaderCompleteDelegate);
 		this._loader.removeEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
@@ -222,6 +222,7 @@ export class Loader extends DisplayObjectContainer
 	}
 
 	_unload(stopExecution: boolean, gc: boolean): void {
+		console.log("80pro todo: loader._unload");
 		// if (this._loadStatus < LoadStatus.Initialized) {
 		//   this._loadStatus = LoadStatus.Unloaded;
 		//   return;

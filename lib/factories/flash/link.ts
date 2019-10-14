@@ -27,6 +27,7 @@ import { ApplicationDomain } from '../as3webFlash/system/ApplicationDomain';
 import { System } from '../as3webFlash/system/System';
 import { Graphics } from "../as3webFlash/display/Graphics";
 import { Event } from "../as3webFlash/events/Event";
+import { URLLoader } from "../as3webFlash/net/URLLoader";
 
 import { Scene } from "./display/Scene";
 import { Keyboard } from "./ui/Keyboard";
@@ -50,6 +51,14 @@ import { Timer } from "./utils/Timer";
 import { TimerEvent } from "./events/TimerEvent";
 import { ProgressEvent } from "./events/ProgressEvent";
 import { SoundMixer } from "./media/SoundMixer";
+import { TextSnapshot } from "./text/TextSnapshot";
+/*
+import { NativeMenu } from "./display/NativeMenu";
+import { NativeMenuItem } from "./display/NativeMenuItem";
+import { ContextMenu } from "./ui/ContextMenu";
+import { ContextMenuItem } from "./ui/ContextMenuItem";
+import { ContextMenuBuiltInItems } from "./ui/ContextMenuBuiltInItems";
+import { ContextMenuClipboardItems } from "./ui/ContextMenuClipboardItems";*/
 /*
 import { URLRequest } from "./net/URLRequest";
 import { ApplicationDomain } from "./system/ApplicationDomain";
@@ -65,8 +74,6 @@ import { JPEGLoaderContext } from "./system/JPEGLoaderContext";
 import { System } from "../avm2/natives/system";
 import { AVM1Movie } from "./display/AVM1Movie";
 import { MorphShape } from "./display/MorphShape";
-import { NativeMenu } from "./display/NativeMenu";
-import { NativeMenuItem } from "./display/NativeMenuItem";
 import { FrameLabel } from "./display/FrameLabel";
 import { GradientType } from "./display/GradientType";
 import { SpreadMethod } from "./display/SpreadMethod";
@@ -89,10 +96,6 @@ import { MouseEvent } from "./events/MouseEvent";
 import { TextEvent } from "./events/TextEvent";
 import { HTTPStatusEvent } from "./events/HTTPStatusEvent";
 import { UncaughtErrorEvents } from "./events/UncaughtErrorEvents";
-import { ContextMenu } from "./ui/ContextMenu";
-import { ContextMenuItem } from "./ui/ContextMenuItem";
-import { ContextMenuBuiltInItems } from "./ui/ContextMenuBuiltInItems";
-import { ContextMenuClipboardItems } from "./ui/ContextMenuClipboardItems";
 import { Keyboard } from "./ui/Keyboard";
 import { Mouse } from "./ui/Mouse";
 import { MouseCursorData } from "./ui/MouseCursorData";
@@ -108,7 +111,6 @@ import { StaticText } from "./text/StaticText";
 import { StyleSheet } from "./text/StyleSheet";
 import { TextFormat } from "./text/TextFormat";
 import { TextRun } from "./text/TextRun";
-import { TextSnapshot } from "./text/TextSnapshot";
 import { TextLineMetrics } from "./text/TextLineMetrics";
 import { Sound } from "./media/Sound";
 import { SoundChannel } from "./media/SoundChannel";
@@ -135,7 +137,6 @@ import { Responder } from "./net/Responder";
 import { URLRequestHeader } from "./net/URLRequestHeader";
 import { URLStream } from "./net/URLStream";
 import { FileReferenceList } from "./net/FileReferenceList";
-import { URLLoader } from "./net/URLLoader";
 import { LocalConnection } from "./net/LocalConnection";
 import { Socket } from "./net/Socket";
 import { Security } from "./system/Security";
@@ -191,8 +192,8 @@ M("flash.ui.Keyboard", Keyboard);
 M("flash.events.KeyboardEvent", KeyboardEvent);
 M("flash.text.TextField", TextField);
 // M("flash.display.MorphShape", MorphShape);
-// M("flash.display.NativeMenu", NativeMenu);
-// M("flash.display.NativeMenuItem", NativeMenuItem);
+ //M("flash.display.NativeMenu", NativeMenu);
+ //M("flash.display.NativeMenuItem", NativeMenuItem);
 // M("flash.display.FrameLabel", FrameLabel);
 // M("flash.display.AVM1Movie", AVM1Movie);
 
@@ -239,10 +240,11 @@ M("flash.events.MouseEvent", MouseEvent);
 
  M("flash.external.ExternalInterface", ExternalInterface);
 
-// M("flash.ui.ContextMenu", ContextMenu);
-// M("flash.ui.ContextMenuItem", ContextMenuItem);
-// M("flash.ui.ContextMenuBuiltInItems", ContextMenuBuiltInItems);
-// M("flash.ui.ContextMenuClipboardItems", ContextMenuClipboardItems);
+ /*
+ M("flash.ui.ContextMenu", ContextMenu);
+ M("flash.ui.ContextMenuItem", ContextMenuItem);
+ M("flash.ui.ContextMenuBuiltInItems", ContextMenuBuiltInItems);
+ M("flash.ui.ContextMenuClipboardItems", ContextMenuClipboardItems);*/
 // M("flash.ui.Mouse", Mouse);
 // M("flash.ui.MouseCursorData", MouseCursorData);
 
@@ -262,7 +264,7 @@ M("flash.events.MouseEvent", MouseEvent);
 // M("flash.text.StyleSheet", StyleSheet);
  M("flash.text.TextFormat", TextFormat);
 // M("flash.text.TextRun", TextRun);
-// M("flash.text.TextSnapshot", TextSnapshot);
+ M("flash.text.TextSnapshot", TextSnapshot);
 // M("flash.text.TextLineMetrics", TextLineMetrics);
 
  M("flash.media.Sound", Sound);
@@ -285,7 +287,7 @@ M("flash.events.MouseEvent", MouseEvent);
  M("flash.net.URLRequest", URLRequest);
 // M("flash.net.URLRequestHeader", URLRequestHeader);
 // M("flash.net.URLStream", URLStream);
-// M("flash.net.URLLoader", URLLoader);
+ M("flash.net.URLLoader", URLLoader);
  M("flash.net.SharedObject", SharedObject);
 // M("flash.net.ObjectEncoding", ObjectEncoding);
 // M("flash.net.LocalConnection", LocalConnection);

@@ -4,6 +4,7 @@ import {IOErrorEvent} from "../events/IOErrorEvent";
 import {ProgressEvent} from "../events/ProgressEvent";
 import {Event} from "../events/Event";
 import { Loader } from "./Loader";
+import { LoaderInfo as LoaderInfoAway } from "@awayjs/core";
 import { DisplayObject } from "./DisplayObject";
 import {ByteArray} from "../utils/ByteArray";
 
@@ -121,9 +122,8 @@ import {ByteArray} from "../utils/ByteArray";
  */
 export class LoaderInfo extends EventDispatcher
 {
+	public adaptee:LoaderInfoAway;
 	public _loader:Loader;
-
-	private _url:string;
 	private _applicationDomain:ApplicationDomain;
 	/**
 	 * The ActionScript version of the loaded SWF file.
@@ -182,13 +182,11 @@ export class LoaderInfo extends EventDispatcher
 	 * @throws	SecurityError This security sandbox of the caller is not allowed to access this ApplicationDomain.
 	 */
 	public get applicationDomain () : ApplicationDomain{
-		//console.log("applicationDomain not implemented yet in flash/LoaderInfo");
 		return this._applicationDomain;
 		
 	}
 
 	public set applicationDomain (value:ApplicationDomain){
-		//console.log("applicationDomain not implemented yet in flash/LoaderInfo");
 		this._applicationDomain=value;
 
 	}
@@ -213,9 +211,7 @@ export class LoaderInfo extends EventDispatcher
 	 * the value of bytesTotal, all of the bytes are loaded.
 	 */
 	public get bytesLoaded () : number{
-		//console.log("bytesLoaded not implemented yet in flash/LoaderInfo");
-		return 1024;
-		
+		return this.adaptee.bytesLoaded;		
 	}
 
 	/**
@@ -227,9 +223,7 @@ export class LoaderInfo extends EventDispatcher
 	 * reflects the actual number of bytes to be downloaded.
 	 */
 	public get bytesTotal () : number{
-		//console.log("bytesTotal not implemented yet in flash/LoaderInfo");
-		return 1024;
-		
+		return this.adaptee.bytesTotal;			
 	}
 
 	/**
@@ -248,8 +242,7 @@ export class LoaderInfo extends EventDispatcher
 	 */
 	public get childAllowsParent () : boolean{
 		console.log("childAllowsParent not implemented yet in flash/LoaderInfo");
-		return false;
-		
+		return false;		
 	}
 
 	/**
@@ -261,8 +254,7 @@ export class LoaderInfo extends EventDispatcher
 	 */
 	public get childSandboxBridge () : any{
 		console.log("childSandboxBridge not implemented yet in flash/LoaderInfo");
-		return null;
-		
+		return null;		
 	}
 	public set childSandboxBridge (door:any){
 		console.log("childSandboxBridge not implemented yet in flash/LoaderInfo");
@@ -281,7 +273,7 @@ export class LoaderInfo extends EventDispatcher
 	 */
 	public get content() : DisplayObject
 	{
-		return this._loader && this._loader.content;
+		return (this._loader && this._loader.content)?this._loader.content:null;
 	}
 	
 
@@ -295,9 +287,7 @@ export class LoaderInfo extends EventDispatcher
 	 *   "image/png"
 	 */
 	public get contentType () : string{
-		console.log("contentType not implemented yet in flash/LoaderInfo");
-		return "";
-		
+		return this.adaptee.contentType;
 	}
 
 	/**
@@ -313,9 +303,7 @@ export class LoaderInfo extends EventDispatcher
 	 * @throws	Error If the file is not a SWF file.
 	 */
 	public get frameRate () : number{
-		console.log("frameRate not implemented yet in flash/LoaderInfo");
-		return 0;
-		
+		return 0;//this.adaptee.frameRate;		
 	}
 
 	/**
@@ -325,8 +313,8 @@ export class LoaderInfo extends EventDispatcher
 	 * @throws	Error If the file is not downloaded sufficiently to retrieve the requested information.
 	 */
 	public get height () : number{
-		//console.log("height not implemented yet in flash/LoaderInfo");
-		return 0;
+		console.log("height not implemented yet in flash/LoaderInfo");
+		return 0;//this.adaptee.height;
 		
 	}
 
@@ -369,8 +357,7 @@ export class LoaderInfo extends EventDispatcher
 	 *   Security.
 	 */
 	public get loader () : Loader{
-		console.log("loader not implemented yet in flash/LoaderInfo");
-		return null;
+		return this._loader;
 		
 	}
 
@@ -508,12 +495,13 @@ export class LoaderInfo extends EventDispatcher
 	 */
 	public get url () : string{
 		
-		return this._url;
+		return this.adaptee.url;
 		
 	}
 	public set url (value:string){
 		
-		this._url=value;
+		console.log("url not implemented yet in flash/LoaderInfo");
+		//this.adaptee.url=value;
 		
 	}
 
@@ -524,17 +512,19 @@ export class LoaderInfo extends EventDispatcher
 	 * @throws	Error If the file is not downloaded sufficiently to retrieve the requested information.
 	 */
 	public get width () : number{
-		//console.log("width not implemented yet in flash/LoaderInfo");
+		console.log("width not implemented yet in flash/LoaderInfo");
 		return 0;
 		
 	}
-/*
-	public dispatchEvent (event:Event) : boolean{
-		console.log("dispatchEvent not implemented yet in flash/LoaderInfo");
-		return false;
-		
+	
+	public dispatchEventInternal (event:Event){
+		return super.dispatchEvent(event);		
 	}
-	*/
+	
+	public dispatchEvent (event:Event){
+		throw("LoaderInfo.dispatchEvent should never be called");
+	}
+	
 
 	/**
 	 * Returns the LoaderInfo object associated with a SWF file defined as an object.

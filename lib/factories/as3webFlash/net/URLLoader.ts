@@ -1,12 +1,15 @@
-import {URLLoader as URLLoaderAway, URLRequest, LoaderEvent, URLLoaderEvent, IAssetAdapter} from "@awayjs/core";
+import {URLLoader as URLLoaderAway, LoaderEvent, URLLoaderEvent, IAssetAdapter} from "@awayjs/core";
 
 import {EventDispatcher} from "../events/EventDispatcher"
 import {IEventMapper} from "../events/IEventMapper"
 import {Event} from "../events/Event"
 import {ProgressEvent} from "../events/ProgressEvent"
+import { AXClass } from '../../avm2/run/AXClass';
+import { URLRequest } from './URLRequest';
 
 export class URLLoader extends EventDispatcher
 {
+	static axClass: typeof URLLoader & AXClass;
 	private _adaptee:URLLoaderAway;
 	//for AVM1:
 	public bytesLoaded:number;
@@ -30,6 +33,10 @@ export class URLLoader extends EventDispatcher
 			callback:this._progressCallbackDelegate});
 	}
 
+	public close()
+	{
+		console.log("not mimplemented: URLoader.close")
+	}
 	public get data():any
 	{
 		return this._adaptee.data;
@@ -42,21 +49,26 @@ export class URLLoader extends EventDispatcher
 	{
 		this._adaptee.removeEventListener(type, callback);
 	}
+	public addEventListener(type:string, callback:(event:any) => void):void
+	{
+		super.addEventListener(type, callback);
+	}
 	private _progressCallbackDelegate:(event:URLLoaderEvent) => void;
 	private progressCallback(event:URLLoaderEvent=null):void
 	{
-		var newEvent:ProgressEvent = new ProgressEvent(ProgressEvent.PROGRESS, null, null, event.urlLoader.bytesLoaded, event.urlLoader.bytesTotal);
+		var newEvent:ProgressEvent = new this.sec.flash.events.ProgressEvent(ProgressEvent.PROGRESS, null, null, event.urlLoader.bytesLoaded, event.urlLoader.bytesTotal);
 		newEvent.currentTarget=this;
 		this.dispatchEvent(newEvent);
 	}
 	private _completeCallbackDelegate:(event:URLLoaderEvent) => void;
 	private completeCallback(event:URLLoaderEvent=null):void
 	{
-		var newEvent:Event=new Event(Event.COMPLETE);
+		var newEvent:Event=new this.sec.flash.events.Event(Event.COMPLETE);
 		newEvent.currentTarget=this;
+		newEvent.target=this;
 		this.dispatchEvent(newEvent);
 	}
 	public load(request:URLRequest):void{
-		this._adaptee.load(request);
+		this._adaptee.load(request.adaptee);
 	};
 }

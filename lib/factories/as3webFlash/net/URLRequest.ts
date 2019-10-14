@@ -28,6 +28,7 @@ export class URLRequest extends ASObject {
   static axClass: typeof URLRequest;
 
   private _adaptee:URLRequestAway;
+  
   constructor (url: string = null) {
     super();
     this._adaptee=new URLRequestAway(url);

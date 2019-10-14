@@ -217,6 +217,7 @@ export class SoundStream {
   channels: number;
   format: any;
   currentSample: number;
+  allChunks: Uint8Array[];
 
   decode: (block: Uint8Array) => DecodedSound;
 
@@ -227,6 +228,7 @@ export class SoundStream {
     this.channels = channels;
     this.format = null;
     this.currentSample = 0;
+    this.allChunks = [];
   }
 
   static FromTag(tag): SoundStream {

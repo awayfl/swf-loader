@@ -1,4 +1,4 @@
-import { EventDispatcher } from "../events/EventDispatcher";
+import { EventDispatcher } from "../../as3webFlash/events/EventDispatcher";
 
 /**
  * Copyright 2014 Mozilla Foundation

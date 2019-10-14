@@ -666,6 +666,9 @@ export class SWFParser extends ParserBase
 			cmds_startSounds.length=0;
 			cmds_stopSounds.length=0;
 			unparsedTags.length=0;
+			if(swfFrames[i].soundStreamHead){
+				console.log("stream encountered", swfFrames[i].soundStreamHead)
+			}
 			if(swfFrames[i].initActionBlocks){
 				awayTimeline.avm1InitActions[i]=swfFrames[i].initActionBlocks;
 			}
@@ -1853,8 +1856,20 @@ export class SWFParser extends ParserBase
 				this._currentSoundStreamHead = SoundStream.FromTag(soundStreamTag);
 				break;
 			case SwfTagCode.CODE_SOUND_STREAM_BLOCK:
-                console.warn("Timeline sound is set to streaming!");
+				//if(!this._currentSoundStreamHead)
+				//	throw("Error when parsing CODE_SOUND_STREAM_BLOCK - a _currentSoundStreamHead must exist")
 				this._currentSoundStreamBlock = this.swfData.subarray(stream.pos, stream.pos += tagLength);
+				//this._currentSoundStreamHead.allChunks.push(this._currentSoundStreamBlock);
+				/*console.log(this._currentSoundStreamBlock.buffer);
+				console.log(this._currentSoundStreamBlock.length);
+				console.log(this._currentSoundStreamBlock.byteLength);
+				console.log(this._currentSoundStreamBlock.byteOffset);
+				console.log(this._currentSoundStreamBlock.buffer.byteLength);
+				var int16array=new Uint16Array(this._currentSoundStreamBlock.buffer, this._currentSoundStreamBlock.byteOffset, this._currentSoundStreamBlock.length);
+				console.log(int16array.buffer);
+				console.log(int16array.length);
+				console.log(int16array.byteLength);
+				console.log(int16array[0]);*/
 				break;
 			case SwfTagCode.CODE_FRAME_LABEL:
 				var tagEnd = stream.pos + tagLength;

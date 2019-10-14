@@ -76,6 +76,7 @@ import { axCoerceObject } from "./axCoerceObject";
 import { initializeAXBasePrototype, AXBasePrototype } from "./initializeAXBasePrototype";
 import { ISecurityDomain } from '../../ISecurityDomain';
 import { ByteArray, ByteArrayDataProvider } from '../natives/byteArray';
+import { Namespace } from '../abc/lazy/Namespace';
 
 /**
  * Provides security isolation between application domains.
@@ -682,7 +683,7 @@ export class AXSecurityDomain implements ISecurityDomain{
       this.prepareNativeClass("AXXMLList", "XMLList", false);
       this.prepareNativeClass("AXQName", "QName", false);
       this.prepareNativeClass("AXNamespace", "Namespace", false);
-  
+
       var AXArray = this.prepareNativeClass("AXArray", "Array", false);
       D(AXArray, 'axBox', axBoxPrimitive);
       AXArray.tPrototype.$BgtoString = AXFunction.axBox(function () {
