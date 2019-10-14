@@ -58,21 +58,33 @@ export class AVM1Key extends AVM1Object {
 		this._lastKeyCode = 0;
 	}
 
+	public static keyDownDelegate:any=null; 
+	public static keyUpDelegate:any=null; 
+
 	public static bindStage(context: AVM1Context, cls: AVM1Object, stage: AVMAwayStage, htmlElement:HTMLElement): void {
 
-		htmlElement.addEventListener('keydown', function (e) {
+		if(AVM1Key.keyDownDelegate)
+			htmlElement.removeEventListener('keydown', AVM1Key.keyDownDelegate);
+		
+		if(AVM1Key.keyUpDelegate)
+			htmlElement.removeEventListener('keyup', AVM1Key.keyUpDelegate);
+		
+		AVM1Key.keyDownDelegate=(e)=>{
 			var staticState: typeof AVM1Key = context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = e.keyCode;
 			staticState._keyStates[e.keyCode] = 1;
 			alCallProperty(cls, 'broadcastMessage', ['onKeyDown']);
-		});
-
-		htmlElement.addEventListener('keyup', function (e) {
+		}
+		AVM1Key.keyUpDelegate=(e)=>{
 			var staticState: typeof AVM1Key = context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = e.keyCode;
 			delete staticState._keyStates[e.keyCode];
 			alCallProperty(cls, 'broadcastMessage', ['onKeyUp']);
-		});
+		}
+		
+		htmlElement.addEventListener('keydown', AVM1Key.keyDownDelegate);
+		htmlElement.addEventListener('keyup', AVM1Key.keyUpDelegate);
+
 	}
 
 	public static isDown(context: AVM1Context, code) {

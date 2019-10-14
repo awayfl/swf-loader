@@ -29,20 +29,38 @@ export class AVM1Mouse extends AVM1Object {
 		var wrapped = wrapAVM1NativeClass(context, false, AVM1Mouse, ['show', 'hide'], []);
 		return wrapped;
 	}
+	public static mouseDownDelegate:any=null; 
+	public static mouseMoveDelegate:any=null; 
+	public static mouseOutDelegate:any=null; 
+	public static mouseUpDelegate:any=null;
 
 	public static bindStage(context: AVM1Context, cls: AVM1Object, stage: AVMAwayStage, htmlElement:HTMLElement): void {
-		stage.addEventListener('mouseDown', function (e: MouseEvent) {
+		
+		if(AVM1Mouse.mouseDownDelegate)
+			stage.removeEventListener('keydown', AVM1Mouse.mouseDownDelegate);		
+		if(AVM1Mouse.mouseMoveDelegate)
+			stage.removeEventListener('keyup', AVM1Mouse.mouseMoveDelegate);
+		if(AVM1Mouse.mouseOutDelegate)
+			stage.removeEventListener('keyup', AVM1Mouse.mouseOutDelegate);
+		if(AVM1Mouse.mouseUpDelegate)
+			stage.removeEventListener('keyup', AVM1Mouse.mouseUpDelegate);
+
+		AVM1Mouse.mouseDownDelegate=(e)=>{
 			alCallProperty(cls, 'broadcastMessage', ['onMouseDown']);
-		});
-		stage.addEventListener('mouseMove', function (e: MouseEvent) {
+		}
+		AVM1Mouse.mouseMoveDelegate=(e)=>{
 			alCallProperty(cls, 'broadcastMessage', ['onMouseMove']);
-		});
-		stage.addEventListener('mouseOut', function (e: MouseEvent) {
-			alCallProperty(cls, 'broadcastMessage', ['onMouseMove']);
-		});
-		stage.addEventListener('mouseUp', function (e: MouseEvent) {
+		}
+		AVM1Mouse.mouseOutDelegate=(e)=>{
+			alCallProperty(cls, 'broadcastMessage', ['onMouseOut']);
+		}
+		AVM1Mouse.mouseUpDelegate=(e)=>{
 			alCallProperty(cls, 'broadcastMessage', ['onMouseUp']);
-		});
+		}
+		stage.addEventListener('mouseDown', AVM1Mouse.mouseDownDelegate);
+		stage.addEventListener('mouseMove', AVM1Mouse.mouseMoveDelegate);
+		stage.addEventListener('mouseOut', AVM1Mouse.mouseOutDelegate);
+		stage.addEventListener('mouseUp', AVM1Mouse.mouseUpDelegate);
 	}
 
 	public static hide() {
