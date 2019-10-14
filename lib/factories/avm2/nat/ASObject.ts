@@ -229,6 +229,11 @@ export class ASObject implements IMetaobjectProtocol {
         var name = this.axResolveMultiname(mn);
         var value = this[name];
 
+        //80pro: workaround:
+        if(!value){
+            value = this[name.replace("$Bg", "")];
+
+        }
         //console.log("axGetProperty", name, value);
         if (typeof value === 'function') {
             return this.axGetMethod(name);
