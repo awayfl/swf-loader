@@ -16,7 +16,7 @@ import {URLRequest} from "../net/URLRequest";
 import {Event} from "../events/Event";
 import {ProgressEvent} from "../events/ProgressEvent";
 import {Font, DisplayObjectContainer as AwayDisplayObjectContainer, DisplayObject as AwayDisplayObject, SceneImage2D} from "@awayjs/scene";
-import {Image2DParser} from "@awayjs/stage";
+import {Image2DParser, BitmapImage2D} from "@awayjs/stage";
 import {Sound} from "../media/Sound";
 import {FlashSceneGraphFactory} from "../factories/FlashSceneGraphFactory";
 import {URLLoaderEvent} from "@awayjs/core";
@@ -100,7 +100,7 @@ export class Loader extends DisplayObjectContainer
 
 		if (asset.isAsset(AwayTextField)) {
 			this._loaderContext.applicationDomain.addDefinition(asset.name, <AwayTextField> asset);
-		} else if (asset.isAsset(SceneImage2D)) {
+		} else if (asset.isAsset(SceneImage2D) || asset.isAsset(BitmapImage2D)) {
 			this._loaderContext.applicationDomain.addDefinition(asset.name, <SceneImage2D> asset);
 
 			// we should only do this for bitmaps loaded from jpg or png
@@ -126,6 +126,8 @@ export class Loader extends DisplayObjectContainer
 				this.addChild(newClone);
 				//this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
 			}
+		}else {
+			console.log("loaded unhandled asset-type")
 		}
 	}
 

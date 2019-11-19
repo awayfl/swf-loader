@@ -451,7 +451,7 @@ export class InteractiveObject extends DisplayObject{
 			removeListener:this.removeMouseListener,
 			callback:this._mouseCallbackDelegate});
 			
-			this.eventMappingInvert[MouseEventAway.MOUSE_OUT]=MouseEvent.ROLL_OUT;
+			/*this.eventMappingInvert[MouseEventAway.MOUSE_OUT]=MouseEvent.ROLL_OUT;
 			this.eventMapping[MouseEvent.ROLL_OUT]=(<IEventMapper>{
 				adaptedType:MouseEventAway.MOUSE_OUT,
 				addListener:this.initMouseListener,
@@ -463,7 +463,7 @@ export class InteractiveObject extends DisplayObject{
 				adaptedType:MouseEventAway.MOUSE_OVER,
 				addListener:this.initMouseListener,
 				removeListener:this.removeMouseListener,
-				callback:this._mouseCallbackDelegate});
+				callback:this._mouseCallbackDelegate});*/
 	}
 
 	// ---------- event mapping functions for KeyboardEvent.KEY_UP:

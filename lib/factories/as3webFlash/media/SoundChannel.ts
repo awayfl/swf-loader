@@ -96,6 +96,10 @@ export class SoundChannel extends EventDispatcher
 	 * @refpath
 	 */
 	public stop () {
+		if(!this._sound){
+			console.log("SoundChannel.stop: No sound exists");
+			return;
+		}
 		this._sound.stop();
 	}
 }

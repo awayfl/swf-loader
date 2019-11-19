@@ -230,7 +230,7 @@ export class ASObject implements IMetaobjectProtocol {
         var value = this[name];
 
         //80pro: workaround:
-        if(!value){
+        if(typeof value === "undefined"){
             value = this[name.replace("$Bg", "")];
 
         }

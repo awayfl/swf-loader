@@ -607,6 +607,9 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	public get loaderInfo () : LoaderInfo{
 		//console.log("loaderInfo not implemented yet in flash/DisplayObject");
 		//this._adaptee.loaderInfo
+		if(!this._loaderInfo){
+			this._loaderInfo=new this.sec.flash.display.LoaderInfo()
+		}
 		return this._loaderInfo;
 	}
 	public set loaderInfo (value:LoaderInfo){
@@ -995,7 +998,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	public get transform () : Transform
 	{
 		this._ctBlockedByScript=true;
-		return this._transform;
+		return this._transform = new this.sec.flash.geom.Transform(this.adaptee.transform);
 
 	}
 	public set transform (value:Transform) {
@@ -1157,7 +1160,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		//console.log("DisplayObject:getBounds not yet implemented");
 
 		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
-		return new this.sec.flash.geom.Rectangle(box.x, box.y, box.width, box.height);
+		return new this.sec.flash.geom.Rectangle(box.x-this.x, box.y-this.y, box.width, box.height);
 
 	}
 
@@ -1175,8 +1178,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   the targetCoordinateSpace any's coordinate system.
 	 */
 	public getRect (targetCoordinateSpace:DisplayObject) : Rectangle{
-		console.log("DisplayObject:getRect not yet implemented");
-		return new this.sec.flash.geom.Rectangle();//this._adaptee.getBounds();
+		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
+		if(!box){
+			return new this.sec.flash.geom.Rectangle();
+		}
+		//console.log("DisplayObject:getRect not yet implemented");FromBounds
+		return new this.sec.flash.geom.Rectangle(box.x-this.x, box.y-this.y, box.width, box.height);
 
 	}
 

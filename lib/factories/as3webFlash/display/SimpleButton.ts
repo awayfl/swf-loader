@@ -2,6 +2,7 @@ import { InteractiveObject } from "./InteractiveObject";
 
 import { DisplayObject } from "./DisplayObject";
 import {SoundTransform} from "../media/SoundTransform";
+import { MovieClip } from './MovieClip';
 
 /**
  * The SimpleButton class lets you control all instances of button symbols in a SWF
@@ -37,7 +38,7 @@ import {SoundTransform} from "../media/SoundTransform";
  * the constructor based on the button's state.</li></ol><codeblock xml:space="preserve" class="+ topic/pre pr-d/codeblock ">
 
  */
-export class SimpleButton extends InteractiveObject
+export class SimpleButton extends MovieClip
 {
 	/**
 	 * Creates a new SimpleButton instance. Any or all of the display objects that represent
@@ -54,7 +55,11 @@ export class SimpleButton extends InteractiveObject
 	// for AVM1:
 	public buttonMode:any;
 
+	public registerScriptObject(child: any): void {
+	}
 
+	public unregisterScriptObject(child: any): void {
+	}
 
 
 	/**

@@ -55,6 +55,7 @@ export function FlashUtilScript_getTimer(param1: any){
 	return 0;
 }
 export function FlashNetScript_navigateToURL(param1: any, param2:any, param3:any=null){
+	window.open(param2.url, param3);
 }
 export function forEachPublicProperty(param1: any, param2:any, param3:any=null){
 	return 0;

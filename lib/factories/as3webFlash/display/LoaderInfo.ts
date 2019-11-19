@@ -162,6 +162,8 @@ export class LoaderInfo extends EventDispatcher
 		//this.eventMappingDummys[HTTPStatusEvent.IO_ERROR]="HTTPStatusEvent.IO_ERROR";
 		this.eventMappingDummys[Event.OPEN]="LoaderInfo:Event.OPEN";
 		this.eventMappingDummys[Event.INIT]="LoaderInfo:Event.INIT";
+		this.adaptee=new LoaderInfoAway();
+
 	}
 
 	// for AVM:
@@ -494,7 +496,8 @@ export class LoaderInfo extends EventDispatcher
 	 * isURLInaccessible property for details.
 	 */
 	public get url () : string{
-		
+		if(!this.adaptee || !this.adaptee.url)
+			return "";
 		return this.adaptee.url;
 		
 	}

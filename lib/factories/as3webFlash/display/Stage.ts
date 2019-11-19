@@ -223,6 +223,7 @@ export class Stage extends DisplayObjectContainer{
 			/*if(color==0xffffff){
 			 color=0xcccccc;
 			 }*/
+			// alpha=0.5;
 			var lookupstr:string=texObj.bitmap.id+gradient.type;
 			if(Stage._textureMaterials[lookupstr]){
 				texObj.material=Stage._textureMaterials[lookupstr];

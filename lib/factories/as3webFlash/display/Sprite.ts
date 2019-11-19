@@ -1,7 +1,7 @@
 import {Sprite as AwaySprite, DisplayObject as AwayDisplayObject, MovieClip as AwayMovieClip} from "@awayjs/scene";
 import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {DisplayObject} from "./DisplayObject";
-import {Rectangle} from "@awayjs/core";
+import {Rectangle, Matrix3D} from "@awayjs/core";
 import {Graphics} from "./Graphics";
 import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
 import { ASObject } from '../../avm2/nat/ASObject';
@@ -48,7 +48,28 @@ export class  Sprite extends DisplayObjectContainer
 		// if the adaptee was passed in via AwayMovieClip.mcForConstructor, its actually a MovieClip, 
 		// not a Sprite, and we need to reset it after the adapter was constructed
 		if(AwayMovieClip.mcForConstructor){
+
+			var old_matrix:Matrix3D = adaptee.transform.matrix3D;
+			var tmpMatrix={
+				a:old_matrix._rawData[0],
+				b:old_matrix._rawData[1],
+				c:old_matrix._rawData[4],
+				d:old_matrix._rawData[5],
+				tx:old_matrix._rawData[12],
+				ty:old_matrix._rawData[13],
+
+			}
 			adaptee.reset();
+			
+			var new_matrix:Matrix3D = adaptee.transform.matrix3D;
+			new_matrix._rawData[0] = tmpMatrix.a;
+			new_matrix._rawData[1] =  tmpMatrix.b;
+			new_matrix._rawData[4] =  tmpMatrix.c;
+			new_matrix._rawData[5] =  tmpMatrix.d;
+			new_matrix._rawData[12] =  tmpMatrix.tx;
+			new_matrix._rawData[13] =  tmpMatrix.ty;
+
+			adaptee.transform.invalidateComponents();
 			AwayMovieClip.mcForConstructor=null;
 		}
 

@@ -1,10 +1,13 @@
-import { FrameScriptManager, MovieClip } from '@awayjs/scene';
+import { FrameScriptManager, MovieClip, SceneImage2D } from '@awayjs/scene';
 import { AssetLibrary, AssetBase, WaveAudio } from '@awayjs/core';
 import { Sound } from '../../as3webFlash/media/Sound';
+import { BitmapData } from '../../as3webFlash/display/BitmapData';
+import { BitmapImage2D } from '@awayjs/stage';
 
 export class ActiveLoaderContext {
     public static loaderContext: any;
-    public static soundForConstructor: WaveAudio;
+    public static waveAudioForSoundConstructor: WaveAudio;
+    public static sceneImage2DForBitmapConstructor: SceneImage2D;
 }
 
 /**
@@ -20,7 +23,7 @@ export function axConstruct(argArray?: any[]) {
     var symbol=null;
     var timeline=null;
     var classToCheck=this;
-    // find the timline that shoiuld be used for this MC. might be on superclass...
+    //  find the AwayJS-timline that should be used for this MC. might be on superclass...
     while(classToCheck && !timeline){
         symbol=classToCheck._symbol;
         if(symbol && symbol.timeline)
@@ -41,7 +44,23 @@ export function axConstruct(argArray?: any[]) {
 
             var asset = ActiveLoaderContext.loaderContext.applicationDomain.getAwayJSAudio(this.classInfo.instanceInfo.name.name);
             if (asset && (<AssetBase>asset).isAsset(WaveAudio)) {
-                ActiveLoaderContext.soundForConstructor = <WaveAudio>asset;
+                ActiveLoaderContext.waveAudioForSoundConstructor = <WaveAudio>asset;
+            }
+            else {
+                console.log("error: could not find audio for class", this.classInfo.instanceInfo.name.name, asset)
+            }
+        }
+        else {
+            console.log("error: ActiveLoaderContext.loaderContext not set. can not rerieve Sound");
+        }
+    }
+    else if (this.superClass && this.superClass.classInfo && this.superClass.classInfo.instanceInfo && this.superClass.classInfo.instanceInfo.name.name == "BitmapData") {
+        //console.log("find sound for name", this.classInfo.instanceInfo.name.name)
+        if (ActiveLoaderContext.loaderContext) {
+
+            var asset = ActiveLoaderContext.loaderContext.applicationDomain.getDefinition(this.classInfo.instanceInfo.name.name);
+            if (asset && (<AssetBase>asset).isAsset(SceneImage2D) || (<AssetBase>asset).isAsset(BitmapImage2D)) {
+                ActiveLoaderContext.sceneImage2DForBitmapConstructor = <SceneImage2D>asset;
             }
             else {
                 console.log("error: could not find audio for class", this.classInfo.instanceInfo.name.name, asset)

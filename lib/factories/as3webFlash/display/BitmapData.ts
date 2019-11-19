@@ -1,5 +1,5 @@
-import { IAssetAdapter } from "@awayjs/core";
-import { StageManager } from "@awayjs/stage";
+import { IAssetAdapter, ColorUtils } from "@awayjs/core";
+import { StageManager, ImageUtils } from "@awayjs/stage";
 //****************************************************************************
 // ActionScript Standard Library
 // flash.display.BitmapData object
@@ -18,6 +18,7 @@ import { notImplemented } from '../../base/utilities/Debug';
 import { ByteArray } from '../../avm2/natives/byteArray';
 import { Uint32Vector } from '../../avm2/natives/uint32Vector';
 import { GenericVector } from '../../avm2/natives/GenericVector';
+import { ActiveLoaderContext } from '../../avm2/run/axConstruct';
 
 export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapter {
 	private _adaptee: SceneImage2D;
@@ -88,7 +89,13 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 	}
 	constructor(width: number, height: number, transparent: boolean = true, fillColor: number = 0xffffffff) {
 		super();
-		this._adaptee = new SceneImage2D(width, height, transparent, fillColor, false, StageManager.getInstance().getStageAt(0));
+		if(ActiveLoaderContext.sceneImage2DForBitmapConstructor){
+			this._adaptee=ActiveLoaderContext.sceneImage2DForBitmapConstructor;
+			ActiveLoaderContext.sceneImage2DForBitmapConstructor=null;
+		}
+		else{
+			this._adaptee = new SceneImage2D(width, height, transparent, fillColor, false, StageManager.getInstance().getStageAt(0));
+		}
 		this._adaptee.adapter = this;
 	}
 
@@ -159,6 +166,8 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 		this._adaptee.draw(source.adaptee, matrix?matrix.adaptee:null, colorTransform?colorTransform.adaptee:null, blendMode, clipRect?(<any>clipRect).adaptee:null, smooth);
 	}
 	public fillRect(rect: Rectangle, color: number) {
+		var colorArr=ColorUtils.float32ColorToARGB(color);
+		color=ColorUtils.ARGBtoFloat32(colorArr[0], colorArr[3], colorArr[2], colorArr[1]);
 		this._adaptee.fillRect(rect.adaptee, color);
 	}
 

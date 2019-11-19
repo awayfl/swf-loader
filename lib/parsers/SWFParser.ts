@@ -347,7 +347,8 @@ export class SWFParser extends ParserBase
 			material=new MethodMaterial();
 			var myImage=this._awaySymbols[bitmapIndex];
 			if(!myImage || (!myImage.isAsset(BitmapImage2D) && !myImage.isAsset(SceneImage2D))){
-				console.log("error: can not find image for bitmapfill", myImage)
+				console.log("error: can not find image for bitmapfill", myImage);
+				myImage=new BitmapImage2D(512, 512, false, 0xff0000ff, true);
 			}
 			material.ambientMethod.texture=new ImageTexture2D(myImage);
 			
@@ -537,10 +538,11 @@ export class SWFParser extends ParserBase
                             awayBitmap.setPixels(new Rectangle(0,0,symbol.definition.width, symbol.definition.height), symbol.definition.data);
                         }
 						if(awayBitmap){
-                            this._awaySymbols[dictionary[i].id] = awayBitmap;
-                            awayBitmap.name="awayBitmap_"+dictionary[i].id.toString();
+							this._awaySymbols[dictionary[i].id] = awayBitmap;
+							
+							(<any>awayBitmap).className=this.symbolClassesMap[symbol.id]?this.symbolClassesMap[symbol.id]:symbol.className;
+                            awayBitmap.name=(<any>awayBitmap).className;
                             assetsToFinalize[dictionary[i].id]=awayBitmap;
-							(<any>awayBitmap).className=symbol.className;
                         }
 						break;
 					case "binary":
@@ -985,7 +987,7 @@ export class SWFParser extends ParserBase
                                         if(freeChilds[placeObjectTag.symbolId]){
                                             name=placeObjectTag.name?placeObjectTag.name:"noname";
                                             // first we check if a instance is available that had the same instance-name
-                                            if(freeChilds[placeObjectTag.symbolId][name]&& freeChilds[placeObjectTag.symbolId][name].length>0){
+                                            if(freeChilds[placeObjectTag.symbolId][name] && freeChilds[placeObjectTag.symbolId][name].length>0){
                                                 sessionID=freeChilds[placeObjectTag.symbolId][name].shift();
                                             } 
                                             else{  
@@ -1825,6 +1827,7 @@ export class SWFParser extends ParserBase
 					/* if (!release && traceLevel.value > 0) {
 					   console.log('Registering symbol class ' + symbolClassName + ' to symbol ' + symbolId);
 					 }*/
+					   //console.log('Registering symbol class ' + symbolClassName + ' to symbol ' + symbolId);
 					this.symbolClassesMap[symbolId] = symbolClassName;
 					this.symbolClassesList.push({id: symbolId, className: symbolClassName});
 				}

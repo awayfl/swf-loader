@@ -1,6 +1,7 @@
 import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, Sprite as AwaySprite, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline, FrameScriptManager } from "@awayjs/scene";
 import { Sprite } from "./Sprite";
 import { constructClassFromSymbol } from '../../link';
+import { Matrix3D } from '@awayjs/core';
 
 var includeString: string = '';//TODO
 
@@ -111,10 +112,37 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			adaptee.name=Timeline.currentInstanceName;
 			Timeline.currentInstanceName=null;
 		};
+		
+		if(Timeline.currentInstanceMatrix){
+		
+			var new_matrix:Matrix3D = adaptee.transform.matrix3D;
+			new_matrix._rawData[0] = Timeline.currentInstanceMatrix.a;
+			new_matrix._rawData[1] =  Timeline.currentInstanceMatrix.b;
+			new_matrix._rawData[4] =  Timeline.currentInstanceMatrix.c;
+			new_matrix._rawData[5] =  Timeline.currentInstanceMatrix.d;
+			new_matrix._rawData[12] =  Timeline.currentInstanceMatrix.tx/20;
+			new_matrix._rawData[13] =  Timeline.currentInstanceMatrix.ty/20;
+
+			adaptee.transform.invalidateComponents();
+			Timeline.currentInstanceMatrix=null;
+		}
+		
 		AwayMovieClip.mcForConstructor=adaptee;
 		clone.axInitializer();
-		if(clone.adaptee.timeline)
+		if(clone.adaptee.timeline){
 			clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
+			
+			// hack to stick to frame 1 for BadIceCreamFont compiledClip
+			if((<any>this)._symbol.className && (<any>this)._symbol.className=="BadIcecreamFont"){
+				clone.adaptee.noTimelineUpdate=true;
+				clone.adaptee.timeline.frame_command_indices=[clone.adaptee.timeline.frame_command_indices[0]];
+				clone.adaptee.timeline.frame_recipe=[clone.adaptee.timeline.frame_recipe[0]];
+				clone.adaptee.timeline.keyframe_constructframes=[clone.adaptee.timeline.keyframe_constructframes[0]];
+				clone.adaptee.timeline.keyframe_durations=[clone.adaptee.timeline.keyframe_durations[0]];
+				clone.adaptee.timeline.keyframe_firstframes=[clone.adaptee.timeline.keyframe_firstframes[0]];
+				clone.adaptee.timeline.keyframe_indices=[clone.adaptee.timeline.keyframe_indices[0]];	
+			}
+		}
 		(<any>clone).noReset=true;
 		return clone;
 	}

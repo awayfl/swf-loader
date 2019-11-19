@@ -1,5 +1,5 @@
 import {ByteArray, AssetBase} from "@awayjs/core";
-import {IDisplayObjectAdapter, Font} from "@awayjs/scene";
+import {IDisplayObjectAdapter, Font, SceneImage2D} from "@awayjs/scene";
 import {DisplayObject as AwayDisplayObject} from "@awayjs/scene";
 import {MovieClip as AwayMovieClip} from "@awayjs/scene";
 import {WaveAudio} from "@awayjs/core";
@@ -123,6 +123,10 @@ export class ApplicationDomain extends ASObject
 	public getDefinition (name:string) : any{
 
 		if(this._definitions[name]){
+			if(this._definitions[name].isAsset && this._definitions[name].isAsset(SceneImage2D)){
+				return this._definitions[name];
+
+			}
 			var newAdapter:IDisplayObjectAdapter=this._definitions[name].adapter.clone();
 			if(newAdapter.adaptee.isAsset(AwayMovieClip)){
 				(<AwayMovieClip>newAdapter.adaptee).currentFrameIndex=0;
