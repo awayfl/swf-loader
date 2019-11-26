@@ -152,15 +152,45 @@ export class ASObject implements IMetaobjectProtocol {
             Object.defineProperty(this, qualifiedName, descriptor);
         }
     }
-
+    
     axResolveMultiname(mn: Multiname): any {
-        var name = mn.name;
-        if (typeof name === 'number' || isNumeric(name = axCoerceName(name))) {
-            release || assert(mn.isRuntimeName());
-            return +name;
+        if (mn.numeric)
+            return mn.numericValue
+
+        if (mn.mutable) {
+            let t = this.traits.getTrait(mn.namespaces, mn.name)
+            return t ? t.name.getMangledName() : '$Bg' + mn.name
         }
-        var t = this.traits.getTrait(mn.namespaces, name);
-        return t ? t.name.getMangledName() : '$Bg' + name;
+        else {
+            let k = this["__key__"]
+
+            if (!k) {
+                k = this.axClass.classInfo.instanceInfo.key
+                
+                if (!k) {
+                    k = this.axClass.classInfo.instanceInfo.getClassName()
+                    
+                    this.axClass.classInfo.instanceInfo.key = k
+                }
+                    
+                this["__key__"] = k
+            }
+
+            let c = mn.resolved[k]
+
+            if (c)
+                return c
+
+            let name = mn.name
+
+            let t = this.traits.getTraitMultiname(mn)
+
+            let r = t ? t.name.getMangledName() : ('$Bg' + name)
+
+            mn.resolved[k] = r
+
+            return r
+        }
     }
 
     axHasProperty(mn: Multiname): boolean {
@@ -226,20 +256,19 @@ export class ASObject implements IMetaobjectProtocol {
     }
 
     axGetProperty(mn: Multiname): any {
-        var name = this.axResolveMultiname(mn);
-        var value = this[name];
+        let name = this.axResolveMultiname(mn)
+        let value = this[name]
 
+        if (typeof value === "function")
+            return this.axGetMethod(name)
+        
         //80pro: workaround:
-        if(typeof value === "undefined"){
+        if (typeof value === "undefined")
             value = this[name.replace("$Bg", "")];
+        
 
-        }
-        //console.log("axGetProperty", name, value);
-        if (typeof value === 'function') {
-            return this.axGetMethod(name);
-        }
-        release || checkValue(value);
-        return value;
+        release || checkValue(value)
+        return value
     }
 
     protected _methodClosureCache: any;

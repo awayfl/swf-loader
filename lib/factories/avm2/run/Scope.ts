@@ -13,6 +13,10 @@ export class Scope {
     cache: AXObject[];
     defaultNamespace: Namespace;
   
+    public toString(): string {
+        return "" + this.parent + " => " + this.object + " " + this.isWith
+    }
+
     constructor(parent: Scope, object: AXObject, isWith: boolean = false) {
       this.parent = parent;
       this.object = object;
@@ -50,6 +54,19 @@ export class Scope {
     }
   
     public findScopeProperty(mn: Multiname, strict: boolean, scopeOnly: boolean): AXObject {
+        if (mn.mutable || scopeOnly) 
+            return this._findScopeProperty(mn, strict, scopeOnly)
+        
+        if (mn.scope === this.object)
+            return mn.value
+
+        let value = this._findScopeProperty(mn, strict, scopeOnly)
+        mn.value = value
+        mn.scope = this.object
+        return value
+    }
+
+    public _findScopeProperty(mn: Multiname, strict: boolean, scopeOnly: boolean): AXObject {
       // Multinames with a `null` name are the any name, '*'. Need to catch those here, because
       // otherwise we'll get a failing assert in `RuntimeTraits#getTrait` below.
       if (mn.name === null) {

@@ -8,20 +8,48 @@ import { assert } from "@awayjs/graphics";
 import { internPrefixedNamespace } from "./internPrefixedNamespace";
 import { axCoerceString } from "../../run/axCoerceString";
 import { isNumeric } from "../../../base/utilities";
+import { ScriptInfo } from "./ScriptInfo";
+import { AXObject } from "../../run/AXObject"
 
 export class Multiname {
     private static _nextID = 1;
     public id: number = Multiname._nextID ++;
     private _mangledName: string = null;
+
+    public script: ScriptInfo = null
+    public numeric: boolean = false
+    public numericValue: any = 0
+    public resolved: object = {}
+    public scope: AXObject = null
+    public value: AXObject = null
+
     constructor(
       public abc: ABCFile,
       public index: number,
       public kind: CONSTANT,
       public namespaces: Namespace [],
       public name: any,
-      public parameterType: Multiname = null
+      public parameterType: Multiname = null,
+      public mutable: boolean = false
     ) {
       // ...
+    }
+
+    private others: object = null
+
+    public rename(name : string): Multiname {
+        if (this.others == null)
+            this.others = {}
+            
+        let rn = this.others[name]
+        
+        if (rn === undefined) {
+            rn = new Multiname(this.abc, -1, null, this.namespaces, name, this.parameterType)
+            rn.script = this.script
+            this.others[name] = rn
+        }
+        
+        return rn
     }
   
     public static FromFQNString(fqn: string, nsType: NamespaceType) {
@@ -205,8 +233,11 @@ export class Multiname {
       } else if (this.isQName()) {
         str += this.namespaces[0] + "::";
         str += this._nameToString();
-      } else {
+      } else if (this.namespaces) {
         str += "{" + this.namespaces.map(x => String(x)).join(", ") + "}";
+        str += "::" + this._nameToString();
+      } else {
+        str += "{" + this.namespaces + "}";
         str += "::" + this._nameToString();
       }
       if (this.parameterType) {

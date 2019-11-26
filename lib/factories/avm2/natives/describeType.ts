@@ -116,8 +116,8 @@ export function describeTypeJSON(sec: AXSecurityDomain, o: any, flags: number): 
   return description;
 }
 
-var tmpName = new Multiname(null, 0, CONSTANT.QName, [Namespace.PUBLIC], null);
-var tmpAttr = new Multiname(null, 0, CONSTANT.QNameA, [Namespace.PUBLIC], null);
+var tmpName = new Multiname(null, 0, CONSTANT.QName, [Namespace.PUBLIC], null, null, true);
+var tmpAttr = new Multiname(null, 0, CONSTANT.QNameA, [Namespace.PUBLIC], null, null, true);
 
 export function describeType(sec: AXSecurityDomain, value: any, flags: number): ASXML {
   // Ensure that the XML classes have been initialized:

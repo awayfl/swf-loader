@@ -52,6 +52,22 @@ export class RuntimeTraits {
       release || assert(!this.slots[slot]);
       this.slots[slot] = trait;
     }
+
+    private multinames: object = {}
+    
+    getTraitMultiname(mn: Multiname): RuntimeTraitInfo {
+        if (mn.mutable)
+            return this.getTrait(mn.namespaces, mn.name)
+        
+        let t = this.multinames[mn.id]
+        
+        if (t === undefined) {
+            t = this.getTrait(mn.namespaces, mn.name)
+            this.multinames[mn.id] = t
+        }
+        
+        return t
+    }
   
     /**
      * Returns the trait matching the given multiname parts, if any.

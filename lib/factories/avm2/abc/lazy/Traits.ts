@@ -74,9 +74,18 @@ export class Traits {
       return -1;
     }
   
+    private multinames: object = {}
+
     getTrait(mn: Multiname): TraitInfo {
-      var i = this.indexOf(mn);
-      return i >= 0 ? this.traits[i] : null;
+        let t = this.multinames[mn.id]
+
+        if (t === undefined) {
+            let i = this.indexOf(mn)
+            t = i >= 0 ? this.traits[i] : this
+            this.multinames[mn.id] = t
+        }
+
+        return t === this ? null : t
     }
   
     /**

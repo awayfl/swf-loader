@@ -470,8 +470,8 @@ export function isXMLName(v, sec: AXSecurityDomain) {
   return true;
 }
 
-var tmpMultiname = new Multiname(null, 0, CONSTANT.QName, [], null);
-var anyMultiname = new Multiname(null, 0, CONSTANT.QName, [], null);
+var tmpMultiname = new Multiname(null, 0, CONSTANT.QName, [], null, null, true);
+var anyMultiname = new Multiname(null, 0, CONSTANT.QName, [], null, null, true);
 release || Object.seal(anyMultiname);
 
 export const enum XMLParserErrorCode {

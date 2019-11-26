@@ -109,6 +109,10 @@ export class AXApplicationDomain {
   
     public findDefiningScript(mn: Multiname, execute: boolean): ScriptInfo {
       release || assert(mn instanceof Multiname);
+
+      if (mn.script)
+          return mn.script;
+      
       // Look in parent domain first.
       var script: ScriptInfo;
       if (this.parent) {
@@ -123,6 +127,8 @@ export class AXApplicationDomain {
         var abc = this._abcs[i];
         script = this._findDefiningScriptInABC(abc, mn, execute);
         if (script) {
+          if (!mn.mutable)
+              mn.script = script;
           return script;
         }
       }
@@ -133,6 +139,8 @@ export class AXApplicationDomain {
         this.loadABC(abc);
         script = this._findDefiningScriptInABC(abc, mn, execute);
         release || assert(script, 'Shall find class in loaded ABC');
+        if (!mn.mutable)
+            mn.script = script;
         return script;
       }
   

@@ -173,4 +173,4 @@ export class ASProxy extends ASObject {
   }
 }
 
-var rn = new Multiname(null, 0, CONSTANT.RTQNameL, [], null);
+var rn = new Multiname(null, 0, CONSTANT.RTQNameL, [], null, null, true);

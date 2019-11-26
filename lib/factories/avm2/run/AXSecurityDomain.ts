@@ -462,25 +462,26 @@ export class AXSecurityDomain implements ISecurityDomain{
     }
   
     box(v: any) {
-      if (v == undefined) {
-        return v;
-      }
-      if (AXBasePrototype.isPrototypeOf(v)) {
-        return v;
-      }
-      if (v instanceof Array) {
-        return this.AXArray.axBox(v);
-      }
-      if (typeof v === "number") {
-        return this.AXNumber.axBox(v);
-      }
-      if (typeof v === "boolean") {
-        return this.AXBoolean.axBox(v);
-      }
-      if (typeof v === "string") {
-        return this.AXString.axBox(v);
-      }
-      assert(false, "Cannot box: " + v);
+        if (v == undefined)
+            return v
+
+        if (v.constructor === Array)
+            return this.AXArray.axBox(v)
+
+        const t = typeof v
+
+        if (t === "number")
+            return this.AXNumber.axBox(v)
+
+        if (t === "boolean")
+            return this.AXBoolean.axBox(v)
+
+        if (t === "string")
+            return this.AXString.axBox(v)
+
+        release || assert(AXBasePrototype.isPrototypeOf(v))
+
+        return v
     }
   
     isPrimitive(v: any) {

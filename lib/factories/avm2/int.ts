@@ -33,6 +33,9 @@ import { Errors } from "./errors";
 import { getPropertyDescriptor } from "../base/utilities/ObjectUtilities";
 import { isValidASValue } from './run/initializeAXBasePrototype';
 import { AXClass } from './run/AXClass';
+import { axCoerceName } from "./run/axCoerceName";
+import { isNumeric } from "../base/utilities";
+import { compile } from "./jit";
 
 /**
  * Helps the interpreter allocate fewer Scope objects.
@@ -92,6 +95,9 @@ export class ScopeStack {
 
 
 function popNameInto(stack: any [], mn: Multiname, rn: Multiname) {
+  rn.resolved = {}
+  rn.script = null  
+  rn.numeric = false
   rn.id = mn.id;
   rn.kind = mn.kind;
   if (mn.isRuntimeName()) {
@@ -105,6 +111,10 @@ function popNameInto(stack: any [], mn: Multiname, rn: Multiname) {
       rn.name = name.name;
       rn.namespaces = name.namespaces;
       return;
+    }
+    if (typeof name === "number" || isNumeric(axCoerceName(name))) {
+        rn.numeric = true
+        rn.numericValue = +(axCoerceName(name))
     }
     rn.name = name;
     rn.id = -1;
@@ -130,8 +140,16 @@ function popNameInto(stack: any [], mn: Multiname, rn: Multiname) {
 export function interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, args: any [],
                           callee: AXFunction) {
   executionWriter && executionWriter.enter("> " + methodInfo);
+    if (methodInfo.compiled == null && methodInfo.error == null) {
+        let r = compile(methodInfo)
+        if (typeof r === "string")
+            methodInfo.error = r
+        else 
+            methodInfo.compiled = r
+    }
+
   try {
-    var result = _interpret(self, methodInfo, savedScope, args, callee);
+    var result = methodInfo.compiled ? methodInfo.compiled(savedScope, self, args) : _interpret(self, methodInfo, savedScope, args, callee);
     executionWriter && executionWriter.leave("< " + methodInfo.trait);
     return result;
   } catch (e) {
@@ -259,6 +277,9 @@ class InterpreterFrame {
 
 function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, callArgs: any [],
                     callee: AXFunction) {
+  if (methodInfo.error != null)
+      console.log("interpret: (" + methodInfo.error + ")")
+
   var frame = new InterpreterFrame(self, methodInfo, savedScope, callArgs, callee);
   var stack = frame.stack;
   var locals = frame.locals;
@@ -266,8 +287,7 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
   var sec = frame.sec;
   var abc = methodInfo.abc;
 
-  var rn = new Multiname(abc, 0, null, null, null);
-
+  var rn = new Multiname(abc, 0, null, null, null, null, true);
   var value, object, receiver, a, b, offset, index, result;
   var args = [];
   var argCount = 0;

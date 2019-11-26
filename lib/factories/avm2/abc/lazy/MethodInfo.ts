@@ -14,6 +14,10 @@ export class MethodInfo {
     public minArgs: number;
     private _body: MethodBodyInfo;
     private _returnType: AXClass;
+
+    public compiled:Function = null;
+    public error:string = null;
+
     constructor(
       public abc: ABCFile,
       private _index: number,
@@ -45,6 +49,10 @@ export class MethodInfo {
   
     getBody(): MethodBodyInfo {
       return this._body || (this._body = this.abc.getMethodBodyInfo(this._index));
+    }
+
+    index() : number {
+        return this._index
     }
   
     getType(): AXClass {
