@@ -445,8 +445,9 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 	}
 	public get_root(): AVM1MovieClip {
 		var awayObject: DisplayObjectContainer = this.adaptee;
+		var avmObject = null;
 		while (awayObject && !awayObject.isAVMScene) {
-			var avmObject = <AVM1MovieClip>getAVM1Object(awayObject, this.context);
+			avmObject = <AVM1MovieClip>getAVM1Object(awayObject, this.context);
 			if (avmObject && avmObject.get_lockroot()) {
 				return avmObject;
 			}

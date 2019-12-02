@@ -28,30 +28,44 @@ import { System } from '../as3webFlash/system/System';
 import { Graphics } from "../as3webFlash/display/Graphics";
 import { Event } from "../as3webFlash/events/Event";
 import { URLLoader } from "../as3webFlash/net/URLLoader";
+import { TextField } from '../as3webFlash/text/TextField';
+import { TextFormat } from '../as3webFlash/text/TextFormat';
+import { Sound } from '../as3webFlash/media/Sound';
+import { SoundChannel } from '../as3webFlash/media/SoundChannel';
+import { SoundTransform } from '../as3webFlash/media/SoundTransform';
+import { SharedObject } from '../as3webFlash/net/SharedObject';
+import { URLRequest } from '../as3webFlash/net/URLRequest';
 
-import { Scene } from "./display/Scene";
-import { Keyboard } from "./ui/Keyboard";
-import { KeyboardEvent } from "./events/KeyboardEvent";
-import { MouseEvent } from "./events/MouseEvent";
+import { XMLDocument, XMLNode } from "./natives/xml-document";
+import { ASClass } from './nat/ASClass';
+import { registerNativeClass, registerNativeFunction } from './nat/initializeBuiltins';
 
-import { XMLDocument, XMLNode } from "../avm2/natives/xml-document";
-import { BevelFilter } from "./filters/BevelFilter";
-import { BitmapFilter } from "./filters/BitmapFilter";
-import { BlurFilter } from "./filters/BlurFilter";
-import { ColorMatrixFilter } from "./filters/ColorMatrixFilter";
-import { ConvolutionFilter } from "./filters/ConvolutionFilter";
-import { DisplacementMapFilter } from "./filters/DisplacementMapFilter";
-import { DropShadowFilter } from "./filters/DropShadowFilter";
-import { GlowFilter } from "./filters/GlowFilter";
-import { GradientBevelFilter } from "./filters/GradientBevelFilter";
-import { GradientGlowFilter } from "./filters/GradientGlowFilter";
-import { Capabilities } from "./system/Capabilities";
-import { ExternalInterface } from "./external/ExternalInterface";
-import { Timer } from "./utils/Timer";
-import { TimerEvent } from "./events/TimerEvent";
-import { ProgressEvent } from "./events/ProgressEvent";
-import { SoundMixer } from "./media/SoundMixer";
-import { TextSnapshot } from "./text/TextSnapshot";
+// todo: this classes rely on the flash module, should be merged into our as3web module:
+
+import { fscommand } from "../flash/system/FSCommand";
+import { Security } from '../flash/system/Security';
+import { Scene } from "../flash/display/Scene";
+import { Keyboard } from "../flash/ui/Keyboard";
+import { KeyboardEvent } from "../flash/events/KeyboardEvent";
+import { MouseEvent } from "../flash/events/MouseEvent";
+
+import { BevelFilter } from "../flash/filters/BevelFilter";
+import { BitmapFilter } from "../flash/filters/BitmapFilter";
+import { BlurFilter } from "../flash/filters/BlurFilter";
+import { ColorMatrixFilter } from "../flash/filters/ColorMatrixFilter";
+import { ConvolutionFilter } from "../flash/filters/ConvolutionFilter";
+import { DisplacementMapFilter } from "../flash/filters/DisplacementMapFilter";
+import { DropShadowFilter } from "../flash/filters/DropShadowFilter";
+import { GlowFilter } from "../flash/filters/GlowFilter";
+import { GradientBevelFilter } from "../flash/filters/GradientBevelFilter";
+import { GradientGlowFilter } from "../flash/filters/GradientGlowFilter";
+import { Capabilities } from "../flash/system/Capabilities";
+import { ExternalInterface } from "../flash/external/ExternalInterface";
+import { Timer } from "../flash/utils/Timer";
+import { TimerEvent } from "../flash/events/TimerEvent";
+import { ProgressEvent } from "../flash/events/ProgressEvent";
+import { SoundMixer } from "../flash/media/SoundMixer";
+import { TextSnapshot } from "../flash/text/TextSnapshot";
 /*
 import { NativeMenu } from "./display/NativeMenu";
 import { NativeMenuItem } from "./display/NativeMenuItem";
@@ -141,18 +155,6 @@ import { LocalConnection } from "./net/LocalConnection";
 import { Socket } from "./net/Socket";
 import { Security } from "./system/Security";
 */
-import { fscommand } from "./system/FSCommand";
-import { release, assert } from "../base/utilities/Debug";
-import { ASClass } from '../avm2/nat/ASClass';
-import { registerNativeClass, registerNativeFunction } from '../avm2/nat/initializeBuiltins';
-import { TextField } from '../as3webFlash/text/TextField';
-import { TextFormat } from '../as3webFlash/text/TextFormat';
-import { Sound } from '../as3webFlash/media/Sound';
-import { SoundChannel } from '../as3webFlash/media/SoundChannel';
-import { SoundTransform } from '../as3webFlash/media/SoundTransform';
-import { SharedObject } from '../as3webFlash/net/SharedObject';
-import { URLRequest } from '../as3webFlash/net/URLRequest';
-import { Security } from './system/Security';
 /**
  * Copyright 2014 Mozilla Foundation
  *

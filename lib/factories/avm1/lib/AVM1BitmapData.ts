@@ -28,7 +28,6 @@ import {toAS3Matrix} from "./AVM1Matrix";
 //import {BitmapImage2D as BitmapData} from "@awayjs/stage";
 import {SceneImage2D as BitmapData} from "@awayjs/scene";
 import {AssetLibrary, IAsset} from "@awayjs/core";
-import {constructClassFromSymbol} from "../../link";
 import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Stage} from "./AVM1Stage";
 import { BitmapImage2D } from '@awayjs/stage';
@@ -85,7 +84,6 @@ export class AVM1BitmapData extends AVM1Object implements IHasAS3ObjectReference
 			var bitmapData = new AVM1BitmapData(context);
 			bitmapData.adaptee = <IAsset><any>symbol;
 			return bitmapData;
-
 		}
 		/*
 		var symbolClass = symbol.symbolProps.symbolClass;

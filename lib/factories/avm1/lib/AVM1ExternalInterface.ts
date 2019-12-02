@@ -65,7 +65,9 @@ export class AVM1ExternalInterface extends AVM1Object {
 
 	public static call(context: AVM1Context, methodName: string, ...parameters: any[]): any {
 		var args = [];// [alCoerceString(context, methodName)];
-		for (var i = 0; i < parameters.length; i++) {
+		var paramsLength:number=parameters.length;
+		var i:number=0;
+		for (i = 0; i < paramsLength; i++) {
 			// TODO convert AVM1 objects to AVM2
 			args.push(parameters[i]);
 		}
@@ -75,7 +77,7 @@ export class AVM1ExternalInterface extends AVM1Object {
 		try {
 			var methodnames=methodName.split(".");
 			var method:any=window;
-			for(var i=0; i<methodnames.length; i++){
+			for(i=0; i<methodnames.length; i++){
 				method=method[methodnames[i]];
 			}
 

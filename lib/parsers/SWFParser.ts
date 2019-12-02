@@ -22,7 +22,7 @@ import {
 	EagerlyParsedDictionaryEntry,
 	memCopy} from "@awayjs/graphics";
 
-import {Stream} from "../utils/stream";
+import {Stream} from "../parsers/utils/stream";
 import {Inflate, LzmaDecoder} from "@awayjs/graphics";
 
 import {
@@ -31,16 +31,16 @@ import {
 	parseSoundStreamHeadTag,
     parseDefineSceneTag,
     parseSoundInfo,
-	tagHandlers} from "../utils/parser/SWFLowLevel";
+	tagHandlers} from "../parsers/utils/parser/SWFLowLevel";
 
-import {defineSound, SoundStream} from "../utils/parser/sound";
-import {defineShape} from "../utils/parser/shape";
-import {defineFont} from "../utils/parser/font";
-import {defineText} from "../utils/parser/text";
-import {defineButton} from "../utils/parser/button";
-import {defineBitmap} from "../utils/parser/bitmap";
-import {defineImage} from "../utils/parser/image";
-import {defineLabel} from "../utils/parser/label";
+import {defineSound, SoundStream} from "../parsers/utils/parser/sound";
+import {defineShape} from "../parsers/utils/parser/shape";
+import {defineFont} from "../parsers/utils/parser/font";
+import {defineText} from "../parsers/utils/parser/text";
+import {defineButton} from "../parsers/utils/parser/button";
+import {defineBitmap} from "../parsers/utils/parser/bitmap";
+import {defineImage} from "../parsers/utils/parser/image";
+import {defineLabel} from "../parsers/utils/parser/label";
 import {SWFFrame} from "./SWFFrame";
 import {SWFFile} from "./SWFFile";
 
@@ -54,7 +54,7 @@ import {
 	PlaceObjectTag,
 	PlaceObjectFlags,
 	TextFlags,
-	getSwfTagCodeName} from "../utils/SWFTags";
+	getSwfTagCodeName} from "../parsers/utils/SWFTags";
 import {__extends} from "tslib";
 import { ABCFile } from '../factories/avm2/abc/lazy/ABCFile';
 import { FlashSceneGraphFactory } from '../factories/as3webFlash/factories/FlashSceneGraphFactory';

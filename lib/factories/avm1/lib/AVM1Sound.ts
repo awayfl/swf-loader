@@ -16,12 +16,10 @@
 
 import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Context} from "../context";
-import {Debug, warning, notImplemented} from "../../base/utilities/Debug";
+import {warning} from "../../base/utilities/Debug";
 import {IAVM1SymbolBase, wrapAVM1NativeClass} from "./AVM1Utils";
 import {AVM1MovieClip} from "./AVM1MovieClip";
-import {ASObject} from "../../AVM2Dummys";
 import {WaveAudio, AssetLibrary} from "@awayjs/core";
-import {constructClassFromSymbol} from "../../link";
 
 class SoundSymbol{
 

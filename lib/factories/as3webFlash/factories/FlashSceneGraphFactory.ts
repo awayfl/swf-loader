@@ -16,9 +16,9 @@ import { Graphics as Graphicsadapter} from '../display/graphics';
 import { AXSecurityDomain } from '../../avm2/run/AXSecurityDomain';
 import { Multiname } from '../../avm2/abc/lazy/Multiname';
 import { NamespaceType } from '../../avm2/abc/lazy/NamespaceType';
-import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
 import { ABCFile } from '../../avm2/abc/lazy/ABCFile';
-import { ISecurityDomain } from '../../ISecurityDomain';
+import { ISecurityDomain } from '../../avm1/ISecurityDomain';
 import { AXClass } from '../../avm2/run/AXClass';
 
 export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements ISceneGraphFactory

@@ -7,7 +7,7 @@ import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {Stage} from "./Stage";
 import { PickGroup, BasicPartition } from '@awayjs/view';
 import { SceneGraphPartition } from '@awayjs/scene';
-import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
 import { AXClass } from '../../avm2/run/AXClass';
 import { Transform } from '../geom/Transform';
 import { Rectangle } from '../geom/Rectangle';

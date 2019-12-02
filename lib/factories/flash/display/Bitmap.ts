@@ -1,7 +1,7 @@
 import { DisplayObject, DisplayObjectDirtyFlags } from "./DisplayObject";
 import { assert, axCoerceString, PixelSnapping, Bounds } from "@awayjs/graphics";
 import { release } from "../../base/utilities/Debug";
-import { constructClassFromSymbol } from "../constructClassFromSymbol";
+import { constructClassFromSymbol } from "../../avm2/constructClassFromSymbol";
 import { BitmapSymbol, BitmapData } from './BitmapData';
 import { Errors } from '../../avm2/errors';
 

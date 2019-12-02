@@ -4,24 +4,17 @@ import { createSecurityDomain, AVM2LoadLibrariesFlags } from "./avmLoader";
 import { initSystem } from "../avm2/natives/system";
 
 import { Sprite } from "../as3webFlash/display/Sprite";
-import { MovieClip } from "../as3webFlash/display/MovieClip";
 import { FlashSceneGraphFactory } from "../as3webFlash/factories/FlashSceneGraphFactory";
 import { Loader } from "../as3webFlash/display/Loader";
 import { Stage } from "../as3webFlash/display/Stage";
 import { LoaderContext } from "../as3webFlash/system/LoaderContext";
-import { ApplicationDomain } from "../as3webFlash/system/ApplicationDomain";
 import { Event } from "../as3webFlash/events/Event";
 import { RequestAnimationFrame, ColorUtils, AssetEvent } from '@awayjs/core';
-import { ABCFile } from '../avm2/abc/lazy/ABCFile';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
-import { initLink } from '../flash/link';
-import { constructClassFromSymbol } from '../flash/constructClassFromSymbol';
-import { Multiname } from '../avm2/abc/lazy/Multiname';
-import { NamespaceType } from '../avm2/abc/lazy/NamespaceType';
+import { initLink } from '../avm2/link';
 import { initlazy } from '../avm2/abc/lazy';
 import { FrameScriptManager } from '@awayjs/scene';
 import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
-import { ISecurityDomain } from '../ISecurityDomain';
 import { ActiveLoaderContext } from '../avm2/run/axConstruct';
 class EntryClass extends Sprite {
 	constructor() {
@@ -43,7 +36,7 @@ export class Player {
 	private _parser: SWFParser;
 	private _timer: RequestAnimationFrame;
 	private _time: number = 0;
-	private _sec: ISecurityDomain;
+	private _sec: AXSecurityDomain;
 	private _events: any[];
 	private _eventOnEnter: Event;
 	private _eventFrameConstructed: Event;
@@ -63,7 +56,7 @@ export class Player {
 		}
 		createSecurityDomain(
 			AVM2LoadLibrariesFlags.Builtin | AVM2LoadLibrariesFlags.Playerglobal
-		).then((sec:ISecurityDomain) => {
+		).then((sec:AXSecurityDomain) => {
 			console.log("builtins are loaded fine, start parsing SWF");
 			this._sec = sec;
 			AXSecurityDomain.instance=sec;

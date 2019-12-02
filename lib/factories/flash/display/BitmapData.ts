@@ -38,7 +38,7 @@ import { swap32 } from "../../base/utilities/IntegerUtilities";
 import { BitmapFilter } from "../filters/BitmapFilter";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { LoaderInfo } from "./LoaderInfo";
-import { constructClassFromSymbol } from "../constructClassFromSymbol";
+import { constructClassFromSymbol } from "../../avm2/constructClassFromSymbol";
 import { AXClass } from '../../avm2/run/AXClass';
 
 /**

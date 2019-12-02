@@ -1,6 +1,6 @@
 import { HitTestingResult, IAdvancable, DisplayObject, DisplayObjectFlags, HitTestingType } from "./DisplayObject";
 import { MapObject } from "../../base/utilities";
-import { SoundInfoFlags, SwfTagCode } from "../../../utils/SWFTags";
+import { SoundInfoFlags, SwfTagCode } from "../../../parsers/utils/SWFTags";
 import { Sprite, SpriteSymbol } from "./Sprite";
 import { assert, release, assertUnreachable } from "../../base/utilities/Debug";
 import { InitActionBlock, ActionBlock } from "@awayjs/graphics";
@@ -13,7 +13,7 @@ import { SoundStart } from "../symbol";
 import { Event } from "../events/Event";
 import { SoundSymbol, Sound } from "../media/Sound";
 import { MovieClipSoundStream } from "./MovieClipSoundStream";
-import { constructClassFromSymbol } from "../constructClassFromSymbol";
+import { constructClassFromSymbol } from "../../avm2/constructClassFromSymbol";
 import { enterTimeline, leaveTimeline } from "../../avm2/module";
 import { getAVM1Object } from '../../avm1/lib/AVM1Utils';
 import { AVM1MovieClip } from '../../avm1/lib/AVM1MovieClip';

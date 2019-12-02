@@ -24,7 +24,6 @@ import {
 import {avm1BroadcastEvent} from "./AVM1Utils";
 import {isNullOrUndefined} from "../../base/utilities";
 import {URLLoaderEvent as Event, URLLoader, URLRequest} from "@awayjs/core";
-import {forEachPublicProperty} from "../../AVM2Dummys";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Function } from "../runtime/AVM1Function";
 

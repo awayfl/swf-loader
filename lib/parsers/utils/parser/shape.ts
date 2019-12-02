@@ -18,7 +18,7 @@ import {Graphics} from "@awayjs/graphics"
 import {MorphSprite} from "@awayjs/scene"
 import {ShapeTag} from "@awayjs/graphics";
 
-import { SWFParser } from '../../parsers/SWFParser';
+import { SWFParser } from '../../SWFParser';
 
 /*
  * Applies the current segment1 to the paths of all styles specified in the last

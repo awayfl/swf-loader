@@ -16,13 +16,10 @@
 
 import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Context} from "../context";
-import {avm1BroadcastEvent, getAVM1Object, wrapAVM1NativeClass} from "./AVM1Utils";
+import {wrapAVM1NativeClass} from "./AVM1Utils";
 import {AVM1MovieClip} from "./AVM1MovieClip";
 import {AVM1Broadcaster} from "./AVM1Broadcaster";
-import {notImplemented, release} from "../../base/utilities/Debug";
-import {EventBase as Event} from "@awayjs/core";
-import {IOErrorEvent} from "../../customAway/events/IOErrorEvent";
-import {ProgressEvent} from "../../customAway/events/ProgressEvent";
+import {notImplemented} from "../../base/utilities/Debug";
 import { AVM1LoaderHelper } from './AVM1LoaderHelper';
 
 

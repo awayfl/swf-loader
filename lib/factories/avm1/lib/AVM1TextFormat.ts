@@ -24,7 +24,7 @@ import {AVM1Context} from "../context";
 import {IHasAS3ObjectReference, wrapAVM1NativeClass} from "./AVM1Utils";
 import {TextField, TextFormat} from "@awayjs/scene";
 import {AVM1Object} from "../runtime/AVM1Object";
-import {Debug, notImplemented, warning} from "../../base/utilities/Debug";
+import {notImplemented} from "../../base/utilities/Debug";
 
 export class AVM1TextFormat extends AVM1Object implements IHasAS3ObjectReference {
 	static createAVM1Class(context: AVM1Context): AVM1Object {
@@ -37,11 +37,12 @@ export class AVM1TextFormat extends AVM1Object implements IHasAS3ObjectReference
 			members,
 			null, AVM1TextFormat.prototype.avm1Constructor);
 		var proto = wrapped.alGetPrototypeProperty();
+		var p =null;
 		members.forEach((x) => {
 			if (x[x.length - 1] === '#') {
 				x = x.slice(0, -1);
 			}
-			var p = proto.alGetOwnProperty(x);
+			p = proto.alGetOwnProperty(x);
 			p.flags &= ~AVM1PropertyFlags.DONT_ENUM;
 			proto.alSetOwnProperty(x, p);
 		});

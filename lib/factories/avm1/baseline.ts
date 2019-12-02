@@ -44,18 +44,25 @@ function getActionsCalls() {
 export class ActionsDataCompiler {
 	private convertArgs(args: any[], id: number, res, ir: AnalyzerResults): string {
 		var parts: string[] = [];
-		for (var i: number = 0; i < args.length; i++) {
-			var arg = args[i];
+		var arg;
+		var argsLen:number=args.length;
+		var constant;
+		var hint:string;
+		var currentConstantPool;
+		var registerNumber:number;
+		var resName:string;
+		for (var i: number = 0; i < argsLen; i++) {
+			arg = args[i];
 			if (typeof arg === 'object' && arg !== null && !Array.isArray(arg)) {
 				if (arg instanceof ParsedPushConstantAction) {
 					if (ir.singleConstantPool) {
-						var constant = ir.singleConstantPool[(<ParsedPushConstantAction> arg).constantIndex];
+						constant = ir.singleConstantPool[(<ParsedPushConstantAction> arg).constantIndex];
 						parts.push(constant === undefined ? 'undefined' : JSON.stringify(constant));
 					} else {
-						var hint = '';
-						var currentConstantPool = res.constantPool;
+						hint = '';
+						currentConstantPool = res.constantPool;
 						if (currentConstantPool) {
-							var constant = currentConstantPool[(<ParsedPushConstantAction> arg).constantIndex];
+							constant = currentConstantPool[(<ParsedPushConstantAction> arg).constantIndex];
 							hint = constant === undefined ? 'undefined' : JSON.stringify(constant);
 							// preventing code breakage due to bad constant
 							hint = hint.indexOf('*/') >= 0 ? '' : ' /* ' + hint + ' */';
@@ -63,14 +70,14 @@ export class ActionsDataCompiler {
 						parts.push('constantPool[' + (<ParsedPushConstantAction> arg).constantIndex + ']' + hint);
 					}
 				} else if (arg instanceof ParsedPushRegisterAction) {
-					var registerNumber = (<ParsedPushRegisterAction> arg).registerNumber;
+					registerNumber = (<ParsedPushRegisterAction> arg).registerNumber;
 					if (registerNumber < 0 || registerNumber >= ir.registersLimit) {
 						parts.push('undefined'); // register is out of bounds -- undefined
 					} else {
 						parts.push('registers[' + registerNumber + ']');
 					}
 				} else if (arg instanceof AVM1ActionsData) {
-					var resName = 'code_' + id + '_' + i;
+					resName = 'code_' + id + '_' + i;
 					res[resName] = arg;
 					parts.push('res.' + resName);
 				} else {

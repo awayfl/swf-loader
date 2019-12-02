@@ -16,7 +16,7 @@
 
 //module Shumway.AVM1 {
 //import flash = flash;
-import {AVM1Movie, ISecurityDomain} from "../ISecurityDomain";
+import {AVM1Movie, ISecurityDomain} from "./ISecurityDomain";
 
 import {AnalyzerResults} from "./analyze";
 import {alCoerceString, alToString, IAVM1Builtins, IAVM1Context} from "./runtime";
@@ -29,7 +29,7 @@ import {AVM1Mouse} from "./lib/AVM1Mouse";
 import {AVM1Stage} from "./lib/AVM1Stage";
 import {AVM1MovieClip} from "./lib/AVM1MovieClip";
 import {getAVM1Object} from "./lib/AVM1Utils";
-import {LoaderInfo} from "../customAway/LoaderInfo";
+import {LoaderInfo} from "./customAway/LoaderInfo";
 import {AVMAwayStage} from "./AVMAwayStage";
 import { AVM1Object } from "./runtime/AVM1Object";
 import { AVM1Function } from "./runtime/AVM1Function";
@@ -140,21 +140,21 @@ export class AVM1Context implements IAVM1Context {
 	 */
 	public normalizeName: (name) => string;
 
-	private normalizeNameCaseSensitive(name): string {
+	private normalizeNameCaseSensitive(name:any): string {
 		switch (typeof name) {
 			case 'number':
 			case 'string':
-				return name;
+				return <string>name;
 			default:
 				return alToString(this, name);
 		}
 	}
 
 	private _nameCache: Map<string, string>;
-	private normalizeNameCaseInsensitive(name): string {
+	private normalizeNameCaseInsensitive(name:any): string {
 		switch (typeof name) {
 			case 'number':
-				return name;
+				return (<number>name).toString();
 			case 'string':
 				break;
 			default:

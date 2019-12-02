@@ -17,14 +17,11 @@
 
 import { AVM1PropertyDescriptor } from "../runtime/AVM1PropertyDescriptor";
 import {
-	alIsArray, AVM1PropertyFlags, alCoerceNumber, alCoerceString, alDefineObjectProperties, alNewObject, alToBoolean
+	alIsArray, AVM1PropertyFlags, alCoerceString, alDefineObjectProperties, alNewObject, alToBoolean
 } from "../runtime";
 import {wrapAVM1NativeClass} from "./AVM1Utils";
 import {AVM1Context} from "../context";
-import {Debug} from "../../base/utilities/Debug";
-import {SharedObject} from "../../customAway/SharedObject";
 import {AVM1Object} from "../runtime/AVM1Object";
-import { AVM1Function } from "../runtime/AVM1Function";
 import { AVM1ArrayNative } from "../natives";
 
 
@@ -119,8 +116,9 @@ export class AVM1SharedObject extends AVM1Object {
 			console.log("array");
 			var jsArray=avm1value.value;	
 			var arr=[];	
-			if(jsArray){		
-				for(var i=0; i< jsArray.length; i++){
+			if(jsArray){	
+				var arrLength:number=jsArray.length;
+				for(var i=0; i< arrLength; i++){
 					arr[i]=this.getJSValue(jsArray[i]);
 				}
 			}

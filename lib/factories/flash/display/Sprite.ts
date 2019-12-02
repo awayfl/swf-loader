@@ -12,7 +12,7 @@ import { SoundTransform } from "../media/SoundTransform";
 import { Graphics } from "./Graphics";
 import { ActionScriptVersion } from "./ActionScriptVersion";
 import { MovieClip } from "./MovieClip";
-import { SwfTagCode, PlaceObjectTag, PlaceObjectFlags } from "../../../utils/SWFTags";
+import { SwfTagCode, PlaceObjectTag, PlaceObjectFlags } from "../../../parsers/utils/SWFTags";
 import { SWFFrame } from '../../../parsers/SWFFrame';
 
 /**
@@ -132,7 +132,7 @@ export class Sprite extends DisplayObjectContainer {
         }
         // For AVM1 objects, children with depth 16384 (0 from API point of view)
         // are not removed.
-        if ('_as2Object' in child && child._depth >= 16384) {
+        if ('_as2Object' in child && (<any>child)._depth >= 16384) {
           continue;
         }
         var tag = null;

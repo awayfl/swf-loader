@@ -3,7 +3,7 @@ import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {DisplayObject} from "./DisplayObject";
 import {Rectangle, Matrix3D} from "@awayjs/core";
 import {Graphics} from "./Graphics";
-import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
 import { ASObject } from '../../avm2/nat/ASObject';
 import { AXSecurityDomain } from '../../avm2/run/AXSecurityDomain';
 export class  Sprite extends DisplayObjectContainer

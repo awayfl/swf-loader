@@ -4,7 +4,7 @@ import { Loader, URLLoaderEvent, LoaderEvent, AssetEvent, IAsset, AssetLibrary, 
 import { AVM1Context } from "../context";
 import { DisplayObject, MovieClip } from "@awayjs/scene";
 import { PromiseWrapper } from "../../base/utilities";
-import { LoaderInfo } from '../../customAway/LoaderInfo';
+import { LoaderInfo } from '../customAway/LoaderInfo';
 
 export class AVM1LoaderHelper {
 	private _loader:Loader;

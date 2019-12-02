@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-import {AVM1SymbolBase} from "./AVM1SymbolBase"
-import {getAwayObjectOrTemplate, getAVM1Object,
-	wrapAVM1NativeClass, initializeAVM1Object
-} from "./AVM1Utils";
-import {AVM1Context} from "../context";
-import {alToBoolean} from "../runtime";
+import {getAVM1Object,wrapAVM1NativeClass} from "./AVM1Utils";
+import {AVM1Context, AVM1ActionsData} from "../context";
 import {EventDispatcher} from "@awayjs/core";
-import {DisplayObject, MovieClip} from "@awayjs/scene";
-import {AVM1ButtonAction} from "../../link";
-import {LoaderInfo} from "../../customAway/LoaderInfo";
+import {MovieClip} from "@awayjs/scene";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1EventHandler } from "./AVM1EventHandler";
 import {notImplemented, somewhatImplemented, warning, release, assert} from "../../base/utilities/Debug";
@@ -32,6 +26,12 @@ import {ClipEventMappings,EventsListForButton} from "./AVM1EventHandler";
 import {AVM1ClipEvents} from "../../base/SWFTags";
 
 
+class AVM1ButtonAction {
+	keyCode: number;
+	stateTransitionFlags: number;
+	actionsData: Uint8Array;
+	actionsBlock: AVM1ActionsData;
+}
 
 
 enum StateTransitions {
@@ -132,8 +132,12 @@ export class AVM1Button extends AVM1MovieClip {
 		var nativeButton = this.adaptee;
 		var requiredListeners = this._requiredListeners = Object.create(null);
 		var actions = this._actions = nativeButton.timeline.avm1ButtonActions;
-		for (var i = 0; i < actions.length; i++) {
-			var action = actions[i];
+		var action=null;
+		var boundListener=null;
+		var foundValidAction:boolean=false;
+		var actionsLength:number=actions.length;
+		for (var i = 0; i < actionsLength; i++) {
+			action = actions[i];
 			if (!action.actionsBlock) {
 				action.actionsBlock = context.actionsDataFactory.createActionsData(action.actionsData, 's' + nativeButton.id + 'e' + i);
 			}
@@ -142,8 +146,8 @@ export class AVM1Button extends AVM1MovieClip {
 				//continue;
 			}
 			if(action.stateTransitionFlags!=0){
-                var boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags);
-                var foundValidAction:boolean=false;
+                boundListener=this._mouseEventHandler.bind(this, action.stateTransitionFlags);
+                foundValidAction=false;
                 for(var key in buttonActionsMap){
                     if(action.stateTransitionFlags & parseInt(key)){
                         foundValidAction=true;
@@ -179,7 +183,6 @@ export class AVM1Button extends AVM1MovieClip {
 		if (value == this.enabled)
 			return;
 		this.enabled = value;		
-		
         this.setEnabledListener(value);
         this.adaptee.mouseEnabled=true;
 	}
@@ -202,16 +205,18 @@ export class AVM1Button extends AVM1MovieClip {
         this.setEnabledListener(this.enabled);
 	}
 	public _removeListeners() {
+		var target: EventDispatcher=null;
 		for (var type in this._requiredListeners) {
 			//var target: EventDispatcher = type === 'keyDown' ?	(<any>this.adaptee).stage :	this.adaptee;
-			var target: EventDispatcher=this.adaptee;
+			target=this.adaptee;
 			target.removeEventListener(type, this._requiredListeners[type].boundListener);
 		}
 	}
 
 	private _keyDownHandler(event) {
 		var actions = this._actions;
-		for (var i = 0; i < actions.length; i++) {
+		var actionsLength:number = actions.length;
+		for (var i = 0; i < actionsLength; i++) {
 			var action = actions[i];
 			if (!action.keyCode) {
 				continue;
@@ -227,7 +232,8 @@ export class AVM1Button extends AVM1MovieClip {
 
 	private _mouseEventHandler(type: number) {
 		var actions = this._actions;
-		for (var i = 0; i < actions.length; i++) {
+		var actionsLength:number = actions.length;
+		for (var i = 0; i < actionsLength; i++) {
 			var action = actions[i];
 			if (action.stateTransitionFlags === type) {
 				this._runAction(action);

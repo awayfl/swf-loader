@@ -1,19 +1,11 @@
 
-import {defineSound, SoundStream} from "../utils/parser/sound";
+import {SoundStream} from "../parsers/utils/parser/sound";
 
 import {
-	assert,
-	Bounds,
-	IDataDecoder,
-	ABCBlock,
 	ActionBlock,
 	InitActionBlock,
 	SymbolExport,
-	UnparsedTag,
-	utf8encode,
-	DictionaryEntry,
-	EagerlyParsedDictionaryEntry,
-	memCopy} from "@awayjs/graphics";
+	UnparsedTag} from "@awayjs/graphics";
 export class SWFFrame {
 	controlTags: UnparsedTag[];
 	labelNames: string[];

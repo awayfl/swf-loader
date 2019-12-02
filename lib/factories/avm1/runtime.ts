@@ -19,7 +19,7 @@
 import {AVM1Context} from "./context";
 import {Debug, release} from "../base/utilities/Debug";
 import {AVM1ArrayNative, AVM1BooleanNative, AVM1NumberNative, AVM1StringNative} from "./natives";
-import {axCoerceString} from "../AVM2Dummys";
+import {axCoerceString} from "./AVM1Helpers";
 import {isIndex, isNullOrUndefined} from "../base/utilities";
 import {IDisplayObjectAdapter, DisplayObject} from "@awayjs/scene";
 import {IAsset} from "@awayjs/core";

@@ -67,9 +67,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 		|| !(<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene){
 			return;
 		}
-        console.log("dispatch keyEvent", (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.useSoftkeyboard)
+        //console.log("dispatch keyEvent", (<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.useSoftkeyboard)
 		if((<AVM1Stage>this.context.globals.Stage)._awayAVMStage.scene.mouseManager.useSoftkeyboard){
-            console.log("dispatch keyEvent")
+            //console.log("dispatch keyEvent")
             var staticState: typeof AVM1Key = this.context.getStaticState(AVM1Key);
 			staticState._lastKeyCode = keyCode;
 			staticState._keyStates[keyCode] = 1;
@@ -666,8 +666,9 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 					}
 					this._textVarHolder = getAVM1Object(instance.parent, this.context);
 				}
+				var childName:string=null;
 				while (targetPath.length > 0) {
-					var childName = targetPath.shift();
+					childName = targetPath.shift();
 					this._textVarHolder = avm1ContextUtils.getProperty(this._textVarHolder, childName);
 					if (!this._textVarHolder) {
 						return; // cannot find child clip

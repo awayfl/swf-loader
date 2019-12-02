@@ -53,12 +53,12 @@
 	import {MovieClip, FrameScriptManager} from "@awayjs/scene";
 	import {create, RandomSeed} from "random-seed";
 	
-	import {forEachPublicProperty, FlashNetScript_navigateToURL, FlashUtilScript_getTimer} from "../../AVM2Dummys";
+	import {forEachPublicProperty, FlashNetScript_navigateToURL} from "../AVM1Helpers";
 	import {AVM1Object} from "../runtime/AVM1Object";
 	
 	import {AVM1Selection} from "./AVM1Selection";
-	import {IAVMRandomProvider} from "../../IAVMRandomProvider";
-	import {ISoftKeyboardManager} from "../../ISoftKeyboardManager";
+	import {IAVMRandomProvider} from "../IAVMRandomProvider";
+	import {ISoftKeyboardManager} from "../ISoftKeyboardManager";
 	import { AVM1Function } from "../runtime/AVM1Function";
 	import { AVM1ArrayNative } from "../natives";
 	
@@ -231,7 +231,8 @@
 				};
 			}
 			var args: any[] = [];
-			for (var i = argsStartIdx; i < arguments.length; i++) {
+			var argsLength:number=arguments.length;
+			for (var i = argsStartIdx; i < argsLength; i++) {
 				args.push(arguments[i]);
 			}
 	
@@ -254,7 +255,8 @@
 			var fn:Function = arguments[0].toJSFunction();	
 			var time= alToInteger(this.context, arguments[1]);
 			var args: any[] = [];
-			for (var i = 2; i < arguments.length; i++) {
+			var argsLength:number=arguments.length;
+			for (var i = 2; i < argsLength; i++) {
 				args.push(arguments[i]);
 			}
 			var callback=function(){

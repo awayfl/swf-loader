@@ -7,7 +7,7 @@ import { ByteArray } from "../../avm2/natives/byteArray";
 import { transformJSValueToAS  } from "../../avm2/nat/transformJSValueToAS";
 import { UncaughtErrorEvents } from "../events/UncaughtErrorEvents";
 import { AXClass } from "../../avm2/run/AXClass";
-import { constructClassFromSymbol } from "../constructClassFromSymbol";
+import { constructClassFromSymbol } from "../../avm2/constructClassFromSymbol";
 import { ActionScriptVersion } from "./ActionScriptVersion";
 import { ApplicationDomain } from "../system/ApplicationDomain";
 import { Symbol, EagerlyResolvedSymbol, BinarySymbol } from "../symbol";

@@ -31,15 +31,14 @@ import {isNullOrUndefined} from "../../base/utilities";
 import {AVM1BitmapData, toAS3BitmapData} from "./AVM1BitmapData";
 import {toAS3Matrix} from "./AVM1Matrix";
 import {AVM1ArrayNative} from "../natives";
-import {FlashNetScript_navigateToURL} from "../../AVM2Dummys";
+import {FlashNetScript_navigateToURL} from "../AVM1Helpers";
 import {copyAS3PointTo, toAS3Point} from "./AVM1Point";
 import {MovieClipProperties} from "../interpreter/MovieClipProperties";
 import {IMovieClipAdapter, DisplayObject, MovieClip, TextField, Billboard, TextFormat, MouseManager} from "@awayjs/scene";
 import {AssetLibrary, Matrix3D, Point, WaveAudio, URLRequest, Rectangle} from "@awayjs/core";
 import {AVM1TextField} from "./AVM1TextField";
 import {Graphics, LineScaleMode, GradientType} from "@awayjs/graphics";
-import {BitmapImage2D as Bitmap} from "@awayjs/stage";
-import {LoaderInfo} from "../../customAway/LoaderInfo";
+import {LoaderInfo} from "../customAway/LoaderInfo";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
 import {AVM1Stage} from "./AVM1Stage";
@@ -51,11 +50,8 @@ import {EventsListForMC} from "./AVM1EventHandler";
 import { AVM1InterpretedFunction } from '../interpreter';
 import { PickGroup } from '@awayjs/view';
 
-import {BasicMaterial, ImageTexture2D, MethodMaterial} from "@awayjs/materials";
+import {MethodMaterial} from "@awayjs/materials";
 
-class SpriteSymbol{
-	avm1Name:string;
-}
 
 export interface IFrameScript {
 	(any?): any;
@@ -63,17 +59,6 @@ export interface IFrameScript {
 	context?: MovieClip;
 }
 
-enum StateTransitions {
-	IdleToOverUp =      0x001, // roll over
-	OverUpToIdle =      0x002, // roll out
-	OverUpToOverDown =  0x004, // press
-	OverDownToOverUp =  0x008, // release
-	OverDownToOutDown = 0x010, // drag out
-	OutDownToOverDown = 0x020, // drag over
-	OutDownToIdle =     0x040, // release outside
-	IdleToOverDown =    0x080, // ???
-	OverDownToIdle =    0x100  // ???
-}
 
 export const enum LookupChildOptions {
 	DEFAULT = 0,
@@ -1474,13 +1459,19 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 
 		var processed = Object.create(null);
-		for (var i = 0; i < keys.length; i++) {
+		var keysLength:number=keys.length;
+		var i:number=0;
+		for (i = 0; i < keysLength; i++) {
 			processed[keys[i]] = true;
 		}
-		for (var i = 0, length = as3MovieClip._children.length; i < length; i++) {
-			var child = as3MovieClip._children[i];
-			var name = child.name;
-			var normalizedName = name; // TODO something like this._unescapeProperty(this._escapeProperty(name));
+		var numChilds:number=as3MovieClip._children.length;
+		var child=null;
+		var name:string=null;
+		var normalizedName:string=null;
+		for (i = 0;i < numChilds; i++) {
+			child = as3MovieClip._children[i];
+			name = child.name;
+			normalizedName = name; // TODO something like this._unescapeProperty(this._escapeProperty(name));
 			processed[normalizedName] = true;
 		}
 		return Object.getOwnPropertyNames(processed);

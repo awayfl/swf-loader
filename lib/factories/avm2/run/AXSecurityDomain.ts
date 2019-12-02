@@ -74,7 +74,7 @@ import { axConstructObject } from "./axConstructObject";
 import { axCoerceObject } from "./axCoerceObject";
 
 import { initializeAXBasePrototype, AXBasePrototype } from "./initializeAXBasePrototype";
-import { ISecurityDomain } from '../../ISecurityDomain';
+import { ISecurityDomain } from '../../avm1/ISecurityDomain';
 import { ByteArray, ByteArrayDataProvider } from '../natives/byteArray';
 import { Namespace } from '../abc/lazy/Namespace';
 

@@ -39,9 +39,11 @@ class AVM1Capabilities extends AVM1Object {
 		super(context);
 		this.alPrototype = context.builtins.Object.alGetPrototypeProperty();
 		//var as3Capabilities = context.sec.flash.system.Capabilities.axClass;
+		var getter=null;
+		var desc=null;
 		capabilitiesProperties.forEach((name) => {
-			var getter = { alCall: function () { return null;}};//as3Capabilities.axGetPublicProperty(name); }};
-			var desc = new AVM1PropertyDescriptor(AVM1PropertyFlags.ACCESSOR |
+			getter = { alCall: function () { return null;}};//as3Capabilities.axGetPublicProperty(name); }};
+			desc = new AVM1PropertyDescriptor(AVM1PropertyFlags.ACCESSOR |
 				AVM1PropertyFlags.DONT_DELETE |
 				AVM1PropertyFlags.DONT_ENUM,
 				null, getter);

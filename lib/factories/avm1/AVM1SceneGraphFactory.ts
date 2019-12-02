@@ -1,11 +1,11 @@
 import {BitmapImage2D, Image2D} from "@awayjs/stage";
 import {Timeline, MovieClip, Sprite, DisplayObjectContainer, Billboard, ISceneGraphFactory, TextField, PrefabBase, DefaultSceneGraphFactory} from "@awayjs/scene";
 import {MaterialBase} from "@awayjs/materials";
-import {AVM1MovieClip} from "./avm1/lib/AVM1MovieClip";
-import {AVM1Context} from "./avm1/context";
-import {getAVM1Object} from "./avm1/lib/AVM1Utils";
-import {AVM1TextField} from "./avm1/lib/AVM1TextField";
-import {AVM1Button} from "./avm1/lib/AVM1Button";
+import {AVM1MovieClip} from "./lib/AVM1MovieClip";
+import {AVM1Context} from "./context";
+import {getAVM1Object} from "./lib/AVM1Utils";
+import {AVM1TextField} from "./lib/AVM1TextField";
+import {AVM1Button} from "./lib/AVM1Button";
 
 
 

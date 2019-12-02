@@ -1,10 +1,10 @@
 import { SWFParser } from "../../parsers/SWFParser";
 import { AVMAwayStage } from "../avm1/AVMAwayStage";
-import { AVM1SceneGraphFactory } from "../AVM1SceneGraphFactory";
+import { AVM1SceneGraphFactory } from "../avm1/AVM1SceneGraphFactory";
 import { AVM1Globals, TraceLevel } from "../avm1/lib/AVM1Globals";
 import { AVM1ContextImpl } from "../avm1/interpreter";
-import { SecurityDomain } from "../ISecurityDomain";
-import { LoaderInfo } from "../customAway/LoaderInfo";
+import { SecurityDomain } from "../avm1/ISecurityDomain";
+import { LoaderInfo } from "../avm1/customAway/LoaderInfo";
 import { AssetLibrary, AudioManager, AssetEvent, LoaderEvent, URLLoaderEvent, URLRequest, ColorUtils, IAsset } from "@awayjs/core";
 import { MovieClip } from "@awayjs/scene";
 import { AVM1MovieClip } from "../avm1/lib/AVM1MovieClip";

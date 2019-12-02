@@ -15,7 +15,7 @@ import { DataBuffer } from "@awayjs/graphics";
 import { axCoerceString } from "../../avm2/run/axCoerceString";
 import { Errors } from "../../avm2/errors";
 import { clamp } from "../../base/utilities/NumberUtilities";
-import { TextRecordFlags, TextRecord, TextFlags, TextTag } from "../../../utils/SWFTags"
+import { TextRecordFlags, TextRecord, TextFlags, TextTag } from "../../../parsers/utils/SWFTags"
 import { Rectangle } from "../geom/Rectangle";
 import { TextLineMetrics } from "./TextLineMetrics";
 import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";

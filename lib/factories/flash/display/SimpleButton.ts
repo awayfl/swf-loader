@@ -3,7 +3,7 @@ import { assert, release, notImplemented } from "../../base/utilities/Debug";
 import { SpriteSymbol } from "./Sprite";
 import { DisplaySymbol, SymbolData } from "../symbol";
 import { LoaderInfo } from "./LoaderInfo";
-import { PlaceObjectTag, SwfTagCode, PlaceObjectFlags } from "../../../utils/SWFTags";
+import { PlaceObjectTag, SwfTagCode, PlaceObjectFlags } from "../../../parsers/utils/SWFTags";
 import { DisplayObjectDirtyFlags, DisplayObjectFlags, HitTestingResult, HitTestingType, DisplayObject } from "./DisplayObject";
 import { Bounds } from "../../base/utilities";
 import { SoundTransform } from "../media/SoundTransform";

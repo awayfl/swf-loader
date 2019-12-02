@@ -2,7 +2,7 @@ import { assert, release, somewhatImplemented, warning } from "../../base/utilit
 import { AVM1Movie } from "./AVM1Movie";
 import { DisplayObject, IAdvancable, DisplayObjectFlags } from "./DisplayObject";
 import { DisplayObjectContainer } from "./DisplayObjectContainer";
-import { constructClassFromSymbol } from "../constructClassFromSymbol";
+import { constructClassFromSymbol } from "../../avm2/constructClassFromSymbol";
 import { Errors } from "../../avm2/errors";
 import { UncaughtErrorEvents } from "../events/UncaughtErrorEvents";
 import { BitmapSymbol } from "./BitmapData";

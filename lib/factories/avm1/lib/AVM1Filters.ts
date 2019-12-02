@@ -23,7 +23,7 @@ import {AVM1Context} from "../context";
 import {AVM1BitmapData, toAS3BitmapData} from "./AVM1BitmapData";
 import {AVM1Point, toAS3Point} from "./AVM1Point";
 import {Debug, release} from "../../base/utilities/Debug";
-import {ASObject, AXClass} from "../../AVM2Dummys";
+import {ASObject, AXClass} from "../AVM1Helpers";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Function } from "../runtime/AVM1Function";
 

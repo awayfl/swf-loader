@@ -195,9 +195,10 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 	}
 	public alGetOwnPropertiesKeys(): string[] {
 		var keys: string[] = [];
+		var desc;
 		if (!this.context.isPropertyCaseSensitive) {
 			for (var name in this._ownProperties) {
-				var desc = this._ownProperties[name];
+				desc = this._ownProperties[name];
 				release || Debug.assert("originalName" in desc);
 				if (!(desc.flags & AVM1PropertyFlags.DONT_ENUM)) {
 					keys.push(desc.originalName);
@@ -205,7 +206,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			}
 		} else {
 			for (var name in this._ownProperties) {
-				var desc = this._ownProperties[name];
+				desc = this._ownProperties[name];
 				if (!(desc.flags & AVM1PropertyFlags.DONT_ENUM)) {
 					keys.push(name);
 				}
@@ -409,6 +410,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 		// Merging two keys sets
 		// TODO check if we shall worry about __proto__ usage here
 		var context = this.context;
+		var k:number;
 		// If the context is case-insensitive, names only differing in their casing overwrite each
 		// other. Iterating over the keys returns the first original, case-preserved key that was
 		// ever used for the property, though.
@@ -416,11 +418,14 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			var keyLists = [ownKeys, otherKeys];
 			var canonicalKeysMap = Object.create(null);
 			var keys = [];
-			for (var k = 0; k < keyLists.length; k++) {
-				var keyList = keyLists[k];
+			var keyList;
+			var key;
+			var canonicalKey;
+			for (k = 0; k < keyLists.length; k++) {
+				keyList = keyLists[k];
 				for (var i = keyList.length; i--;) {
-					var key = keyList[i];
-					var canonicalKey = context.normalizeName(key);
+					key = keyList[i];
+					canonicalKey = context.normalizeName(key);
 					if (canonicalKeysMap[canonicalKey]) {
 						continue;
 					}
@@ -431,11 +436,13 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 			return keys;
 		} else {
 			var processed = Object.create(null);
-			for (var i = 0; i < ownKeys.length; i++) {
-				processed[ownKeys[i]] = true;
+			var keyLength:number=ownKeys.length;
+			for (k = 0; k < keyLength; k++) {
+				processed[ownKeys[k]] = true;
 			}
-			for (var i = 0; i < otherKeys.length; i++) {
-				processed[otherKeys[i]] = true;
+			var keyLength:number=otherKeys.length;
+			for (k = 0;  k< keyLength; k++) {
+				processed[otherKeys[k]] = true;
 			}
 			return Object.getOwnPropertyNames(processed);
 		}

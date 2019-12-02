@@ -4,7 +4,7 @@ import {DisplayObject} from "./DisplayObject";
 import {InteractiveObject} from "./InteractiveObject";
 import {Event} from "../events/Event";
 import {PickGroup} from "@awayjs/view";
-import { constructClassFromSymbol } from '../../flash/constructClassFromSymbol';
+import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
 import { Point } from '../geom/Point';
 
 export class DisplayObjectContainer extends InteractiveObject{

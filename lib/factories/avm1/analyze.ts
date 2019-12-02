@@ -55,8 +55,16 @@ export class ActionsDataAnalyzer {
 		// Parsing all actions we can reach. Every action will have next position
 		// and conditional jump location.
 		var queue: number[] = [0];
+		var position;
+		var action;
+		var nextPosition;
+		var item: ActionCodeBlockItem;
+		var jumpPosition: number;
+		var branching: boolean;
+		var nonConditionalBranching: boolean;
+		var skipCount: number;
 		while (queue.length > 0) {
-			var position = queue.shift();
+			position = queue.shift();
 			if (actions[position]) {
 				continue;
 			}
@@ -64,28 +72,28 @@ export class ActionsDataAnalyzer {
 
 			// reading block of actions until the first jump of end of actions
 			while (!parser.eof && !actions[position]) {
-				var action = parser.readNext();
+				action = parser.readNext();
 				if (action.actionCode === 0) {
 					break;
 				}
 
-				var nextPosition = parser.position;
+				nextPosition = parser.position;
 
-				var item: ActionCodeBlockItem = {
+				item = {
 					action: action,
 					next: nextPosition,
 					conditionalJumpTo: -1
 				};
 
-				var jumpPosition: number = 0;
-				var branching: boolean = false;
-				var nonConditionalBranching: boolean = false;
+				jumpPosition = 0;
+				branching = false;
+				nonConditionalBranching = false;
 				switch (action.actionCode) {
 					case ActionCode.ActionWaitForFrame:
 					case ActionCode.ActionWaitForFrame2:
 						branching = true;
 						// skip is specified in amount of actions (instead of bytes)
-						var skipCount: number = action.actionCode === ActionCode.ActionWaitForFrame ?
+						skipCount = action.actionCode === ActionCode.ActionWaitForFrame ?
 							action.args[1] : action.args[0];
 						parser.skip(skipCount);
 						jumpPosition = parser.position;
@@ -146,16 +154,19 @@ export class ActionsDataAnalyzer {
 
 		// Creating blocks for every unique label
 		var blocks: ActionCodeBlock[] = [];
+		var items: ActionCodeBlockItem[];
+		var lastPosition;
+		var item: ActionCodeBlockItem;
 		labels.forEach((position) => {
 			if (!actions[position]) {
 				return;
 			}
-			var items: ActionCodeBlockItem[] = [];
-			var lastPosition = position;
+			items = [];
+			lastPosition = position;
 
 			// continue grabbing items until other label or next code exist
 			do {
-				var item: ActionCodeBlockItem = actions[lastPosition];
+				item = actions[lastPosition];
 				items.push(item);
 				lastPosition = item.next;
 			} while(!processedLabels[lastPosition] && actions[lastPosition]);

@@ -2,7 +2,7 @@ import { warning, abstractMethod, notImplemented } from "../../base/utilities/De
 import { ISecurityDomain } from "../../avm2/nat/ISecurityDomain";
 import { SoundChannel } from "../media/SoundChannel";
 import { Sound } from "../media/Sound";
-import { DecodedSound, SoundStream } from "../../../utils/parser/sound";
+import { DecodedSound, SoundStream } from "../../../parsers/utils/parser/sound";
 import { MovieClip } from "./MovieClip";
 
 

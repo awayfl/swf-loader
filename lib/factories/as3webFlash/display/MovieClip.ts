@@ -1,7 +1,7 @@
 import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, Sprite as AwaySprite, DisplayObject as AwayDisplayObject, IMovieClipAdapter, SceneGraphPartition, Timeline, FrameScriptManager } from "@awayjs/scene";
 import { Sprite } from "./Sprite";
-import { constructClassFromSymbol } from '../../link';
 import { Matrix3D } from '@awayjs/core';
+import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
 
 var includeString: string = '';//TODO
 

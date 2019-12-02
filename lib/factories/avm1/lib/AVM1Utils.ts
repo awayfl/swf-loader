@@ -16,21 +16,16 @@
 
 import {isNullOrUndefined} from "../../base/utilities";
 
-import {AVM1ActionsData, AVM1Context, IAVM1EventPropertyObserver} from "../context";
-import {ASObject} from "../../AVM2Dummys";
+import {AVM1ActionsData, AVM1Context} from "../context";
 import {
-	alCoerceString, alDefineObjectProperties, alToBoolean, alToInt32, alToInteger, alToNumber,
-	AVM1NativeFunction, AVM1PropertyFlags
+	alDefineObjectProperties, AVM1NativeFunction, AVM1PropertyFlags
 } from "../runtime";
 import {Debug, release} from "../../base/utilities/Debug";
-import {AVM1MovieClip} from "./AVM1MovieClip";
 import {AVM1ArrayNative} from "../natives";
 import {AVM1ClipEvents} from "../../base/SWFTags";
 
 import {DisplayObject, TextField, MovieClip, DisplayObjectContainer } from "@awayjs/scene";
 
-import {AVM1TextField} from "./AVM1TextField";
-import {AVM1Button} from "./AVM1Button";
 import {AVM1SymbolBase} from "./AVM1SymbolBase";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1Function } from "../runtime/AVM1Function";
@@ -134,11 +129,12 @@ export function avm1BroadcastNativeEvent(context: AVM1Context, target: any, prop
 	}
 	var _listeners = target.alGet('_listeners');
 	if (_listeners instanceof AVM1ArrayNative) {
+		var handlerOnListener: AVM1Function=null;
 		_listeners.value.forEach(function (listener) {
 			if (!(listener instanceof AVM1Object)) {
 				return;
 			}
-			var handlerOnListener: AVM1Function = listener.alGet(propertyName);
+			handlerOnListener = listener.alGet(propertyName);
 			if (handlerOnListener instanceof AVM1Function) {
 				context.executeFunction(handlerOnListener, target, args);
 			}
@@ -153,11 +149,12 @@ export function avm1BroadcastEvent(context: AVM1Context, target: any, propertyNa
 	}
 	var _listeners = target.alGet('_listeners');
 	if (_listeners instanceof AVM1ArrayNative) {
+		var handlerOnListener: AVM1Function=null;
 		_listeners.value.forEach(function (listener) {
 			if (!(listener instanceof AVM1Object)) {
 				return;
 			}
-			var handlerOnListener: AVM1Function = listener.alGet(propertyName);
+			handlerOnListener = listener.alGet(propertyName);
 			if (handlerOnListener instanceof AVM1Function) {
 				handlerOnListener.alCall(target, args);
 			}
@@ -344,9 +341,17 @@ export function initializeAVM1Object(awayObject: any,
 	if (!events) {
 		return;
 	}
+	var swfEvent;
+	var actionsData;
+	var handler;
+	var flags;
+	var eventFlag;
+	var eventMapping;
+	var eventName;
+	var eventProps=null;
 	for (var j = 0; j < events.length; j++) {
-		var swfEvent = events[j];
-		var actionsData;
+		swfEvent = events[j];
+		actionsData;
 		if (swfEvent.actionsBlock) {
 			actionsData = context.actionsDataFactory.createActionsData(swfEvent.actionsBlock,'s' + placeObjectTag.symbolId + 'd' + placeObjectTag.depth + 'e' + j);
 			swfEvent.actionsBlock = null;
@@ -355,10 +360,10 @@ export function initializeAVM1Object(awayObject: any,
 			actionsData = swfEvent.compiled;
 		}
 		release || Debug.assert(actionsData);
-		var handler = clipEventHandler.bind(null, actionsData, instanceAVM1);
-		var flags = swfEvent.flags;
+		handler = clipEventHandler.bind(null, actionsData, instanceAVM1);
+		flags = swfEvent.flags;
 		for (var key in ClipEventMappings) {
-			var eventFlag=parseInt(key);
+			eventFlag=parseInt(key);
 			eventFlag |= 0;
 			if (!(flags & (eventFlag | 0))) {
 				continue;
@@ -372,14 +377,13 @@ export function initializeAVM1Object(awayObject: any,
                 continue;
             }
 
-			var eventMapping = ClipEventMappings[eventFlag];
-			var eventName = eventMapping.eventName;
+			eventMapping = ClipEventMappings[eventFlag];
+			eventName = eventMapping.eventName;
             //console.log("eventName", eventName, eventMapping, eventFlag, swfEvent);
 			if (!eventName) {
 				Debug.warning("ClipEvent: " + eventFlag + ' not implemented');
 				continue;
 			}
-			var eventProps=null;
 			if(swfEvent.keyCode){
 				eventProps=new AVM1EventProps();
 				eventProps.keyCode=swfEvent.keyCode;

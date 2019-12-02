@@ -24,10 +24,10 @@ import {hasAwayJSAdaptee} from "./lib/AVM1Utils";
 import {AVM1MovieClip} from "./lib/AVM1MovieClip";
 import {AVM1ArrayNative} from "./natives";
 import {ErrorTypes, Telemetry} from "../base/utilities/Telemetry";
-import {LoaderInfo} from "../customAway/LoaderInfo";
+import {LoaderInfo} from "./customAway/LoaderInfo";
 import {isNullOrUndefined} from "../base/utilities";
 
-import {ASArray, ASBoolean, ASFunction, ASNumber, ASObject, ASString} from "../AVM2Dummys";
+import {ASArray, ASBoolean, ASFunction, ASNumber, ASObject, ASString} from "./AVM1Helpers";
 import { AVM1Object } from "./runtime/AVM1Object";
 import { AVM1Function } from "./runtime/AVM1Function";
 import { AVM1PropertyDescriptor } from "./runtime/AVM1PropertyDescriptor";
@@ -35,7 +35,6 @@ import {MovieClipProperties} from "./interpreter/MovieClipProperties";
 import {TextField} from "@awayjs/scene";
 
 import Big from "big.js";
-import { AVM1SymbolBase } from './lib/AVM1SymbolBase';
 var noVarGetDebug:boolean=true;
 
 declare var Proxy;

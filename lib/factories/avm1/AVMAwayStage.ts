@@ -71,14 +71,14 @@ export class AVMAwayStage extends Sprite{
 			//console.log("get color");
 			//alpha=0.5;
 			var texObj:any={};
-
+			var newmat:MethodMaterial;
 			if(AVMAwayStage._useTextureAtlasForColors){
 				texObj=TextureAtlas.getTextureForColor(color, alpha);
 				if(AVMAwayStage._colorMaterials[texObj.bitmap.id]){
 					texObj.material=AVMAwayStage._colorMaterials[texObj.bitmap.id];
 					return texObj;
 				}
-				var newmat:MethodMaterial=new MethodMaterial(texObj.bitmap);
+				newmat=new MethodMaterial(texObj.bitmap);
 				newmat.alphaBlending=true;
 				newmat.useColorTransform = true;
 				newmat.bothSides = true;
@@ -92,7 +92,7 @@ export class AVMAwayStage extends Sprite{
 				texObj.material=AVMAwayStage._colorMaterials[colorstr];
 				return texObj;
 			}
-			var newmat:MethodMaterial=new MethodMaterial(color, alpha);
+			newmat=new MethodMaterial(color, alpha);
 			newmat.alphaBlending=true;
 			newmat.useColorTransform = true;
 			newmat.bothSides = true;
@@ -496,10 +496,12 @@ export class AVMAwayStage extends Sprite{
 			}
         }
         
-        len=this._collectedDispatcher.length;
+		len=this._collectedDispatcher.length;
+		var dispatcherLen:number;
 		for(i=0;i<len;i++) {
             if(this.avm1Listener[mouseEvent.type] && this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id]){
-				for(var e:number=0; e<this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id].length; e++){
+				dispatcherLen=this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id].length;
+				for(var e:number=0; e<dispatcherLen; e++){
 					this.avm1Listener[mouseEvent.type][this._collectedDispatcher[i].id][e].callback();
 				}
             }
@@ -1343,11 +1345,14 @@ export class AVMAwayStage extends Sprite{
 		
         var len=this._layers.length;
 		//this.runAVM1Framescripts();
+		var myLayer;
+		var numChilds;
+		var child;
 		for(var i=0;i<len;i++) {
-			var myLayer=this._layers[i];
-			var numChilds = myLayer.numChildren;
+			myLayer=this._layers[i];
+			numChilds = myLayer.numChildren;
 			for (var c = 0; c < numChilds; ++c) {
-				var child = myLayer.getChildAt(c);
+				child = myLayer.getChildAt(c);
 				child.dispose();
 			}
 		}
