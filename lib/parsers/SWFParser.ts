@@ -669,7 +669,7 @@ export class SWFParser extends ParserBase
 			cmds_stopSounds.length=0;
 			unparsedTags.length=0;
 			if(swfFrames[i].soundStreamHead){
-				console.log("stream encountered", swfFrames[i].soundStreamHead)
+				//console.log("stream encountered", swfFrames[i].soundStreamHead)
 			}
 			if(swfFrames[i].initActionBlocks){
 				awayTimeline.avm1InitActions[i]=swfFrames[i].initActionBlocks;

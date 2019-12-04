@@ -57,7 +57,7 @@ export function FlashUtilScript_getTimer(param1: any) {
 export function FlashNetScript_navigateToURL(param1: any, param2: any, param3: any = null) {
 
 	if (param2.url && param2.url.toLowerCase().indexOf('fscommand:') === 0) {
-		console.log("fsCommand not implemented in FlashNetScript_navigateToURL");
+		//console.log("fsCommand not implemented in FlashNetScript_navigateToURL");
 		return;
 	}
 	window.open(param2.url, param3);
