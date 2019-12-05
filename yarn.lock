@@ -2,68 +2,42 @@
 # yarn lockfile v1
 
 
-"@awayjs/core@^0.7.0":
-  version "0.7.58"
-  resolved "https://registry.yarnpkg.com/@awayjs/core/-/core-0.7.58.tgz#be2074ef789d66c313219a7074b2dd5166df6405"
+"@as3web/flash@^0.1.118":
+  version "0.1.119"
+  resolved "https://registry.yarnpkg.com/@as3web/flash/-/flash-0.1.119.tgz#e5f0b1ed1cca2ec5f1f77fd6cad90c6116dae41b"
+
+"@awayjs/core@^0.8.0":
+  version "0.8.9"
+  resolved "https://registry.yarnpkg.com/@awayjs/core/-/core-0.8.9.tgz#a55f1b090a8b9588f104ac6629fd5f984c593ca8"
   dependencies:
     fs "0.0.1-security"
     tslib "^1.9.0"
 
-"@awayjs/graphics@^0.2.0":
-  version "0.2.43"
-  resolved "https://registry.yarnpkg.com/@awayjs/graphics/-/graphics-0.2.43.tgz#52e51051595d82c9baa474f27b5db645f7e961e2"
+"@awayjs/graphics@^0.4.0":
+  version "0.4.18"
+  resolved "https://registry.yarnpkg.com/@awayjs/graphics/-/graphics-0.4.18.tgz#f45244a3c165902d1bd7405228ae539e5d2f9414"
   dependencies:
-    "@awayjs/core" "^0.7.0"
-    "@awayjs/renderer" "^0.9.0"
-    "@awayjs/stage" "^0.9.0"
     tess2 "^1.0.0"
-    tslib "^1.9.0"
 
-"@awayjs/materials@^0.4.0":
-  version "0.4.14"
-  resolved "https://registry.yarnpkg.com/@awayjs/materials/-/materials-0.4.14.tgz#494ccc78bcc9efe4363d25a004c95d80427db4e9"
-  dependencies:
-    "@awayjs/core" "^0.7.0"
-    "@awayjs/renderer" "^0.9.0"
-    "@awayjs/stage" "^0.9.0"
-    tslib "^1.9.0"
+"@awayjs/materials@^0.5.0":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@awayjs/materials/-/materials-0.5.4.tgz#2ab67fff54be52aef6d860af0466b047fb481408"
 
-"@awayjs/renderer@^0.9.0":
-  version "0.9.14"
-  resolved "https://registry.yarnpkg.com/@awayjs/renderer/-/renderer-0.9.14.tgz#d30c96f26663913c734c49346af2d9d729bf65ce"
-  dependencies:
-    "@awayjs/core" "^0.7.0"
-    "@awayjs/stage" "^0.9.0"
-    tslib "^1.9.0"
+"@awayjs/renderer@^0.10.0":
+  version "0.10.7"
+  resolved "https://registry.yarnpkg.com/@awayjs/renderer/-/renderer-0.10.7.tgz#a2b134cbbfb6b1cb9121c2b6cfec2fa3670bd93e"
 
-"@awayjs/scene@^0.9.0":
-  version "0.9.111"
-  resolved "https://registry.yarnpkg.com/@awayjs/scene/-/scene-0.9.111.tgz#48b84d738b7077ebf907bb13afb5a73e9318eab1"
-  dependencies:
-    "@awayjs/core" "^0.7.0"
-    "@awayjs/graphics" "^0.2.0"
-    "@awayjs/materials" "^0.4.0"
-    "@awayjs/renderer" "^0.9.0"
-    "@awayjs/stage" "^0.9.0"
-    tslib "^1.9.0"
+"@awayjs/scene@^0.12.0":
+  version "0.12.44"
+  resolved "https://registry.yarnpkg.com/@awayjs/scene/-/scene-0.12.44.tgz#501d068645ee9dc17f00bbd80805424369b42b4d"
 
-"@awayjs/stage@^0.9.0":
-  version "0.9.12"
-  resolved "https://registry.yarnpkg.com/@awayjs/stage/-/stage-0.9.12.tgz#35f309f7b48c6125c3b12c3af1eaf3a605d69e68"
-  dependencies:
-    "@awayjs/core" "^0.7.0"
-    tslib "^1.9.0"
+"@awayjs/stage@^0.10.0":
+  version "0.10.14"
+  resolved "https://registry.yarnpkg.com/@awayjs/stage/-/stage-0.10.14.tgz#d352c340366c6a679894b2ff2feeea2360d958d7"
 
-"@awayjs/view@0.3.43":
-  version "0.3.43"
-  resolved "https://registry.yarnpkg.com/@awayjs/view/-/view-0.3.43.tgz#741d3b22375474907eb6f65495a0913e9dd6be98"
-  dependencies:
-    "@awayjs/core" "^0.7.0"
-    "@awayjs/graphics" "^0.2.0"
-    "@awayjs/renderer" "^0.9.0"
-    "@awayjs/scene" "^0.9.0"
-    "@awayjs/stage" "^0.9.0"
-    tslib "^1.9.0"
+"@awayjs/view@^0.5.0":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@awayjs/view/-/view-0.5.10.tgz#7a94e0a8a5203ed908fa144247d683dff61482ba"
 
 "@types/acorn@^4.0.3":
   version "4.0.3"
@@ -521,9 +495,9 @@ tslib@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
 
-typescript@2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.6.1.tgz#ef39cdea27abac0b500242d6726ab90e0c846631"
+typescript@^3.7.3:
+  version "3.7.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.3.tgz#b36840668a16458a7025b9eabfad11b66ab85c69"
 
 uglify-js@^3.0.15:
   version "3.4.5"

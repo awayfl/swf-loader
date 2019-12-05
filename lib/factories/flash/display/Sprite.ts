@@ -132,7 +132,7 @@ export class Sprite extends DisplayObjectContainer {
         }
         // For AVM1 objects, children with depth 16384 (0 from API point of view)
         // are not removed.
-        if ('_as2Object' in child && (<any>child)._depth >= 16384) {
+        if (child._depth >= 16384 && '_as2Object' in child) {
           continue;
         }
         var tag = null;

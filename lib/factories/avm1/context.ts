@@ -144,7 +144,7 @@ export class AVM1Context implements IAVM1Context {
 		switch (typeof name) {
 			case 'number':
 			case 'string':
-				return <string>name;
+				return <string> name;
 			default:
 				return alToString(this, name);
 		}
@@ -154,7 +154,7 @@ export class AVM1Context implements IAVM1Context {
 	private normalizeNameCaseInsensitive(name:any): string {
 		switch (typeof name) {
 			case 'number':
-				return (<number>name).toString();
+				return name.toString();
 			case 'string':
 				break;
 			default:

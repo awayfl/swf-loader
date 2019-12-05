@@ -29,7 +29,6 @@ import { Bitmap } from '../as3webFlash/display/Bitmap';
 import { BitmapData } from '../as3webFlash/display/BitmapData';
 import { SimpleButton } from '../as3webFlash/display/SimpleButton';
 import { TextField } from '../as3webFlash/text/TextField';
-import { ISecurityDomain } from './ISecurityDomain';
 import { Point } from '../as3webFlash/geom/Point';
 import { Event } from '../as3webFlash/events/Event';
 import { KeyboardEvent } from '../as3webFlash/events/KeyboardEvent';
