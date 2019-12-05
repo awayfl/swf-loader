@@ -282,6 +282,10 @@ function toXML(v, sec: AXSecurityDomain) {
     x._children[0]._parent = null;
     return x._children[0];
   }
+  if (length === 2) {
+    x._children[1]._parent = null;
+    return x._children[1];
+  }
   sec.throwError('TypeError', Errors.XMLMarkupMustBeWellFormed);
 }
 
