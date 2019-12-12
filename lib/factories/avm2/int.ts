@@ -137,9 +137,7 @@ function popNameInto(stack: any [], mn: Multiname, rn: Multiname) {
 }
 
 
-export function interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, args: any [],
-                          callee: AXFunction) {
-  executionWriter && executionWriter.enter("> " + methodInfo);
+export function interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, args: any [], callee: AXFunction) {
     if (methodInfo.compiled == null && methodInfo.error == null) {
         let r = compile(methodInfo)
         if (typeof r === "string")
@@ -148,14 +146,7 @@ export function interpret(self: Object, methodInfo: MethodInfo, savedScope: Scop
             methodInfo.compiled = r
     }
 
-  try {
-    var result = methodInfo.compiled ? methodInfo.compiled(savedScope, self, args) : _interpret(self, methodInfo, savedScope, args, callee);
-    executionWriter && executionWriter.leave("< " + methodInfo.trait);
-    return result;
-  } catch (e) {
-    executionWriter && executionWriter.leave("< " + methodInfo.trait + ", Exception: " + e);
-    throw e;
-  }
+    return methodInfo.compiled ? methodInfo.compiled(savedScope, self, args) : _interpret(self, methodInfo, savedScope, args, callee)
 }
 
 class InterpreterFrame {

@@ -22,6 +22,7 @@ export class Multiname {
     public resolved: object = {}
     public scope: AXObject = null
     public value: AXObject = null
+    private _key: string = null
 
     constructor(
       public abc: ABCFile,
@@ -52,6 +53,18 @@ export class Multiname {
         return rn
     }
   
+    public key(): string {
+        if (this._key)
+            return this._key
+        
+        let r = this.toString()
+        
+        if (!this.mutable)
+            this._key = r
+        
+        return r
+    }
+    
     public static FromFQNString(fqn: string, nsType: NamespaceType) {
       var lastDot = fqn.lastIndexOf('.');
       var uri = lastDot === -1 ? '' : fqn.substr(0, lastDot);

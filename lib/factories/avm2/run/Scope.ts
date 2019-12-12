@@ -26,6 +26,23 @@ export class Scope {
       this.defaultNamespace = null;
     }
   
+    extend(object: AXObject) {
+        if (object === this.object)
+            return this
+
+        let c = object["__scope__"]
+        
+        if (c)
+            if (c.parent == this)
+                return c
+
+        let s = new Scope(this, object, false)
+
+        object["__scope__"] = s
+        
+        return s
+    }
+    
     public findDepth(object: any): number {
       var current:Scope = this;
       var depth = 0;

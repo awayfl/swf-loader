@@ -23,6 +23,7 @@ import { validateCall } from '../run/validateCall';
 import { validateConstruct } from '../run/validateConstruct';
 import { defineNonEnumerableProperty } from '../../base/utilities/ObjectUtilities';
 import { AXObject } from '../run/AXObject';
+import { recording, resolver } from "../rsl"
 
 export class ASObject implements IMetaobjectProtocol {
     traits: RuntimeTraits;
@@ -157,9 +158,11 @@ export class ASObject implements IMetaobjectProtocol {
         if (mn.numeric)
             return mn.numericValue
 
+        let s = mn.name
+        
         if (mn.mutable) {
-            let t = this.traits.getTrait(mn.namespaces, mn.name)
-            return t ? t.name.getMangledName() : '$Bg' + mn.name
+            let t = this.traits.getTrait(mn.namespaces, s)
+            return t ? t.name.getMangledName() : '$Bg' + s
         }
         else {
             let k = this["__key__"]
@@ -181,11 +184,9 @@ export class ASObject implements IMetaobjectProtocol {
             if (c)
                 return c
 
-            let name = mn.name
-
             let t = this.traits.getTraitMultiname(mn)
 
-            let r = t ? t.name.getMangledName() : ('$Bg' + name)
+            let r = t ? t.name.getMangledName() : ('$Bg' + s)
 
             mn.resolved[k] = r
 
@@ -244,11 +245,19 @@ export class ASObject implements IMetaobjectProtocol {
             }
             var type = t.getType();
             if (type) {
+                if (recording)
+                    if (value !== type.axCoerce(value))
+                        resolver.recordCoerce(mn)
+                
                 value = type.axCoerce(value);
             }
         } else {
             mangledName = '$Bg' + name;
         }
+        
+        if (recording)
+            resolver.recordResolve(mn, mangledName)
+
         this[mangledName] = value;
         if (freeze) {
             Object.defineProperty(this, mangledName, { writable: false });
@@ -257,8 +266,16 @@ export class ASObject implements IMetaobjectProtocol {
 
     axGetProperty(mn: Multiname): any {
         let name = this.axResolveMultiname(mn)
+        
+        if (recording)
+            resolver.recordResolve(mn, name)
+        
         let value = this[name]
 
+        if (recording)
+            if (typeof value === "function")
+                resolver.recordFun(mn)
+        
         if (typeof value === "function")
             return this.axGetMethod(name)
         

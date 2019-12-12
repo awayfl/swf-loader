@@ -17,6 +17,7 @@ import {isNumeric} from "../base/utilities"
 import {ABCFile} from "./abc/lazy/ABCFile"
 import {ScriptInfo} from "./abc/lazy/ScriptInfo"
 import {b2Class} from "./btd"
+import {recording, resolver} from "./rsl"
 
 export enum Bytecode {
     BKPT = 0x01,
@@ -910,7 +911,7 @@ export function compile(methodInfo: MethodInfo) {
     
     let js = ["// (#" + methodInfo.index() + ") --- " + methodInfo]
 
-    js.push("(function(context) { return function(scope, self, args) {")
+    js.push("(function (context) { return function compiled_" + (methodInfo.getName()).replace(/([^a-z0-9]+)/gi, "_") + "(scope, self, args) {")
 
     for (let i: number = 0; i < params.length; i++)
         if (params[i].hasOptionalValue()) {
@@ -950,7 +951,19 @@ export function compile(methodInfo: MethodInfo) {
     js.push("    let p = 0;")
     js.push("    while (true) {")
     js.push("        switch (p) {")
+    
+    let names: Multiname[] = []
 
+    let getname = (n: number) => {
+        let mn = abc.getMultiname(n)
+        let i = names.indexOf(mn)
+        if (i < 0) {
+            i = names.length
+            names.push(mn)
+        }
+        return "context.names[" + i + "]"
+    }    
+        
     for (let i: number = 0; i < q.length; i++) {
         let z = q[i]
 
@@ -973,6 +986,8 @@ export function compile(methodInfo: MethodInfo) {
 
         let param = (n: number) => z.params[n]
 
+        resolver.extra = methodInfo.index() + " | " + z.position + " | "
+        
         if (z.stack < 0) {
             js.push("                    // unreachable")
         }
@@ -1236,7 +1251,7 @@ export function compile(methodInfo: MethodInfo) {
                     }
                     else {
                         js.push("                // " + abc.getMultiname(param(0)))
-                        js.push("                " + stackF(param(0)) + " = context.callproperty(" + param(1) + ", " + pp.shift() + ", [" + pp.join(", ") + "]);")
+                        js.push("                " + stackF(param(0)) + " = context.callproperty(" + getname(param(1)) + ", " + pp.shift() + ", [" + pp.join(", ") + "]);")
                     }
                     break
                 case Bytecode.CALLPROPVOID: {
@@ -1245,7 +1260,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 0; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.callpropvoid(" + param(1) + ", " + pp.shift() + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.callpropvoid(" + getname(param(1)) + ", " + pp.shift() + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.APPLYTYPE: {
@@ -1261,11 +1276,11 @@ export function compile(methodInfo: MethodInfo) {
 
                 case Bytecode.FINDPROPSTRICT:
                     js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                " + stackN + " = context.findpropstrict(" + param(0) + ", " + scope + ");")
+                    js.push("                " + stackN + " = context.findpropstrict(" + getname(param(0)) + ", " + scope + ");")
                     break
                 case Bytecode.FINDPROPERTY:
                     js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                " + stackN + " = context.findproperty(" + param(0) + ", " + scope + ");")
+                    js.push("                " + stackN + " = context.findproperty(" + getname(param(0)) + ", " + scope + ");")
                     break
                 case Bytecode.NEWFUNCTION:
                     js.push("                // " + abc.getMethodInfo(param(0)))
@@ -1325,7 +1340,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.callsuper(context.name(" + param(1) + "), scope, " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.callsuper(" + getname(param(1)) + ", scope, " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CONSTRUCTPROP: {
@@ -1334,44 +1349,76 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
                     
-                    js.push("                " + stackF(param(0)) + " = context.constructprop(" + param(1) + ", " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0)) + " = context.constructprop(" + getname(param(1)) + ", " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.GETPROPERTY:
-                    js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                " + stack0 + " = context.getproperty(context.name(" + param(0) + "), " + stack0 + ");")
+                    var mn = abc.getMultiname(param(0))
+                    js.push("                // " + mn)
+                    
+                    if (recording) {
+                        js.push("                context.extra(\"" + resolver.extra + "\");")
+                        js.push("                " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                        js.push("                context.extra(\"@@@ | \");")
+                    }
+                    else {
+                        let r = resolver.resolveGet(mn)
+
+                        if (r) {
+                            js.push("                " + stack0 + " = " + stack0 + ".__fast__ ? " + stack0 + "[\"" + mn.name + "\"] : " + stack0 + "[\"" + r + "\"];")
+                        }
+                        else {
+                            js.push("                " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                        }
+                    }
                     break
                 case Bytecode.GETPROPERTY_DYN:
-                    js.push("                " + stack1 + " = context.getproperty(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
+                    js.push("                " + stack1 + " = context.getpropertydyn(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
                     break
                 case Bytecode.SETPROPERTY:
-                    js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                context.setproperty(context.name(" + param(0) + "), " + stack0 + ", " + stack1 + ");")
+                    var mn = abc.getMultiname(param(0))
+                    js.push("                // " + mn)
+
+                    if (recording) {
+                        js.push("                context.extra(\"" + resolver.extra + "\");")
+                        js.push("                context.setproperty(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
+                        js.push("                context.extra(\"@@@ | \");")
+                    }
+                    else {
+                        let r = resolver.resolveSet(mn)
+
+                        if (r) {
+                            js.push("                if (" + stack1 + ".__fast__) {" + stack1 + "[\"" + mn.name + "\"] = " + stack0 + ";} else {" + stack1 + "[\"" + r + "\"] = " + stack0 + ";}")
+                        }
+                        else {
+                            js.push("                context.setproperty(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
+                        }
+                    }
                     break
                 case Bytecode.SETPROPERTY_DYN:
                     js.push("                context.setproperty(context.runtimename(" + stack1 + ", " + param(0) + "), " + stack0 + ", " + stack2 + ");")
                     break
                 case Bytecode.DELETEPROPERTY:
                     js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                " + stack0 + " = context.deleteproperty(context.name(" + param(0) + "), " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.deleteproperty(" + getname(param(0)) + ", " + stack0 + ");")
                     break
                 case Bytecode.DELETEPROPERTY_DYN:
                     js.push("                " + stack1 + " = context.deleteproperty(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
                     break
                 case Bytecode.GETSUPER:
-                    js.push("                " + stack0 + " = context.getsuper(context.name(" + param(0) + "), scope, " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.getsuper(" + getname(param(0)) + ", scope, " + stack0 + ");")
                     break
                 case Bytecode.GETSUPER_DYN:
                     js.push("                " + stack1 + " = context.getsuper(context.runtimename(" + stack0 + ", " + param(0) + "), scope, " + stack1 + ");")
                     break
                 case Bytecode.SETSUPER:
-                    js.push("                context.setsuper(context.name(" + param(0) + "), scope, " + stack0 + ", " + stack1 + ");")
+                    js.push("                context.setsuper(" + getname(param(0)) + ", scope, " + stack0 + ", " + stack1 + ");")
                     break
                 case Bytecode.SETSUPER_DYN:
                     js.push("                context.setsuper(context.runtimename(" + stack1 + ", " + param(0) + "), scope, " + stack0 + ", " + stack2 + ");")
                     break
                 case Bytecode.GETLEX:
-                    js.push("                " + stackN + " = context.getlex(" + param(0) + ", " + scope + ");")
+                    js.push("                " + stackN + " = context.getlex(" + getname(param(0)) + ", " + scope + ");")
                     break
                 case Bytecode.RETURNVALUE:
                     js.push("                return " + stack0 + ";")
@@ -1380,7 +1427,7 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                return;")
                     break
                 case Bytecode.COERCE:
-                    js.push("                " + stack0 + " = context.coerce(" + param(0) + ", " + scope + ", " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.coerce(" + getname(param(0)) + ", " + scope + ", " + stack0 + ");")
                     break
                 case Bytecode.COERCE_A:
                     js.push("                ;")
@@ -1419,18 +1466,26 @@ export function compile(methodInfo: MethodInfo) {
     if (w.indexOf(underrun) >= 0)
         return "STACK UNDERRUN"
     
-    return eval(w)(new Context(methodInfo))
+    resolver.extra = "@@@ | "
+    
+    return eval(w)(new Context(methodInfo, names))
 }
 
 class Context {
     private readonly mi: MethodInfo
     private readonly sec: AXSecurityDomain
     private readonly abc: ABCFile
+    private readonly names: Multiname[]
 
-    constructor(mi: MethodInfo) {
+    constructor(mi: MethodInfo, names:Multiname[]) {
         this.mi = mi
         this.abc = mi.abc
         this.sec = mi.abc.applicationDomain.sec
+        this.names = names
+    }
+
+    extra(v : string): void {
+        resolver.extra = v
     }
 
     call(value, obj, pp): any {
@@ -1438,22 +1493,16 @@ class Context {
         return value.axApply(obj, pp)
     }
 
-    callproperty(index, obj, pp) {
-        let mn = this.abc.getMultiname(index)
-
-        if (obj)
-            if (obj.__fast__)
-                return obj[mn.name].apply(obj, pp)
+    callproperty(mn, obj, pp) {
+        if (obj && obj.__fast__)
+            return obj[mn.name].apply(obj, pp)
 
         return this.sec.box(obj).axCallProperty(mn, pp, false)
     }
 
-    callpropvoid(index, obj, pp) {
-        let mn = this.abc.getMultiname(index)
-
-        if (obj)
-            if (obj.__fast__)
-                return obj[mn.name].apply(obj, pp)
+    callpropvoid(mn, obj, pp) {
+        if (obj && obj.__fast__)
+            return obj[mn.name].apply(obj, pp)
 
         return this.sec.box(obj).axCallProperty(mn, pp, false)
     }
@@ -1462,34 +1511,41 @@ class Context {
         return (<ScriptInfo>(<any>scope.global.object).scriptInfo).abc.env.app.getClass(Multiname.FromSimpleName(pp[0]))
     }
 
-    findpropstrict(index, scope) {
-        return scope.findScopeProperty(this.abc.getMultiname(index), true, false)
+    findpropstrict(mn, scope) {
+        return scope.findScopeProperty(mn, true, false)
     }
 
-    getproperty(name, obj) {
-        if (obj)
-            if (obj.__fast__)
-                return obj[name.name]
+    getproperty(mn, obj) {
+        if (obj.__fast__)
+            return obj[mn.name]
+
+        return obj.axGetProperty(mn)
+    }
+
+    getpropertydyn(mn, obj) {
+        if (obj && obj.__fast__)
+            return obj[mn.name]
 
         let b = this.sec.box(obj)
 
-        if (typeof name === "number") {
-            let r = b.axGetNumericProperty(name)
-            return r
-        }
+        if (recording)
+            if (b !== obj)
+                resolver.recordBox(mn)
+        
+        if (typeof mn === "number")
+            return b.axGetNumericProperty(mn)
 
-        return b.axGetProperty(name)
+        return b.axGetProperty(mn)
     }
 
-    setproperty(name, value, obj) {
-        if (obj)
-            if (obj.__fast__)
-                return obj[name.name] = value
+    setproperty(mn, value, obj) {
+        if (obj && obj.__fast__)
+            return obj[mn.name] = value
 
-        if (typeof name === "number")
-            return this.sec.box(obj).axSetNumericProperty(name, value)
+        if (typeof mn === "number")
+            return this.sec.box(obj).axSetNumericProperty(mn, value)
 
-        this.sec.box(obj).axSetProperty(name, value, Bytecode.INITPROPERTY)
+        this.sec.box(obj).axSetProperty(mn, value, Bytecode.INITPROPERTY)
     }
 
     deleteproperty(name, obj) {
@@ -1506,12 +1562,12 @@ class Context {
         return this.sec.box(obj).axSetSuper(name, savedScope, value)
     }
 
-    getlex(index, scope) {
-        return scope.findScopeProperty(this.abc.getMultiname(index), true, false).axGetProperty(this.abc.getMultiname(index))
+    getlex(mn, scope) {
+        return scope.findScopeProperty(mn, true, false).axGetProperty(mn)
     }
 
-    findproperty(index, scope) {
-        return scope.findScopeProperty(this.abc.getMultiname(index), false, false)
+    findproperty(mn, scope) {
+        return scope.findScopeProperty(mn, false, false)
     }
 
     newfunction(index, scope) {
@@ -1568,19 +1624,23 @@ class Context {
         if (r != null)
             return r
 
+        // if (mn.name.indexOf("b2") >= 0)
+        //     console.log("*B2: " + mn.name)
+
         validateConstruct(this.sec, obj, pp.length)
         return obj.axConstruct(pp)
     }
 
 
-    constructprop(index, obj, pp) {
-        let mn = this.abc.getMultiname(index)
-
+    constructprop(mn, obj, pp) {
         let r = b2Class(mn.name, pp)
 
         if (r != null)
             return r
 
+        // if (mn.name.indexOf("b2") >= 0)
+        //     console.log("B2: " + mn.name)
+        
         let b = this.sec.box(obj)
         let name = b.axResolveMultiname(mn)
         let ctor = b[name]
@@ -1596,12 +1656,14 @@ class Context {
 
 
     pushscope(scope, obj) {
-        return (scope.object == this.sec.box(obj) && scope.isWith == false) ? scope : new Scope(scope, this.sec.box(obj), false)
+        let b = this.sec.box(obj) 
+        return scope.extend(b)
     }
 
 
     pushwith(scope, obj) {
-        return (scope.object == this.sec.box(obj) && scope.isWith == true) ? scope : new Scope(scope, this.sec.box(obj), true)
+        let b = this.sec.box(obj)
+        return (scope.object === b && scope.isWith == true) ? scope : new Scope(scope, b, true)
     }
 
 
@@ -1615,8 +1677,8 @@ class Context {
     }
 
 
-    coerce(index, scope, obj) {
-        return (<AXClass> scope.getScopeProperty(this.abc.getMultiname(index), true, false)).axCoerce(obj)
+    coerce(mn, scope, obj) {
+        return (<AXClass> scope.getScopeProperty(mn, true, false)).axCoerce(obj)
     }
 
 
