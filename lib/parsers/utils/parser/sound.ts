@@ -15,6 +15,13 @@
  */
 
 import {SoundTag} from "../SWFTags"
+import { WaveAudio } from '@awayjs/core';
+import { WaveAudioData } from '@awayjs/core/dist/lib/audio/WaveAudio';
+declare var require;
+var mp3Parser = require("mp3-parser");
+const decode = require('audio-decode');
+//const buffer = require('audio-lena/mp3');
+//import {mp3Parser} from "mp3-parser"
 
 var SOUND_SIZE_8_BIT  = 0;
 var SOUND_SIZE_16_BIT = 1;
@@ -37,7 +44,7 @@ var WaveHeader = new Uint8Array([0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00,
   0x01, 0x00, 0x02, 0x00, 0x44, 0xAC, 0x00, 0x00, 0x10, 0xB1, 0x02, 0x00,
   0x04, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00]);
 
-function packageWave(data, sampleRate, channels, size, swapBytes) {
+export function packageWave(data, sampleRate, channels, size, swapBytes) {
   var sizeInBytes = size >> 3;
   var sizePerSecond = channels * sampleRate * sizeInBytes;
   var sizePerSample = channels * sizeInBytes;
@@ -215,17 +222,19 @@ export class SoundStream {
   samplesCount: number;
   sampleRate: number;
   channels: number;
+  streamSize: number;
   format: any;
   currentSample: number;
   allChunks: Uint8Array[];
 
   decode: (block: Uint8Array) => DecodedSound;
 
-  constructor(samplesCount, sampleRate, channels) {
+  constructor(samplesCount, sampleRate, channels, streamSize) {
     this.streamId = (nextSoundStreamId++);
     this.samplesCount = samplesCount;
     this.sampleRate = sampleRate;
     this.channels = channels;
+    this.streamSize = streamSize;
     this.format = null;
     this.currentSample = 0;
     this.allChunks = [];
@@ -235,7 +244,8 @@ export class SoundStream {
     var channels = tag.streamType == SOUND_TYPE_STEREO ? 2 : 1;
     var samplesCount = tag.samplesCount;
     var sampleRate = SOUND_RATES[tag.streamRate];
-    var stream = new SoundStream(samplesCount, sampleRate, channels);
+    var streamSize = tag.streamSize;
+    var stream = new SoundStream(samplesCount, sampleRate, channels, streamSize);
 
     switch (tag.streamCompression) {
       case SOUND_FORMAT_PCM_BE:
@@ -270,7 +280,9 @@ function SwfSoundStream_decode_PCM(data) : DecodedSound {
   return {
     streamId: this.streamId,
     samplesCount: pcm.length / this.channels,
-    pcm: pcm
+    pcm: pcm,
+    data: data,
+    seek:0
   };
 }
 
@@ -282,7 +294,9 @@ function SwfSoundStream_decode_PCM_be(data) : DecodedSound {
   return {
     streamId: this.streamId,
     samplesCount: pcm.length / this.channels,
-    pcm: pcm
+    pcm: pcm,
+    data: data,
+    seek:0
   };
 }
 
@@ -294,7 +308,9 @@ function SwfSoundStream_decode_PCM_le(data) : DecodedSound {
   return {
     streamId: this.streamId,
     samplesCount: pcm.length / this.channels,
-    pcm: pcm
+    pcm: pcm,
+    data: data,
+    seek:0
   };
 }
 
@@ -309,4 +325,3 @@ function SwfSoundStream_decode_MP3(data) : DecodedSound {
     seek: seek
   };
 }
-

@@ -619,7 +619,7 @@ export function parseSoundStreamHeadTag(stream: Stream, tagEnd: number): SoundSt
   var streamFlags = stream.readUi8();
   var streamCompression = tag.streamCompression = streamFlags >> 4 & 15;
   tag.streamRate = streamFlags >> 2 & 3;
-  tag.streamSize = streamFlags >> 1 & 1;
+  tag.streamSize = (streamFlags >> 1 & 1)==0?8:16;
   tag.streamType = streamFlags & 1;
   tag.samplesCount = stream.readUi16();
   if (streamCompression == 2 && tagEnd - stream.pos >= 2) {

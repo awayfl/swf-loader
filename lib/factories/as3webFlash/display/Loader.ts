@@ -24,6 +24,7 @@ import { release, somewhatImplemented } from '../../base/utilities/Debug';
 import { UncaughtErrorEvents } from '../events/UncaughtErrorEvents';
 import { Errors } from '../../avm2/errors';
 import { ByteArray } from '../../avm2/natives/byteArray';
+import { Graphics } from '@awayjs/graphics';
 
 // todo: define all methods (start new with converting as3-Loader to ts ?)
 
@@ -126,7 +127,10 @@ export class Loader extends DisplayObjectContainer
 				this.addChild(newClone);
 				//this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
 			}
-		}else {
+		}
+		else if(asset.isAsset(Graphics)) {
+		}
+		else {
 			console.log("loaded unhandled asset-type")
 		}
 	}

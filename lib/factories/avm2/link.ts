@@ -36,12 +36,17 @@ import { SoundTransform } from '../as3webFlash/media/SoundTransform';
 import { SharedObject } from '../as3webFlash/net/SharedObject';
 import { URLRequest } from '../as3webFlash/net/URLRequest';
 
+import { SecurityDomain } from '../as3webFlash/system/SecurityDomain';
+
 import { XMLDocument, XMLNode } from "./natives/xml-document";
 import { ASClass } from './nat/ASClass';
 import { registerNativeClass, registerNativeFunction } from './nat/initializeBuiltins';
 
 // todo: this classes rely on the flash module, should be merged into our as3web module:
 
+import { IOErrorEvent } from "../flash/events/IOErrorEvent";
+import { ErrorEvent } from "../flash/events/ErrorEvent";
+import { TextEvent } from "../flash/events/TextEvent";
 import { fscommand } from "../flash/system/FSCommand";
 import { Security } from '../flash/system/Security';
 import { Scene } from "../flash/display/Scene";
@@ -78,7 +83,6 @@ import { URLRequest } from "./net/URLRequest";
 import { ApplicationDomain } from "./system/ApplicationDomain";
 import { SharedObject } from "./net/SharedObject";
 import { URLVariables } from "./net/URLVariables";
-import { SecurityDomain } from "./system/SecurityDomain";
 import { Symbol } from "./symbol";
 import { ByteArray, ObjectEncoding } from "../avm2/natives/byteArray";
 import { AccessibilityProperties } from "./accessibility/AccessibilityProperties";
@@ -103,11 +107,8 @@ import { Vector3D } from "./geom/Vector3D";
 import { Transform } from "./geom/Transform";
 import { ColorTransform } from "./geom/ColorTransform";
 import { PerspectiveProjection } from "./geom/PerspectiveProjection";
-import { ErrorEvent } from "./events/ErrorEvent";
-import { IOErrorEvent } from "./events/IOErrorEvent";
 import { KeyboardEvent } from "./events/KeyboardEvent";
 import { MouseEvent } from "./events/MouseEvent";
-import { TextEvent } from "./events/TextEvent";
 import { HTTPStatusEvent } from "./events/HTTPStatusEvent";
 import { UncaughtErrorEvents } from "./events/UncaughtErrorEvents";
 import { Keyboard } from "./ui/Keyboard";
@@ -226,12 +227,12 @@ M("flash.text.TextField", TextField);
  M("flash.geom.ColorTransform", ColorTransform);
 // M("flash.geom.PerspectiveProjection", PerspectiveProjection);
 
-M("flash.events.EventDispatcher", EventDispatcher);
-M("flash.events.MouseEvent", MouseEvent);
-// M("flash.events.ErrorEvent", ErrorEvent);
-// M("flash.events.IOErrorEvent", IOErrorEvent);
+ M("flash.events.EventDispatcher", EventDispatcher);
+ M("flash.events.MouseEvent", MouseEvent);
+ M("flash.events.ErrorEvent", ErrorEvent);
+ M("flash.events.IOErrorEvent", IOErrorEvent);
 // M("flash.events.GestureEvent", GestureEvent);
-// M("flash.events.TextEvent", TextEvent);
+ M("flash.events.TextEvent", TextEvent);
  M("flash.events.TimerEvent", TimerEvent);
  M("flash.events.ProgressEvent", ProgressEvent);
 // M("flash.events.StatusEvent", StatusEvent);
@@ -299,7 +300,7 @@ M("flash.events.MouseEvent", MouseEvent);
  M("flash.system.Capabilities", Capabilities);
  M("flash.system.Security", Security);
  M("flash.system.System", System);
-// M("flash.system.SecurityDomain", SecurityDomain);
+ M("flash.system.SecurityDomain", SecurityDomain);
 M("flash.system.ApplicationDomain", ApplicationDomain);
 // M("flash.system.JPEGLoaderContext", JPEGLoaderContext);
 M("flash.system.LoaderContext", LoaderContext);

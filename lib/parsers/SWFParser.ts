@@ -7,7 +7,7 @@ import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultScen
 import {Graphics} from "@awayjs/graphics";
 
 import {MethodMaterial, ImageTexture2D} from "@awayjs/materials";
-
+import {MovieClipSoundsManager} from "../factories/timelinesounds/MovieClipSoundsManager"
 import {
 	assert,
 	Bounds,
@@ -589,6 +589,7 @@ export class SWFParser extends ParserBase
 		if(!states && !swfFrames)
 			throw("error when creating timeline - neither movieclip frames nor button-states present");
 		
+		//console.log("swfFrames", swfFrames);
 		var isButton:boolean=false;
 		var key:string;
 		symbol.isButton=false;
@@ -658,6 +659,7 @@ export class SWFParser extends ParserBase
 		var framesLen:number=swfFrames.length;
 		var command_recipe_flag:number=0;
 		var audio_commands_cnt:number=0;
+		MovieClip.movieClipSoundsManagerClass=MovieClipSoundsManager;
         //console.log("new mc ");
 		for (i = 0; i < framesLen; i++) {
 			noTimelineDebug || console.log("	process frame:", i+1, "/", framesLen);
@@ -669,6 +671,11 @@ export class SWFParser extends ParserBase
 			cmds_stopSounds.length=0;
 			unparsedTags.length=0;
 			if(swfFrames[i].soundStreamHead){
+				awayMc.initSoundStream(swfFrames[i].soundStreamHead, framesLen);
+				//console.log("stream encountered", swfFrames[i].soundStreamHead)
+			}
+			if(swfFrames[i].soundStreamBlock){
+				awayMc.addSoundStreamBlock(i, swfFrames[i].soundStreamBlock);
 				//console.log("stream encountered", swfFrames[i].soundStreamHead)
 			}
 			if(swfFrames[i].initActionBlocks){
@@ -2058,13 +2065,25 @@ export class SWFParser extends ParserBase
 					stream.pos = spriteTagEnd;
 					tagLength = 0;
 					break;
+					
 				case SwfTagCode.CODE_SOUND_STREAM_HEAD:
-					//stream.pos = spriteTagEnd;
-					//tagLength = 0;
+				case SwfTagCode.CODE_SOUND_STREAM_HEAD2:
+					//console.warn("Timeline sound is set to streaming!");
+					var tagStart = stream.pos;
+					var tagEnd = stream.pos + tagLength;
+					var soundStreamTag = parseSoundStreamHeadTag(stream, tagEnd);
+					soundStreamHead = SoundStream.FromTag(soundStreamTag);
+					
+					stream.pos = tagStart;
 					break;
 				case SwfTagCode.CODE_SOUND_STREAM_BLOCK:
-                    console.warn("Timeline sound is set to streaming!");
-                    break;
+					var tagStart = stream.pos;
+					var tagEnd = stream.pos + tagLength;
+					//if(!this._currentSoundStreamHead)
+					//	throw("Error when parsing CODE_SOUND_STREAM_BLOCK - a _currentSoundStreamHead must exist")
+					soundStreamBlock = this.swfData.subarray(stream.pos, tagEnd);
+					stream.pos = tagStart;
+					break;
         
 				default:
 					//console.log("ignored timeline tag", tagCode);
