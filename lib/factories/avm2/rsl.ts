@@ -10,17 +10,43 @@ export class Resolver {
     started: boolean = false
     keys: string[] = []
     resolved = {}    
+    lex = {}    
     boxed = {}    
     coerced = {}    
     
+    resolveLex(mn: Multiname): number {
+        return RecordedData["lex"][this.extra + mn.key()] || RecordedData["lex"][mn.key()] || 0
+    }
+    
     resolveGet(mn: Multiname): string {
-        return RecordedData["get"][this.extra + mn.key()] || RecordedData["get"][mn.key()]
+        return RecordedData["get"][this.extra + mn.key()] || RecordedData["get"][mn.key()] || null
     }
     
     resolveSet(mn: Multiname): string {
-        return RecordedData["set"][this.extra + mn.key()] || RecordedData["set"][mn.key()]
+        return RecordedData["set"][this.extra + mn.key()] || RecordedData["set"][mn.key()] || null
     }
     
+    
+    recordLex(mn: Multiname, l: number) {
+        if (!this.started) {
+            setTimeout(() => this.print(), timeout)
+            this.started = true
+        }
+        
+        let key = mn.key()
+
+        if (!this.lex[key]) {
+            this.lex[key] = {}
+        }
+
+        if (!this.lex[key][this.extra])
+            this.lex[key][this.extra] = [l]
+        else
+        if (this.lex[key][this.extra].indexOf(l) < 0) {
+            this.lex[key][this.extra].push(l)
+        }
+    }    
+
     recordResolve(mn: Multiname, r: string) {
         if (!this.started) {
             setTimeout(() => this.print(), timeout)
@@ -149,6 +175,33 @@ export class Resolver {
                     if (this.resolved[key][extras[j]].length == 1)
                         if (!this.coerced[key] || !this.coerced[key][extras[j]])
                             js.push("        \"" + extras[j] + key + "\": \"" + this.resolved[key][extras[j]][0] + "\",")
+        }   
+        
+        js.push("    }")
+
+        js.push("    static lex = {")
+        
+        for (let i = 0; i < this.keys.length; i++) {
+            let key = this.keys[i]
+
+            let extras = []
+            for (let extra in this.lex[key])
+                if (this.lex[key].hasOwnProperty(extra))
+                    extras.push(extra)
+
+            let lex = []
+            for (let j = 0; j < extras.length; j++)
+                for (let k = 0; k < this.lex[key][extras[j]].length; k++)
+                    if (lex.indexOf(this.lex[key][extras[j]][k]) < 0)
+                        lex.push(this.lex[key][extras[j]][k])
+
+            if (!this.coerced[key] && lex.length == 1)
+                js.push("        \"" + key + "\": \"" + lex[0] + "\",")
+            else
+                for (let j = 0; j < extras.length; j++)
+                    if (this.lex[key][extras[j]].length == 1)
+                        if (!this.coerced[key] || !this.coerced[key][extras[j]])
+                            js.push("        \"" + extras[j] + key + "\": \"" + this.lex[key][extras[j]][0] + "\",")
         }   
         
         js.push("    }")

@@ -18,6 +18,7 @@ import {ABCFile} from "./abc/lazy/ABCFile"
 import {ScriptInfo} from "./abc/lazy/ScriptInfo"
 import {b2Class} from "./btd"
 import {recording, resolver} from "./rsl"
+import {AXGlobal} from "./run/AXGlobal"
 
 export enum Bytecode {
     BKPT = 0x01,
@@ -1417,8 +1418,42 @@ export function compile(methodInfo: MethodInfo) {
                 case Bytecode.SETSUPER_DYN:
                     js.push("                context.setsuper(context.runtimename(" + stack1 + ", " + param(0) + "), scope, " + stack0 + ", " + stack2 + ");")
                     break
+                /*
                 case Bytecode.GETLEX:
                     js.push("                " + stackN + " = context.getlex(" + getname(param(0)) + ", " + scope + ");")
+                    break
+                    */
+                case Bytecode.GETLEX:
+                    var mn = abc.getMultiname(param(0))
+                    js.push("                // " + mn)
+
+                    if (recording) {
+                        js.push("                context.extra(\"" + resolver.extra + "\");")
+                        js.push("                " + stackN + " = context.getlexrecording(" + getname(param(0)) + ", " + scope + ");")
+                        js.push("                context.extra(\"@@@ | \");")
+                    }
+                    else {
+                        let l = resolver.resolveLex(mn)
+                        let r = resolver.resolveGet(mn)
+
+                        if (r != null && l != 0) {
+                            if (l > 0) {
+                                let ps = ""
+                                for (let j = 1; j < l; j++)
+                                    ps = ps + ".parent"
+
+                                js.push("                " + stackN + " = " + scope + ps + ".object[\"" + r + "\"];")
+                            }
+                            else {
+                                js.push("                " + stackN + " = " + scope + ".global.object.applicationDomain.findProperty(" + getname(param(0)) + ", true, true)[\"" + r + "\"];")
+                            }
+
+                            // js.push("                var xyz = context.getlex(" + getname(param(0)) + ", " + scope + ");")
+                            // js.push("                if (xyz !== " + stackN + ") console.log(\"expe\" + \"cted \" + xyz + \" got \" + " + stackN + ");")
+                        }
+                        else
+                            js.push("                " + stackN + " = context.getlex(" + getname(param(0)) + ", " + scope + ");")
+                    }
                     break
                 case Bytecode.RETURNVALUE:
                     js.push("                return " + stack0 + ";")
@@ -1562,6 +1597,38 @@ class Context {
         return this.sec.box(obj).axSetSuper(name, savedScope, value)
     }
 
+    getlexrecording(mn: Multiname, scope: Scope) {
+        let a = scope.findScopeProperty(mn, true, false)
+
+        if ((scope.global.object as AXGlobal).applicationDomain.findProperty(mn, true, true) === a)
+            resolver.recordLex(mn, -1)
+        else {
+            let n = 1
+            let s = scope
+
+            while (true) {
+                if (s.object === a) {
+                    resolver.recordLex(mn, n)
+                    break
+                }
+                
+                if (s.parent != null) {
+                    n += 1
+                    s = s.parent
+                }
+                else {
+                    resolver.recordLex(mn, 0)
+                    break
+                }
+            }
+        }
+
+
+        let b = a.axGetProperty(mn)
+        
+        return b
+    }
+    
     getlex(mn, scope) {
         return scope.findScopeProperty(mn, true, false).axGetProperty(mn)
     }
