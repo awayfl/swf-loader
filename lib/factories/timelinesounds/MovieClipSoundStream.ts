@@ -1,9 +1,4 @@
-
-import { MP3DecoderSession } from "./MP3DecoderSession";
-import { SoundChannel } from "../as3webFlash/media/SoundChannel";
 import { ISecurityDomain } from "../avm1/ISecurityDomain";
-import { Sound } from "../as3webFlash/media/Sound";
-import { MovieClip } from "@awayjs/scene";
 import { SoundStream, packageWave } from "../../parsers/utils/parser/sound";
 import { WaveAudio } from '@awayjs/core';
 import { WaveAudioData } from '@awayjs/core/dist/lib/audio/WaveAudio';
@@ -30,13 +25,13 @@ interface ISoundStreamAdapter {
   isPlaying:boolean;
 }
 
+/*
 class HTMLAudioElementAdapter implements ISoundStreamAdapter {
   private _sec: ISecurityDomain;
   private _element: HTMLAudioElement;
-  private _channel: SoundChannel;
 
   get isReady(): boolean {
-    return !!this._channel;
+    return false;//!!this._channel;
   }
 
   get element(): HTMLAudioElement {
@@ -83,21 +78,17 @@ class HTMLAudioElementAdapter implements ISoundStreamAdapter {
     }
   }
 
-  constructor(sec: ISecurityDomain, element: HTMLAudioElement) {
-    this._sec = sec;
+  constructor(element: HTMLAudioElement) {
     this._element = element;
   }
 
   createChannel() {
-    //this._channel = SoundChannel.initializeFromAudioElement(this._sec, this._element);
   }
 
   queueData(frame: DecodedSound) {
-    //Debug.abstractMethod('HTMLAudioElementAdapter::queueData');
   }
 
   finish() {
-    //Debug.abstractMethod('HTMLAudioElementAdapter::finish');
   }
 }
 
@@ -109,8 +100,8 @@ class MediaSourceStreamAdapter extends HTMLAudioElementAdapter {
   private _rawFrames: any[];
   private _isReady: boolean;
 
-  constructor(sec: ISecurityDomain, element: HTMLAudioElement) {
-    super(sec, element);
+  constructor(element: HTMLAudioElement) {
+    super(element);
     this._mediaSource = new MediaSource();
     this._sourceBuffer = null;
     this._updating = false;
@@ -167,8 +158,8 @@ class MediaSourceStreamAdapter extends HTMLAudioElementAdapter {
 class BlobStreamAdapter extends HTMLAudioElementAdapter {
   private _rawFrames: any[];
 
-  constructor(sec: ISecurityDomain, element: HTMLAudioElement) {
-    super(sec, element);
+  constructor(element: HTMLAudioElement) {
+    super(element);
     this._rawFrames = [];
   }
 
@@ -207,9 +198,8 @@ function syncTime(element, movieClip) {
     initialized = false;
   });
 }
-
+*/
 class WebAudioAdapter implements ISoundStreamAdapter {
-  protected _sec: ISecurityDomain;
   protected _sound: WaveAudio;
   protected _data;
   protected _frameData;
@@ -220,11 +210,16 @@ class WebAudioAdapter implements ISoundStreamAdapter {
   }
 
   playFrom(time: number) {
-    // tslint, noop
-    this._sound.play(time);
+    var startPlay=true;
+    if(this._sound.duration<this._sound.currentTime){
+      startPlay=false;
+    }
+    this.stop();
+    if(startPlay){
+      this._sound.play(time);
+    }
   }
   stop() {
-    // tslint, noop
     if(this._sound)
       this._sound.stop();
   }
@@ -234,7 +229,6 @@ class WebAudioAdapter implements ISoundStreamAdapter {
   }
 
   set paused(value: boolean) {
-    // tslint, noop
   }
 
   get isPlaying(): boolean {
@@ -244,8 +238,7 @@ class WebAudioAdapter implements ISoundStreamAdapter {
     return !!this._sound;
   }
 
-  constructor(sec: ISecurityDomain, data) {
-    this._sec = sec;
+  constructor(data) {
     this._sound = null;
     this._frameData = [];
     this._data = data;
@@ -275,7 +268,6 @@ class WebAudioAdapter implements ISoundStreamAdapter {
     var packagedWave = packageWave(finalBytes, this._data.sampleRate, this._data.channels, this._data.streamSize, false);
     var sound = new WaveAudio(new WaveAudioData(packagedWave.data.buffer));
 
-    //sound.play(0);
     this._sound = sound;
   }
 }
@@ -283,8 +275,8 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 class WebAudioMP3Adapter extends WebAudioAdapter {
   //private _decoderPosition: number;
   //private _decoderSession: MP3DecoderSession;
-  constructor(sec: ISecurityDomain, data) {
-    super(sec, data);
+  constructor(data) {
+    super(data);
 
     /*this._decoderPosition = 0;
     this._decoderSession = new MP3DecoderSession();
@@ -326,61 +318,55 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
     var file = new Blob([finalBytes.buffer], {type: 'text/plain'});
     a.href = URL.createObjectURL(file);
     a.download = "testmp3.mp3";
-    a.click();*/
-
-    var sound = new WaveAudio(new WaveAudioData(finalBytes.buffer));
+    a.click();
     //sound._symbol = data;
     //sound.applySymbol();
     //sound.play(0);
     //var mp3Parser=new MP3Parser();
     //mp3Parser.push(this._data.pcm);
     //this._decoderSession.close();
+    */
+   
+    var sound = new WaveAudio(new WaveAudioData(finalBytes.buffer));
     this._sound = sound;
   }
 }
 
 export class MovieClipSoundStream {
-  private movieClip: MovieClip;
   private data;
   private seekIndex: Array<number>;
   private position: number;
   private finalized: boolean;
   public isPlaying: boolean;
   private element;
-  private startFrame: number;
   private soundStreamAdapter: ISoundStreamAdapter;
 
   private decode: (block: Uint8Array) => DecodedSound;
 
-  private expectedFrame: number;
-  private waitFor: number;
 
-  public constructor(streamInfo: SoundStream, movieClip: MovieClip, startFrame: number) {
-    this.movieClip = movieClip;
+  public constructor(streamInfo: SoundStream) {
     this.decode = streamInfo.decode.bind(streamInfo);
     this.data = {
       sampleRate: streamInfo.sampleRate,
       channels: streamInfo.channels,
       streamSize: streamInfo.streamSize,
     };
-    this.startFrame = startFrame;
     this.seekIndex = [];
     this.position = 0;
-    this.expectedFrame = 0;
-    this.waitFor = 0;
-    let audioContext;
-    var webAudioMP3Option: boolean = false;
-    var mediaSourceMP3Option: boolean = false;
+    
+    var isMP3 = streamInfo.format === 'mp3';
+    this.soundStreamAdapter = !isMP3 ? new WebAudioAdapter(this.data) : new WebAudioMP3Adapter(this.data);
+    /*
     try {
-      audioContext = new (window.AudioContext || (<any>window).webkitAudioContext)();
-      webAudioMP3Option = false;
+      // todo: do this check only once
+      let audioContext = new (window.AudioContext || (<any>window).webkitAudioContext)();
     } catch (error) {
       window.alert(
         `Sorry, but your browser doesn't support the Web Audio API!`
       );
     }
-    var sec = (<any>movieClip).sec;
-    var isMP3 = streamInfo.format === 'mp3';
+    */
+    //var sec = (<any>movieClip).sec;
     /*if (isMP3 && !webAudioMP3Option) {
       var element = document.createElement('audio');
       element.preload = 'metadata'; // for mobile devices
@@ -402,13 +388,13 @@ export class MovieClipSoundStream {
       }
       // Falls through to WebAudio if element cannot play MP3.
     }*/
-    this.soundStreamAdapter = !isMP3 ? new WebAudioAdapter(sec, this.data) : new WebAudioMP3Adapter(sec, this.data);
+    
   }
 
   public appendBlock(frameNum: number, streamBlock: Uint8Array) {
     var decodedBlock = this.decode(streamBlock);
     var streamPosition = this.position;
-    this.seekIndex[frameNum] = streamPosition + decodedBlock.seek * this.data.channels;
+    this.seekIndex[frameNum] = (streamPosition + decodedBlock.seek);
     this.position = streamPosition + decodedBlock.samplesCount;
     this.soundStreamAdapter.queueData(decodedBlock);
   }
@@ -422,19 +408,21 @@ export class MovieClipSoundStream {
     }
 
     this.isPlaying=true;
-    var PAUSE_WHEN_OF_SYNC_GREATER = 1.0;
-    var PLAYBACK_ADJUSTMENT = 0.25;
+    var PLAYBACK_ADJUSTMENT = 0.5;
 
     if (!this.finalized) {
       this.finalized = true;
       this.soundStreamAdapter.finish();
     }
     var soundStreamData = this.data;
-    var time = this.seekIndex[frameNum] / soundStreamData.sampleRate / soundStreamData.channels;
+    var time = this.seekIndex[frameNum]  / soundStreamData.channels / soundStreamData.sampleRate;
     var elementTime = this.soundStreamAdapter.currentTime;
-    console.log("time", time, "elementTime", elementTime);
-    if(!this.soundStreamAdapter.isPlaying)
+    if(!this.soundStreamAdapter.isPlaying || Math.abs(time-elementTime)>PLAYBACK_ADJUSTMENT){
+      //console.log("start sound at: time", time, "elementTime", elementTime, this.soundStreamAdapter.isPlaying);
       this.soundStreamAdapter.playFrom(time);
+
+    }
+
   }
   /*
       if (this.soundStreamAdapter.isReady &&

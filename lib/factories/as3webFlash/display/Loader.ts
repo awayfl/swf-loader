@@ -99,9 +99,11 @@ export class Loader extends DisplayObjectContainer
 
 		var asset:IAsset = event.asset;
 
+
 		if (asset.isAsset(AwayTextField)) {
 			this._loaderContext.applicationDomain.addDefinition(asset.name, <AwayTextField> asset);
 		} else if (asset.isAsset(SceneImage2D) || asset.isAsset(BitmapImage2D)) {
+
 			this._loaderContext.applicationDomain.addDefinition(asset.name, <SceneImage2D> asset);
 
 			// we should only do this for bitmaps loaded from jpg or png
