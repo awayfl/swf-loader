@@ -2,7 +2,10 @@ import { FrameScriptManager, MovieClip, SceneImage2D } from '@awayjs/scene';
 import { AssetLibrary, AssetBase, WaveAudio } from '@awayjs/core';
 import { Sound } from '../../as3webFlash/media/Sound';
 import { BitmapData } from '../../as3webFlash/display/BitmapData';
+import { MovieClip as FlashMovieClip } from '../../as3webFlash/display/MovieClip';
 import { BitmapImage2D } from '@awayjs/stage';
+import { OrphanManager } from '../../as3webFlash/display/DisplayObject';
+
 
 export class ActiveLoaderContext {
     public static loaderContext: any;
@@ -37,6 +40,7 @@ export function axConstruct(argArray?: any[]) {
         object.noReset=true;
         
         MovieClip.mcForConstructor = newMC;
+        OrphanManager.addOrphan(object);
     }
     if (this.superClass && this.superClass.classInfo && this.superClass.classInfo.instanceInfo && this.superClass.classInfo.instanceInfo.name.name == "Sound") {
         //console.log("find sound for name", this.classInfo.instanceInfo.name.name)

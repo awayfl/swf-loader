@@ -13,9 +13,10 @@ import { RequestAnimationFrame, ColorUtils, AssetEvent } from '@awayjs/core';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 import { initLink } from '../avm2/link';
 import { initlazy } from '../avm2/abc/lazy';
-import { FrameScriptManager } from '@awayjs/scene';
+import { FrameScriptManager, DisplayObject } from '@awayjs/scene';
 import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
 import { ActiveLoaderContext } from '../avm2/run/axConstruct';
+import { OrphanManager } from '../as3webFlash/display/DisplayObject';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
@@ -122,7 +123,7 @@ export class Player {
 
 			// advance the stage
 			this._stage.advanceFrame(this._events);
-
+			OrphanManager.updateOrphans(this._events);
 			/*var displayGraph={};
 			this._stage.debugDisplayGraph(displayGraph);
 			console.log("SceneGraph frame :", displayGraph);*/
