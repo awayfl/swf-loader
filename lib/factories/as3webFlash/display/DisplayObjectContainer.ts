@@ -1,6 +1,6 @@
 import {Box} from "@awayjs/core";
 import {Billboard, TextField as AwayTextField, DisplayObjectContainer as AwayDisplayObjectContainer, Sprite as AwaySprite, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject} from "@awayjs/scene";
-import {DisplayObject} from "./DisplayObject";
+import {DisplayObject, OrphanManager} from "./DisplayObject";
 import {InteractiveObject} from "./InteractiveObject";
 import {Event} from "../events/Event";
 import {PickGroup} from "@awayjs/view";
@@ -82,19 +82,21 @@ export class DisplayObjectContainer extends InteractiveObject{
 		while(i>0){
 			i--;
 			var oneChild:AwayDisplayObject=(<AwayDisplayObjectContainer> this._adaptee)._children[i];
-			if(oneChild.isAsset(AwayDisplayObjectContainer)){
-				if(oneChild.adapter){
-					(<DisplayObjectContainer>oneChild.adapter).advanceFrame(events);
+			if(oneChild){
+				if(oneChild.isAsset(AwayDisplayObjectContainer)){
+					if(oneChild.adapter){
+						(<DisplayObjectContainer>oneChild.adapter).advanceFrame(events);
+					}
 				}
-			}
-			else if(oneChild.isAsset(AwaySprite)) {
-				if (oneChild.adapter && (<any>oneChild.adapter).advanceFrame) {
-					// when Flash constructs Sprites for "Shape" it will not include the DispayObjectContainer in the inheritance chain
-					(<DisplayObjectContainer>oneChild.adapter).advanceFrame(events);
+				else if(oneChild.isAsset(AwaySprite)) {
+					if (oneChild.adapter && (<any>oneChild.adapter).advanceFrame) {
+						// when Flash constructs Sprites for "Shape" it will not include the DispayObjectContainer in the inheritance chain
+						(<DisplayObjectContainer>oneChild.adapter).advanceFrame(events);
+					}
 				}
-			}
-			else if(oneChild.isAsset(AwayMovieClip)){
-				(<AwayMovieClip>oneChild).update(events);
+				else if(oneChild.isAsset(AwayMovieClip)){
+					(<AwayMovieClip>oneChild).update(events);
+				}
 			}
 		}
 		this.dispatchEvent(events[1]);//EXIT_FRAME
@@ -268,7 +270,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 		(<AwayDisplayObjectContainer> this._adaptee).addChild((<DisplayObject>child).adaptee);
 		child.dispatchEvent(this._eventAdded);
 		child.dispatchEvent(this._eventAddedToStage);
-		
+		OrphanManager.removeOrphan(child);
 		return child;
 	}
 

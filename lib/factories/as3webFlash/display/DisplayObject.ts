@@ -1,10 +1,10 @@
-import {Transform as AwayTransform, Point as AwayPoint, Box, Vector3D as AwayVector3D, AbstractMethodError} from "@awayjs/core";
-import {EventDispatcher} from "../events/EventDispatcher";
-import {Event} from "../events/Event";
-import {DisplayObject as AwayDisplayObject, IDisplayObjectAdapter} from "@awayjs/scene";
-import {LoaderInfo} from "./LoaderInfo";
-import {DisplayObjectContainer} from "./DisplayObjectContainer";
-import {Stage} from "./Stage";
+import { Transform as AwayTransform, Point as AwayPoint, Box, Vector3D as AwayVector3D, AbstractMethodError } from "@awayjs/core";
+import { EventDispatcher } from "../events/EventDispatcher";
+import { Event } from "../events/Event";
+import { DisplayObject as AwayDisplayObject, IDisplayObjectAdapter } from "@awayjs/scene";
+import { LoaderInfo } from "./LoaderInfo";
+import { DisplayObjectContainer } from "./DisplayObjectContainer";
+import { Stage } from "./Stage";
 import { PickGroup, BasicPartition } from '@awayjs/view';
 import { SceneGraphPartition } from '@awayjs/scene';
 import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
@@ -14,27 +14,55 @@ import { Rectangle } from '../geom/Rectangle';
 import { Point } from '../geom/Point';
 import { Vector3D } from '../geom/Vector3D';
 
-export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter
-{
+export class OrphanManager {
+
+	static orphans: DisplayObject[] = [];
+	static addOrphan(orphan: DisplayObject) {
+		if (OrphanManager.orphans.indexOf(orphan)>=0) {
+			return;
+		}
+		OrphanManager.orphans.push(orphan);
+	}
+	static removeOrphan(orphan: DisplayObject) {
+		if (OrphanManager.orphans.indexOf(orphan)<0) {
+			return;
+		}
+		// todo: make this faster:
+		var newOrphans = [];
+		for (var i = 0; i < OrphanManager.orphans.length; i++) {
+			if (OrphanManager.orphans[i] != orphan) {
+				newOrphans.push(OrphanManager.orphans[i]);
+			}
+		}
+		OrphanManager.orphans = newOrphans;
+	}
+	static updateOrphans(events) {
+		for (var i = 0; i < OrphanManager.orphans.length; i++) {
+			(<any>OrphanManager.orphans[i]).advanceFrame(events);
+		}
+	}
+
+}
+export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter {
 	static axClass: typeof DisplayObject & AXClass;
 
 	//for AVM1:
-	public _parent:any;
-	public _depth:number;
+	public _parent: any;
+	public _depth: number;
 
 
-	protected _loaderInfo:LoaderInfo;
-	public _blockedByScript:boolean;
-    public _ctBlockedByScript:boolean;
-    //public protoTypeChanged:boolean;
-	protected _visibilityByScript:boolean;
-	
-	private _transform:Transform;
+	protected _loaderInfo: LoaderInfo;
+	public _blockedByScript: boolean;
+	public _ctBlockedByScript: boolean;
+	//public protoTypeChanged:boolean;
+	protected _visibilityByScript: boolean;
 
-	public applySymbol(){
+	private _transform: Transform;
+
+	public applySymbol() {
 
 	}
-	protected _adaptee:AwayDisplayObject;
+	protected _adaptee: AwayDisplayObject;
 	/**
 	 *
 	 *
@@ -105,31 +133,30 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	 */
 
-	constructor(adaptee:AwayDisplayObject = null)
-	{
+	constructor(adaptee: AwayDisplayObject = null) {
 		super();
 
-		this._blockedByScript=false;
-		this._ctBlockedByScript=false;
-		this._visibilityByScript=false;
-		
+		this._blockedByScript = false;
+		this._ctBlockedByScript = false;
+		this._visibilityByScript = false;
+
 		this.adaptee = adaptee || new AwayDisplayObject();
 
 		// needed, because `this.stage` must already be available when constructor of extending classes are executed
-		this._stage=this.activeStage;
+		this._stage = this.activeStage;
 
 		// no eventMapping needed for the DisplayObject-events.
 		// they can all be dispatched without listening on other objects
 		// still need to create a dummy mapping with empty message, in order to have them registered
 		// (we want unknown events to fail when they try to register in addEventListener
-		this.eventMappingExtern[Event.ENTER_FRAME]="";
-		this.eventMappingExtern[Event.FRAME_CONSTRUCTED]="";
-		this.eventMappingExtern[Event.EXIT_FRAME]="";
-		this.eventMappingExtern[Event.RENDER]="";
+		this.eventMappingExtern[Event.ENTER_FRAME] = "";
+		this.eventMappingExtern[Event.FRAME_CONSTRUCTED] = "";
+		this.eventMappingExtern[Event.EXIT_FRAME] = "";
+		this.eventMappingExtern[Event.RENDER] = "";
 		//this.eventMappingExtern[Event.REMOVED_FROM_STAGE]="";
-		this.eventMappingExtern[Event.REMOVED]="";
-		this.eventMappingExtern[Event.ADDED_TO_STAGE]="";
-		this.eventMappingExtern[Event.ADDED]="";
+		this.eventMappingExtern[Event.REMOVED] = "";
+		this.eventMappingExtern[Event.ADDED_TO_STAGE] = "";
+		this.eventMappingExtern[Event.ADDED] = "";
 
 		this._transform = new this.sec.flash.geom.Transform(this.adaptee.transform);
 	}
@@ -139,14 +166,13 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	//---------------------------stuff added to make it work:
 
 
-	protected _stage:Stage;
+	protected _stage: Stage;
 
 
-	public static _activeStage:Stage=null;
+	public static _activeStage: Stage = null;
 
-	public get activeStage():any
-	{
-		if(this.sec.flash.display.DisplayObject.axClass._activeStage==null){
+	public get activeStage(): any {
+		if (this.sec.flash.display.DisplayObject.axClass._activeStage == null) {
 			//console.log("ERROR: a Stage must have been created before any Sprite can be created!")
 		}
 		return this.sec.flash.display.DisplayObject.axClass._activeStage;
@@ -161,20 +187,18 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	//		- RENDER
 	//		- REMOVED_FROM_STAGE
 	//		- ADDED_TO_STAGE
-	
-	public dispatchEventRecursive(event:Event) {	this.dispatchEvent(event);	}
+
+	public dispatchEventRecursive(event: Event) { this.dispatchEvent(event); }
 
 
 
 	// --------------------- stuff needed because of implementing the existing IDisplayObjectAdapter
 
-	public get adaptee():AwayDisplayObject
-	{
+	public get adaptee(): AwayDisplayObject {
 		return this._adaptee;
 	}
 
-	public set adaptee(value:AwayDisplayObject)
-	{
+	public set adaptee(value: AwayDisplayObject) {
 		if (this._adaptee == value)
 			return;
 
@@ -188,61 +212,53 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 				this._adaptee.partition = new SceneGraphPartition(this._adaptee);
 			this._adaptee.adapter = this;
 		}
-		
-	}
-
-	public doInitEvents():void
-	{
 
 	}
 
-	public isBlockedByScript():boolean
-	{
+	public doInitEvents(): void {
+
+	}
+
+	public isBlockedByScript(): boolean {
 		//console.log("isBlockedByScript not implemented yet in flash/DisplayObject");
 		return this._blockedByScript;
 	}
 
-	public isVisibilityByScript():boolean
-	{
+	public isVisibilityByScript(): boolean {
 		//console.log("isVisibilityByScript not implemented yet in flash/DisplayObject");
 		return this._visibilityByScript;
 	}
-	public isColorTransformByScript():boolean
-	{
+	public isColorTransformByScript(): boolean {
 		//console.log("isVisibilityByScript not implemented yet in flash/DisplayObject");
 		return this._ctBlockedByScript;
 	}
 
-	public freeFromScript():void
-	{
+	public freeFromScript(): void {
 		//console.log("freeFromScript not implemented yet in flash/DisplayObject");
-		this._blockedByScript=false;
-		this._ctBlockedByScript=false;
-		this._visibilityByScript=false;
+		this._blockedByScript = false;
+		this._ctBlockedByScript = false;
+		this._visibilityByScript = false;
 	}
 
-	public clone():DisplayObject
-	{
-		if(!(<any>this)._symbol){
-			throw("_symbol not defined when cloning movieclip")
+	public clone(): DisplayObject {
+		if (!(<any>this)._symbol) {
+			throw ("_symbol not defined when cloning movieclip")
 		}
 		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
-		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		var clone = constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
 		clone.axInitializer();
 		this.adaptee.copyTo(clone.adaptee);
 		return clone;
 	}
 
-	public dispose():void
-	{
+	public dispose(): void {
 		throw new AbstractMethodError();
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
-	public disposeValues():void
-	{
+	public disposeValues(): void {
 		this.adaptee = null;
 	}
 
@@ -258,12 +274,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * is prepopulated with any information you entered in the Accessibility panel for
 	 * that any.
 	 */
-	public get accessibilityProperties () : any{
+	public get accessibilityProperties(): any {
 		console.log("accessibilityProperties not implemented yet in flash/DisplayObject");
 		//todo: flash.accessibility.AccessibilityProperties
 		return null;
 	}
-	public set accessibilityProperties (value:any){
+	public set accessibilityProperties(value: any) {
 		console.log("accessibilityProperties not implemented yet in flash/DisplayObject");
 	}
 
@@ -273,12 +289,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * The default value is 1. displayobjects with alpha
 	 * set to 0 are active, even though they are invisible.
 	 */
-	public get alpha () : number {
+	public get alpha(): number {
 		return this.adaptee.alpha;
 	}
-	public set alpha (value:number) {
-		this._ctBlockedByScript=true;
-		this.adaptee.alpha=value;
+	public set alpha(value: number) {
+		this._ctBlockedByScript = true;
+		this.adaptee.alpha = value;
 	}
 
 	/**
@@ -366,12 +382,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * BlendMode.SHADER without first setting the blendShader property,
 	 * the blendMode property is set to BlendMode.NORMAL. Not supported under GPU rendering.
 	 */
-	public get blendMode () : string{
+	public get blendMode(): string {
 		console.log("blendMode not implemented yet in flash/DisplayObject");
 		// todo: translate awayblendmode to as3blendmode
 		return "";
 	}
-	public set blendMode (value:string) {
+	public set blendMode(value: string) {
 		console.log("blendMode not implemented yet in flash/DisplayObject");
 		//this._adaptee.blendMode=value;
 	}
@@ -415,7 +431,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   data in the input any. See the ShaderInput.input
 	 *   property for more information.
 	 */
-	public set blendShader (value:any) {
+	public set blendShader(value: any) {
 		console.log("blendShader not implemented yet in flash/DisplayObject");
 		//todo (if ever)
 	}
@@ -452,11 +468,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * clips, cacheAsBitmap can lead to performance increases when the
 	 * movie clip is translated (when its x and y position is changed).
 	 */
-	public get cacheAsBitmap () : boolean{
+	public get cacheAsBitmap(): boolean {
 		console.log("cacheAsBitmap not implemented yet in flash/DisplayObject");
 		return false;
 	}
-	public set cacheAsBitmap (value:boolean) {
+	public set cacheAsBitmap(value: boolean) {
 		console.log("cacheAsBitmap not implemented yet in flash/DisplayObject");
 	}
 
@@ -547,11 +563,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   data in the input data. See the ShaderInput.input
 	 *   property for more information.
 	 */
-	public get filters () : any[]{
+	public get filters(): any[] {
 		//console.log("filters not implemented yet in flash/DisplayObject");
 		return [];
 	}
-	public set filters (value:any[]) {
+	public set filters(value: any[]) {
 		//console.log("filters not implemented yet in flash/DisplayObject");
 	}
 
@@ -572,26 +588,26 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * Except for TextField and Video anys, a displayobject with no content (such as an empty sprite) has a height
 	 * of 0, even if you try to set height to a different value.
 	 */
-	public get height () : number{
+	public get height(): number {
 
-		if(!this._adaptee.partition){
+		if (!this._adaptee.partition) {
 			console.warn("Trying to get Display.height on orphan child!");
 			return 100;
 		}
-		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
-		return (box == null)? 0 : box.height;
+		var box: Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
+		return (box == null) ? 0 : box.height;
 	}
-	public set height (value:number) {
-		
+	public set height(value: number) {
+
 		if (isNaN(value))
 			return;
-		
-		if(!this._adaptee.partition){
+
+		if (!this._adaptee.partition) {
 			console.warn("Trying to set Display.height on orphan child!");
 			return;
 		}
 		PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).height = value;
-	
+
 	}
 
 	/**
@@ -604,18 +620,18 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   A large SWF file can monitor its download by calling
 	 * this.root.loaderInfo.addEventListener(Event.COMPLETE, func).
 	 */
-	public get loaderInfo () : LoaderInfo{
+	public get loaderInfo(): LoaderInfo {
 		//console.log("loaderInfo not implemented yet in flash/DisplayObject");
 		//this._adaptee.loaderInfo
-		if(!this._loaderInfo){
-			this._loaderInfo=new this.sec.flash.display.LoaderInfo()
+		if (!this._loaderInfo) {
+			this._loaderInfo = new this.sec.flash.display.LoaderInfo()
 		}
 		return this._loaderInfo;
 	}
-	public set loaderInfo (value:LoaderInfo){
+	public set loaderInfo(value: LoaderInfo) {
 		//console.log("loaderInfo not implemented yet in flash/DisplayObject");
 		//this._adaptee.loaderInfo
-		this._loaderInfo=value;
+		this._loaderInfo = value;
 	}
 
 	/**
@@ -637,32 +653,32 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * When the mask is assigned to a second displayobject, it is removed as the mask of the first
 	 * any, and that any's mask property becomes null.
 	 */
-	public get mask () : DisplayObject{
-		if(this.adaptee.masks==null){
+	public get mask(): DisplayObject {
+		if (this.adaptee.masks == null) {
 			return null;
 		}
-		if(this.adaptee.masks.length==0){
+		if (this.adaptee.masks.length == 0) {
 			return null;
 		}
 		return (<DisplayObject>this.adaptee.masks[0].adapter);
 	}
-	public set mask (value:DisplayObject) {
-		if(value==null){
-			if(this.adaptee.masks!=null){
-				this.adaptee.masks[0].maskMode=false;
+	public set mask(value: DisplayObject) {
+		if (value == null) {
+			if (this.adaptee.masks != null) {
+				this.adaptee.masks[0].maskMode = false;
 			}
-			this.adaptee.masks=null;
+			this.adaptee.masks = null;
 			return;
 		}
-		value.adaptee.maskMode=true;
-		this.adaptee.masks=[value.adaptee];
+		value.adaptee.maskMode = true;
+		this.adaptee.masks = [value.adaptee];
 	}
 
-	public get metaData () : any{
+	public get metaData(): any {
 		console.log("mask not implemented yet in flash/DisplayObject");
 		return null;
 	}
-	public set metaData (data:any) {
+	public set metaData(data: any) {
 		console.log("mask not implemented yet in flash/DisplayObject");
 	}
 
@@ -672,7 +688,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   Note: For a DisplayObject that has been rotated, the returned x coordinate will reflect the
 	 * non-rotated any.
 	 */
-	public get mouseX () : number{
+	public get mouseX(): number {
 		//console.log("mouseX not implemented yet in flash/DisplayObject");
 		//todo: theres probably a faster option than this
 		return this.adaptee.transform.globalToLocal(new AwayPoint(this.stage.mouseX, 0)).x;
@@ -684,7 +700,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   Note: For a DisplayObject that has been rotated, the returned y coordinate will reflect the
 	 * non-rotated any.
 	 */
-	public get mouseY () : number{
+	public get mouseY(): number {
 		//todo: theres probably a faster option than this
 		return this.adaptee.transform.globalToLocal(new AwayPoint(0, this.stage.mouseY)).y;
 	}
@@ -699,11 +715,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @console.logs	IllegalOperationError If you are attempting to set this property on an any that was
 	 *   placed on the timeline in the Flash authoring tool.
 	 */
-	public get name () : string{
+	public get name(): string {
 		return this.adaptee.name;
 	}
-	public set name (value:string) {
-		this.adaptee.name=value;
+	public set name(value: string) {
+		this.adaptee.name = value;
 	}
 	/**
 	 * Specifies whether the displayobject is opaque with a certain background color.
@@ -719,11 +735,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * improve rendering performance.The opaque background region is not matched when calling the hitTestPoint()
 	 * method with the shapeFlag parameter set to true.The opaque background region does not respond to mouse events.
 	 */
-	public get opaqueBackground () : any{
+	public get opaqueBackground(): any {
 		console.log("opaqueBackground not implemented yet in flash/DisplayObject");
 		return null;
 	}
-	public set opaqueBackground (value:any) {
+	public set opaqueBackground(value: any) {
 		console.log("opaqueBackground not implemented yet in flash/DisplayObject");
 	}
 
@@ -737,8 +753,8 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   to which you do not have access. You can avoid this situation by having
 	 *   the parent movie call the Security.allowDomain() method.
 	 */
-	public get parent () : DisplayObjectContainer{
-		if(this.adaptee.parent==null || this.adaptee.parent.adapter==null || this.adaptee.parent.adapter==this.adaptee.parent){
+	public get parent(): DisplayObjectContainer {
+		if (this.adaptee.parent == null || this.adaptee.parent.adapter == null || this.adaptee.parent.adapter == this.adaptee.parent) {
 			return null;
 		}
 		return (<DisplayObjectContainer>this.adaptee.parent.adapter);
@@ -761,7 +777,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * does not have its root property set until it is added as a child of a displayobject for which the
 	 * root property is set.
 	 */
-	public get root () : DisplayObject{
+	public get root(): DisplayObject {
 		//console.log("root not implemented yet in flash/DisplayObject");
 		return this.stage.getChildAt(0);
 	}
@@ -772,11 +788,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * subtracted from 360 to obtain a value within the range. For example, the statement my_video.rotation = 450 is the
 	 * same as  my_video.rotation = 90.
 	 */
-	public get rotation () : number{
+	public get rotation(): number {
 		return this.adaptee.rotationZ;
 	}
-	public set rotation (value:number) {
-		this.adaptee.rotationZ=isNaN(value)? 0 : isFinite(value)? value : -8;
+	public set rotation(value: number) {
+		this.adaptee.rotationZ = isNaN(value) ? 0 : isFinite(value) ? value : -8;
 	}
 
 	/**
@@ -784,12 +800,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * clockwise rotation; values from 0 to -180 represent counterclockwise rotation. Values outside this range are added to or
 	 * subtracted from 360 to obtain a value within the range.
 	 */
-	public get rotationX () : number{
+	public get rotationX(): number {
 		return this.adaptee.rotationX;
 
 	}
-	public set rotationX (value:number) {
-		this.adaptee.rotationX=value;
+	public set rotationX(value: number) {
+		this.adaptee.rotationX = value;
 	}
 
 	/**
@@ -801,12 +817,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @playerversion	AIR 1.5
 	 * @playerversion	Lite 4
 	 */
-	public get rotationY () : number{
+	public get rotationY(): number {
 		return this.adaptee.rotationY;
 
 	}
-	public set rotationY (value:number) {
-		this.adaptee.rotationY=value;
+	public set rotationY(value: number) {
+		this.adaptee.rotationY = value;
 
 	}
 
@@ -815,12 +831,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * clockwise rotation; values from 0 to -180 represent counterclockwise rotation. Values outside this range are added to or
 	 * subtracted from 360 to obtain a value within the range.
 	 */
-	public get rotationZ () : number{
+	public get rotationZ(): number {
 		return this.adaptee.rotationZ;
 
 	}
-	public set rotationZ (value:number) {
-		this.adaptee.rotationZ=value;
+	public set rotationZ(value: number) {
+		this.adaptee.rotationZ = value;
 
 	}
 
@@ -878,12 +894,10 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   </listing>
 	 * @console.logs	ArgumentError If you pass an invalid argument to the method.
 	 */
-	public get scale9Grid () : Rectangle
-	{
+	public get scale9Grid(): Rectangle {
 		return new this.sec.flash.geom.Rectangle(this.adaptee.scale9Grid);
 	}
-	public set scale9Grid (innerRectangle:Rectangle)
-	{
+	public set scale9Grid(innerRectangle: Rectangle) {
 		this.adaptee.scale9Grid = innerRectangle.adaptee;
 	}
 
@@ -894,11 +908,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   Scaling the local coordinate system changes the x and y property values, which are defined in
 	 * whole pixels.
 	 */
-	public get scaleX () : number{
+	public get scaleX(): number {
 		return this.adaptee.scaleX;
 	}
-	public set scaleX (value:number) {
-		this.adaptee.scaleX=value;
+	public set scaleX(value: number) {
+		this.adaptee.scaleX = value;
 	}
 
 	/**
@@ -908,11 +922,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   Scaling the local coordinate system changes the x and y property values, which are defined in
 	 * whole pixels.
 	 */
-	public get scaleY () : number{
+	public get scaleY(): number {
 		return this.adaptee.scaleY;
 	}
-	public set scaleY (value:number) {
-		this.adaptee.scaleY=value;
+	public set scaleY(value: number) {
+		this.adaptee.scaleY = value;
 	}
 
 	/**
@@ -922,11 +936,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   Scaling the local coordinate system changes the x, y and z property values, which are defined in
 	 * whole pixels.
 	 */
-	public get scaleZ () : number{
+	public get scaleZ(): number {
 		return this.adaptee.scaleZ;
 	}
-	public set scaleZ (value:number) {
-		this.adaptee.scaleZ=value;
+	public set scaleZ(value: number) {
+		this.adaptee.scaleZ = value;
 	}
 
 	/**
@@ -944,13 +958,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * the y property of the scrollRect Rectangle any. If the displayobject
 	 * is rotated 90° and you scroll it left and right, the displayobject actually scrolls up and down.
 	 */
-	public get scrollRect () : Rectangle
-	{
+	public get scrollRect(): Rectangle {
 		return new this.sec.flash.geom.Rectangle(this.adaptee.scrollRect);
 
 	}
-	public set scrollRect (value:Rectangle)
-	{
+	public set scrollRect(value: Rectangle) {
 		this.adaptee.scrollRect = value.adaptee;
 	}
 
@@ -963,12 +975,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   If a displayobject is not added to the display list, its stage property is set to
 	 * null.
 	 */
-	public get stage () : Stage{
+	public get stage(): Stage {
 		return this._stage;
 
 	}
-	public set stage (value: Stage) {
-		this._stage=value;
+	public set stage(value: Stage) {
+		this._stage = value;
 
 	}
 
@@ -995,13 +1007,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * myNewDisplayObj:myNewDisplayObj.transform = myOldDisplayObj.transform;The resulting displayobject, myNewDisplayObj, now has the same values for its
 	 * matrix, color transform, and pixel bounds as the old displayobject, myOldDisplayObj.Note that AIR for TV devices use hardware acceleration, if it is available, for color transforms.
 	 */
-	public get transform () : Transform
-	{
-		this._ctBlockedByScript=true;
+	public get transform(): Transform {
+		this._ctBlockedByScript = true;
 		return this._transform = new this.sec.flash.geom.Transform(this.adaptee.transform);
 
 	}
-	public set transform (value:Transform) {
+	public set transform(value: Transform) {
 		console.log("DisplayObject:setter for transform not yet implemented");
 		//this._adaptee.transform=value;
 	}
@@ -1011,13 +1022,13 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * are disabled. For example, if visible=false for an Interactiveany instance,
 	 * it cannot be clicked.
 	 */
-	public get visible () : boolean{
+	public get visible(): boolean {
 		return this.adaptee.visible;
 
 	}
-	public set visible (value:boolean) {
-		this._visibilityByScript=true;
-		this.adaptee.visible=value;
+	public set visible(value: boolean) {
+		this._visibilityByScript = true;
+		this.adaptee.visible = value;
 
 	}
 
@@ -1038,24 +1049,24 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * Except for TextField and Video anys, a displayobject with no content (such as an empty sprite) has a width
 	 * of 0, even if you try to set width to a different value.
 	 */
-	public get width () : number{
-		
+	public get width(): number {
+
 
 		//todo2019
-		if(!this.adaptee.partition){
+		if (!this.adaptee.partition) {
 			console.warn("Trying to get Display.width on orphan child!");
 			return 100;
 
 		}
 
-		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
-		
-		return (box == null)? 0 : box.width;
+		var box: Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
+
+		return (box == null) ? 0 : box.width;
 
 	}
-	public set width (value:number) {
+	public set width(value: number) {
 
-		if(!this.adaptee.partition){
+		if (!this.adaptee.partition) {
 			console.warn("Trying to set Display.width on orphan child!");
 			return;
 
@@ -1064,9 +1075,9 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		//todo2019
 		if (isNaN(value))
 			return;
-		
+
 		PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).width = value;
-	
+
 
 	}
 
@@ -1078,13 +1089,13 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * children inherit a coordinate system that is rotated 90° counterclockwise.
 	 * The any's coordinates refer to the registration point position.
 	 */
-	public get x () : number{
+	public get x(): number {
 		return this.adaptee.x;
 
 	}
-	public set x (value:number) {
-		this._blockedByScript=true;
-		this.adaptee.x=value;
+	public set x(value: number) {
+		this._blockedByScript = true;
+		this.adaptee.x = value;
 
 	}
 
@@ -1096,12 +1107,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * children inherit a coordinate system that is rotated 90° counterclockwise.
 	 * The any's coordinates refer to the registration point position.
 	 */
-	public get y () : number{
+	public get y(): number {
 		return this.adaptee.y;
 	}
-	public set y (value:number) {
-		this._blockedByScript=true;
-		this.adaptee.y=value;
+	public set y(value: number) {
+		this._blockedByScript = true;
+		this.adaptee.y = value;
 	}
 
 	/**
@@ -1117,12 +1128,12 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * is not drawn at pixel location (100,100). The child is drawn wherever the 3D projection
 	 * calculation puts it. The calculation is: (x~~cameraFocalLength/cameraRelativeZPosition, y~~cameraFocalLength/cameraRelativeZPosition)
 	 */
-	public get z () : number{
+	public get z(): number {
 		return this.adaptee.z;
 	}
-	public set z (value:number) {
-		this._blockedByScript=true;
-		this.adaptee.z=value;
+	public set z(value: number) {
+		this._blockedByScript = true;
+		this.adaptee.z = value;
 	}
 
 	/**
@@ -1156,11 +1167,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	The rectangle that defines the area of the displayobject relative to
 	 *   the targetCoordinateSpace any's coordinate system.
 	 */
-	public getBounds (targetCoordinateSpace:DisplayObject) : Rectangle{
+	public getBounds(targetCoordinateSpace: DisplayObject): Rectangle {
 		//console.log("DisplayObject:getBounds not yet implemented");
 
-		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
-		return new this.sec.flash.geom.Rectangle(box.x-this.x, box.y-this.y, box.width, box.height);
+		var box: Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
+		return new this.sec.flash.geom.Rectangle(box.x - this.x, box.y - this.y, box.width, box.height);
 
 	}
 
@@ -1177,13 +1188,13 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	The rectangle that defines the area of the displayobject relative to
 	 *   the targetCoordinateSpace any's coordinate system.
 	 */
-	public getRect (targetCoordinateSpace:DisplayObject) : Rectangle{
-		var box:Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
-		if(!box){
+	public getRect(targetCoordinateSpace: DisplayObject): Rectangle {
+		var box: Box = PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).getBoxBounds(this.adaptee);
+		if (!box) {
 			return new this.sec.flash.geom.Rectangle();
 		}
 		//console.log("DisplayObject:getRect not yet implemented");FromBounds
-		return new this.sec.flash.geom.Rectangle(box.x-this.x, box.y-this.y, box.width, box.height);
+		return new this.sec.flash.geom.Rectangle(box.x - this.x, box.y - this.y, box.width, box.height);
 
 	}
 
@@ -1202,7 +1213,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   specifies the x and y coordinates as properties.
 	 * @return	A Point any with coordinates relative to the displayobject.
 	 */
-	public globalToLocal (point:Point) : Point{
+	public globalToLocal(point: Point): Point {
 		return new this.sec.flash.geom.Point(this.adaptee.transform.globalToLocal(point.adaptee));
 
 	}
@@ -1224,7 +1235,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	A Vector3D any with coordinates relative to the three-dimensional
 	 *   displayobject.
 	 */
-	public globalToLocal3D (point:Point) : Vector3D{
+	public globalToLocal3D(point: Point): Vector3D {
 		console.log("DisplayObject:globalToLocal3D not yet implemented");
 		return new this.sec.flash.geom.Vector3D(); //todo: works with vector3D-input instead of pouibnt: this.adaptee.globalToLocal3D();
 
@@ -1236,8 +1247,8 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @param	obj	The displayobject to test against.
 	 * @return	true if the bounding boxes of the displayobjects intersect; false if not.
 	 */
-	public hitTestObject (obj:DisplayObject) : boolean{
-		
+	public hitTestObject(obj: DisplayObject): boolean {
+
 		return PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).hitTestObject(PickGroup.getInstance(this._stage.view).getBoundsPicker(obj.adaptee.partition));
 
 
@@ -1256,12 +1267,11 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	true if the displayobject overlaps or intersects with the specified point;
 	 *   false otherwise.
 	 */
-	public hitTestPoint (x:number, y:number, shapeFlag:boolean=false) : boolean{
+	public hitTestPoint(x: number, y: number, shapeFlag: boolean = false): boolean {
 		return PickGroup.getInstance(this._stage.view).getBoundsPicker(this.adaptee.partition).hitTestPoint(x, y, shapeFlag);
 	}
 
-	protected _getObjectsUnderPointInternal(point:Point, children:DisplayObject[])
-	{
+	protected _getObjectsUnderPointInternal(point: Point, children: DisplayObject[]) {
 		//nothing to do here
 	}
 
@@ -1283,7 +1293,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 * @return	A two-dimensional point representing a three-dimensional point
 	 *   in two-dimensional space.
 	 */
-	public local3DToGlobal (point3d:Vector3D) : Point{
+	public local3DToGlobal(point3d: Vector3D): Point {
 		console.log("DisplayObject:local3DToGlobal not yet implemented");
 		return new this.sec.flash.geom.Point();//this._adaptee.getBounds();
 
@@ -1305,7 +1315,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	 *   x and y coordinates as properties.
 	 * @return	A Point any with coordinates relative to the Stage.
 	 */
-	public localToGlobal (point:Point) : Point{
+	public localToGlobal(point: Point): Point {
 		return new this.sec.flash.geom.Point(this.adaptee.transform.localToGlobal(point.adaptee));
 	}
 }
