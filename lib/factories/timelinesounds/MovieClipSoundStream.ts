@@ -339,6 +339,7 @@ export class MovieClipSoundStream {
   private finalized: boolean;
   public isPlaying: boolean;
   private element;
+  private isMP3: boolean;
   private soundStreamAdapter: ISoundStreamAdapter;
 
   private decode: (block: Uint8Array) => DecodedSound;
@@ -354,8 +355,8 @@ export class MovieClipSoundStream {
     this.seekIndex = [];
     this.position = 0;
     
-    var isMP3 = streamInfo.format === 'mp3';
-    this.soundStreamAdapter = !isMP3 ? new WebAudioAdapter(this.data) : new WebAudioMP3Adapter(this.data);
+    this.isMP3 = streamInfo.format === 'mp3';
+    this.soundStreamAdapter = !this.isMP3 ? new WebAudioAdapter(this.data) : new WebAudioMP3Adapter(this.data);
     /*
     try {
       // todo: do this check only once
@@ -417,9 +418,12 @@ export class MovieClipSoundStream {
     var soundStreamData = this.data;
     var time = this.seekIndex[frameNum]  / soundStreamData.channels / soundStreamData.sampleRate;
     var elementTime = this.soundStreamAdapter.currentTime;
+    if(this.isMP3){
+      time*=soundStreamData.channels;
+    }
+    //console.log("start sound at: time", time, "elementTime", elementTime, this.soundStreamAdapter.isPlaying);
     if(!this.soundStreamAdapter.isPlaying || Math.abs(time-elementTime)>PLAYBACK_ADJUSTMENT){
-      //console.log("start sound at: time", time, "elementTime", elementTime, this.soundStreamAdapter.isPlaying);
-      this.soundStreamAdapter.playFrom(time);
+       this.soundStreamAdapter.playFrom(time);
 
     }
 
