@@ -149,12 +149,12 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	public get buttonMode () : boolean{
 		//todo
-		console.log("buttonMode not implemented yet in flash/Sprite");
+		//console.log("buttonMode not implemented yet in flash/Sprite");
 		return false;
 	}
 	public set buttonMode (value:boolean) {
 		//todo
-		console.log("buttonMode not implemented yet in flash/Sprite");
+		//console.log("buttonMode not implemented yet in flash/Sprite");
 	}
 
 	/**
@@ -232,12 +232,13 @@ export class  Sprite extends DisplayObjectContainer
 	 */
 	public get useHandCursor () : boolean{
 		//todo
-		console.log("useHandCursor not implemented yet in flash/Sprite");
-		return false;
+		//console.log("useHandCursor not implemented yet in flash/Sprite");
+		return (<AwayMovieClip>this.adaptee)._useHandCursor;
 	}
 	public set useHandCursor (value:boolean){
 		//todo
-		console.log("useHandCursor not implemented yet in flash/Sprite");
+		(<AwayMovieClip>this.adaptee)._useHandCursor=value;
+		//console.log("useHandCursor not implemented yet in flash/Sprite");
 	}
 
 	/**
