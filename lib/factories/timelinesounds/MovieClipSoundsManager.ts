@@ -1,12 +1,36 @@
 
 import { MovieClipSoundStream } from "./MovieClipSoundStream";
 import { MovieClip } from "@awayjs/scene";
+import { WaveAudio } from '@awayjs/core';
 
 export class MovieClipSoundsManager {
     private lastFrameNum: number;
     private soundStreamHead: any;
     private _soundStreams: MovieClipSoundStream[];
+    private static activeSounds={};
 
+    public static addActiveSound(sound:WaveAudio){
+        if(!MovieClipSoundsManager.activeSounds[sound.id]){
+            MovieClipSoundsManager.activeSounds[sound.id]={}
+        }
+        MovieClipSoundsManager.activeSounds[sound.id].active=true;
+        MovieClipSoundsManager.activeSounds[sound.id].sound=sound;
+    }
+    public static enterFrame(){
+        for(var key in MovieClipSoundsManager.activeSounds){
+            var sound= MovieClipSoundsManager.activeSounds[key];
+            sound.active=false;
+        }
+    }
+    public static exitFrame(){
+        for(var key in MovieClipSoundsManager.activeSounds){
+            var sound= MovieClipSoundsManager.activeSounds[key];
+            if(!sound.active){
+                sound.sound.stop();
+            }
+            delete MovieClipSoundsManager.activeSounds[key];
+        }
+    }
     constructor() {
         this.lastFrameNum = -2;
         this._soundStreams = [];
@@ -32,14 +56,10 @@ export class MovieClipSoundsManager {
     }
 
 
-    syncSounds(frameNum: number, isPlaying:boolean) {
+    syncSounds(frameNum: number, isPlaying:boolean, parent:any) {
 
         for(var i=0; i<this._soundStreams.length; i++){   
-            if(isPlaying)         
-                this._soundStreams[i].playFrame(frameNum);     
-            if(!this._soundStreams[i].isPlaying)  
-                this._soundStreams[i].stop();
-            this._soundStreams[i].isPlaying=false;
+            this._soundStreams[i].playFrame(frameNum);     
         }
     }
 }

@@ -17,6 +17,8 @@ export class PlayerAVM1 {
 	private _stage: AVMAwayStage;
 	private _avm1SceneGraphFactory: AVM1SceneGraphFactory;
 	private _parser: SWFParser;
+	private _skipFrames: number=0;
+	private showAdOnFrame: number=-1;
 
 	constructor() {
 		
@@ -39,7 +41,9 @@ export class PlayerAVM1 {
 	public get avm1SceneGraphFactory():any {
 		return this._avm1SceneGraphFactory;
 	}
-	public playSWF(buffer, url) {
+	public playSWF(buffer, url, skipFramesOnScene=0, showAdOnFrame=-1) {
+		this._skipFrames=skipFramesOnScene;
+		this._stage.showPokiAddOnFrame=showAdOnFrame;
 		AudioManager.setVolume(1);
 		(<AVM1ContextImpl>this._avm1SceneGraphFactory.avm1Context).executionProhibited=false;
 		if(!this._parser){
@@ -63,6 +67,8 @@ export class PlayerAVM1 {
 					this._stage.getLayer(0).addChild(<MovieClip>asset);
 					
 				(<AVM1MovieClip>(<MovieClip>asset).adapter).doInitEvents();
+				if(this._skipFrames>0)
+					(<MovieClip>asset).currentFrameIndex=7;
 			}
 		}				
 	}

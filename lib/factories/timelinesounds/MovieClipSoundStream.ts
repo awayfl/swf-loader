@@ -2,6 +2,7 @@ import { ISecurityDomain } from "../avm1/ISecurityDomain";
 import { SoundStream, packageWave } from "../../parsers/utils/parser/sound";
 import { WaveAudio } from '@awayjs/core';
 import { WaveAudioData } from '@awayjs/core/dist/lib/audio/WaveAudio';
+import { MovieClipSoundsManager } from './MovieClipSoundsManager';
 
 export interface DecodedSound {
   streamId: number;
@@ -208,6 +209,9 @@ class WebAudioAdapter implements ISoundStreamAdapter {
   get currentTime(): number {
     return this._sound.currentTime;
   }
+  get sound():WaveAudio{
+    return this._sound;
+  }
 
   playFrom(time: number) {
     var startPlay=true;
@@ -340,7 +344,7 @@ export class MovieClipSoundStream {
   public isPlaying: boolean;
   private element;
   private isMP3: boolean;
-  private soundStreamAdapter: ISoundStreamAdapter;
+  private soundStreamAdapter: WebAudioAdapter;
 
   private decode: (block: Uint8Array) => DecodedSound;
 
@@ -421,6 +425,7 @@ export class MovieClipSoundStream {
     if(this.isMP3){
       time*=soundStreamData.channels;
     }
+    MovieClipSoundsManager.addActiveSound(this.soundStreamAdapter.sound);
     //console.log("start sound at: time", time, "elementTime", elementTime, this.soundStreamAdapter.isPlaying);
     if(!this.soundStreamAdapter.isPlaying || Math.abs(time-elementTime)>PLAYBACK_ADJUSTMENT){
        this.soundStreamAdapter.playFrom(time);

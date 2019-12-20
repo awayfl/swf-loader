@@ -1,5 +1,5 @@
 
-import {BuildMode, IAsset, ColorUtils, Rectangle} from "@awayjs/core";
+import {BuildMode, IAsset, ColorUtils, Rectangle, AudioManager} from "@awayjs/core";
 
 import {EventBase, RequestAnimationFrame, CoordinateSystem, PerspectiveProjection} from "@awayjs/core";
 import {Graphics, GradientFillStyle, TextureAtlas, Shape} from "@awayjs/graphics";
@@ -15,6 +15,7 @@ import { AVM1TextField } from '../avm1/lib/AVM1TextField';
 import { StageScaleMode } from '../as3webFlash/display/StageScaleMode';
 import { StageAlign } from '../as3webFlash/display/StageAlign';
 import { AVM1EventProps } from './lib/AVM1EventHandler';
+import { MovieClipSoundsManager } from '../timelinesounds/MovieClipSoundsManager';
 
 
 export interface FrameScript {
@@ -46,6 +47,7 @@ export class AVMAwayStage extends Sprite{
 	protected _fpsTextField:HTMLDivElement;
 
 	private _layers:Sprite[];
+	public showPokiAddOnFrame:number;
 
 	private enterEvent:any=new EventBase("enterFrame");
 	private exitEvent:any=new EventBase("exitFrame");
@@ -524,9 +526,35 @@ export class AVMAwayStage extends Sprite{
                 enterFramesChilds.push(child);
         }
 	}
+	private _isOnCommercialBreak:boolean=false;
+	private _lastFrameIdxOfScene:number=-1;
+	private  endCommercialBreak(){
+		this._isOnCommercialBreak=false;
+		var i:number;
+		var c:number;
+		var numChilds:number;
+		var child:DisplayObject;
+		var myLayer:DisplayObjectContainer;
+		var len:number=this._layers.length;
+		for(i=0;i<len;i++) {
+			myLayer=this._layers[i];
+			numChilds = myLayer.numChildren;
+			for (c = 0; c < numChilds; ++c) {
+				child = myLayer.getChildAt(c);
+				if (child.isAsset(MovieClip)){
+					if((<MovieClip> child).isAVMScene){	
+						(<MovieClip> child).currentFrameIndex=0;
+						(<MovieClip> child).currentFrameIndex=this.showPokiAddOnFrame;		
+					}
+				}
+			}
+		}
+		
+
+	}
+	
 	protected onEnterFrame(dt: number)
 	{
-
 		// make sure all things are processed already (mouseEvents)
 		FrameScriptManager.execute_queue();
 
@@ -547,7 +575,20 @@ export class AVMAwayStage extends Sprite{
 				// each child in here should be a swf-scene
 				if (child.isAsset(MovieClip)){
 					(<MovieClip> child).advanceFrame();
-
+					/*if((<MovieClip> child).isAVMScene){						
+						if(this.showPokiAddOnFrame>=0 && window["PokiSDK"] && 
+							(<MovieClip> child).currentFrameIndex==this.showPokiAddOnFrame &&
+							this._lastFrameIdxOfScene!=(<MovieClip> child).currentFrameIndex){
+							this._isOnCommercialBreak=true;
+							this._lastFrameIdxOfScene=(<MovieClip> child).currentFrameIndex;
+							AudioManager.stopAllSounds();
+							setTimeout(()=>this.endCommercialBreak(), 15000);
+							//window["PokiSDK"].commercialBreak().then(() => this.endCommercialBreak());
+							return;
+						}
+						this._lastFrameIdxOfScene=(<MovieClip> child).currentFrameIndex;
+					}
+*/
 				}
 			}
 		}
@@ -597,48 +638,55 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
+		MovieClipSoundsManager.enterFrame();
 		if(!this._stage || !this._scene || !this._scene.renderer){
 			this._timer.stop();
 			return;
 		} 
-		var frameMarker:number = 1000/this._frameRate;
-		this._stageTime += Math.min(dt, frameMarker);
+		if(!this._isOnCommercialBreak){
 
-		if (this._stageTime >= frameMarker) {
-			this._stage.clear();
-			this.onEnterFrame(this._stageTime);
-			this._stageTime -= frameMarker;
+			var frameMarker:number = 1000/this._frameRate;
+			this._stageTime += Math.min(dt, frameMarker);
 
-			//this.dispatchEventRecursive(this._eventOnEnter);
-			//this.update(this._events);
-			//this.dispatchEventRecursive(this._eventFrameConstructed);
-			// todo: move Framescriptexecution and rest from frame-update logic from Movieclip.update to here
-			//this.dispatchEventRecursive(this._eventExitFrame);
-			//this.dispatchEventRecursive(this._eventRender);
+			if (this._stageTime >= frameMarker) {
+				this._stage.clear();
+				this.onEnterFrame(this._stageTime);
+				this._stageTime -= frameMarker;
+				if(this._isOnCommercialBreak)
+					return;
 
-			if(!this._stage || !this._scene || !this._scene.renderer){
-				this._timer.stop();
-				return;
-			} 
+				//this.dispatchEventRecursive(this._eventOnEnter);
+				//this.update(this._events);
+				//this.dispatchEventRecursive(this._eventFrameConstructed);
+				// todo: move Framescriptexecution and rest from frame-update logic from Movieclip.update to here
+				//this.dispatchEventRecursive(this._eventExitFrame);
+				//this.dispatchEventRecursive(this._eventRender);
 
-			this._currentFps++;
-			this._scene.render();
+				if(!this._stage || !this._scene || !this._scene.renderer){
+					this._timer.stop();
+					return;
+				} 
+
+				this._currentFps++;
+				this._scene.render();
 
 
 
-/*
-			this._debugtimer++;
+	/*
+				this._debugtimer++;
 
-			if(this._debugtimer%150==0){
+				if(this._debugtimer%150==0){
 
-				var displayGraph={};
-				this.debugDisplayGraph(displayGraph);
-				console.log("SceneGraph frame :", this._debugtimer, displayGraph);
+					var displayGraph={};
+					this.debugDisplayGraph(displayGraph);
+					console.log("SceneGraph frame :", this._debugtimer, displayGraph);
 
+				}
+				*/
 			}
-			*/
-			
+				
 		}
+		MovieClipSoundsManager.exitFrame();
 	}
 
 	public get rendererStage():Stage
