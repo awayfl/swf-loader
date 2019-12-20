@@ -10,6 +10,7 @@ export class MovieClipSoundsManager {
     private static activeSounds={};
 
     public static addActiveSound(sound:WaveAudio){
+        //console.log("start sound with id", sound.id)
         if(!MovieClipSoundsManager.activeSounds[sound.id]){
             MovieClipSoundsManager.activeSounds[sound.id]={}
         }
@@ -18,6 +19,7 @@ export class MovieClipSoundsManager {
     }
     public static enterFrame(){
         for(var key in MovieClipSoundsManager.activeSounds){
+            //console.log("set sound to inactive", key)
             var sound= MovieClipSoundsManager.activeSounds[key];
             sound.active=false;
         }
@@ -26,9 +28,10 @@ export class MovieClipSoundsManager {
         for(var key in MovieClipSoundsManager.activeSounds){
             var sound= MovieClipSoundsManager.activeSounds[key];
             if(!sound.active){
+                //console.log("stop inactive sound", key)
                 sound.sound.stop();
+                delete MovieClipSoundsManager.activeSounds[key];
             }
-            delete MovieClipSoundsManager.activeSounds[key];
         }
     }
     constructor() {

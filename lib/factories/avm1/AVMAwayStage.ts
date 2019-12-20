@@ -638,7 +638,7 @@ export class AVMAwayStage extends Sprite{
 	 */
 	protected internalOnEnterFrame(dt: number)
 	{
-		MovieClipSoundsManager.enterFrame();
+		//console.log("START NEW FRAME \n")
 		if(!this._stage || !this._scene || !this._scene.renderer){
 			this._timer.stop();
 			return;
@@ -649,6 +649,7 @@ export class AVMAwayStage extends Sprite{
 			this._stageTime += Math.min(dt, frameMarker);
 
 			if (this._stageTime >= frameMarker) {
+				MovieClipSoundsManager.enterFrame();
 				this._stage.clear();
 				this.onEnterFrame(this._stageTime);
 				this._stageTime -= frameMarker;
@@ -669,6 +670,7 @@ export class AVMAwayStage extends Sprite{
 
 				this._currentFps++;
 				this._scene.render();
+				MovieClipSoundsManager.exitFrame();
 
 
 
@@ -686,7 +688,6 @@ export class AVMAwayStage extends Sprite{
 			}
 				
 		}
-		MovieClipSoundsManager.exitFrame();
 	}
 
 	public get rendererStage():Stage
