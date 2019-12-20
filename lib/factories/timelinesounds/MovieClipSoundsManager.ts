@@ -59,7 +59,8 @@ export class MovieClipSoundsManager {
     syncSounds(frameNum: number, isPlaying:boolean, parent:any) {
 
         for(var i=0; i<this._soundStreams.length; i++){   
-            this._soundStreams[i].playFrame(frameNum);     
+            if(isPlaying && parent)
+                this._soundStreams[i].playFrame(frameNum);     
         }
     }
 }

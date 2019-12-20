@@ -15,13 +15,7 @@
  */
 
 import {SoundTag} from "../SWFTags"
-import { WaveAudio } from '@awayjs/core';
-import { WaveAudioData } from '@awayjs/core/dist/lib/audio/WaveAudio';
-declare var require;
-var mp3Parser = require("mp3-parser");
-const decode = require('audio-decode');
-//const buffer = require('audio-lena/mp3');
-//import {mp3Parser} from "mp3-parser"
+
 
 var SOUND_SIZE_8_BIT  = 0;
 var SOUND_SIZE_16_BIT = 1;
