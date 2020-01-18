@@ -581,7 +581,7 @@ export class Stage extends DisplayObjectContainer{
 	public render()
 	{		
 		this._currentFps++;
-		this._rendererStage.clear();
+		//this._rendererStage.clear();
 		this._scene.render();
 	}
 
