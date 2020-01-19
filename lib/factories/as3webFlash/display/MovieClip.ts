@@ -105,8 +105,10 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		}
 		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
 		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		//console.log("clone", (<any>this)._symbol, (<any>this)._symbol.symbolClass);
 		var adaptee=new AwayMovieClip((<AwayMovieClip>this.adaptee).timeline);
 		this.adaptee.copyTo(adaptee);
+
 		
 		if(Timeline.currentInstanceName){
 			adaptee.name=Timeline.currentInstanceName;
@@ -129,11 +131,22 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		
 		AwayMovieClip.mcForConstructor=adaptee;
 		clone.axInitializer();
+
+		// if this is a custom class (not a plain MC or Sprite)
+		// make sure that the clone will not be reused on the timeline.
+		// it must reclone for every new instance thats added to scene, so that the as3 constructor (axInitializer) will run again...
+		// (if cloneForEveryInstance is true, the awayjs-mc will not cache the instance on the potentialinstance-list)
+		if((<any>this)._symbol.className){
+			clone.adaptee.cloneForEveryInstance=true;
+		}
 		if(clone.adaptee.timeline){
 			clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
 			
-			// hack to stick to frame 1 for BadIceCreamFont compiledClip
+			// 	hack to BadIceCreamFont compiledClip:
+			//	the compiledClip "BadIcecreamFont" seem to behave different to other classes
+			//	it seem to always stick to frame 0, 
 			if((<any>this)._symbol.className && (<any>this)._symbol.className=="BadIcecreamFont"){
+				clone.adaptee.cloneForEveryInstance=false; // for this special case, we do not want to reclone it on reset
 				clone.adaptee.noTimelineUpdate=true;
 				clone.adaptee.timeline.frame_command_indices=[clone.adaptee.timeline.frame_command_indices[0]];
 				clone.adaptee.timeline.frame_recipe=[clone.adaptee.timeline.frame_recipe[0]];
@@ -143,6 +156,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 				clone.adaptee.timeline.keyframe_indices=[clone.adaptee.timeline.keyframe_indices[0]];	
 			}
 		}
+		// 	in awayjs, mcs do reset after adding them as child
+		//	for as3 mcs we prevent this by setting noReset to true
 		(<any>clone).noReset=true;
 		return clone;
 	}
@@ -172,7 +187,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 * If the current frame has no label, currentLabel is null.
 	 */
 	public get currentFrameLabel(): string {
-		return (<AwayMovieClip>this.adaptee).timeline.getCurretFrameLabel(<AwayMovieClip>this.adaptee);
+		return (<AwayMovieClip>this.adaptee).timeline.getCurrentFrameLabel(<AwayMovieClip>this.adaptee);
 	}
 
 	/**
@@ -182,7 +197,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 * currentLabel returns null.
 	 */
 	public get currentLabel(): string {
-		return (<AwayMovieClip>this.adaptee).timeline.getCurretLabel(<AwayMovieClip>this.adaptee);
+		return (<AwayMovieClip>this.adaptee).timeline.getCurrentLabel(<AwayMovieClip>this.adaptee);
 	}
 
 	/**
@@ -328,6 +343,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 
 
 		if (typeof frame === "string") {
+			// todo: only do toLowerCase if FP version <=9
+			frame=frame.toLowerCase();
 			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame] == null) {
 				frame = parseInt(frame);
 				if (!isNaN(frame)) {
@@ -362,6 +379,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return;
 
 		if (typeof frame === "string") {
+			// todo: only do toLowerCase if FP version <=9
+			frame=frame.toLowerCase();
 			if ((<AwayMovieClip>this.adaptee).timeline._labels[frame] == null) {
 				frame = parseInt(frame);
 				if (!isNaN(frame)) {

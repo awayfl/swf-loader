@@ -16,7 +16,7 @@
 
 import {getAVM1Object,wrapAVM1NativeClass} from "./AVM1Utils";
 import {AVM1Context, AVM1ActionsData} from "../context";
-import {EventDispatcher} from "@awayjs/core";
+import {EventDispatcher, AudioManager} from "@awayjs/core";
 import {MovieClip} from "@awayjs/scene";
 import {AVM1Object} from "../runtime/AVM1Object";
 import { AVM1EventHandler } from "./AVM1EventHandler";
@@ -72,6 +72,8 @@ var buttonActionsMap:any={
 export class AVM1Button extends AVM1MovieClip {
 	private _requiredListeners: any;
 	private _actions: AVM1ButtonAction[];
+
+	static buttonPokiSDKActions:any={};
 
 	static createAVM1Class(context: AVM1Context) : AVM1Object {
 		return wrapAVM1NativeClass(context, true, AVM1Button,
@@ -236,7 +238,26 @@ export class AVM1Button extends AVM1MovieClip {
 		for (var i = 0; i < actionsLength; i++) {
 			var action = actions[i];
 			if (action.stateTransitionFlags === type) {
-				this._runAction(action);
+				console.log("press button", (<MovieClip>this.adaptee.parent).symbolID, this.adaptee.symbolID)
+				if(AVM1Button.buttonPokiSDKActions[this.adaptee.name]){
+					console.log("button has poki sdk action");
+					AudioManager.setVolume(0);
+					AVM1Button.buttonPokiSDKActions[this.adaptee.name](()=>{
+						AudioManager.setVolume(1);
+						this._runAction(action)
+					})				
+				}
+				else if(AVM1Button.buttonPokiSDKActions["all"]){
+					console.log("button has poki sdk action");
+					AudioManager.setVolume(0);
+					AVM1Button.buttonPokiSDKActions["all"](()=>{
+						AudioManager.setVolume(1);
+						this._runAction(action)
+					})		
+				}
+				else{
+					this._runAction(action);
+				}
 			}
 		}
 	}

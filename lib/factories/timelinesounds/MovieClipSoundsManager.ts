@@ -59,11 +59,17 @@ export class MovieClipSoundsManager {
     }
 
 
-    syncSounds(frameNum: number, isPlaying:boolean, parent:any) {
+    syncSounds(frameNum: number, isPlaying:boolean, parent:any):number {
 
+        var skipFrames:number=0;
         for(var i=0; i<this._soundStreams.length; i++){   
-            if(isPlaying && parent)
-                this._soundStreams[i].playFrame(frameNum);     
+            if(isPlaying && parent){
+                var skipFrames_oneStream:number=this._soundStreams[i].playFrame(frameNum);  
+                if(Math.abs(skipFrames_oneStream)>Math.abs(skipFrames)){
+                    skipFrames=skipFrames_oneStream;
+                }  
+            } 
         }
+        return skipFrames;
     }
 }

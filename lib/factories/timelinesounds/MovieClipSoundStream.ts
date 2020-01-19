@@ -214,14 +214,14 @@ class WebAudioAdapter implements ISoundStreamAdapter {
   }
 
   playFrom(time: number) {
-    var startPlay=true;
+    /*var startPlay=true;
     if(this._sound.duration<this._sound.currentTime){
       startPlay=false;
-    }
+    }*/
     this.stop();
-    if(startPlay){
+    //if(startPlay){
       this._sound.play(time);
-    }
+    //}
   }
   stop() {
     if(this._sound)
@@ -337,6 +337,7 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
 }
 
 export class MovieClipSoundStream {
+  public static frameRate:number=25;
   private data;
   private seekIndex: Array<number>;
   private position: number;
@@ -399,7 +400,20 @@ export class MovieClipSoundStream {
   public appendBlock(frameNum: number, streamBlock: Uint8Array) {
     var decodedBlock = this.decode(streamBlock);
     var streamPosition = this.position;
+    /*if(!this.seekIndex[frameNum-1]){
+      this.seekIndex[frameNum-1]=streamPosition;
+      var time = this.seekIndex[frameNum-1]  / this.data.channels / this.data.sampleRate;
+      if(this.isMP3){
+        time*=this.data.channels;
+      }
+      console.log("add soundblock", frameNum-1, this.seekIndex[frameNum-1], time)
+    }*/
     this.seekIndex[frameNum] = (streamPosition + decodedBlock.seek);
+    var time = this.seekIndex[frameNum]  / this.data.channels / this.data.sampleRate;
+    if(this.isMP3){
+      time*=this.data.channels;
+    }
+    //console.log("add soundblock", frameNum, this.seekIndex[frameNum], time)
     this.position = streamPosition + decodedBlock.samplesCount;
     this.soundStreamAdapter.queueData(decodedBlock);
   }
@@ -407,9 +421,9 @@ export class MovieClipSoundStream {
   public stop() {
     this.soundStreamAdapter.stop();
   }
-  public playFrame(frameNum: number) {
+  public playFrame(frameNum: number):number {
     if (isNaN(this.seekIndex[frameNum])) {
-      return;
+      return 0;
     }
 
     this.isPlaying=true;
@@ -420,6 +434,7 @@ export class MovieClipSoundStream {
       this.soundStreamAdapter.finish();
     }
     var soundStreamData = this.data;
+    
     var time = this.seekIndex[frameNum]  / soundStreamData.channels / soundStreamData.sampleRate;
     var elementTime = this.soundStreamAdapter.currentTime;
     if(this.isMP3){
@@ -427,10 +442,20 @@ export class MovieClipSoundStream {
     }
     MovieClipSoundsManager.addActiveSound(this.soundStreamAdapter.sound);
     //console.log("start sound at: time", time, "elementTime", elementTime, this.soundStreamAdapter.isPlaying);
-    if(!this.soundStreamAdapter.isPlaying || Math.abs(time-elementTime)>PLAYBACK_ADJUSTMENT){
+    if(!this.soundStreamAdapter.isPlaying){//} || Math.abs(time-elementTime)>PLAYBACK_ADJUSTMENT){
        this.soundStreamAdapter.playFrom(time);
+    }
+    
+    /*console.log("should be at time: ", time);
+    console.log("is at time: ", elementTime);
+    console.log("diff: ", time-elementTime);
+    console.log("diff in frames: ", Math.round(((elementTime-time)*1000)/(1000/MovieClipSoundStream.frameRate)));*/
+
+    if((elementTime-time)<0){
+      return Math.ceil(((elementTime-time)*1000)/(1000/MovieClipSoundStream.frameRate));
 
     }
+    return Math.floor(((elementTime-time)*1000)/(1000/MovieClipSoundStream.frameRate));
 
   }
   /*

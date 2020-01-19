@@ -47,7 +47,6 @@ export class AVMAwayStage extends Sprite{
 	protected _fpsTextField:HTMLDivElement;
 
 	private _layers:Sprite[];
-	public showPokiAddOnFrame:number;
 
 	private enterEvent:any=new EventBase("enterFrame");
 	private exitEvent:any=new EventBase("exitFrame");
@@ -526,32 +525,6 @@ export class AVMAwayStage extends Sprite{
                 enterFramesChilds.push(child);
         }
 	}
-	private _isOnCommercialBreak:boolean=false;
-	private _lastFrameIdxOfScene:number=-1;
-	private  endCommercialBreak(){
-		this._isOnCommercialBreak=false;
-		var i:number;
-		var c:number;
-		var numChilds:number;
-		var child:DisplayObject;
-		var myLayer:DisplayObjectContainer;
-		var len:number=this._layers.length;
-		for(i=0;i<len;i++) {
-			myLayer=this._layers[i];
-			numChilds = myLayer.numChildren;
-			for (c = 0; c < numChilds; ++c) {
-				child = myLayer.getChildAt(c);
-				if (child.isAsset(MovieClip)){
-					if((<MovieClip> child).isAVMScene){	
-						(<MovieClip> child).currentFrameIndex=0;
-						(<MovieClip> child).currentFrameIndex=this.showPokiAddOnFrame;		
-					}
-				}
-			}
-		}
-		
-
-	}
 	
 	protected onEnterFrame(dt: number)
 	{
@@ -575,20 +548,6 @@ export class AVMAwayStage extends Sprite{
 				// each child in here should be a swf-scene
 				if (child.isAsset(MovieClip)){
 					(<MovieClip> child).advanceFrame();
-					/*if((<MovieClip> child).isAVMScene){						
-						if(this.showPokiAddOnFrame>=0 && window["PokiSDK"] && 
-							(<MovieClip> child).currentFrameIndex==this.showPokiAddOnFrame &&
-							this._lastFrameIdxOfScene!=(<MovieClip> child).currentFrameIndex){
-							this._isOnCommercialBreak=true;
-							this._lastFrameIdxOfScene=(<MovieClip> child).currentFrameIndex;
-							AudioManager.stopAllSounds();
-							setTimeout(()=>this.endCommercialBreak(), 15000);
-							//window["PokiSDK"].commercialBreak().then(() => this.endCommercialBreak());
-							return;
-						}
-						this._lastFrameIdxOfScene=(<MovieClip> child).currentFrameIndex;
-					}
-*/
 				}
 			}
 		}
@@ -643,7 +602,6 @@ export class AVMAwayStage extends Sprite{
 			this._timer.stop();
 			return;
 		} 
-		if(!this._isOnCommercialBreak){
 
 			var frameMarker:number = 1000/this._frameRate;
 			this._stageTime += Math.min(dt, frameMarker);
@@ -653,9 +611,6 @@ export class AVMAwayStage extends Sprite{
 				this._stage.clear();
 				this.onEnterFrame(this._stageTime);
 				this._stageTime -= frameMarker;
-				if(this._isOnCommercialBreak)
-					return;
-
 				//this.dispatchEventRecursive(this._eventOnEnter);
 				//this.update(this._events);
 				//this.dispatchEventRecursive(this._eventFrameConstructed);
@@ -687,7 +642,7 @@ export class AVMAwayStage extends Sprite{
 				*/
 			}
 				
-		}
+		
 	}
 
 	public get rendererStage():Stage

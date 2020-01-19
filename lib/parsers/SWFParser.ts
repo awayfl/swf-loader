@@ -608,6 +608,7 @@ export class SWFParser extends ParserBase
 			
 		var avm2scripts={};		
 		var awayMc:MovieClip=this._factory.createMovieClip(null, symbol);
+		awayMc.symbolID=symbol.id;
 		if(awayMc._adapter != awayMc && (<any>awayMc._adapter).getScripts){
 			avm2scripts = (<any>awayMc._adapter).getScripts();
 		}		
@@ -780,7 +781,7 @@ export class SWFParser extends ParserBase
 						}
 						swfFrames[i].labelNames[fl]=scriptLabels.length>0?scriptLabels[0]:"";
 						var labelName=swfFrames[i].labelNames[fl];
-						if(this.swfFile.swfVersion<9){
+						if(this.swfFile.swfVersion<=9){
 							labelName=labelName.toLowerCase();
 						}
                         if(!awayTimeline._labels[labelName])

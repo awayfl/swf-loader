@@ -79,7 +79,11 @@ function convertAS3RectangeToBounds(as3Rectange: any, context): AVM1Object {
 
 export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieClipAdapter {
     public static currentMCAssetNameSpace:string="";
-    public static currentDraggedMC:AVM1MovieClip=null;;
+	public static currentDraggedMC:AVM1MovieClip=null;
+	
+	// if a stop-action occurs, we check if a child with this name is present, and if so, we execute the function provided
+    public static pokiSDKonStopActionChildName:string=null;
+    public static pokiSDKonStopAction:any=null;
 	public static createAVM1Class(context: AVM1Context): AVM1Object {
 		return wrapAVM1NativeClass(context, true, AVM1MovieClip,
 			[],
@@ -1284,6 +1288,12 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
         }
     }
 	public stop() {
+		if(AVM1MovieClip.pokiSDKonStopAction && AVM1MovieClip.pokiSDKonStopActionChildName && this.adaptee.getChildByName(AVM1MovieClip.pokiSDKonStopActionChildName)){
+			AVM1MovieClip.pokiSDKonStopAction();//console.log("called stop on retry mc")
+		}
+		if(AVM1MovieClip.pokiSDKonStopAction && AVM1MovieClip.pokiSDKonStopActionChildName=="all"){
+			AVM1MovieClip.pokiSDKonStopAction();
+		}
 		return this.adaptee.stop();
 	}
 	public stopDragDelegate:(e)=>void;
