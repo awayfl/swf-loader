@@ -1,7 +1,34 @@
 import { ASObject } from '../../avm2/nat/ASObject';
-import { notImplemented } from '../../base/utilities/Debug';
+import { notImplemented, warning } from '../../base/utilities/Debug';
 import { AXClass } from '../../avm2/run/AXClass';
+import { axCoerceString } from '../../avm2/run/axCoerceString';
+import { ObjectEncoding } from '../../avm2/natives/byteArray';
+import { StringUtilities } from '../../base/utilities/StringUtilities';
+import { AMF3 } from '../../avm2/amf';
+import { ByteArray } from '../utils/ByteArray';
 
+interface IStorage {
+	getItem(key: string): string;
+	setItem(key: string, value: string): void;
+	removeItem(key: string): void;
+  }
+  
+  var _sharedObjectStorage: IStorage;
+function getSharedObjectStorage(): IStorage  {
+	/*if (!_sharedObjectStorage) {
+	  if (typeof ShumwayCom !== 'undefined' && ShumwayCom.createSpecialStorage) {
+		_sharedObjectStorage = ShumwayCom.createSpecialStorage();
+	  } else {
+		_sharedObjectStorage = (<any>window).sessionStorage;
+	  }
+	}
+	release || assert(_sharedObjectStorage, "SharedObjectStorage is not available.");
+	*/
+	if (typeof (Storage) !== "undefined") {
+		_sharedObjectStorage=localStorage;
+	}
+	return _sharedObjectStorage;
+  }
 export class SharedObject extends ASObject {
 	private _data: ASObject;
 	private _object_name: string;
@@ -11,19 +38,8 @@ export class SharedObject extends ASObject {
 	//for AVM1:
 	//public fps: number;
 
-	constructor(name: string) {
+	constructor() {
 		super();
-		this._object_name = name;
-		if (typeof (Storage) !== "undefined") {
-			console.log("80pro: todo: loading shared data errors in avm2");
-			/*var data=JSON.parse(localStorage.getItem(name));
-			if(data)
-				this._data = this.sec.createObjectFromJS(data);*/
-		}
-		if (this._data == null) {
-			console.log("no shared object found");
-			this._data = this.sec.createObject();
-		}
 	}
 
 
@@ -40,21 +56,96 @@ export class SharedObject extends ASObject {
 		notImplemented("public flash.net.SharedObject::static getDiskUsage");
 		return 0;
 	}
+	
+	public _path: string;
+	public _fps: number;
+	public _objectEncoding;
+	private static _defaultObjectEncoding = ObjectEncoding.DEFAULT;
+	
 	public static getLocal(name: string, localPath?: string, secure?: boolean): SharedObject {
-		return this.sec.flash.net.SharedObject(name);
+		name = axCoerceString(name);
+		localPath = axCoerceString(localPath);
+		secure = !!secure;
+		var path = (localPath || '') + '/' + name;
+		/*if (this._sharedObjects[path]) {
+		return this._sharedObjects[path];
+		}*/
+		var encodedData = getSharedObjectStorage().getItem(path);
+		var data;
+		var encoding = this._defaultObjectEncoding;
+		if (encodedData) {
+		try {
+			var bytes = StringUtilities.decodeRestrictedBase64ToBytes(encodedData);
+			//console.log("loaded bytes", bytes);
+			var serializedData = new ByteArray(bytes.length);
+			(<any>serializedData).sec=this.sec;
+			serializedData.setArrayBuffer(bytes.buffer);
+			
+			//console.log("serializedData.arraybytes", serializedData.arraybytes);
+			
+				
+			//	unexpected("Object Encoding");
+			//}
+			data = AMF3.read(<any>serializedData); //serializedData.readObject();
+			//encoding = serializedData.objectEncoding;
+		} catch (e) {
+			warning('Error encountered while decoding LocalStorage entry. Resetting data.');
+		}
+		if (!data || typeof data !== 'object') {
+			data = this.sec.createObject();
+		}
+		} else {
+		data = this.sec.createObject();
+		}
+		var so = this.sec.flash.net.SharedObject();
+		so._path=path;
+		so._objectEncoding = encoding;
+		so._data=data;
+		return so;
 	}
 	public static getRemote(name: string, remotePath?: string, persistence?: boolean, secure?: boolean): SharedObject {
-		return new SharedObject(name);
+		return new SharedObject();
 	}
 
-	public flush(minDiscSapce: number = 0): void {
-		if (typeof (Storage) !== "undefined") {
+	public flush(minDiskSpace: number = 0): void {
+		/*if (typeof (Storage) !== "undefined") {
 			localStorage.setItem(this._object_name, JSON.stringify(this._data));
 		}
 		else {
 			console.log("no local storage available");
 
+		}*/
+		minDiskSpace = minDiskSpace | 0;
+
+		
+		// Check if the object is empty. If it is, don't create a stored object if one doesn't exist.
+		var isEmpty = true;
+		for (var key in this._data) {
+		  if (this._data.hasOwnProperty(key)) {
+			isEmpty = false;
+			break;
+		  }
 		}
+		if (isEmpty && !getSharedObjectStorage().getItem(this._path)) {
+		  return;
+		}
+		var serializedData = new ByteArray();
+		(<any>serializedData).sec=this.sec;
+		//serializedData.objectEncoding = this._objectEncoding;
+		serializedData.writeObject(this._data);
+		
+        AMF3.write(<any>serializedData, this._data);
+		//data = AMF3.write(<any>serializedData); //serializedData.readObject();
+		var bytes = new Uint8Array(serializedData.arraybytes);
+		var encodedData = StringUtilities.base64EncodeBytes(bytes);
+		/*if (!release) {
+		  var decoded = StringUtilities.decodeRestrictedBase64ToBytes(encodedData);
+		  assert(decoded.byteLength === bytes.byteLength);
+		  for (var i = 0; i < decoded.byteLength; i++) {
+			assert(decoded[i] === bytes[i]);
+		  }
+		}*/
+		getSharedObjectStorage().setItem(this._path, encodedData);
 	}
 
 
