@@ -9,7 +9,7 @@ import { Loader } from "../as3webFlash/display/Loader";
 import { Stage } from "../as3webFlash/display/Stage";
 import { LoaderContext } from "../as3webFlash/system/LoaderContext";
 import { Event } from "../as3webFlash/events/Event";
-import { RequestAnimationFrame, ColorUtils, AssetEvent } from '@awayjs/core';
+import { RequestAnimationFrame, ColorUtils, AssetEvent} from '@awayjs/core';
 import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 import { initLink } from '../avm2/link';
 import { initlazy } from '../avm2/abc/lazy';
@@ -17,6 +17,7 @@ import { FrameScriptManager, DisplayObject } from '@awayjs/scene';
 import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
 import { ActiveLoaderContext } from '../avm2/run/axConstruct';
 import { OrphanManager } from '../as3webFlash/display/DisplayObject';
+import { URLRequest } from '../as3webFlash/net/URLRequest';
 class EntryClass extends Sprite {
 	constructor() {
 		super();
@@ -76,7 +77,12 @@ export class Player {
 			ActiveLoaderContext.loaderContext=loaderContext;
 			this._loader.loaderInfo.addEventListener(Event.COMPLETE, this._onLoadCompleteDelegate);
 			this._loader.loaderInfo.addEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
-			this._loader.loadData(buffer, loaderContext);
+			if(buffer){
+				this._loader.loadData(buffer, loaderContext);
+			}
+			else{
+				this._loader.load(new URLRequest(url), loaderContext);
+			}
 			this._stage.rendererStage.container.style.visibility="hidden";
 
 
@@ -134,7 +140,8 @@ export class Player {
 			// render
 			this._stage.render();
 			if(!this._renderStarted){
-				window["hidePokiProgressBar"]();
+				if(window["hidePokiProgressBar"])
+					window["hidePokiProgressBar"]();
 				this._stage.rendererStage.container.style.visibility="visible";
 			}
 			this._renderStarted=true;

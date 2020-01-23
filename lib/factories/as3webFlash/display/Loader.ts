@@ -165,7 +165,7 @@ export class Loader extends DisplayObjectContainer
 		console.log("start loading the url:"+url.url);
 		var ext:string = url.url.substr(-3);
 		this._isImage = (ext == "jpg" || ext == "png");
-		url.url=url.url.replace(".swf", ".awd");
+		//url.url=url.url.replace(".swf", ".awd");
 		this._loaderContext=context;
 		this._loaderInfo.applicationDomain=context.applicationDomain;
 
