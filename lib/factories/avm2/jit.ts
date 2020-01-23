@@ -1584,8 +1584,9 @@ class Context {
     }
 
     deleteproperty(name, obj) {
-        let b = this.sec.box(obj)
-
+        let b = this.sec.box(obj);
+        if(typeof name ==="number" || typeof name ==="string")
+            return delete b[name];
         return b.axDeleteProperty(name)
     }
 
