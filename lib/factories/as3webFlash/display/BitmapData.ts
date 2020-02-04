@@ -127,7 +127,7 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 	}
 
 	public get rect(): Rectangle {
-		return new this.sec.flash.geom.Rectangle(this._adaptee.rect);
+		return new this.sec.flash.geom.Rectangle(this._adaptee.rect.clone());
 	}
 	public getPixel(x: number, y: number): number {
 		return this._adaptee.getPixel(x, y);
@@ -154,7 +154,7 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 
 	}
 	public copyPixels(sourceBitmap: any, sourceRect: Rectangle, destPoint: Point, alphaBitmapData: BitmapData = null, alphaPoint: Point = null, mergeAlpha: boolean = false) {
-		this._adaptee.copyPixels(sourceBitmap.adaptee, sourceRect.adaptee, destPoint.adaptee);
+		this._adaptee.copyPixels(sourceBitmap.adaptee, sourceRect.adaptee, destPoint.adaptee, alphaBitmapData? alphaBitmapData.adaptee : null, alphaPoint? alphaPoint.adaptee : null, mergeAlpha);
 	}
 	public dispose() {
 		this._adaptee.dispose();
