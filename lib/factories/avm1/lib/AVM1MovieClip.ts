@@ -805,8 +805,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			var i:number=names.length;
 			var mc_path:string="";
 			while(i>0){
-				mc_path+="/";
 				i--;
+				if(names[i]!="")
+					mc_path+="/";
 				mc_path+=names[i];
 			}
 			//console.log(mc_path);
