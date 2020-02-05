@@ -1,7 +1,7 @@
 import { ISecurityDomain } from "../avm1/ISecurityDomain";
 import { SoundStream, packageWave } from "../../parsers/utils/parser/sound";
 import { WaveAudio } from '@awayjs/core';
-import { WaveAudioData } from '@awayjs/core/dist/lib/audio/WaveAudio';
+import { WaveAudioData } from '@awayjs/core';
 import { MovieClipSoundsManager } from './MovieClipSoundsManager';
 
 export interface DecodedSound {
