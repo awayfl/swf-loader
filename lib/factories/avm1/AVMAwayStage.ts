@@ -302,7 +302,8 @@ export class AVMAwayStage extends Sprite{
 
 	//---------------------------stuff added to make it work:
 
-	public takeSnapShot ():HTMLElement{
+	public takeSnapShot():HTMLCanvasElement
+	{
 
 		var myBitmap:BitmapImage2D=new BitmapImage2D(550, 400, true, 0xffffffff, false);
 
@@ -315,7 +316,7 @@ export class AVMAwayStage extends Sprite{
 
 		// flip vertical:
 
-		var oldData=myBitmap.getImageData().data;
+		var oldData=myBitmap.data;
 		var myBitmap2:BitmapImage2D=new BitmapImage2D(550, 400, true, 0xff00ffff, false);
 		var x = 0;
 		var y = 0;
@@ -333,11 +334,19 @@ export class AVMAwayStage extends Sprite{
 		}
 
 		myBitmap2.invalidate();
-		var htmlImage=myBitmap2.getCanvas();
+		var htmlImage:HTMLCanvasElement = document.createElement("canvas");
+		htmlImage.width = myBitmap2.width;
+		htmlImage.height = myBitmap2.height;
 		htmlImage.style.position = "absolute";
 		htmlImage.style.top = "0px";
 		htmlImage.style.left = "0px";
 		htmlImage.style.width = "100%";
+
+		var context:CanvasRenderingContext2D = htmlImage.getContext("2d");
+		var imageData:ImageData = context.getImageData(0, 0, myBitmap2.width, myBitmap2.height);
+		imageData.data.set(myBitmap2.data);
+		context.putImageData(imageData, 0, 0);	
+
 		return htmlImage;
 
 	}
