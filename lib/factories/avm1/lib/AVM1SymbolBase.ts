@@ -467,7 +467,7 @@ export class AVM1SymbolBase<T extends DisplayObjectContainer> extends AVM1Object
 		while(value<-180){
 			value+=360;
 		}
-		return value;
+		return Math.round(value*10000)/10000;
 	}
 
 	public set_rotation(value: number) {
