@@ -1,8 +1,5 @@
-import { FrameScriptManager, MovieClip, SceneImage2D } from '@awayjs/scene';
-import { AssetLibrary, AssetBase, WaveAudio } from '@awayjs/core';
-import { Sound } from '../../as3webFlash/media/Sound';
-import { BitmapData } from '../../as3webFlash/display/BitmapData';
-import { MovieClip as FlashMovieClip } from '../../as3webFlash/display/MovieClip';
+import { MovieClip, SceneImage2D } from '@awayjs/scene';
+import { AssetBase, WaveAudio } from '@awayjs/core';
 import { BitmapImage2D } from '@awayjs/stage';
 import { OrphanManager } from '../../as3webFlash/display/DisplayObject';
 
