@@ -44,7 +44,6 @@
     "random-seed": "^0.3.0"
   },
   "peerDependencies": {
-    "@as3web/flash": "^0.1.118",
     "@awayjs/core": "^0.8.0",
     "@awayjs/graphics": "^0.4.0",
     "@awayjs/materials": "^0.5.0",
@@ -55,7 +54,6 @@
     "tslib": "^1.9.0"
   },
   "devDependencies": {
-    "@as3web/flash": "^0.1.118",
     "@awayjs/core": "^0.8.0",
     "@awayjs/graphics": "^0.4.0",
     "@awayjs/materials": "^0.5.0",
