@@ -910,49 +910,48 @@ export function compile(methodInfo: MethodInfo) {
 
     const underrun = "[stack underrun]"
     
-    let js = ["// (#" + methodInfo.index() + ") --- " + methodInfo]
+    let js0 = ["// (#" + methodInfo.index() + ") --- " + methodInfo]
 
-    js.push("(function (context) { return function compiled_" + (methodInfo.getName()).replace(/([^a-z0-9]+)/gi, "_") + "(scope, self, args) {")
+    js0.push("(function (context) { return function compiled_" + (methodInfo.getName()).replace(/([^a-z0-9]+)/gi, "_") + "(scope, self, args) {")
 
     for (let i: number = 0; i < params.length; i++)
         if (params[i].hasOptionalValue()) {
-            js.push("    let argnum = args.length;")
+            js0.push("    let argnum = args.length;")
             break
         }
 
-    js.push("    let local0 = self;")
+    js0.push("    let local0 = self;")
 
     for (let i: number = 0; i < params.length; i++) {
         let p = params[i]
-        js.push("    let local" + (i + 1) + " = args[" + i + "];")
+        js0.push("    let local" + (i + 1) + " = args[" + i + "];")
 
         if (params[i].hasOptionalValue())
             switch (p.optionalValueKind) {
                 case CONSTANT.Utf8:
-                    js.push("    if (argnum <= " + i + ") local" + (i + 1) + " = context.getstring(" + p.optionalValueIndex + ");")
+                    js0.push("    if (argnum <= " + i + ") local" + (i + 1) + " = context.getstring(" + p.optionalValueIndex + ");")
                     break
                 default:
-                    js.push("    if (argnum <= " + i + ") local" + (i + 1) + " = " + p.getOptionalValue() + ";")
+                    js0.push("    if (argnum <= " + i + ") local" + (i + 1) + " = " + p.getOptionalValue() + ";")
                     break
             }
     }
 
     for (let i: number = params.length + 1; i <= maxlocal; i++)
-        js.push("    let local" + i + " = undefined;")
+        js0.push("    let local" + i + " = undefined;")
 
     for (let i: number = 0; i <= maxstack; i++)
-        js.push("    let stack" + i + " = undefined;")
+        js0.push("    let stack" + i + " = undefined;")
 
     for (let i: number = 0; i <= maxscope; i++)
-        js.push("    let scope" + i + " = undefined;")
+        js0.push("    let scope" + i + " = undefined;")
 
     if (temp)
-        js.push("    let temp = undefined;")
+        js0.push("    let temp = undefined;")
 
-    js.push("    let p = 0;")
-    js.push("    while (true) {")
-    js.push("        switch (p) {")
-    
+    js0.push("    let tk = undefined;")
+    js0.push("    let tr = undefined;")
+
     let names: Multiname[] = []
 
     let getname = (n: number) => {
@@ -961,10 +960,17 @@ export function compile(methodInfo: MethodInfo) {
         if (i < 0) {
             i = names.length
             names.push(mn)
+            js0.push("    let name" + i + " = context.names[" + i + "];")
         }
-        return "context.names[" + i + "]"
-    }    
-        
+        return "name" + i
+    }
+
+    let js = []
+
+    js.push("    let p = 0;")
+    js.push("    while (true) {")
+    js.push("        switch (p) {")
+
     for (let i: number = 0; i < q.length; i++) {
         let z = q[i]
 
@@ -1369,7 +1375,24 @@ export function compile(methodInfo: MethodInfo) {
                             js.push("                " + stack0 + " = " + stack0 + ".__fast__ ? " + stack0 + "[\"" + mn.name + "\"] : " + stack0 + "[\"" + r + "\"];")
                         }
                         else {
-                            js.push("                " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                if (" + stack0 + ") {")
+                            js.push("                    tk = " + stack0 + "['__key__'];")
+                            js.push("                    if (tk) {")
+                            js.push("                        tr = " + getname(param(0)) + ".resolved[tk];")
+                            js.push("                        if (tr) {")
+                            js.push("                            " + stack0 + " = " + stack0 + "[tr];")
+                            js.push("                        }")
+                            js.push("                        else {")
+                            js.push("                            " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                        }")
+                            js.push("                    }")
+                            js.push("                    else {")
+                            js.push("                        " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                    }")
+                            js.push("                }")
+                            js.push("                else {")
+                            js.push("                    " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                }")
                         }
                     }
                     break
@@ -1447,9 +1470,6 @@ export function compile(methodInfo: MethodInfo) {
                             else {
                                 js.push("                " + stackN + " = " + scope + ".global.object.applicationDomain.findProperty(" + getname(param(0)) + ", true, true)[\"" + r + "\"];")
                             }
-
-                            // js.push("                var xyz = context.getlex(" + getname(param(0)) + ", " + scope + ");")
-                            // js.push("                if (xyz !== " + stackN + ") console.log(\"expe\" + \"cted \" + xyz + \" got \" + " + stackN + ");")
                         }
                         else
                             js.push("                " + stackN + " = context.getlex(" + getname(param(0)) + ", " + scope + ");")
@@ -1496,7 +1516,7 @@ export function compile(methodInfo: MethodInfo) {
     js.push("    }")
     js.push("}})")
     
-    let w = js.join("\n")
+    let w = js0.join("\n") + "\n" + js.join("\n")
     
     if (w.indexOf(underrun) >= 0)
         return "STACK UNDERRUN"
