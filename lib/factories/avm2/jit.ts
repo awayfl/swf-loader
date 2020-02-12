@@ -19,6 +19,7 @@ import {ScriptInfo} from "./abc/lazy/ScriptInfo"
 import {b2Class} from "./btd"
 import {recording, resolver} from "./rsl"
 import {AXGlobal} from "./run/AXGlobal"
+import { jsGlobal } from '../base/utilities/jsGlobal'
 
 export enum Bytecode {
     BKPT = 0x01,
@@ -912,19 +913,19 @@ export function compile(methodInfo: MethodInfo) {
     
     let js0 = ["// (#" + methodInfo.index() + ") --- " + methodInfo]
 
-    js0.push("(function (context) { return function compiled_" + (methodInfo.getName()).replace(/([^a-z0-9]+)/gi, "_") + "(scope, self, args) {")
+    js0.push("(function (context) { return function compiled_" + (methodInfo.getName()).replace(/([^a-z0-9]+)/gi, "_") + "() {")
 
     for (let i: number = 0; i < params.length; i++)
         if (params[i].hasOptionalValue()) {
-            js0.push("    let argnum = args.length;")
+            js0.push("    let argnum = arguments.length;")
             break
         }
 
-    js0.push("    let local0 = self;")
+    js0.push("    let local0 = this === context.jsGlobal ? context.savedScope.global.object : this;")
 
     for (let i: number = 0; i < params.length; i++) {
         let p = params[i]
-        js0.push("    let local" + (i + 1) + " = args[" + i + "];")
+        js0.push("    let local" + (i + 1) + " = arguments[" + i + "];")
 
         if (params[i].hasOptionalValue())
             switch (p.optionalValueKind) {
@@ -986,7 +987,7 @@ export function compile(methodInfo: MethodInfo) {
         let stack3 = stackF(3)
         let stackN = stackF(-1)
 
-        let scope = z.scope > 0 ? "scope" + (z.scope - 1) : "scope"
+        let scope = z.scope > 0 ? "scope" + (z.scope - 1) : "context.savedScope"
         let scopeN = "scope" + z.scope
 
         let local = (n: number) => "local" + n
@@ -1025,7 +1026,7 @@ export function compile(methodInfo: MethodInfo) {
                     break
 
                 case Bytecode.GETGLOBALSCOPE:
-                    js.push("                " + stackN + " = context.getglobalscope(scope);")
+                    js.push("                " + stackN + " = context.savedScope.global.object;")
                     break
                 case Bytecode.PUSHSCOPE:
                     js.push("                " + scopeN + " = context.pushscope(" + scope + ", " + stack0 + ");")
@@ -1329,7 +1330,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.constructsuper(scope, " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.constructsuper(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CALLSUPER_DYN: {
@@ -1338,7 +1339,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0) + 1) + " = context.callsuper(context.rutimename(" + stackF(param(0)) + ", " + param(1) + "), scope, " + stackF(param(0) + 1) + ", [" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0) + 1) + " = context.callsuper(context.rutimename(" + stackF(param(0)) + ", " + param(1) + "), " + stackF(param(0) + 1) + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CALLSUPERVOID: {
@@ -1347,7 +1348,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.callsuper(" + getname(param(1)) + ", scope, " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.callsuper(" + getname(param(1)) + ", " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CONSTRUCTPROP: {
@@ -1430,16 +1431,16 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + stack1 + " = context.deleteproperty(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
                     break
                 case Bytecode.GETSUPER:
-                    js.push("                " + stack0 + " = context.getsuper(" + getname(param(0)) + ", scope, " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.getsuper(" + getname(param(0)) + ", " + stack0 + ");")
                     break
                 case Bytecode.GETSUPER_DYN:
-                    js.push("                " + stack1 + " = context.getsuper(context.runtimename(" + stack0 + ", " + param(0) + "), scope, " + stack1 + ");")
+                    js.push("                " + stack1 + " = context.getsuper(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
                     break
                 case Bytecode.SETSUPER:
-                    js.push("                context.setsuper(" + getname(param(0)) + ", scope, " + stack0 + ", " + stack1 + ");")
+                    js.push("                context.setsuper(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
                     break
                 case Bytecode.SETSUPER_DYN:
-                    js.push("                context.setsuper(context.runtimename(" + stack1 + ", " + param(0) + "), scope, " + stack0 + ", " + stack2 + ");")
+                    js.push("                context.setsuper(context.runtimename(" + stack1 + ", " + param(0) + "), " + stack0 + ", " + stack2 + ");")
                     break
                 /*
                 case Bytecode.GETLEX:
@@ -1472,7 +1473,7 @@ export function compile(methodInfo: MethodInfo) {
                             }
                         }
                         else
-                            js.push("                " + stackN + " = context.getlex(" + getname(param(0)) + ", " + scope + ");")
+                            js.push("                " + stackN + " = " + scope + ".findScopeProperty(" + getname(param(0)) + ", true, false).axGetProperty(" + getname(param(0)) + ");")
                     }
                     break
                 case Bytecode.RETURNVALUE:
@@ -1523,20 +1524,23 @@ export function compile(methodInfo: MethodInfo) {
     
     resolver.extra = "@@@ | "
     
-    return eval(w)(new Context(methodInfo, names))
+    return {names: names, compiled: eval(w)};
 }
 
-class Context {
-    private readonly mi: MethodInfo
+export class Context {
+    private readonly mi: MethodInfo;
+    private readonly savedScope: Scope;
     private readonly sec: AXSecurityDomain
     private readonly abc: ABCFile
     private readonly names: Multiname[]
+    private readonly jsGlobal: Object = jsGlobal;
 
-    constructor(mi: MethodInfo, names:Multiname[]) {
-        this.mi = mi
-        this.abc = mi.abc
-        this.sec = mi.abc.applicationDomain.sec
-        this.names = names
+    constructor(mi: MethodInfo, savedScope: Scope, names:Multiname[]) {
+        this.mi = mi;
+        this.savedScope = savedScope;
+        this.abc = mi.abc;
+        this.sec = mi.abc.applicationDomain.sec;
+        this.names = names;
     }
 
     extra(v : string): void {
@@ -1610,12 +1614,12 @@ class Context {
         return b.axDeleteProperty(name)
     }
 
-    getsuper(name, savedScope, obj) {
-        return this.sec.box(obj).axGetSuper(name, savedScope)
+    getsuper(name, obj) {
+        return this.sec.box(obj).axGetSuper(name, this.savedScope)
     }
 
-    setsuper(name, savedScope, value, obj) {
-        return this.sec.box(obj).axSetSuper(name, savedScope, value)
+    setsuper(name, value, obj) {
+        return this.sec.box(obj).axSetSuper(name, this.savedScope, value)
     }
 
     getlexrecording(mn: Multiname, scope: Scope) {
@@ -1670,10 +1674,6 @@ class Context {
         return this.sec.box(obj).axSetSlot(index, value)
     }
 
-    getglobalscope(savedScope) {
-        return savedScope.global.object
-    }
-
     newclass(index, scope, value) {
         return this.sec.createClass(this.abc.classes[index], value, scope)
     }
@@ -1694,13 +1694,13 @@ class Context {
     }
 
 
-    constructsuper(savedScope, obj, pp) {
-        return (<any>savedScope.object).superClass.tPrototype.axInitializer.apply(obj, pp)
+    constructsuper(obj, pp) {
+        return (<any>this.savedScope.object).superClass.tPrototype.axInitializer.apply(obj, pp)
     }
 
 
-    callsuper(name, savedScope, obj, pp) {
-        return this.sec.box(obj).axCallSuper(name, savedScope, pp)
+    callsuper(name, obj, pp) {
+        return this.sec.box(obj).axCallSuper(name, this.savedScope, pp)
     }
 
 

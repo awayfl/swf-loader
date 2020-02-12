@@ -350,7 +350,7 @@ export class AXSecurityDomain implements ISecurityDomain{
       var initializerCode = initializer.getBody().code;
       // ... except if it's the standard class initializer that doesn't really do anything.
       if (initializerCode[0] !== 208 || initializerCode[1] !== 48 || initializerCode[2] !== 71) {
-        interpret(axClass, initializer, classScope, [axClass], null);
+        interpret(initializer, classScope, null).apply(axClass, [axClass]);
       }
       return axClass;
     }
@@ -386,11 +386,7 @@ export class AXSecurityDomain implements ISecurityDomain{
   
     createFunction(methodInfo: MethodInfo, scope: Scope, hasDynamicScope: boolean): AXFunction {
       var traceMsg = !release && flashlog && methodInfo.trait ? methodInfo.toFlashlogString() : null;
-      var fun = this.boxFunction(function () {
-        release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
-        var self = this === jsGlobal ? scope.global.object : this;
-        return interpret(self, methodInfo, scope, <any>arguments, fun);
-      });
+      var fun = this.boxFunction(interpret(methodInfo, scope, fun));
       //fun.methodInfo = methodInfo;
       fun.receiver = {scope: scope};
       if (!release) {
@@ -406,7 +402,7 @@ export class AXSecurityDomain implements ISecurityDomain{
     createInitializerFunction(classInfo: ClassInfo, scope: Scope): AXCallable {
       var methodInfo = classInfo.instanceInfo.getInitializer();
       var traceMsg = !release && flashlog && methodInfo.trait ? methodInfo.toFlashlogString() : null;
-      var fun = getNativeInitializer(classInfo);
+      var fun:AXCallable = getNativeInitializer(classInfo);
       if (!fun) {
         release || assert(!methodInfo.isNative(), "Must provide a native initializer for " +
                                                   classInfo.instanceInfo.getClassName());      
@@ -417,14 +413,11 @@ export class AXSecurityDomain implements ISecurityDomain{
             console.log("create instance for binary data:", classInfo.instanceInfo.getClassName());  
             ByteArrayDataProvider.symbolForConstructor=binarySymbol;
             release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
-            return interpret(this, methodInfo, scope, <any>arguments, null);
+            return interpret(methodInfo, scope, null).apply(this, arguments);
           };
         }    
         else{            
-          fun = <any> function () {
-            release || (traceMsg && flashlog.writeAS3Trace(methodInfo.toFlashlogString()));
-            return interpret(this, methodInfo, scope, <any>arguments, null);
-          };
+          fun = <any> interpret(methodInfo, scope, null);
         }       
         if (!release) {
           try {

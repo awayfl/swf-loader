@@ -37,10 +37,8 @@ export function createMethodForTrait(methodTraitInfo: MethodTraitInfo, scope: Sc
         method.isInterpreted = false;
       }
     } else {
-      method = function () {
-        var self = this === jsGlobal ? scope.global.object : this;
-        return interpret(self, methodInfo, scope, <any>arguments, null);
-      };
+      method = interpret(methodInfo, scope, null);
+
       if (!release) {
         method.toString = function () {
           return "Interpreted " + methodTraitInfo.toString();

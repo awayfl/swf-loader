@@ -35,7 +35,8 @@ import { isValidASValue } from './run/initializeAXBasePrototype';
 import { AXClass } from './run/AXClass';
 import { axCoerceName } from "./run/axCoerceName";
 import { isNumeric } from "../base/utilities";
-import { compile } from "./jit";
+import { compile, Context } from "./jit";
+import { jsGlobal } from '../base/utilities/jsGlobal';
 
 /**
  * Helps the interpreter allocate fewer Scope objects.
@@ -137,16 +138,18 @@ function popNameInto(stack: any [], mn: Multiname, rn: Multiname) {
 }
 
 
-export function interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, args: any [], callee: AXFunction) {
+export function interpret(methodInfo: MethodInfo, savedScope: Scope, callee: AXFunction) {
     if (methodInfo.compiled == null && methodInfo.error == null) {
         let r = compile(methodInfo)
-        if (typeof r === "string")
+        if (typeof r === "string") {
             methodInfo.error = r
-        else 
-            methodInfo.compiled = r
+        } else {
+          methodInfo.compiled = r.compiled;
+          methodInfo.names = r.names
+        }
     }
 
-    return methodInfo.compiled ? methodInfo.compiled(savedScope, self, args) : _interpret(self, methodInfo, savedScope, args, callee)
+    return methodInfo.compiled ? methodInfo.compiled(new Context(methodInfo, savedScope, methodInfo.names)) : _interpret(methodInfo, savedScope, callee)
 }
 
 class InterpreterFrame {
@@ -161,7 +164,7 @@ class InterpreterFrame {
 
   private hasNext2Infos: HasNext2Info[] = null;
 
-  constructor(receiver: Object, methodInfo: MethodInfo, parentScope: Scope, callArgs: any[],
+  constructor(receiver: Object, methodInfo: MethodInfo, parentScope: Scope, callArgs: IArguments,
               callee: AXFunction) {
     var body = this.body = methodInfo.getBody();
     this.code = body.code;
@@ -266,12 +269,13 @@ class InterpreterFrame {
   }
 }
 
-function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, callArgs: any [],
-                    callee: AXFunction) {
+function _interpret(methodInfo: MethodInfo, savedScope: Scope, callee: AXFunction) {
   if (methodInfo.error != null)
       console.log("interpret: (" + methodInfo.error + ")")
 
-  var frame = new InterpreterFrame(self, methodInfo, savedScope, callArgs, callee);
+  return function () {
+
+  var frame = new InterpreterFrame(this, methodInfo, savedScope, arguments, callee);
   var stack = frame.stack;
   var locals = frame.locals;
   var scopes = frame.scopes;
@@ -872,6 +876,7 @@ function _interpret(self: Object, methodInfo: MethodInfo, savedScope: Scope, cal
       throw e;
     }
   }
+}
 }
 
 function createValidException(sec: AXSecurityDomain, internalError, bc: Bytecode,

@@ -8,6 +8,7 @@ import { TRAIT } from "./TRAIT";
 import { InstanceInfo } from "./InstanceInfo";
 import { ClassInfo } from "./ClassInfo";
 import { METHOD } from "./METHOD";
+import { Multiname } from './Multiname';
 
 export class MethodInfo {
     public trait: MethodTraitInfo = null;
@@ -16,6 +17,7 @@ export class MethodInfo {
     private _returnType: AXClass;
 
     public compiled:Function = null;
+    public names:Multiname[];
     public error:string = null;
 
     constructor(

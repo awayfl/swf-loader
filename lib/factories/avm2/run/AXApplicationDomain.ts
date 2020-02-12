@@ -80,7 +80,7 @@ export class AXApplicationDomain {
       var global = this.sec.createAXGlobal(this, scriptInfo);
       scriptInfo.global = global;
       scriptInfo.state = ScriptInfoState.Executing;
-      interpret(<any>global, scriptInfo.getInitializer(), global.scope, [], null);
+      interpret(scriptInfo.getInitializer(), global.scope, null).apply(global, []);
       scriptInfo.state = ScriptInfoState.Executed;
     }
   
