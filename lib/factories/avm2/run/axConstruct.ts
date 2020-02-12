@@ -1,7 +1,9 @@
-import { MovieClip, SceneImage2D } from '@awayjs/scene';
+import { MovieClip, SceneImage2D, FrameScriptManager } from '@awayjs/scene';
+import { MovieClip as AS3MovieClip } from '../../as3webFlash/display/MovieClip';
 import { AssetBase, WaveAudio } from '@awayjs/core';
 import { BitmapImage2D } from '@awayjs/stage';
 import { OrphanManager } from '../../as3webFlash/display/DisplayObject';
+import {Event} from "../../as3webFlash/events/Event";
 
 
 export class ActiveLoaderContext {
@@ -33,10 +35,13 @@ export function axConstruct(argArray?: any[]) {
     if (timeline) {
         var newMC = new MovieClip(timeline);
         //console.log("create mc via axConstruct");
+        object.adaptee=newMC;
         newMC.timelineMC = true;
+        newMC.reset();
         object.noReset=true;
-        
-        MovieClip.mcForConstructor = newMC;
+		FrameScriptManager.execute_as3_constructors();
+        //FrameScriptManager.execute_queue();
+        //(<any>object).dispatchStaticEvent(Event.FRAME_CONSTRUCTED)
         OrphanManager.addOrphan(object);
     }
     if (this.superClass && this.superClass.classInfo && this.superClass.classInfo.instanceInfo && this.superClass.classInfo.instanceInfo.name.name == "Sound") {
@@ -45,7 +50,8 @@ export function axConstruct(argArray?: any[]) {
 
             var asset = ActiveLoaderContext.loaderContext.applicationDomain.getAwayJSAudio(this.classInfo.instanceInfo.name.name);
             if (asset && (<AssetBase>asset).isAsset(WaveAudio)) {
-                ActiveLoaderContext.waveAudioForSoundConstructor = <WaveAudio>asset;
+                //ActiveLoaderContext.waveAudioForSoundConstructor = <WaveAudio>asset;
+                object.adaptee=asset;
             }
             else {
                 console.log("error: could not find audio for class", this.classInfo.instanceInfo.name.name, asset)
@@ -61,7 +67,8 @@ export function axConstruct(argArray?: any[]) {
 
             var asset = ActiveLoaderContext.loaderContext.applicationDomain.getDefinition(this.classInfo.instanceInfo.name.name);
             if (asset && (<AssetBase>asset).isAsset(SceneImage2D) || (<AssetBase>asset).isAsset(BitmapImage2D)) {
-                ActiveLoaderContext.sceneImage2DForBitmapConstructor = <SceneImage2D>asset;
+                //ActiveLoaderContext.sceneImage2DForBitmapConstructor = <SceneImage2D>asset;
+                object.adaptee=asset;
             }
             else {
                 console.log("error: could not find audio for class", this.classInfo.instanceInfo.name.name, asset)
@@ -72,7 +79,18 @@ export function axConstruct(argArray?: any[]) {
         }
     }
     object.noReset=true;
-    //FrameScriptManager.execute_queue();
-    object.axInitializer.apply(object, argArray);
+   
+    if((<any>object).getQueuedEvents){
+        var events=(<any>object).getQueuedEvents();
+        object.axInitializer.apply(object, argArray);
+        if(events){
+            for(var i=0; i<events.length; i++){
+                (<any>object).dispatchEvent(events[i]);
+            }
+        }
+    }
+    else{            
+        object.axInitializer.apply(object, argArray);
+    }
     return object;
 }

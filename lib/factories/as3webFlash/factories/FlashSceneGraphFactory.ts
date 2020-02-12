@@ -62,8 +62,9 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		//Graphicsadapter.currentAwayGraphics=graphics;
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, symbolClass);
+		asObj.adaptee= new AwaySprite(graphics);
 		// manually call the axInitializer for now:
-		asObj.axInitializer(AwaySprite.getNewSprite(new this._sec.flash.display.Graphics(graphics).adaptee));
+		//asObj.axInitializer(AwaySprite.getNewSprite(new this._sec.flash.display.Graphics(graphics).adaptee));
 
 		asObj.adaptee["fileurl"]=this.url;
 		return asObj.adaptee;
@@ -95,16 +96,12 @@ export class FlashSceneGraphFactory extends DefaultSceneGraphFactory implements 
 		
 		// create the root for the root-symbol
 		var asObj = constructClassFromSymbol(symbol, this._sec.flash.display.MovieClip.axClass);
-		// 	manually call the axInitializer - this will run the constructor
-		//	creating new Away-MovieClip and timeline, and registers framescripts on the timeline:
-		try{
-			
-			AwayMovieClip.mcForConstructor=null;
-			asObj.axInitializer();
-			symbol.timeline=asObj.adaptee.timeline;
 
-		}
-		catch{};
+		asObj.adaptee= new AwayMovieClip();
+		symbol.timeline=asObj.adaptee.timeline;
+
+		//(<AwayMovieClip>asObj.adaptee).timeline.resetScripts();
+		//(<any>asObj).axInitializer();
 		asObj.adaptee.timelineMC=true;
 		asObj.adaptee["fileurl"]=this.url;
 		return asObj.adaptee;

@@ -14,6 +14,7 @@ import { AXSecurityDomain } from '../avm2/run/AXSecurityDomain';
 import { initLink } from '../avm2/link';
 import { initlazy } from '../avm2/abc/lazy';
 import { FrameScriptManager, DisplayObject } from '@awayjs/scene';
+import { DisplayObject as AS3DisplayObject } from '../as3webFlash/display/DisplayObject';
 import { initializeAXBasePrototype } from '../avm2/run/initializeAXBasePrototype';
 import { ActiveLoaderContext } from '../avm2/run/axConstruct';
 import { OrphanManager } from '../as3webFlash/display/DisplayObject';
@@ -69,6 +70,7 @@ export class Player {
 			this._eventRender = new this._sec.flash.events.Event(Event.RENDER);
 			this._events = [this._eventOnEnter, this._eventExitFrame];
 			this._stage = new this._sec.flash.display.Stage(null, window.innerWidth, window.innerHeight, 0xffffff, 30, true);
+			this._sec.flash.display.DisplayObject.axClass._activeStage=this._stage;
 			this._parser = new SWFParser(new FlashSceneGraphFactory(sec));
 			this._parser._iFileName=url;
 			this._loader = new this._sec.flash.display.Loader(this._parser);
@@ -127,15 +129,34 @@ export class Player {
 			
 			this._time -= frameMarker;
 
-			// advance the stage
+			// 	advance the stage - this updates the timeline
+			//	objects get removed, created and updated - framescripts get queued
+			//	as3 constructors for the adpaters are not yet run
+			//	ADD events are queued on the objects, because they need to run after the constructors
 			this._stage.advanceFrame(this._events);
 			OrphanManager.updateOrphans(this._events);
+			
+			// broadcast ENTER_FRAME event
+			this._stage.dispatchStaticBroadCastEvent(Event.ENTER_FRAME);
+			
+			// run all as3 constructors
+			FrameScriptManager.execute_as3_constructors();
+			
+			// 	ADD events events have been queued on the objects before their constructor was run
+			//	dispatch them now (this is recursivly)
+			this._stage.dispatchQueuedEvents();
+
+			// broadcast FRAME_CONSTRUCTED event to all objects
+			this._stage.dispatchStaticBroadCastEvent(Event.FRAME_CONSTRUCTED);
+
+			// run all queued framescripts
+			FrameScriptManager.execute_queue();
+			
 			/*var displayGraph={};
 			this._stage.debugDisplayGraph(displayGraph);
 			console.log("SceneGraph frame :", displayGraph);*/
 			
 			// execute queued scripts
-			FrameScriptManager.execute_queue();
 			
 			// render
 			this._stage.render();

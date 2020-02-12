@@ -1,5 +1,5 @@
 import {Box} from "@awayjs/core";
-import {Billboard, TextField as AwayTextField, DisplayObjectContainer as AwayDisplayObjectContainer, Sprite as AwaySprite, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject} from "@awayjs/scene";
+import {Billboard, TextField as AwayTextField, DisplayObjectContainer as AwayDisplayObjectContainer, Sprite as AwaySprite, MovieClip as AwayMovieClip, DisplayObject as AwayDisplayObject, FrameScriptManager} from "@awayjs/scene";
 import {DisplayObject, OrphanManager} from "./DisplayObject";
 import {InteractiveObject} from "./InteractiveObject";
 import {Event} from "../events/Event";
@@ -24,9 +24,6 @@ export class DisplayObjectContainer extends InteractiveObject{
 
 	}
 
-	private _eventRemoved:Event;
-	private _eventAdded:Event;
-	private _eventAddedToStage:Event;
 	/**
 	 * The DisplayObjectContainer class is the base class for all objects that can serve as display object containers on
 	 * the display list. The display list manages all objects displayed in the Flash runtimes.
@@ -51,12 +48,13 @@ export class DisplayObjectContainer extends InteractiveObject{
 	 *
 	 *   new Loader()new Sprite()new MovieClip()
 	 */
-	constructor(adaptee:AwayDisplayObjectContainer = null)
+	constructor()
 	{
-		super(adaptee || new AwayDisplayObjectContainer());
-		this._eventRemoved=new this.sec.flash.events.Event(Event.REMOVED);
-		this._eventAdded=new this.sec.flash.events.Event(Event.ADDED);
-		this._eventAddedToStage=new this.sec.flash.events.Event(Event.ADDED_TO_STAGE);
+		super();
+	}
+	
+	protected createAdaptee():AwayDisplayObject{
+		return new AwayDisplayObjectContainer();
 	}
 	//---------------------------stuff added to make it work:
 
@@ -77,7 +75,6 @@ export class DisplayObjectContainer extends InteractiveObject{
 	 if any child is a MovieClip this function will not be called on its childrens adapter.
 	 */
 	public advanceFrame(events:any[]) {
-		this.dispatchEvent(events[0]);//ENTER_FRAME
 		var i:number=(<AwayDisplayObjectContainer> this._adaptee)._children.length;
 		while(i>0){
 			i--;
@@ -95,12 +92,19 @@ export class DisplayObjectContainer extends InteractiveObject{
 					}
 				}
 				else if(oneChild.isAsset(AwayMovieClip)){
-					(<AwayMovieClip>oneChild).update(events);
+					(<AwayMovieClip>oneChild).update();
 				}
 			}
 		}
-		this.dispatchEvent(events[1]);//EXIT_FRAME
+	}
+	public dispatchQueuedEvents() {
+		super.dispatchQueuedEvents();
+		for(var i=0;i < (<AwayDisplayObjectContainer>this._adaptee).numChildren;i++){
+			var oneChild:AwayDisplayObject=(<AwayDisplayObjectContainer> this._adaptee).getChildAt(i);
+			if(oneChild && oneChild.adapter && (<any>oneChild.adapter).dispatchQueuedEvents)
+				(<any>oneChild.adapter).dispatchQueuedEvents();
 
+		}
 	}
 	public debugDisplayGraph(obj:any) {
 		obj.object=this;
@@ -266,10 +270,13 @@ export class DisplayObjectContainer extends InteractiveObject{
 	public addChild (child:DisplayObject) : DisplayObject {
 		
 		//child.dispatchEventRecursive(new Event(Event.ADDED_TO_STAGE));
-
+		(<any>child).noReset=true;
 		(<AwayDisplayObjectContainer> this._adaptee).addChild((<DisplayObject>child).adaptee);
-		child.dispatchEvent(this._eventAdded);
-		child.dispatchEvent(this._eventAddedToStage);
+		
+		(<any>child).noReset=false;
+		child.dispatchStaticEvent(Event.ADDED);
+		child.dispatchStaticEvent(Event.ADDED_TO_STAGE);
+		//child.dispatchStaticEvent(Event.FRAME_CONSTRUCTED);
 		OrphanManager.removeOrphan(child);
 		return child;
 	}
@@ -301,6 +308,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 		//child.dispatchEventRecursive(new Event(Event.ADDED_TO_STAGE));
 		// todo: this should be done much more efficient (in awayjs)
 		var allChildren=[];
+		(<any>child).noReset=true;
 		for(var i:number /*uint*/ = 0; i < (<AwayDisplayObjectContainer> this._adaptee).numChildren; i++){
 			if(child.adaptee.id != (<AwayDisplayObjectContainer> this._adaptee)._children[i].id){
 				allChildren[allChildren.length]=(<AwayDisplayObjectContainer> this._adaptee)._children[i];
@@ -316,11 +324,14 @@ export class DisplayObjectContainer extends InteractiveObject{
 				(<AwayDisplayObjectContainer> this._adaptee).addChild(child.adaptee);
 			}
 			else{
+				allChildren[newChildCnt].adapter.noReset=true;
 				(<AwayDisplayObjectContainer> this._adaptee).addChild(allChildren[newChildCnt++]);
 			}
 		}
-		child.dispatchEvent(this._eventAdded);
-		child.dispatchEvent(this._eventAddedToStage);
+		(<any>child).noReset=false;
+		child.dispatchStaticEvent(Event.ADDED);
+		child.dispatchStaticEvent(Event.ADDED_TO_STAGE);
+		//child.dispatchStaticEvent(Event.FRAME_CONSTRUCTED);
 		//(<AwayDisplayObjectContainer>(<AwayDisplayObjectContainer> this._adaptee)).addChildAt(child.adaptee, index);
 		return child;
 	}
@@ -490,7 +501,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 	 */
 	public removeChild (child:DisplayObject) : DisplayObject {
 		//child.dispatchEventRecursive(new Event(Event.REMOVED_FROM_STAGE));
-		child.dispatchEvent(this._eventRemoved);
+		child.dispatchStaticEvent(Event.REMOVED);
 		(<AwayDisplayObjectContainer> this._adaptee).removeChild(child.adaptee);
 		//console.log("removeChild not implemented yet in flash/DisplayObjectContainer");
 		return child;
@@ -535,7 +546,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 			var oneChild:AwayDisplayObject=(<AwayDisplayObjectContainer> this._adaptee)._children[i];
 			if(oneChild.adapter){
 				//(<DisplayObject>oneChild.adapter).dispatchEventRecursive(new Event(Event.REMOVED_FROM_STAGE));
-				(<DisplayObject>oneChild.adapter).dispatchEvent(this._eventRemoved);
+				(<DisplayObject>oneChild.adapter).dispatchStaticEvent(Event.REMOVED);
 			}
 		}
 
@@ -582,6 +593,7 @@ export class DisplayObjectContainer extends InteractiveObject{
 
 			(<AwayDisplayObjectContainer> this._adaptee).removeChild(allChildren[i]);
 		}
+		(<any>child).noReset=true;
 		var newChildCnt=0;
 		var oldChild;
 		for(i = 0; i < allChildren.length; i++){
@@ -590,16 +602,20 @@ export class DisplayObjectContainer extends InteractiveObject{
 			}
 			else{
 				oldChild=allChildren[newChildCnt++];
+				(<any>oldChild.adapter).noReset=true;
 				if(oldChild.id!=child.adaptee.id){
 					(<AwayDisplayObjectContainer> this._adaptee).addChild(oldChild);
 				}
 				else{
 					oldChild = allChildren[newChildCnt++];
+					(<any>oldChild.adapter).noReset=true;
 					(<AwayDisplayObjectContainer> this._adaptee).addChild(oldChild);
 				}
+				(<any>oldChild.adapter).noReset=false;
 
 			}
 		}
+		(<any>child).noReset=false;
 	}
 
 	public stopAllMovieClips ()  {

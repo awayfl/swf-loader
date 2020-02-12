@@ -71,6 +71,7 @@ import { TimerEvent } from "../flash/events/TimerEvent";
 import { ProgressEvent } from "../flash/events/ProgressEvent";
 import { SoundMixer } from "../flash/media/SoundMixer";
 import { TextSnapshot } from "../flash/text/TextSnapshot";
+import { URLVariables } from "../flash/net/URLVariables";
 /*
 import { NativeMenu } from "./display/NativeMenu";
 import { NativeMenuItem } from "./display/NativeMenuItem";
@@ -295,7 +296,7 @@ M("flash.text.TextField", TextField);
 // M("flash.net.ObjectEncoding", ObjectEncoding);
 // M("flash.net.LocalConnection", LocalConnection);
 // M("flash.net.Socket", Socket);
-// M("flash.net.URLVariables", URLVariables);
+M("flash.net.URLVariables", URLVariables);
 
  M("flash.system.Capabilities", Capabilities);
  M("flash.system.Security", Security);

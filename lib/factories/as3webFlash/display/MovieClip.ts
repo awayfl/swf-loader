@@ -2,6 +2,7 @@ import { IDisplayObjectAdapter, MovieClip as AwayMovieClip, Sprite as AwaySprite
 import { Sprite } from "./Sprite";
 import { Matrix3D } from '@awayjs/core';
 import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
+import { Event } from "../events/Event";
 
 var includeString: string = '';//TODO
 
@@ -29,8 +30,10 @@ declare var __framescript__;
 export class MovieClip extends Sprite implements IMovieClipAdapter {
 	private static _movieClips: Array<MovieClip> = new Array<MovieClip>();
 
-	private _tmpScripts:any;
+	// 	executed directly after a MC has been constructed via Object.create,
+	//	befre the actual constructors have been run
 	public applySymbol() {}
+
 	public static getNewMovieClip(adaptee: AwayMovieClip): MovieClip {
 		if (MovieClip._movieClips.length) {
 			var movieClip: MovieClip = MovieClip._movieClips.pop();
@@ -38,7 +41,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return movieClip;
 		}
 
-		return new MovieClip(adaptee);
+		return new MovieClip();
 	}
 
 
@@ -63,22 +66,36 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		}
 	}
 
+	public initAdapter(): void {
+		
+		if ((<IMovieClipAdapter>this).executeConstructor) {
+			FrameScriptManager.queue_as3_constructor(<AwayMovieClip>this.adaptee);
+		}
+
+	}
 	/**
 	 * Creates a new MovieClip instance. After creating the MovieClip, call the
 	 * addChild() or addChildAt() method of a
 	 * display object container that is onstage.
 	 */
-	constructor(adaptee: AwayMovieClip = null) {
-		if(!adaptee && AwayMovieClip.mcForConstructor){
-			adaptee=AwayMovieClip.mcForConstructor;
-			AwayMovieClip.mcForConstructor=null;
-		}
-		super(adaptee || AwayMovieClip.getNewMovieClip());	
-		this.adaptee.reset();
-		this._tmpScripts={};
+	constructor() {
+		super();	
 	}
 
+	protected createAdaptee():AwayDisplayObject{
+		var adaptee=AwayMovieClip.getNewMovieClip();
+		(<any>adaptee).timelineMC=true;
+		adaptee.reset();
+		//console.log("createAdaptee AwayMovieClip");
+		(<any>this).noReset=true;
+        //FrameScriptManager.execute_queue();
+		return adaptee;
+	}
 	// --------------------- stuff needed because of implementing the existing IMovieClipAdapter
+
+	public clearPropsDic(){
+		this["$Bg__setPropDict"].map= new WeakMap();
+	}
 
 	public evalScript(str: string): Function {
 		var tag: HTMLScriptElement = document.createElement('script');
@@ -104,62 +121,48 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			throw("_symbol not defined when cloning movieclip")
 		}
 		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
-		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		var newMC:MovieClip=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
 		//console.log("clone", (<any>this)._symbol, (<any>this)._symbol.symbolClass);
 		var adaptee=new AwayMovieClip((<AwayMovieClip>this.adaptee).timeline);
+		//console.log("clone mc", newMC, adaptee, adaptee.id, (<any>this)._symbol, (<any>this)._symbol.symbolClass)
 		this.adaptee.copyTo(adaptee);
-
-		
-		if(Timeline.currentInstanceName){
-			adaptee.name=Timeline.currentInstanceName;
-			Timeline.currentInstanceName=null;
-		};
-		
-		if(Timeline.currentInstanceMatrix){
-		
-			var new_matrix:Matrix3D = adaptee.transform.matrix3D;
-			new_matrix._rawData[0] = Timeline.currentInstanceMatrix.a;
-			new_matrix._rawData[1] =  Timeline.currentInstanceMatrix.b;
-			new_matrix._rawData[4] =  Timeline.currentInstanceMatrix.c;
-			new_matrix._rawData[5] =  Timeline.currentInstanceMatrix.d;
-			new_matrix._rawData[12] =  Timeline.currentInstanceMatrix.tx/20;
-			new_matrix._rawData[13] =  Timeline.currentInstanceMatrix.ty/20;
-
-			adaptee.transform.invalidateComponents();
-			Timeline.currentInstanceMatrix=null;
+		newMC.adaptee=adaptee;
+		newMC._stage = this.activeStage;
+		(<IMovieClipAdapter>newMC).executeConstructor=()=>{
+			(<AwayMovieClip>newMC.adaptee).timeline.resetScripts();
+			//console.log("executeConstructor mc", newMC, newMC.adaptee.id);
+			var events=(<any>newMC).getQueuedEvents();
+			(<any>newMC).axInitializer();
+			if(events){
+				for(var i=0; i<events.length; i++){
+					(<any>newMC).dispatchEvent(events[i]);
+				}
+			}
 		}
-		
-		AwayMovieClip.mcForConstructor=adaptee;
-		clone.axInitializer();
 
 		// if this is a custom class (not a plain MC or Sprite)
 		// make sure that the clone will not be reused on the timeline.
 		// it must reclone for every new instance thats added to scene, so that the as3 constructor (axInitializer) will run again...
 		// (if cloneForEveryInstance is true, the awayjs-mc will not cache the instance on the potentialinstance-list)
 		if((<any>this)._symbol.className){
-			clone.adaptee.cloneForEveryInstance=true;
+			(<any>newMC.adaptee).cloneForEveryInstance=true;
 		}
-		if(clone.adaptee.timeline){
-			clone.adaptee.timeline.add_script_for_postcontruct(clone.adaptee, 0, true );
+		if((<AwayMovieClip>newMC.adaptee).timeline){
 			
 			// 	hack to BadIceCreamFont compiledClip:
 			//	the compiledClip "BadIcecreamFont" seem to behave different to other classes
 			//	it seem to always stick to frame 0, 
 			if((<any>this)._symbol.className && (<any>this)._symbol.className=="BadIcecreamFont"){
-				clone.adaptee.cloneForEveryInstance=false; // for this special case, we do not want to reclone it on reset
-				clone.adaptee.noTimelineUpdate=true;
-				clone.adaptee.timeline.frame_command_indices=[clone.adaptee.timeline.frame_command_indices[0]];
-				clone.adaptee.timeline.frame_recipe=[clone.adaptee.timeline.frame_recipe[0]];
-				clone.adaptee.timeline.keyframe_constructframes=[clone.adaptee.timeline.keyframe_constructframes[0]];
-				clone.adaptee.timeline.keyframe_durations=[clone.adaptee.timeline.keyframe_durations[0]];
-				clone.adaptee.timeline.keyframe_firstframes=[clone.adaptee.timeline.keyframe_firstframes[0]];
-				clone.adaptee.timeline.keyframe_indices=[clone.adaptee.timeline.keyframe_indices[0]];	
+				(<any>newMC.adaptee).adaptee.timeline.frame_command_indices=[(<any>newMC.adaptee).timeline.frame_command_indices[0]];
+				(<any>newMC.adaptee).adaptee.timeline.frame_recipe=[(<any>newMC.adaptee).timeline.frame_recipe[0]];
+				(<any>newMC.adaptee).adaptee.timeline.keyframe_constructframes=[(<any>newMC.adaptee).timeline.keyframe_constructframes[0]];
+				(<any>newMC.adaptee).adaptee.timeline.keyframe_durations=[(<any>newMC.adaptee).timeline.keyframe_durations[0]];
+				(<any>newMC.adaptee).adaptee.timeline.keyframe_firstframes=[(<any>newMC.adaptee).timeline.keyframe_firstframes[0]];
+				(<any>newMC.adaptee).adaptee.timeline.keyframe_indices=[(<any>newMC.adaptee).timeline.keyframe_indices[0]];	
+			
 			}
 		}
-		// 	in awayjs, mcs do reset after adding them as child
-		//	for as3 mcs we prevent this by setting noReset to true
-		(<any>clone).noReset=true;
-		return clone;
+		return newMC;
 	}
 
 	/**
@@ -303,9 +306,6 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		console.log("trackAsMenu not implemented yet in flash/MovieClip");
 	}
 
-	public getScripts() {
-		return this._tmpScripts;
-	}
 	public addFrameScript(...args) {
 		// arguments are pairs of frameIndex and script/function
 		// frameIndex is in range 0..totalFrames-1
@@ -317,11 +317,15 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		for (var i = 0; i < numArgs; i += 2) {
 			var frameNum = (arguments[i] | 0);
 			var fn = arguments[i + 1];
-			(<AwayMovieClip>this.adaptee).timeline.add_avm2framescript(fn, frameNum);
-			/*
-			if(!this._tmpScripts[frameNum])
-				this._tmpScripts[frameNum]=[];
-			this._tmpScripts[frameNum].push(fn);*/
+			(<AwayMovieClip>this.adaptee).timeline.add_framescript(fn, frameNum);
+
+			// 	if the mc was already added to scene before the construcor was run,
+			//	no framescript was defined, and therefore we might need to add scripts for the current frame manually
+			//	todo: make sure that this is correctly behaving in case constructor navigates the mc to another frame
+			/*if(this.adaptee.parent && frameNum==0){//(<AwayMovieClip>this.adaptee).currentFrameIndex==frameNum){
+				FrameScriptManager.add_script_to_queue_pass2(<AwayMovieClip>this.adaptee, [fn]);
+			}*/
+
 			
 		}
 	}
@@ -358,6 +362,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return;
 		this.play();
 		this._gotoFrame(frame);
+		FrameScriptManager.execute_as3_constructors();
+		this.dispatchStaticBroadCastEvent(Event.FRAME_CONSTRUCTED);
 		FrameScriptManager.execute_queue();
 	}
 
@@ -375,8 +381,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	 */
 	public gotoAndStop(frame: any, scene: string = null) {
 
-		if (frame == null)
+		// in FP for frame==null, we need to stop the mc
+		if (frame == null){			
+			this.stop();
 			return;
+		}
 
 		if (typeof frame === "string") {
 			// todo: only do toLowerCase if FP version <=9
@@ -394,6 +403,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			return;
 		this.stop();
 		this._gotoFrame(frame);
+		FrameScriptManager.execute_as3_constructors();
+		this.dispatchStaticBroadCastEvent(Event.FRAME_CONSTRUCTED);
 		FrameScriptManager.execute_queue();
 	}
 

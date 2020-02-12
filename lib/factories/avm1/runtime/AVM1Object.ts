@@ -51,7 +51,7 @@ export class AVM1Object extends NullPrototypeObject implements IDisplayObjectAda
 	public isVisibilityByScript():boolean{
 		return this._visibilityByScript;
 	}
-	public doInitEvents():void
+	public initAdapter():void
 	{
 	}
 

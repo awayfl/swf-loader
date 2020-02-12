@@ -7,7 +7,8 @@ import { StyleSheet } from "./StyleSheet";
 import {Rectangle} from "../geom/Rectangle";
 import { TextLineMetrics } from "./TextLineMetrics";
 import {DisplayObject} from "../display/DisplayObject";
-import {TextField as AwayTextField, TextFieldAutoSize, TextFormatAlign} from "@awayjs/scene";
+import {DisplayObject as AwayDisplayObject, TextField as AwayTextField, TextFieldAutoSize, TextFormatAlign, FrameScriptManager} from "@awayjs/scene";
+import { constructClassFromSymbol } from '../../avm2/constructClassFromSymbol';
 /**
  * Flash Player dispatches the textInteractionModeChange event when a user
  * changes the interaction mode of a text field.
@@ -62,7 +63,7 @@ export class TextField extends InteractiveObject
 			return textField;
 		}
 
-		return new TextField(adaptee);
+		return new TextField();
 	}
 
 	/**
@@ -71,8 +72,8 @@ export class TextField extends InteractiveObject
 	 * DisplayObjectContainer object to add the TextField instance to the display list.
 	 * The default size for a text field is 100 x 100 pixels.
 	 */
-	constructor (adaptee:AwayTextField = null){
-		super(adaptee || AwayTextField.getNewTextField());
+	constructor (){
+		super();
 		(<AwayTextField>this.adaptee).autoSize=TextFieldAutoSize.NONE;
 		(<AwayTextField>this.adaptee).textFormat.align=TextFormatAlign.CENTER;
 		//(<AwayTextField> this._adaptee).width=100;//80pro!
@@ -87,7 +88,19 @@ export class TextField extends InteractiveObject
 
 
 	}
+	protected createAdaptee():AwayDisplayObject{
+		var newAdaptee= AwayTextField.getNewTextField();
+		(<any>this).noReset=true;
+		newAdaptee.reset();
+		return newAdaptee;
+	}
+	public initAdapter(): void {
+		
+		if ((<any>this).executeConstructor) {
+			FrameScriptManager.queue_as3_constructor(<any>this.adaptee);
+		}
 
+	}
 	public dispatchKeyEvent(charCode, isShift, isCTRL, isAlt){
 
 	}
@@ -96,9 +109,15 @@ export class TextField extends InteractiveObject
 	}
 	public clone():TextField
 	{
-		var clone:TextField = new this.sec.flash.text.TextField();
-
-		this.adaptee.copyTo(clone.adaptee);
+		var clone:TextField=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
+		//var clone:TextField = new this.sec.flash.text.TextField();
+		var newText:AwayTextField=new AwayTextField();
+		this.adaptee.copyTo(newText);
+		clone.adaptee=newText;
+		clone._stage = this.activeStage;
+		(<any>clone).executeConstructor=()=>{
+			(<any>clone).axInitializer();
+		}
 
 		return clone;
 	}

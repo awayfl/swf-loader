@@ -6,16 +6,18 @@ export class TextEvent extends Event{
 	public static NETWORK_ERROR="networkError";
 	public static VERIFY_ERROR="verifyError";
 
+	private _text:string;
+
 	constructor(type:string, bubbles:boolean=false, cancelable:boolean=false, text:string=""){
 		super(type, bubbles, cancelable);
+		this._text=text;
 	}
 
 	public get text():string{
-		console.log("text not implemented yet in flash/IOErrorEvent");
-		return "";
+		return this._text;
 	}
 	public set text(value:string){
-		console.log("text not implemented yet in flash/IOErrorEvent");
+		this._text=value
 	}
 	public clone():Event{
 		console.log("clone not implemented yet in flash/IOErrorEvent");

@@ -3,6 +3,7 @@ import { InteractiveObject } from "./InteractiveObject";
 import { DisplayObject } from "./DisplayObject";
 import {SoundTransform} from "../media/SoundTransform";
 import { MovieClip } from './MovieClip';
+import { FrameScriptManager } from '@awayjs/scene';
 
 /**
  * The SimpleButton class lets you control all instances of button symbols in a SWF
@@ -55,6 +56,13 @@ export class SimpleButton extends MovieClip
 	// for AVM1:
 	public buttonMode:any;
 
+	public initAdapter(): void {
+		
+		if ((<any>this).executeConstructor) {
+			FrameScriptManager.queue_as3_constructor(<any>this.adaptee);
+		}
+
+	}
 	public registerScriptObject(child: any): void {
 	}
 

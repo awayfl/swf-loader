@@ -1,7 +1,7 @@
 import { Transform as AwayTransform, Point as AwayPoint, Box, Vector3D as AwayVector3D, AbstractMethodError } from "@awayjs/core";
-import { EventDispatcher } from "../events/EventDispatcher";
+import { EventDispatcher, BroadcastEventDispatchQueue } from "../events/EventDispatcher";
 import { Event } from "../events/Event";
-import { DisplayObject as AwayDisplayObject, IDisplayObjectAdapter } from "@awayjs/scene";
+import { DisplayObject as AwayDisplayObject, MovieClip as AwayMovieClip,  IDisplayObjectAdapter, MovieClip } from "@awayjs/scene";
 import { LoaderInfo } from "./LoaderInfo";
 import { DisplayObjectContainer } from "./DisplayObjectContainer";
 import { Stage } from "./Stage";
@@ -38,10 +38,22 @@ export class OrphanManager {
 	}
 	static updateOrphans(events) {
 		for (var i = 0; i < OrphanManager.orphans.length; i++) {
-			(<any>OrphanManager.orphans[i]).advanceFrame(events);
+			
+			if((<AwayMovieClip>OrphanManager.orphans[i].adaptee).isAsset(AwayMovieClip)){
+				(<AwayMovieClip>OrphanManager.orphans[i].adaptee).update(events);
+			}
+			else{
+				(<any>OrphanManager.orphans[i]).advanceFrame(events);
+
+			}
+			//(<any>OrphanManager.orphans[i]).dispatchQueuedEvents();
 		}
 	}
 
+}
+class StaticEvents{
+	
+	public static events:any={};
 }
 export class DisplayObject extends EventDispatcher implements IDisplayObjectAdapter {
 	static axClass: typeof DisplayObject & AXClass;
@@ -58,9 +70,23 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	protected _visibilityByScript: boolean;
 
 	private _transform: Transform;
+	public toString():string {
+		return this.adaptee.name;
 
+
+	}
 	public applySymbol() {
 
+	}
+	public dispatchStaticEvent(eventName:string){
+		if(!StaticEvents.events[eventName])
+			StaticEvents.events[eventName]=new this.sec.flash.events.Event(eventName);
+		this.dispatchEvent(StaticEvents.events[eventName])
+	}
+	public dispatchStaticBroadCastEvent(eventName:string){
+		if(!StaticEvents.events[eventName])
+			StaticEvents.events[eventName]=new this.sec.flash.events.Event(eventName);
+		BroadcastEventDispatchQueue.getInstance().dispatchEvent(StaticEvents.events[eventName])
 	}
 	protected _adaptee: AwayDisplayObject;
 	/**
@@ -133,14 +159,15 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	 */
 
-	constructor(adaptee: AwayDisplayObject = null) {
+	constructor() {
 		super();
 
 		this._blockedByScript = false;
 		this._ctBlockedByScript = false;
 		this._visibilityByScript = false;
 
-		this.adaptee = adaptee || new AwayDisplayObject();
+		// adaptee might already be set !
+		this.adaptee = this.adaptee || this.createAdaptee();
 
 		// needed, because `this.stage` must already be available when constructor of extending classes are executed
 		this._stage = this.activeStage;
@@ -162,6 +189,9 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 	}
 
 
+	protected createAdaptee():AwayDisplayObject{
+		return new AwayDisplayObject();
+	}
 
 	//---------------------------stuff added to make it work:
 
@@ -173,7 +203,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	public get activeStage(): any {
 		if (this.sec.flash.display.DisplayObject.axClass._activeStage == null) {
-			//console.log("ERROR: a Stage must have been created before any Sprite can be created!")
+			console.log("ERROR: a Stage must have been created before any Sprite can be created!")
 		}
 		return this.sec.flash.display.DisplayObject.axClass._activeStage;
 	}
@@ -215,9 +245,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 	}
 
-	public doInitEvents(): void {
-
-	}
+	public initAdapter(): void {}
 
 	public isBlockedByScript(): boolean {
 		//console.log("isBlockedByScript not implemented yet in flash/DisplayObject");
@@ -602,6 +630,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		if (isNaN(value))
 			return;
 
+		this._blockedByScript = true;
 		if (!this._adaptee.partition) {
 			console.warn("Trying to set Display.height on orphan child!");
 			return;
@@ -912,6 +941,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		return this.adaptee.scaleX;
 	}
 	public set scaleX(value: number) {
+		this._blockedByScript = true;
 		this.adaptee.scaleX = value;
 	}
 
@@ -926,6 +956,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		return this.adaptee.scaleY;
 	}
 	public set scaleY(value: number) {
+		this._blockedByScript = true;
 		this.adaptee.scaleY = value;
 	}
 
@@ -940,6 +971,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 		return this.adaptee.scaleZ;
 	}
 	public set scaleZ(value: number) {
+		this._blockedByScript = true;
 		this.adaptee.scaleZ = value;
 	}
 
@@ -1072,6 +1104,7 @@ export class DisplayObject extends EventDispatcher implements IDisplayObjectAdap
 
 		}
 
+		this._blockedByScript = true;
 		//todo2019
 		if (isNaN(value))
 			return;

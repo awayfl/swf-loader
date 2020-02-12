@@ -4,7 +4,7 @@ import {Image2DParser, BitmapImage2D} from "@awayjs/stage";
 
 import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign, SceneImage2D} from "@awayjs/scene";
 
-import {Graphics} from "@awayjs/graphics";
+import {Graphics, SwfTag} from "@awayjs/graphics";
 
 import {MethodMaterial, ImageTexture2D} from "@awayjs/materials";
 import {MovieClipSoundsManager} from "../factories/timelinesounds/MovieClipSoundsManager"
@@ -605,18 +605,12 @@ export class SWFParser extends ParserBase
 				//console.log("buttonSound ", buttonSound);
 			}
 		}
-			
-		var avm2scripts={};		
+				
 		var awayMc:MovieClip=this._factory.createMovieClip(null, symbol);
 		awayMc.symbolID=symbol.id;
-		if(awayMc._adapter != awayMc && (<any>awayMc._adapter).getScripts){
-			avm2scripts = (<any>awayMc._adapter).getScripts();
-		}		
+
 		var awayTimeline:Timeline=awayMc.timeline;
 
-		
-
-		
 		var keyframe_durations:number[]=[];
 		var frame_command_indices:number[]=[];
 		var frame_recipe:number[]=[];
@@ -640,7 +634,6 @@ export class SWFParser extends ParserBase
 
 		var virtualScenegraph:any={};
 		var freeChilds:any={};
-		var registeredGraphicsIDs:any={};
 		var keyFrameCount=0;
 		var framesLen:number=0;
 		
@@ -660,8 +653,25 @@ export class SWFParser extends ParserBase
 		var framesLen:number=swfFrames.length;
 		var command_recipe_flag:number=0;
 		var audio_commands_cnt:number=0;
+		var labelName:string;
+		var fl:number;
+		var fl_len:number;
+		var isEmpty:boolean;
+		var len:number;
+		var ct:number;
+		var unparsedTag:UnparsedTag;
+		var placeObjectTag:PlaceObjectTag;
+		var hasCharacter:boolean;
+		var awaySymbol: IAsset = null;
+		var sessionID: number = -1;
+		var swapGraphicsID: number = -1;
+		var ratio: number = -1;
+		var flashSymbol ;
+		var graphicsSprite:Sprite;
+		var doAdd=true;
+		var tag:any;
 		MovieClip.movieClipSoundsManagerClass=MovieClipSoundsManager;
-        //console.log("new mc ");
+
 		for (i = 0; i < framesLen; i++) {
 			noTimelineDebug || console.log("	process frame:", i+1, "/", framesLen);
 
@@ -705,9 +715,9 @@ export class SWFParser extends ParserBase
 				}
 			}
 			// check if this is a empty frame
-			var isEmpty:boolean=((!swfFrames[i].controlTags || swfFrames[i].controlTags.length==0) &&
+			isEmpty=((!swfFrames[i].controlTags || swfFrames[i].controlTags.length==0) &&
 								(!swfFrames[i].labelNames || swfFrames[i].labelNames.length==0) &&
-								(!swfFrames[i].actionBlocks || swfFrames[i].actionBlocks.length==0) && !avm2scripts[i]);
+								(!swfFrames[i].actionBlocks || swfFrames[i].actionBlocks.length==0));
 			
 			
 				
@@ -722,7 +732,7 @@ export class SWFParser extends ParserBase
 					frame_command_indices.push(command_index_stream.length);
 					keyframe_durations[keyframe_durations.length]=1;
                     frame_recipe.push(command_recipe_flag);
-                    for (var key in virtualScenegraph){
+                    for (key in virtualScenegraph){
                         child=virtualScenegraph[key];
                         freeChildsForID = freeChilds[child.id];
                         if(!freeChildsForID){
@@ -750,7 +760,7 @@ export class SWFParser extends ParserBase
 				command_recipe_flag=0;	
 				if(isButton){
 					command_recipe_flag |= 0x01;
-                    for (var key in virtualScenegraph){
+                    for (key in virtualScenegraph){
                         child=virtualScenegraph[key];
                         freeChildsForID = freeChilds[child.id];
                         if(!freeChildsForID){
@@ -768,35 +778,18 @@ export class SWFParser extends ParserBase
 				frame_command_indices.push(command_index_stream.length);
 				keyframe_durations[keyframe_durations.length]=1;
 				if(!isEmpty && (swfFrames[i].labelNames && swfFrames[i].labelNames.length>0)){
-					var fl_len:number=swfFrames[i].labelNames.length;
-					var scriptsFN=[];
-					for(var fl:number=0;fl<fl_len; fl++){
-						var scriptLabels=swfFrames[i].labelNames[fl].split("_AWS_");
-						for(var sl:number=1; sl<scriptLabels.length; sl++){
-							var scriptID=scriptLabels[sl].replace("_", "");
-							if(window["frameScripts_"+this._iFileName] && window["frameScripts_"+this._iFileName]["script_id_"+scriptID]){
-								//console.log("found function", window["frameScripts_"+this._iFileName]["script_id_"+scriptID]);
-								scriptsFN.push(window["frameScripts_"+this._iFileName]["script_id_"+scriptID]);
-							}
-						}
-						swfFrames[i].labelNames[fl]=scriptLabels.length>0?scriptLabels[0]:"";
-						var labelName=swfFrames[i].labelNames[fl];
+					fl_len=swfFrames[i].labelNames.length;
+					for(fl=0;fl<fl_len; fl++){
+						labelName=swfFrames[i].labelNames[fl];
 						if(this.swfFile.swfVersion<=9){
 							labelName=labelName.toLowerCase();
 						}
                         if(!awayTimeline._labels[labelName])
 						    awayTimeline._labels[labelName]=keyFrameCount;
 					}
-					if(scriptsFN.length>0){
-						awayTimeline._framescripts[keyFrameCount]=scriptsFN;
-
-					}
 				}
 				if(!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length>0){
-					awayTimeline._framescripts[keyFrameCount]=swfFrames[i].actionBlocks;
-                }
-				if(!isEmpty && avm2scripts[i]){
-					awayTimeline._framescripts[keyFrameCount]=avm2scripts[i];
+					awayTimeline.add_framescript(swfFrames[i].actionBlocks, i);
                 }
                 if(buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id!=0){
                     awaySymbol = this._awaySymbols[buttonSound[keyFrameCount].id];
@@ -808,11 +801,10 @@ export class SWFParser extends ParserBase
 				keyFrameCount++;
 				if(!isEmpty && swfFrames[i].controlTags && swfFrames[i].controlTags.length>0){
 					noTimelineDebug || console.log("			Start parsing controltags", swfFrames[i].controlTags.length);
-                    var len:number=swfFrames[i].controlTags.length;
-
-					for (var ct = 0; ct < len; ct++) {
-						var unparsedTag=swfFrames[i].controlTags[ct];
-						var tag= unparsedTag.tagCode === undefined ? unparsedTag : <any>this.getParsedTag(unparsedTag);
+                    len=swfFrames[i].controlTags.length;
+					for (ct = 0; ct < len; ct++) {
+						unparsedTag=swfFrames[i].controlTags[ct];
+						tag= unparsedTag.tagCode === undefined ? unparsedTag : <any>this.getParsedTag(unparsedTag);
 
 						//console.log("parsed tag", tag);
 						switch (tag.code) {
@@ -867,10 +859,10 @@ export class SWFParser extends ParserBase
 							case SwfTagCode.CODE_PLACE_OBJECT:
 							case SwfTagCode.CODE_PLACE_OBJECT2:
 							case SwfTagCode.CODE_PLACE_OBJECT3:
-								var placeObjectTag = <PlaceObjectTag>tag;
+								placeObjectTag = <PlaceObjectTag>tag;
 								//console.log("CODE_PLACE_OBJECT", tag.depth | 0, placeObjectTag);
 								child = virtualScenegraph[tag.depth];
-								var hasCharacter = placeObjectTag.symbolId > -1;
+								hasCharacter = placeObjectTag.symbolId > -1;
 								// Check for invalid flag constellations.
 								if (placeObjectTag.flags & PlaceObjectFlags.Move) {
 									// Invalid case 1: Move flag set but no child found at given depth.
@@ -879,10 +871,10 @@ export class SWFParser extends ParserBase
 										break;
 									}
 								} 
-								var awaySymbol: IAsset = null;
-								var sessionID: number = -1;
-								var swapGraphicsID: number = -1;
-								var ratio: number = -1;
+								awaySymbol = null;
+								sessionID = -1;
+								swapGraphicsID = -1;
+								ratio = -1;
 
 								// possible options:
 
@@ -898,11 +890,10 @@ export class SWFParser extends ParserBase
 
 								// !hasCharacter && !child
 								//		something is wrong ?
-
 								if(hasCharacter) {
 									//console.log("placeTag symbol id",placeObjectTag.symbolId )
 									awaySymbol = this._awaySymbols[placeObjectTag.symbolId];
-									var flashSymbol = this.dictionary[placeObjectTag.symbolId];
+									flashSymbol = this.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if(awaySymbol.isAsset(Graphics)){
 
@@ -912,7 +903,7 @@ export class SWFParser extends ParserBase
 										}
 										
 										// register a new instance for this object
-										var graphicsSprite:Sprite=this._factory.createSprite(null, <Graphics> awaySymbol, flashSymbol);
+										graphicsSprite=this._factory.createSprite(null, <Graphics> awaySymbol, flashSymbol);
 										graphicsSprite.mouseEnabled = false;
 
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds
@@ -955,7 +946,7 @@ export class SWFParser extends ParserBase
                                                 } 
                                                 else{
                                                     // if not, we try to grab any other                                                    
-                                                    for(var key in freeChilds[placeObjectTag.symbolId]){
+                                                    for(key in freeChilds[placeObjectTag.symbolId]){
                                                         if(freeChilds[placeObjectTag.symbolId][key].length>0){
                                                             sessionID=freeChilds[placeObjectTag.symbolId][key].shift();
                                                             break;
@@ -1000,7 +991,7 @@ export class SWFParser extends ParserBase
                                             } 
                                             else{  
                                                 // if not, we try to grab any other
-                                                for(var key in freeChilds[placeObjectTag.symbolId]){
+                                                for(key in freeChilds[placeObjectTag.symbolId]){
                                                     if(freeChilds[placeObjectTag.symbolId][key].length>0){
                                                         sessionID=freeChilds[placeObjectTag.symbolId][key].shift();
                                                         break;
@@ -1016,7 +1007,7 @@ export class SWFParser extends ParserBase
 											awayTimeline.potentialPrototypesInitEventsMap[sessionID+"#"+i]=placeObjectTag;
 										}
 										
-										var doAdd=true;
+										doAdd=true;
 										if(virtualScenegraph[tag.depth] && virtualScenegraph[tag.depth].id==placeObjectTag.symbolId){
 											doAdd=false;
 										}
@@ -1749,8 +1740,7 @@ export class SWFParser extends ParserBase
 
 			var unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
 			var definition = this.getParsedTag(unparsed);
-			var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'sound', definition,
-				this.env);
+			var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'sound', definition);
 			/*if (!release && traceLevel.value > 0) {
 			  var style = flagsToFontStyle(definition.bold, definition.italic);
 			  console.info("Decoding embedded font " + definition.id + " with name '" + definition.name +
@@ -2180,8 +2170,7 @@ export class SWFParser extends ParserBase
 
 	private decodeEmbeddedFont(unparsed: UnparsedTag) {
 		var definition = this.getParsedTag(unparsed);
-		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'font', definition,
-			this.env);
+		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'font', definition);
 		/*if (!release && traceLevel.value > 0) {
 		  var style = flagsToFontStyle(definition.bold, definition.italic);
 		  console.info("Decoding embedded font " + definition.id + " with name '" + definition.name +
@@ -2226,8 +2215,7 @@ export class SWFParser extends ParserBase
 
 	private decodeEmbeddedImage(unparsed: UnparsedTag) {
 		var definition = this.getParsedTag(unparsed);
-		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'image', definition,
-			this.env);
+		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'image', definition);
 		/*if (!release && traceLevel.value > 0) {
 		   console.info("Decoding embedded image " + definition.id + " of type " +
 			   getSwfTagCodeName(unparsed.tagCode) + " (start: " + unparsed.byteOffset +

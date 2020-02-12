@@ -167,9 +167,9 @@ export class AVM1Button extends AVM1MovieClip {
 		this._addListeners();
 	}
 
-	public doInitEvents():void
+	public initAdapter():void
 	{
-        super.doInitEvents();
+        super.initAdapter();
 		this._addListeners();
 	}
 

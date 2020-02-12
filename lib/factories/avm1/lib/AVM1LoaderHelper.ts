@@ -44,7 +44,7 @@ export class AVM1LoaderHelper {
 			if ((<any>asset).isAVMScene) {
 				this._content=<MovieClip>asset;
                 this.result.resolve(<MovieClip>asset);
-                (<any>asset.adapter).doInitEvents();
+                (<any>asset.adapter).initAdapter();
 			}
 		}
 	}

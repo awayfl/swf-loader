@@ -11,8 +11,11 @@ import { AXClass } from '../../avm2/run/AXClass';
 export class EventDispatcherBase extends ASObject
 {
 	static axClass: typeof EventDispatcherBase & AXClass;
+
 	private _listenerObjects:Array<ListenerObject> = new Array<ListenerObject>();
 	private _t:any;
+	protected _queuedEvents:EventBase[]=[];
+
 
     public toString():string{
         return "";
@@ -31,6 +34,8 @@ export class EventDispatcherBase extends ASObject
 	 */
 	public addEventListener(type:string, listener:(event:EventBase) => void):void
 	{
+		if(!this._listenerObjects)
+			return;
 		var l:ListenerObject = this._listenerObjects[type];
 
 		if (l === undefined)
@@ -47,6 +52,9 @@ export class EventDispatcherBase extends ASObject
 	 */
 	public removeEventListener(type:string, listener:(event:EventBase) => void):void
 	{
+		if(!this._listenerObjects)
+			return;
+
 		var l:ListenerObject = this._listenerObjects[type];
 
 		if (l) {
@@ -57,6 +65,14 @@ export class EventDispatcherBase extends ASObject
 		}
 	}
 
+	public getQueuedEvents()
+	{
+		if(!this._queuedEvents)
+			return null;
+		var returnEvents=this._queuedEvents.concat();
+		this._queuedEvents.length=0;
+		return returnEvents;
+	}
 	/**
 	 * Dispatch an event
 	 * @method dispatchEvent
@@ -64,6 +80,12 @@ export class EventDispatcherBase extends ASObject
 	 */
 	public dispatchEvent(event:EventBase):void
 	{
+		if(!this._listenerObjects){
+			if(!this._queuedEvents)
+				this._queuedEvents=[];
+			this._queuedEvents.push(event);
+			return;
+		}
 		var l:ListenerObject = this._listenerObjects[event.type];
 
 		if (l) {
@@ -80,6 +102,8 @@ export class EventDispatcherBase extends ASObject
 	 */
 	public hasEventListener(type:string, listener?:(event:EventBase) => void):boolean
 	{
+		if(!this._listenerObjects)
+			return;
 		if (this._listenerObjects[type] === undefined)
 			return false;
 

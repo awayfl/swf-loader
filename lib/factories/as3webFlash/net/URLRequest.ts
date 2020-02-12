@@ -49,19 +49,15 @@ export class URLRequest extends ASObject {
     this._adaptee.url = value;
   }
   get data(): ASObject {
-    console.log("TODO: URLRequest.data")
     return this._adaptee.data;
   }
   set data(value: ASObject) {
-    console.log("TODO: URLRequest.data")
     this._adaptee.data = value;
   }
   get method(): string {
-    console.log("TODO: URLRequest.method")
     return this._adaptee.method;
   }
   set method(value: string) {
-    console.log("TODO: URLRequest.method")
     this._adaptee.method = value;
   }
   get contentType(): string {

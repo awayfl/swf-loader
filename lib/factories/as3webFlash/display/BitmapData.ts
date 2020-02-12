@@ -33,6 +33,9 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 	public get adaptee(): SceneImage2D {
 		return this._adaptee;
 	}
+	public set adaptee(value: SceneImage2D) {
+		this._adaptee=value;
+	}
 
 	static loadBitmap(id: string): BitmapData {
 		console.log("loadBitmap not implemented yet in flash/BitmapData");
@@ -89,13 +92,9 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 	}
 	constructor(width: number, height: number, transparent: boolean = true, fillColor: number = 0xffffffff) {
 		super();
-		if(ActiveLoaderContext.sceneImage2DForBitmapConstructor){
-			this._adaptee=ActiveLoaderContext.sceneImage2DForBitmapConstructor;
-			ActiveLoaderContext.sceneImage2DForBitmapConstructor=null;
-		}
-		else{
-			this._adaptee = new SceneImage2D(width, height, transparent, fillColor, false, StageManager.getInstance().getStageAt(0));
-		}
+		
+		this._adaptee = this._adaptee || new SceneImage2D(width, height, transparent, fillColor, false, StageManager.getInstance().getStageAt(0));
+		
 		this._adaptee.adapter = this;
 	}
 
@@ -256,7 +255,7 @@ export class BitmapData extends ASObject implements IBitmapDrawable, IAssetAdapt
 		color: number,
 		mask: number,
 		copySource: boolean): number {
-		console.log("threshold not implemented yet in flash/BitmapData");
+		//console.log("threshold not implemented yet in flash/BitmapData");
 		return 0;
 
 	}

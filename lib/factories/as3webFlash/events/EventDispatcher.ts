@@ -3,6 +3,8 @@ import {IEventMapper} from "./IEventMapper";
 import {EventDispatcherBase} from "./EventDispatcherBase";
 
 import {EventBase} from "@awayjs/core";
+import { release } from '../../base/utilities/Debug';
+import { assert } from '@awayjs/graphics';
 
 /**
 	 * [broadcast event] Dispatched when the Flash Player or AIR application operating
@@ -30,6 +32,18 @@ export class EventDispatcher extends EventDispatcherBase
 	}
 	public willTrigger(){
 
+	}
+	public dispatchQueuedEvents():void{
+		
+		for(var i=0; i<this._queuedEvents.length; i++){
+			this.dispatchEvent(this._queuedEvents[i])
+		}
+		this._queuedEvents.length=0;
+		
+	}
+	public getQueuedEvents(){
+		
+		return super.getQueuedEvents();
 	}
 	public dispatchEvent(event:EventBase):void{
 		
@@ -109,6 +123,10 @@ export class EventDispatcher extends EventDispatcherBase
 							priority: number /*int*/ = 0, useWeakReference: boolean = false):void
 	{
 
+		
+		if (!useCapture && Event.isBroadcastEventType(type)) {
+			BroadcastEventDispatchQueue.getInstance().add(type, this);
+		}
 		if(this.eventMappingExtern.hasOwnProperty(type)){
 
 			// this is a external eventMapping
@@ -155,6 +173,90 @@ export class EventDispatcher extends EventDispatcherBase
 		if(this.eventMapping.hasOwnProperty(type)){
 			// a mapping exists
 			this.eventMapping[type].removeListener.call(this, this.eventMapping[type].adaptedType, this.eventMapping[type].callback);
+			if(!this.hasEventListener(type)){
+				
+				if (Event.isBroadcastEventType(type)) {
+					BroadcastEventDispatchQueue.getInstance().remove(type, this);
+				}
+			}
 		}
 	}
 }
+
+export class BroadcastEventDispatchQueue {
+	/**
+	 * The queues start off compact but can have null values if event targets are removed.
+	 * Periodically we compact them if too many null values exist.
+	 */
+	private _queues: {};
+	private static _instance:BroadcastEventDispatchQueue;
+	public static getInstance():BroadcastEventDispatchQueue
+	{
+		if(!BroadcastEventDispatchQueue._instance)
+			BroadcastEventDispatchQueue._instance=new BroadcastEventDispatchQueue();
+		return BroadcastEventDispatchQueue._instance;
+	}
+  
+	constructor() {
+	  this.reset();
+	}
+  
+	reset() {
+	  this._queues = {};
+	}
+  
+	add(type: string, target: EventDispatcher) {
+	  release || assert(Event.isBroadcastEventType(type), "Can only register broadcast events.");
+	  var queue = this._queues[type] || (this._queues[type] = []);
+	  if (queue.indexOf(target) >= 0) {
+		return;
+	  }
+	  queue.push(target);
+	}
+  
+	remove(type: string, target: EventDispatcher) {
+	  release || assert (Event.isBroadcastEventType(type), "Can only unregister broadcast events.");
+	  var queue = this._queues[type];
+	  release || assert (queue, "There should already be a queue for this.");
+	  var index = queue.indexOf(target);
+	  release || assert (index >= 0, "Target should be somewhere in this queue.");
+	  queue[index] = null;
+	  release || assert (queue.indexOf(target) < 0, "Target shouldn't be in this queue anymore.");
+	}
+  
+	dispatchEvent(event: Event) {
+	  release || assert (event.isBroadcastEvent(), "Cannot dispatch non-broadcast events.");
+	  var queue = this._queues[event._type];
+	  if (!queue) {
+		return;
+	  }
+	  /*
+	  if (!release && traceEventsOption.value) {
+		console.log('Broadcast event of type ' + event._type + ' to ' + queue.length +
+					' listeners');
+	  }*/
+	  var nullCount = 0;
+	  for (var i = 0; i < queue.length; i++) {
+		var target = queue[i];
+		if (target === null) {
+		  nullCount++;
+		} else {
+		  target.dispatchEvent(event);
+		}
+	  }
+	  // Compact the queue if there are too many holes in it.
+	  if (nullCount > 16 && nullCount > (queue.length >> 1)) {
+		var compactedQueue = [];
+		for (var i = 0; i < queue.length; i++) {
+		  if (queue[i]) {
+			compactedQueue.push(queue[i]);
+		  }
+		}
+		this._queues[event.type] = compactedQueue;
+	  }
+	}
+  
+	getQueueLength(type: string) {
+	  return this._queues[type] ? this._queues[type].length : 0;
+	}
+  }

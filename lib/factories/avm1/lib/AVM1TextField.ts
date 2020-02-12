@@ -134,7 +134,7 @@ export class AVM1TextField extends AVM1SymbolBase<TextField> {
 	}
 
 
-	public doInitEvents():void
+	public initAdapter():void
 	{
 		if (this.adaptee._symbol) {
 			//console.log("do init", this.adaptee._symbol.variableName, this);

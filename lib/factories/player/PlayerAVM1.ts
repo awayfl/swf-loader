@@ -117,7 +117,7 @@ export class PlayerAVM1 {
 				if(this._stage)
 					this._stage.getLayer(0).addChild(<MovieClip>asset);
 					
-				(<AVM1MovieClip>(<MovieClip>asset).adapter).doInitEvents();
+				(<AVM1MovieClip>(<MovieClip>asset).adapter).initAdapter();
 				if(this._skipFrames>0)
 					(<MovieClip>asset).currentFrameIndex=7;
 			}

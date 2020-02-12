@@ -314,8 +314,8 @@ export class InteractiveObject extends DisplayObject{
 	 *
 	 *   new SimpleButton()new TextField()new Loader()new Sprite()new MovieClip()
 	 */
-	constructor(adaptee:AwayDisplayObject = null){
-		super(adaptee);
+	constructor(){
+		super();
 
 
 		 // these events can not be mapped from awayjs: //todo (?)

@@ -1,4 +1,4 @@
-import {Billboard} from "@awayjs/scene";
+import {Billboard, DisplayObject as AwayDisplayObject} from "@awayjs/scene";
 import { DisplayObject } from "./DisplayObject";
 import { BitmapData } from "./BitmapData";
 import {ImageTexture2D, MethodMaterial} from "@awayjs/materials";
@@ -33,6 +33,9 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner
 	private _texture:ImageTexture2D;
 	private _bitmapData:BitmapData;
 	private static _bitmaps:Array<Bitmap> = new Array<Bitmap>();
+	private static argBitmapMaterial:MethodMaterial;
+	private static argPixelSnapping:string;
+	private static argSmoothing:boolean;
 
 	public static getNewBitmap(bitmapData:BitmapData = null, pixelSnapping:string="auto", smoothing:boolean=false):Bitmap
 	{
@@ -63,7 +66,10 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner
 		newMaterial.alphaBlending = true;
 		newMaterial.useColorTransform = true;
 
-		super(Billboard.getNewBillboard(newMaterial, pixelSnapping, smoothing));
+		Bitmap.argBitmapMaterial=newMaterial;
+		Bitmap.argPixelSnapping=pixelSnapping;
+		Bitmap.argSmoothing=smoothing;
+		super();
 
 		this._bitmapData = bitmapData;
 
@@ -71,6 +77,13 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner
 			this._bitmapData._addOwner(this);
 	}
 
+	protected createAdaptee():AwayDisplayObject{
+		var newAdaptee=Billboard.getNewBillboard(Bitmap.argBitmapMaterial, Bitmap.argPixelSnapping, Bitmap.argSmoothing);		
+		Bitmap.argBitmapMaterial=null;
+		Bitmap.argPixelSnapping=null;
+		Bitmap.argSmoothing=null;
+		return newAdaptee;
+	}
 	public clone():Bitmap
 	{
 		var newInstance:Bitmap = Bitmap.getNewBitmap(this._bitmapData);

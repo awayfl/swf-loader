@@ -4,6 +4,7 @@ import {EventDispatcher} from "../events/EventDispatcher"
 import {IEventMapper} from "../events/IEventMapper"
 import {Event} from "../events/Event"
 import {ProgressEvent} from "../events/ProgressEvent"
+import {IOErrorEvent} from "../events/IOErrorEvent"
 import { AXClass } from '../../avm2/run/AXClass';
 import { URLRequest } from './URLRequest';
 
@@ -21,6 +22,7 @@ export class URLLoader extends EventDispatcher
 
 		this._completeCallbackDelegate = (event:URLLoaderEvent) => this.completeCallback(event);
 		this._progressCallbackDelegate = (event:URLLoaderEvent) => this.progressCallback(event);
+		this._loadErrorDelegate = (event:URLLoaderEvent) => this.loadErrorDelegate(event);
 		this.eventMapping[Event.COMPLETE]=(<IEventMapper>{
 			adaptedType:URLLoaderEvent.LOAD_COMPLETE,
 			addListener:this.initListener,
@@ -31,6 +33,11 @@ export class URLLoader extends EventDispatcher
 			addListener:this.initListener,
 			removeListener:this.removeListener,
 			callback:this._progressCallbackDelegate});
+		this.eventMapping[IOErrorEvent.IO_ERROR]=(<IEventMapper>{
+			adaptedType:URLLoaderEvent.LOAD_ERROR,
+			addListener:this.initListener,
+			removeListener:this.removeListener,
+			callback:this._loadErrorDelegate});
 	}
 
 	public close()
@@ -52,6 +59,13 @@ export class URLLoader extends EventDispatcher
 	public addEventListener(type:string, callback:(event:any) => void):void
 	{
 		super.addEventListener(type, callback);
+	}
+	private _loadErrorDelegate:(event:URLLoaderEvent) => void;
+	private loadErrorDelegate(event:URLLoaderEvent=null):void
+	{
+		var newEvent:IOErrorEvent = new this.sec.flash.events.IOErrorEvent(IOErrorEvent.IO_ERROR);
+		newEvent.currentTarget=this;
+		this.dispatchEvent(newEvent);
 	}
 	private _progressCallbackDelegate:(event:URLLoaderEvent) => void;
 	private progressCallback(event:URLLoaderEvent=null):void

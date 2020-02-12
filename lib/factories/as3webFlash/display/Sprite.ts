@@ -1,4 +1,4 @@
-import {Sprite as AwaySprite, DisplayObject as AwayDisplayObject, MovieClip as AwayMovieClip} from "@awayjs/scene";
+import {Sprite as AwaySprite, DisplayObject as AwayDisplayObject, MovieClip as AwayMovieClip, FrameScriptManager} from "@awayjs/scene";
 import {DisplayObjectContainer} from "./DisplayObjectContainer";
 import {DisplayObject} from "./DisplayObject";
 import {Rectangle, Matrix3D} from "@awayjs/core";
@@ -19,9 +19,16 @@ export class  Sprite extends DisplayObjectContainer
 			return sprite;
 		}
 
-		return new Sprite(adaptee);
+		return new Sprite();
 	}
 
+	public initAdapter(): void {
+		
+		if ((<any>this).executeConstructor) {
+			FrameScriptManager.queue_as3_constructor(<AwayMovieClip>this.adaptee);
+		}
+
+	}
 	private _graphics:Graphics;
 
 	/**
@@ -38,44 +45,29 @@ export class  Sprite extends DisplayObjectContainer
 	 * DisplayObjectContainer.addChild() or DisplayObjectContainer.addChildAt()
 	 * method to add the Sprite to a parent DisplayObjectContainer.
 	 */
-	constructor(adaptee:AwaySprite = null)
+	constructor()
 	{
-		if(!adaptee && AwayMovieClip.mcForConstructor){
+		/*if(!adaptee && AwayMovieClip.mcForConstructor){
 			adaptee=AwayMovieClip.mcForConstructor;
-		}
-		super(adaptee || AwaySprite.getNewSprite());
+		}*/
+		super();
 
-		// if the adaptee was passed in via AwayMovieClip.mcForConstructor, its actually a MovieClip, 
-		// not a Sprite, and we need to reset it after the adapter was constructed
-		if(AwayMovieClip.mcForConstructor){
+		/*if(!this.adaptee.parent && !(<any>this).noReset){
 
-			var old_matrix:Matrix3D = adaptee.transform.matrix3D;
-			var tmpMatrix={
-				a:old_matrix._rawData[0],
-				b:old_matrix._rawData[1],
-				c:old_matrix._rawData[4],
-				d:old_matrix._rawData[5],
-				tx:old_matrix._rawData[12],
-				ty:old_matrix._rawData[13],
-
-			}
-			adaptee.reset();
-			
-			var new_matrix:Matrix3D = adaptee.transform.matrix3D;
-			new_matrix._rawData[0] = tmpMatrix.a;
-			new_matrix._rawData[1] =  tmpMatrix.b;
-			new_matrix._rawData[4] =  tmpMatrix.c;
-			new_matrix._rawData[5] =  tmpMatrix.d;
-			new_matrix._rawData[12] =  tmpMatrix.tx;
-			new_matrix._rawData[13] =  tmpMatrix.ty;
-
-			adaptee.transform.invalidateComponents();
-			AwayMovieClip.mcForConstructor=null;
-		}
-
+		}*/
 		this._graphics = new this.sec.flash.display.Graphics((<AwaySprite> this._adaptee).graphics);
 	}
 
+	protected createAdaptee():AwayDisplayObject{
+		var newAdaptee=AwaySprite.getNewSprite();
+		
+		//console.log("createAdaptee AwaySprite");
+		(<any>newAdaptee).timelineMC=true;
+		newAdaptee.reset();
+		(<any>this).noReset=true;
+        //FrameScriptManager.execute_queue();
+		return newAdaptee;
+	}
 	//---------------------------stuff added to make it work:
 
 	public registerScriptObject(child: AwayDisplayObject): void {
@@ -93,6 +85,9 @@ export class  Sprite extends DisplayObjectContainer
 			(<AwayMovieClip>child).removeButtonListeners();
 	}
 
+	public clearPropsDic(){
+		this["$Bg__setPropDict"].map= new WeakMap();
+	}
 	public clone():Sprite
 	{
 
@@ -101,8 +96,19 @@ export class  Sprite extends DisplayObjectContainer
 		}
 		//var clone: MovieClip = MovieClip.getNewMovieClip(AwayMovieClip.getNewMovieClip((<AwayMovieClip>this.adaptee).timeline));
 		var clone=constructClassFromSymbol((<any>this)._symbol, (<any>this)._symbol.symbolClass);
-		clone.axInitializer();
-		this.adaptee.copyTo(clone.adaptee);
+		var adaptee=new AwaySprite();
+		this.adaptee.copyTo(adaptee);
+		clone.adaptee=adaptee;
+		clone._stage = this.activeStage;
+		(<any>clone).executeConstructor=()=>{
+			var events=(<any>clone).getQueuedEvents();
+			(<any>clone).axInitializer();
+			if(events){
+				for(var i=0; i<events.length; i++){
+					(<any>clone).dispatchEvent(events[i]);
+				}
+			}
+		}
 		clone.adaptee.graphics=this.graphics;
 		return clone;
 	}

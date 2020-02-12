@@ -126,6 +126,7 @@ export class Loader extends DisplayObjectContainer
 
 				var newClone=<DisplayObject>(<IDisplayObjectAdapter> asset.adapter).clone();
 				newClone.loaderInfo=this.loaderInfo;
+				newClone.adaptee.reset();
 				this.addChild(newClone);
 				//this.addChild(this._loaderInfo.content = (<MovieClip>(<AwayMovieClip>asset).adapter));
 			}
