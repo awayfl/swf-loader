@@ -929,7 +929,7 @@ export function compile(methodInfo: MethodInfo) {
         if (params[i].hasOptionalValue())
             switch (p.optionalValueKind) {
                 case CONSTANT.Utf8:
-                    js0.push("    if (argnum <= " + i + ") local" + (i + 1) + " = context.getstring(" + p.optionalValueIndex + ");")
+                    js0.push("    if (argnum <= " + i + ") local" + (i + 1) + " = context.abc.getString(" + p.optionalValueIndex + ");")
                     break
                 default:
                     js0.push("    if (argnum <= " + i + ") local" + (i + 1) + " = " + p.getOptionalValue() + ";")
@@ -1018,17 +1018,17 @@ export function compile(methodInfo: MethodInfo) {
                     break
 
                 case Bytecode.GETSLOT:
-                    js.push("                " + stack0 + " = context.getslot(" + param(0) + ", " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.sec.box(" + stack0 + ").axGetSlot(" + param(0) + ");")
                     break
                 case Bytecode.SETSLOT:
-                    js.push("                context.setslot(" + param(0) + ", " + stack1 + ", " + stack0 + ");")
+                    js.push("                context.sec.box(" + stack1 + ").axSetSlot(" + param(0) + ", " + stack0 + ");")
                     break
 
                 case Bytecode.GETGLOBALSCOPE:
                     js.push("                " + stackN + " = context.savedScope.global.object;")
                     break
                 case Bytecode.PUSHSCOPE:
-                    js.push("                " + scopeN + " = context.pushscope(" + scope + ", " + stack0 + ");")
+                    js.push("                " + scopeN + " = " + scope + ".extend(context.sec.box(" + stack0 + "));")
                     break
                 case Bytecode.PUSHWITH:
                     js.push("                " + scopeN + " = context.pushwith(" + scope + ", " + stack0 + ");")
@@ -1037,14 +1037,14 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + scope + " = undefined;")
                     break
                 case Bytecode.GETSCOPEOBJECT:
-                    js.push("                " + stackN + " = context.getscopeobject(" + "scope" + param(0) + ");")
+                    js.push("                " + stackN + " = scope" + param(0) + ".object;")
                     break
 
                 case Bytecode.NEXTNAME:
-                    js.push("                " + stack1 + " = context.nextname(" + stack1 + ", " + stack0 + ");")
+                    js.push("                " + stack1 + " = context.sec.box(" + stack1 + ").axNextName(" + stack0 + ");")
                     break
                 case Bytecode.NEXTVALUE:
-                    js.push("                " + stack1 + " = context.nextvalue(" + stack1 + ", " + stack0 + ");")
+                    js.push("                " + stack1 + " = context.sec.box(" + stack1 + ").axNextValue(" + stack0 + ");")
                     break
                 case Bytecode.HASNEXT2:
                     js.push("                temp = context.hasnext2(" + local(param(0)) + ", " + local(param(1)) + ");")
@@ -1053,7 +1053,7 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + stackN + " = " + local(param(1)) + " > 0;")
                     break
                 case Bytecode.IN:
-                    js.push("                " + stack1 + " = context.isin(" + stack1 + ", " + stack0 + ");")
+                    js.push("                " + stack1 + " = (" + stack1 + " && " + stack1 + ".axClass === context.sec.AXQName) ? obj.axHasProperty(" + stack1 + ".name) : " + stack0 + ".axHasPublicProperty(" + stack1 + ");")
                     break
 
                 case Bytecode.DUP:
@@ -1087,7 +1087,7 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + stackN + " = " + abc.doubles[param(0)] + ";")
                     break
                 case Bytecode.PUSHSTRING:
-                    js.push("                " + stackN + " = context.getstring(" + param(0) + ");")
+                    js.push("                " + stackN + " = context.abc.getString(" + param(0) + ");")
                     break
                 case Bytecode.PUSHNAN:
                     js.push("                " + stackN + " = NaN;")
@@ -1223,10 +1223,10 @@ export function compile(methodInfo: MethodInfo) {
                     break
 
                 case Bytecode.ISTYPELATE:
-                    js.push("                " + stack1 + " = context.istypelate(" + stack1 + ", " + stack0 + ");")
+                    js.push("                " + stack1 + " = " + stack0 + ".axIsType(" + stack1 + ");")
                     break
                 case Bytecode.ASTYPELATE:
-                    js.push("                " + stack1 + " = context.astypelate(" + stack1 + ", " + stack0 + ");")
+                    js.push("                " + stack1 + " = " + stack0 + ".axAsType(" + stack1 + ");")
                     break
 
                 case Bytecode.CALL: {
@@ -1258,7 +1258,7 @@ export function compile(methodInfo: MethodInfo) {
                     }
                     else {
                         js.push("                // " + abc.getMultiname(param(0)))
-                        js.push("                " + stackF(param(0)) + " = context.callproperty(" + getname(param(1)) + ", " + pp.shift() + ", [" + pp.join(", ") + "]);")
+                        js.push("                " + stackF(param(0)) + " = context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
                     }
                     break
                 case Bytecode.CALLPROPVOID: {
@@ -1267,7 +1267,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 0; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.callpropvoid(" + getname(param(1)) + ", " + pp.shift() + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
                 }
                     break
                 case Bytecode.APPLYTYPE: {
@@ -1276,26 +1276,26 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0)) + " = context.applytype(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0)) + " = context.sec.applyType(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
 
 
                 case Bytecode.FINDPROPSTRICT:
                     js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                " + stackN + " = context.findpropstrict(" + getname(param(0)) + ", " + scope + ");")
+                    js.push("                " + stackN + " = " + scope + ".findScopeProperty(" + getname(param(0)) + ", true, false);")
                     break
                 case Bytecode.FINDPROPERTY:
                     js.push("                // " + abc.getMultiname(param(0)))
-                    js.push("                " + stackN + " = context.findproperty(" + getname(param(0)) + ", " + scope + ");")
+                    js.push("                " + stackN + " = " + scope + ".findScopeProperty(" + getname(param(0)) + ", false, false);")
                     break
                 case Bytecode.NEWFUNCTION:
                     js.push("                // " + abc.getMethodInfo(param(0)))
-                    js.push("                " + stackN + " = context.newfunction(" + param(0) + ", " + scope + ");")
+                    js.push("                " + stackN + " = context.sec.createFunction(context.abc.getMethodInfo(" + param(0) + "), " + scope + ", true);")
                     break
                 case Bytecode.NEWCLASS:
                     js.push("                // " + abc.classes[param(0)])
-                    js.push("                " + stack0 + " = context.newclass(" + param(0) + ", " + scope + ", " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.sec.createClass(context.abc.classes[" + param(0) + "], " + stack0 + ", " + scope + ");")
                     break
                 case Bytecode.NEWARRAY: {
                     let pp = []
@@ -1303,14 +1303,14 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0) - 1) + " = context.newarray([" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0) - 1) + " = context.sec.AXArray.axBox([" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.NEWOBJECT:
-                    js.push("                temp = context.newobject();")
+                    js.push("                temp = Object.create(context.sec.AXObject.tPrototype);")
 
                     for (let j: number = 1; j <= param(0); j++) {
-                        js.push("                context.setpublicproperty(temp, " + stackF(2 * param(0) - 2 * j + 1) + ", " + stackF(2 * param(0) - 2 * j) + ");")
+                        js.push("                temp.axSetPublicProperty(" + stackF(2 * param(0) - 2 * j + 1) + ", " + stackF(2 * param(0) - 2 * j) + ");")
                     }
 
                     js.push("                " + stackF(2 * param(0) - 1) + " = temp;")
@@ -1318,10 +1318,10 @@ export function compile(methodInfo: MethodInfo) {
 
                     break
                 case Bytecode.NEWACTIVATION:
-                    js.push("                " + stackN + " = context.newactivation(" + scope + ");")
+                    js.push("                " + stackN + " = context.sec.createActivation(context.mi, " + scope + ");")
                     break
                 case Bytecode.NEWCATCH:
-                    js.push("                " + stackN + " = context.newcatch(" + param(0) + ", " + scope + ");")
+                    js.push("                " + stackN + " = context.sec.createCatch(context.mi.getBody().catchBlocks[" + param(0) + "], " + scope + ");")
                     break
                 case Bytecode.CONSTRUCTSUPER: {
                     let pp = []
@@ -1329,7 +1329,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.constructsuper(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.savedScope.object.superClass.tPrototype.axInitializer.apply(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CALLSUPER_DYN: {
@@ -1338,7 +1338,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0) + 1) + " = context.callsuper(context.rutimename(" + stackF(param(0)) + ", " + param(1) + "), " + stackF(param(0) + 1) + ", [" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0) + 1) + " = context.sec.box(" + stackF(param(0) + 1) + ").axCallSuper(context.runtimename(" + stackF(param(0)) + ", " + param(1) + "), context.savedScope, [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CALLSUPERVOID: {
@@ -1347,7 +1347,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.callsuper(" + getname(param(1)) + ", " + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                context.sec.box(" + stackF(param(0)) + ").axCallSuper(" + getname(param(1)) + ", context.savedScope, [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CONSTRUCTPROP: {
@@ -1430,16 +1430,16 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + stack1 + " = context.deleteproperty(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
                     break
                 case Bytecode.GETSUPER:
-                    js.push("                " + stack0 + " = context.getsuper(" + getname(param(0)) + ", " + stack0 + ");")
+                    js.push("                " + stack0 + " = context.sec.box(" + stack0 + ").axGetSuper(" + getname(param(0)) + ", context.savedScope);")
                     break
                 case Bytecode.GETSUPER_DYN:
-                    js.push("                " + stack1 + " = context.getsuper(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
+                    js.push("                " + stack1 + " = context.sec.box(" + stack1 + ").axGetSuper(context.runtimename(" + stack0 + ", " + param(0) + "), context.savedScope);")
                     break
                 case Bytecode.SETSUPER:
-                    js.push("                context.setsuper(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
+                    js.push("                context.sec.box(" + stack1 + ").axSetSuper(" + getname(param(0)) + ", context.savedScope, " + stack0 + ");")
                     break
                 case Bytecode.SETSUPER_DYN:
-                    js.push("                context.setsuper(context.runtimename(" + stack1 + ", " + param(0) + "), " + stack0 + ", " + stack2 + ");")
+                    js.push("                context.sec.box(" + stack2 + ").axSetSuper(context.runtimename(" + stack1 + ", " + param(0) + "), context.savedScope, " + stack0 + ");")
                     break
                 /*
                 case Bytecode.GETLEX:
@@ -1482,13 +1482,13 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                return;")
                     break
                 case Bytecode.COERCE:
-                    js.push("                " + stack0 + " = context.coerce(" + getname(param(0)) + ", " + scope + ", " + stack0 + ");")
+                    js.push("                " + stack0 + " = " + scope + ".getScopeProperty(" + getname(param(0)) + ", true, false).axCoerce(" + stack0 + ");")
                     break
                 case Bytecode.COERCE_A:
                     js.push("                ;")
                     break
                 case Bytecode.COERCE_S:
-                    js.push("                " + stack0 + " = context.coercestring(" + stack0 + ");")
+                    js.push("                " + stack0 + " = context.axCoerceString(" + stack0 + ");")
                     break
                 case Bytecode.CONVERT_I:
                     js.push("                " + stack0 + " |= 0;")
@@ -1533,6 +1533,7 @@ export class Context {
     private readonly abc: ABCFile
     private readonly names: Multiname[]
     private readonly jsGlobal: Object = jsGlobal;
+    private readonly axCoerceString: Function = axCoerceString;
 
     constructor(mi: MethodInfo, savedScope: Scope, names:Multiname[]) {
         this.mi = mi;
@@ -1551,20 +1552,8 @@ export class Context {
         return value.axApply(obj, pp)
     }
 
-    callproperty(mn, obj, pp) {
-        return this.sec.box(obj).axCallProperty(mn, pp, false)
-    }
-
-    callpropvoid(mn, obj, pp) {
-        return this.sec.box(obj).axCallProperty(mn, pp, false)
-    }
-
     getdefinitionbyname(scope, obj, pp) {
         return (<ScriptInfo>(<any>scope.global.object).scriptInfo).abc.env.app.getClass(Multiname.FromSimpleName(pp[0]))
-    }
-
-    findpropstrict(mn, scope) {
-        return scope.findScopeProperty(mn, true, false)
     }
 
     getproperty(mn, obj) {
@@ -1596,14 +1585,6 @@ export class Context {
         if(typeof name ==="number" || typeof name ==="string")
             return delete b[name];
         return b.axDeleteProperty(name)
-    }
-
-    getsuper(name, obj) {
-        return this.sec.box(obj).axGetSuper(name, this.savedScope)
-    }
-
-    setsuper(name, value, obj) {
-        return this.sec.box(obj).axSetSuper(name, this.savedScope, value)
     }
 
     getlexrecording(mn: Multiname, scope: Scope) {
@@ -1642,51 +1623,6 @@ export class Context {
         return scope.findScopeProperty(mn, true, false).axGetProperty(mn)
     }
 
-    findproperty(mn, scope) {
-        return scope.findScopeProperty(mn, false, false)
-    }
-
-    newfunction(index, scope) {
-        return this.sec.createFunction(this.abc.getMethodInfo(index), scope, true)
-    }
-
-    getslot(index, obj) {
-        return this.sec.box(obj).axGetSlot(index)
-    }
-
-    setslot(index, obj, value) {
-        return this.sec.box(obj).axSetSlot(index, value)
-    }
-
-    newclass(index, scope, value) {
-        return this.sec.createClass(this.abc.classes[index], value, scope)
-    }
-
-
-    newactivation(scope) {
-        return this.sec.createActivation(this.mi, scope)
-    }
-
-
-    newcatch(index, scope) {
-        return this.sec.createCatch(this.mi.getBody().catchBlocks[index], scope)
-    }
-
-
-    newarray(pp) {
-        return this.sec.AXArray.axBox(pp)
-    }
-
-
-    constructsuper(obj, pp) {
-        return (<any>this.savedScope.object).superClass.tPrototype.axInitializer.apply(obj, pp)
-    }
-
-
-    callsuper(name, obj, pp) {
-        return this.sec.box(obj).axCallSuper(name, this.savedScope, pp)
-    }
-
 
     construct(obj, pp) {
         let mn = obj.classInfo.instanceInfo.getName()
@@ -1712,65 +1648,9 @@ export class Context {
     }
 
 
-    getstring(index) {
-        return this.abc.getString(index)
-    }
-
-
-    pushscope(scope, obj) {
-        let b = this.sec.box(obj) 
-        return scope.extend(b)
-    }
-
-
     pushwith(scope, obj) {
         let b = this.sec.box(obj)
         return (scope.object === b && scope.isWith == true) ? scope : new Scope(scope, b, true)
-    }
-
-
-    getscopeobject(scope) {
-        return scope.object
-    }
-
-
-    newobject() {
-        return Object.create(this.sec.AXObject.tPrototype)
-    }
-
-
-    coerce(mn, scope, obj) {
-        return (<AXClass> scope.getScopeProperty(mn, true, false)).axCoerce(obj)
-    }
-
-
-    coercestring(obj) {
-        return axCoerceString(obj)
-    }
-
-
-    applytype(obj, pp) {
-        return this.sec.applyType(obj, pp)
-    }
-
-
-    istypelate(obj, type) {
-        return type.axIsType(obj)
-    }
-
-
-    astypelate(obj, type) {
-        return type.axAsType(obj)
-    }
-
-
-    nextname(obj, v) {
-        return this.sec.box(obj).axNextName(v)
-    }
-
-
-    nextvalue(obj, v) {
-        return this.sec.box(obj).axNextValue(v)
     }
 
 
@@ -1778,20 +1658,6 @@ export class Context {
         let info = new HasNext2Info(null, 0)
         info.next(this.sec.box(obj), name)
         return [info.object, info.index]
-    }
-    
-    isin(name, obj) {
-        return (name && name.axClass === this.sec.AXQName) ? obj.axHasProperty(name.name) : obj.axHasPublicProperty(name);
-    }
-
-
-    setpublicproperty(obj, name, value) {
-        return obj.axSetPublicProperty(name, value)
-    }
-
-
-    name(index) {
-        return this.abc.getMultiname(index)
     }
 
     runtimename(name, index) {
