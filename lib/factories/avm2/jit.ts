@@ -16,7 +16,6 @@ import {axCoerceName} from "./run/axCoerceName"
 import {isNumeric} from "../base/utilities"
 import {ABCFile} from "./abc/lazy/ABCFile"
 import {ScriptInfo} from "./abc/lazy/ScriptInfo"
-import {b2Class} from "./btd"
 import {recording, resolver} from "./rsl"
 import {AXGlobal} from "./run/AXGlobal"
 import { jsGlobal } from '../base/utilities/jsGlobal'
@@ -1373,7 +1372,7 @@ export function compile(methodInfo: MethodInfo) {
                         let r = resolver.resolveGet(mn)
 
                         if (r) {
-                            js.push("                " + stack0 + " = " + stack0 + ".__fast__ ? " + stack0 + "[\"" + mn.name + "\"] : " + stack0 + "[\"" + r + "\"];")
+                            js.push("                " + stack0 + " = " + stack0 + "[\"" + r + "\"];")
                         }
                         else {
                             js.push("                if (" + stack0 + ") {")
@@ -1413,7 +1412,7 @@ export function compile(methodInfo: MethodInfo) {
                         let r = resolver.resolveSet(mn)
 
                         if (r) {
-                            js.push("                if (" + stack1 + ".__fast__) {" + stack1 + "[\"" + mn.name + "\"] = " + stack0 + ";} else {" + stack1 + "[\"" + r + "\"] = " + stack0 + ";}")
+                            js.push("                " + stack1 + "[\"" + r + "\"] = " + stack0 + ";}")
                         }
                         else {
                             js.push("                context.setproperty(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
@@ -1553,16 +1552,10 @@ export class Context {
     }
 
     callproperty(mn, obj, pp) {
-        if (obj && obj.__fast__)
-            return obj[mn.name].apply(obj, pp)
-
         return this.sec.box(obj).axCallProperty(mn, pp, false)
     }
 
     callpropvoid(mn, obj, pp) {
-        if (obj && obj.__fast__)
-            return obj[mn.name].apply(obj, pp)
-
         return this.sec.box(obj).axCallProperty(mn, pp, false)
     }
 
@@ -1575,16 +1568,10 @@ export class Context {
     }
 
     getproperty(mn, obj) {
-        if (obj.__fast__)
-            return obj[mn.name]
-
         return obj.axGetProperty(mn)
     }
 
     getpropertydyn(mn, obj) {
-        if (obj && obj.__fast__)
-            return obj[mn.name]
-
         let b = this.sec.box(obj)
 
         if (recording)
@@ -1598,9 +1585,6 @@ export class Context {
     }
 
     setproperty(mn, value, obj) {
-        if (obj && obj.__fast__)
-            return obj[mn.name] = value
-
         if (typeof mn === "number")
             return this.sec.box(obj).axSetNumericProperty(mn, value)
 
@@ -1706,11 +1690,6 @@ export class Context {
 
     construct(obj, pp) {
         let mn = obj.classInfo.instanceInfo.getName()
-        
-        let r = b2Class(mn.name, pp)
-
-        if (r != null)
-            return r
 
         // if (mn.name.indexOf("b2") >= 0)
         //     console.log("*B2: " + mn.name)
@@ -1721,11 +1700,6 @@ export class Context {
 
 
     constructprop(mn, obj, pp) {
-        let r = b2Class(mn.name, pp)
-
-        if (r != null)
-            return r
-
         // if (mn.name.indexOf("b2") >= 0)
         //     console.log("B2: " + mn.name)
         
