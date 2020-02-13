@@ -129,6 +129,10 @@ export class Player {
 			
 			this._time -= frameMarker;
 
+			// 	broadcast ENTER_FRAME event
+			//	i think this should really be done after the stage has advanced, but it causes a error in BIC
+			this._stage.dispatchStaticBroadCastEvent(Event.ENTER_FRAME);
+
 			// 	advance the stage - this updates the timeline
 			//	objects get removed, created and updated - framescripts get queued
 			//	as3 constructors for the adpaters are not yet run
@@ -136,8 +140,6 @@ export class Player {
 			this._stage.advanceFrame(this._events);
 			OrphanManager.updateOrphans(this._events);
 			
-			// broadcast ENTER_FRAME event
-			this._stage.dispatchStaticBroadCastEvent(Event.ENTER_FRAME);
 			
 			// run all as3 constructors
 			FrameScriptManager.execute_as3_constructors();
