@@ -221,17 +221,20 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 	}
 	public addScript(source: any, frameIdx: number): any {
-		let actionsBlocks = source;
+		let allscripts = source;
 		var translatedScripts: any[] = [];
-		for (let i = 0; i < actionsBlocks.length; i++) {
-			let actionsBlock = actionsBlocks[i];
-			var mcName: any = this.adaptee.name;
-			if (typeof mcName != "string") {
-				mcName = mcName.toString();
+		for (let i = 0; i < allscripts.length; i++) {
+			let scripts = allscripts[i];
+			for (let s = 0; s < scripts.length; s++) {
+				let script = scripts[s];
+				var mcName: any = this.adaptee.name;
+				if (typeof mcName != "string") {
+					mcName = mcName.toString();
+				}
+				script.data = (<AVM1Context>this._avm1Context).actionsDataFactory.createActionsData(
+					script.actionsData, 'script_' + mcName.replace(/[^\w]/g, '') + "_" + this.adaptee.id + '_frame_' + frameIdx + '_idx_' + i);
+				translatedScripts[translatedScripts.length] = script;
 			}
-			actionsBlock.data = (<AVM1Context>this._avm1Context).actionsDataFactory.createActionsData(
-				actionsBlock.actionsData, 'script_' + mcName.replace(/[^\w]/g, '') + "_" + this.adaptee.id + '_frame_' + frameIdx + '_idx_' + i);
-			translatedScripts[translatedScripts.length] = actionsBlock;
 		}
 		return translatedScripts;
 	}
