@@ -673,6 +673,11 @@ export function compile(methodInfo: MethodInfo) {
                 var argnum = u30()
                 q.push(new Instruction(oldi, z + dyn, [argnum, index], -argnum + d))
                 break
+            case Bytecode.CALLPROPLEX:
+                var [index, dyn, d] = mn()
+                var argnum = u30()
+                q.push(new Instruction(oldi, z + dyn, [argnum, index], -argnum + d))
+                break
             case Bytecode.CALLPROPVOID:
                 var [index, dyn, d] = mn()
                 var argnum = u30()
@@ -1261,6 +1266,15 @@ export function compile(methodInfo: MethodInfo) {
                         js.push("                " + stackF(param(0)) + " = context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
                     }
                     break
+                case Bytecode.CALLPROPLEX: {
+                    let pp = []
+
+                    for (let j: number = 0; j <= param(0); j++)
+                        pp.push(stackF(param(0) - j))
+
+                    js.push("                " + stackF(param(0)) + " = context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], true);")
+                }
+                    break
                 case Bytecode.CALLPROPVOID: {
                     let pp = []
 
@@ -1383,15 +1397,15 @@ export function compile(methodInfo: MethodInfo) {
                             js.push("                            " + stack0 + " = " + stack0 + "[tr];")
                             js.push("                        }")
                             js.push("                        else {")
-                            js.push("                            " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                            " + stack0 + " = context.sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
                             js.push("                        }")
                             js.push("                    }")
                             js.push("                    else {")
-                            js.push("                        " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                        " + stack0 + " = context.sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
                             js.push("                    }")
                             js.push("                }")
                             js.push("                else {")
-                            js.push("                    " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
+                            js.push("                    " + stack0 + " = context.sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
                             js.push("                }")
                         }
                     }
@@ -1441,11 +1455,6 @@ export function compile(methodInfo: MethodInfo) {
                 case Bytecode.SETSUPER_DYN:
                     js.push("                context.sec.box(" + stack2 + ").axSetSuper(context.runtimename(" + stack1 + ", " + param(0) + "), context.savedScope, " + stack0 + ");")
                     break
-                /*
-                case Bytecode.GETLEX:
-                    js.push("                " + stackN + " = context.getlex(" + getname(param(0)) + ", " + scope + ");")
-                    break
-                    */
                 case Bytecode.GETLEX:
                     var mn = abc.getMultiname(param(0))
                     js.push("                // " + mn)
@@ -1471,8 +1480,25 @@ export function compile(methodInfo: MethodInfo) {
                                 js.push("                " + stackN + " = " + scope + ".global.object.applicationDomain.findProperty(" + getname(param(0)) + ", true, true)[\"" + r + "\"];")
                             }
                         }
-                        else
-                            js.push("                " + stackN + " = " + scope + ".findScopeProperty(" + getname(param(0)) + ", true, false).axGetProperty(" + getname(param(0)) + ");")
+                        else {
+                            js.push("                temp = " + scope + ".findScopeProperty(" + getname(param(0)) + ", true, false);")
+                            js.push("                tk = temp['__key__'];")
+                            js.push("                if (tk) {")
+                            js.push("                    tr = " + getname(param(0)) + ".resolved[tk];")
+                            js.push("                    if (tr) {")
+                            js.push("                        " + stackN + " = temp[tr];")
+                            js.push("                        if (typeof " + stackN + " === 'function') {")
+                            js.push("                            " + stackN + " = temp.axGetMethod(tr);")
+                            js.push("                        }")
+                            js.push("                    }")
+                            js.push("                    else {")
+                            js.push("                        " + stackN + " = temp.axGetProperty(" + getname(param(0)) + ");")
+                            js.push("                    }")
+                            js.push("                }")
+                            js.push("                else {")
+                            js.push("                    " + stackN + " = temp.axGetProperty(" + getname(param(0)) + ");")
+                            js.push("                }")
+                        }
                     }
                     break
                 case Bytecode.RETURNVALUE:
