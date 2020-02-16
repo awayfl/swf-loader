@@ -13,7 +13,6 @@ import { CONSTANT } from "./CONSTANT";
 export class InstanceInfo extends Info {
     public classInfo: ClassInfo = null;
     public runtimeTraits: RuntimeTraits = null;
-    public key: string = null;
   
     private _interfaces: Set<AXClass>;
   

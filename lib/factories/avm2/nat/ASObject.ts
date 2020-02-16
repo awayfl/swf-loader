@@ -114,7 +114,9 @@ export class ASObject implements IMetaobjectProtocol {
     }
 
     static axClass: any;
+    static axClassName: string;
     axClass: any;
+    axClassName: string;
 
     getPrototypeOf: () => any;
 
@@ -165,21 +167,7 @@ export class ASObject implements IMetaobjectProtocol {
             return t ? t.name.getMangledName() : '$Bg' + s
         }
         else {
-            let k = this["__key__"]
-
-            if (!k) {
-                k = this.axClass.classInfo.instanceInfo.key
-                
-                if (!k) {
-                    k = this.axClass.classInfo.instanceInfo.getClassName()
-                    
-                    this.axClass.classInfo.instanceInfo.key = k
-                }
-                    
-                this["__key__"] = k
-            }
-
-            let c = mn.resolved[k]
+            let c = mn.resolved[this.axClassName]
 
             if (c)
                 return c
@@ -188,7 +176,7 @@ export class ASObject implements IMetaobjectProtocol {
 
             let r = t ? t.name.getMangledName() : ('$Bg' + s)
 
-            mn.resolved[k] = r
+            mn.resolved[this.axClassName] = r
 
             return r
         }
@@ -349,22 +337,19 @@ export class ASObject implements IMetaobjectProtocol {
     }
 
     axCallProperty(mn: Multiname, args: any[], isLex: boolean): any {
-        var name = this.axResolveMultiname(mn);
-        var fun = this[name];
+        var fun = this[this.axResolveMultiname(mn)];
         //console.log("call function name:", name);
         validateCall(this.sec, fun, args.length);
         return fun.axApply(isLex ? null : this, args);
     }
 
     axCallSuper(mn: Multiname, scope: Scope, args: any[]): any {
-        var name = this.axResolveMultiname(mn);
-        var fun = (<AXClass>scope.parent.object).tPrototype[name];
+        var fun = (<AXClass>scope.parent.object).tPrototype[this.axResolveMultiname(mn)];
         validateCall(this.sec, fun, args.length);
         return fun.axApply(this, args);
     }
     axConstructProperty(mn: Multiname, args: any[]): any {
-        var name = this.axResolveMultiname(mn);
-        var ctor = this[name];
+        var ctor = this[this.axResolveMultiname(mn)];
         validateConstruct(this.sec, ctor, args.length);
         return ctor.axConstruct(args);
     }
