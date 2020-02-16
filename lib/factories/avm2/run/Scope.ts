@@ -90,11 +90,9 @@ export class Scope {
         this.global.object.sec.throwError('ReferenceError', Errors.UndefinedVarError, '*');
       }
       var object:AXObject;
-      if (!scopeOnly && !mn.isRuntime()) {
-        if ((object = this.cache[mn.id])) {
-          return object;
-        }
-      }
+      if ((object = this.cache[mn.id]))
+        return object;
+
       // Scope lookups should not be trapped by proxies. Except for with scopes, check only trait
       // properties.
       if (this.object && (this.isWith ?
