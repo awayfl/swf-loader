@@ -16,7 +16,6 @@ import {axCoerceName} from "./run/axCoerceName"
 import {isNumeric} from "../base/utilities"
 import {ABCFile} from "./abc/lazy/ABCFile"
 import {ScriptInfo} from "./abc/lazy/ScriptInfo"
-import {recording, resolver} from "./rsl"
 import {AXGlobal} from "./run/AXGlobal"
 import { jsGlobal } from '../base/utilities/jsGlobal'
 
@@ -997,8 +996,6 @@ export function compile(methodInfo: MethodInfo) {
         let local = (n: number) => "local" + n
 
         let param = (n: number) => z.params[n]
-
-        resolver.extra = methodInfo.index() + " | " + z.position + " | "
         
         if (z.stack < 0) {
             js.push("                    // unreachable")
@@ -1376,27 +1373,12 @@ export function compile(methodInfo: MethodInfo) {
                 case Bytecode.GETPROPERTY:
                     var mn = abc.getMultiname(param(0))
                     js.push("                // " + mn)
-                    
-                    if (recording) {
-                        js.push("                context.extra(\"" + resolver.extra + "\");")
-                        js.push("                " + stack0 + " = context.getpropertydyn(" + getname(param(0)) + ", " + stack0 + ");")
-                        js.push("                context.extra(\"@@@ | \");")
-                    }
-                    else {
-                        let r = resolver.resolveGet(mn)
-
-                        if (r) {
-                            js.push("                " + stack0 + " = " + stack0 + "[\"" + r + "\"];")
-                        }
-                        else {
-                            js.push("                tr = " + getname(param(0)) + ".resolved[" + stack0 + ".axClassName];")
-                            js.push("                if (tr) {")
-                            js.push("                    " + stack0 + " = " + stack0 + "[tr];")
-                            js.push("                } else {")
-                            js.push("                    " + stack0 + " = context.sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
-                            js.push("                }")
-                        }
-                    }
+                    js.push("                tr = " + getname(param(0)) + ".resolved[" + stack0 + ".axClassName];")
+                    js.push("                if (tr) {")
+                    js.push("                    " + stack0 + " = " + stack0 + "[tr];")
+                    js.push("                } else {")
+                    js.push("                    " + stack0 + " = context.sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
+                    js.push("                }")
                     break
                 case Bytecode.GETPROPERTY_DYN:
                     js.push("                " + stack1 + " = context.getpropertydyn(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
@@ -1404,22 +1386,7 @@ export function compile(methodInfo: MethodInfo) {
                 case Bytecode.SETPROPERTY:
                     var mn = abc.getMultiname(param(0))
                     js.push("                // " + mn)
-
-                    if (recording) {
-                        js.push("                context.extra(\"" + resolver.extra + "\");")
-                        js.push("                context.setproperty(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
-                        js.push("                context.extra(\"@@@ | \");")
-                    }
-                    else {
-                        let r = resolver.resolveSet(mn)
-
-                        if (r) {
-                            js.push("                " + stack1 + "[\"" + r + "\"] = " + stack0 + ";}")
-                        }
-                        else {
-                            js.push("                context.setproperty(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
-                        }
-                    }
+                    js.push("                context.setproperty(" + getname(param(0)) + ", " + stack0 + ", " + stack1 + ");")
                     break
                 case Bytecode.SETPROPERTY_DYN:
                     js.push("                context.setproperty(context.runtimename(" + stack1 + ", " + param(0) + "), " + stack0 + ", " + stack2 + ");")
@@ -1446,41 +1413,16 @@ export function compile(methodInfo: MethodInfo) {
                 case Bytecode.GETLEX:
                     var mn = abc.getMultiname(param(0))
                     js.push("                // " + mn)
-
-                    if (recording) {
-                        js.push("                context.extra(\"" + resolver.extra + "\");")
-                        js.push("                " + stackN + " = context.getlexrecording(" + getname(param(0)) + ", " + scope + ");")
-                        js.push("                context.extra(\"@@@ | \");")
-                    }
-                    else {
-                        let l = resolver.resolveLex(mn)
-                        let r = resolver.resolveGet(mn)
-
-                        if (r != null && l != 0) {
-                            if (l > 0) {
-                                let ps = ""
-                                for (let j = 1; j < l; j++)
-                                    ps = ps + ".parent"
-
-                                js.push("                " + stackN + " = " + scope + ps + ".object[\"" + r + "\"];")
-                            }
-                            else {
-                                js.push("                " + stackN + " = " + scope + ".global.object.applicationDomain.findProperty(" + getname(param(0)) + ", true, true)[\"" + r + "\"];")
-                            }
-                        }
-                        else {
-                            js.push("                temp = " + scope + ".findScopeProperty(" + getname(param(0)) + ", true, false);")
-                            js.push("                tr = " + getname(param(0)) + ".resolved[temp.axClassName];")
-                            js.push("                if (tr) {")
-                            js.push("                    " + stackN + " = temp[tr];")
-                            js.push("                    if (typeof " + stackN + " === 'function') {")
-                            js.push("                        " + stackN + " = temp.axGetMethod(tr);")
-                            js.push("                    }")
-                            js.push("                } else {")
-                            js.push("                    " + stackN + " = temp.axGetProperty(" + getname(param(0)) + ");")
-                            js.push("                }")
-                        }
-                    }
+                    js.push("                temp = " + scope + ".findScopeProperty(" + getname(param(0)) + ", true, false);")
+                    js.push("                tr = " + getname(param(0)) + ".resolved[temp.axClassName];")
+                    js.push("                if (tr) {")
+                    js.push("                    " + stackN + " = temp[tr];")
+                    js.push("                    if (typeof " + stackN + " === 'function') {")
+                    js.push("                        " + stackN + " = temp.axGetMethod(tr);")
+                    js.push("                    }")
+                    js.push("                } else {")
+                    js.push("                    " + stackN + " = temp.axGetProperty(" + getname(param(0)) + ");")
+                    js.push("                }")
                     break
                 case Bytecode.RETURNVALUE:
                     js.push("                return " + stack0 + ";")
@@ -1528,8 +1470,6 @@ export function compile(methodInfo: MethodInfo) {
     if (w.indexOf(underrun) >= 0)
         return "STACK UNDERRUN"
     
-    resolver.extra = "@@@ | "
-    
     return {names: names, compiled: eval(w)};
 }
 
@@ -1550,10 +1490,6 @@ export class Context {
         this.names = names;
     }
 
-    extra(v : string): void {
-        resolver.extra = v
-    }
-
     call(value, obj, pp): any {
         validateCall(this.sec, value, pp.length)
         return value.axApply(obj, pp)
@@ -1569,10 +1505,6 @@ export class Context {
 
     getpropertydyn(mn, obj) {
         let b = this.sec.box(obj)
-
-        if (recording)
-            if (b !== obj)
-                resolver.recordBox(mn)
         
         if (typeof mn === "number")
             return b.axGetNumericProperty(mn)
@@ -1593,43 +1525,6 @@ export class Context {
             return delete b[name];
         return b.axDeleteProperty(name)
     }
-
-    getlexrecording(mn: Multiname, scope: Scope) {
-        let a = scope.findScopeProperty(mn, true, false)
-
-        if ((scope.global.object as AXGlobal).applicationDomain.findProperty(mn, true, true) === a)
-            resolver.recordLex(mn, -1)
-        else {
-            let n = 1
-            let s = scope
-
-            while (true) {
-                if (s.object === a) {
-                    resolver.recordLex(mn, n)
-                    break
-                }
-                
-                if (s.parent != null) {
-                    n += 1
-                    s = s.parent
-                }
-                else {
-                    resolver.recordLex(mn, 0)
-                    break
-                }
-            }
-        }
-
-
-        let b = a.axGetProperty(mn)
-        
-        return b
-    }
-    
-    getlex(mn, scope) {
-        return scope.findScopeProperty(mn, true, false).axGetProperty(mn)
-    }
-
 
     construct(obj, pp) {
         let mn = obj.classInfo.instanceInfo.getName()

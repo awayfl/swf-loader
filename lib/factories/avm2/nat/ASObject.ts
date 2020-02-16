@@ -23,7 +23,6 @@ import { validateCall } from '../run/validateCall';
 import { validateConstruct } from '../run/validateConstruct';
 import { defineNonEnumerableProperty } from '../../base/utilities/ObjectUtilities';
 import { AXObject } from '../run/AXObject';
-import { recording, resolver } from "../rsl"
 
 export class ASObject implements IMetaobjectProtocol {
     traits: RuntimeTraits;
@@ -232,19 +231,12 @@ export class ASObject implements IMetaobjectProtocol {
                     break;
             }
             var type = t.getType();
-            if (type) {
-                if (recording)
-                    if (value !== type.axCoerce(value))
-                        resolver.recordCoerce(mn)
-                
+            if (type)
                 value = type.axCoerce(value);
-            }
+
         } else {
             mangledName = '$Bg' + name;
         }
-        
-        if (recording)
-            resolver.recordResolve(mn, mangledName)
 
         this[mangledName] = value;
         if (freeze) {
@@ -255,14 +247,7 @@ export class ASObject implements IMetaobjectProtocol {
     axGetProperty(mn: Multiname): any {
         let name = this.axResolveMultiname(mn)
         
-        if (recording)
-            resolver.recordResolve(mn, name)
-        
         let value = this[name]
-
-        if (recording)
-            if (typeof value === "function")
-                resolver.recordFun(mn)
         
         if (typeof value === "function")
             return this.axGetMethod(name)
