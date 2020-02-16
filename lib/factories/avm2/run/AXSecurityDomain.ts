@@ -224,6 +224,7 @@ export class AXSecurityDomain implements ISecurityDomain{
       // to all factory protocol handlers by default.
       axClass.tPrototype = Object.create(genericVectorClass.tPrototype);
       axClass.tPrototype.axClass = axClass;
+      axClass.tPrototype.axClassName = axClass.classInfo.instanceInfo.getClassName();
       // We don't need a new dPrototype object.
       axClass.dPrototype = <any>genericVectorClass.dPrototype;
       axClass.superClass = <any>genericVectorClass;
@@ -329,7 +330,8 @@ export class AXSecurityDomain implements ISecurityDomain{
       }
   
       axClass.classInfo = (<any>axClass.dPrototype).classInfo = classInfo;
-      (<any>axClass.dPrototype).axClass = axClass;
+      axClass.dPrototype.axClass = axClass;
+      axClass.dPrototype.axClassName = classInfo.instanceInfo.getClassName();
       axClass.superClass = superClass;
       axClass.scope = scope;
   

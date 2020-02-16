@@ -8,4 +8,5 @@ export interface AXObject extends ITraits, IMetaobjectProtocol {
     $BgvalueOf: AXCallable;
     axInitializer: any;
     axClass: AXClass;
+    axClassName: string;
   }
