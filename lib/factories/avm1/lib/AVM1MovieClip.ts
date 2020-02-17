@@ -293,7 +293,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 
-	public registerScriptObject(child: DisplayObject, force: boolean = true): void {
+	public registerScriptObject(child: DisplayObject, fromTimeline: boolean = true): void {
 
 		// 	whenever multiple childs get registered for the same name, the child with the lowest depth wins
 		//	this is true for objects added via timeline, attachMovie, duplicateMovieClip and CreateEmptyMovieClip and also when renaming objects
@@ -333,7 +333,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 			name = name.toLowerCase();
 
 			var hasVar = this.alHasOwnProperty(name);
-			if (hasVar) {
+			if (fromTimeline && hasVar) {
 				// there exists a avm1 var for this name. Object registration should fail
 				return;
 			}
@@ -354,6 +354,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 				}
 				//register new object
 				this._childrenByName[name] = getAVM1Object(child, this.context);
+				if(!fromTimeline){
+					this.alPut(name, this._childrenByName[name]);
+				}
 
 				// if a object was previous unregistered for this name, we need to check if it was tinted by a color 
 				// and if so, we need to apply the tint to the new object
@@ -601,7 +604,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 		depth = alToNumber(this.context, depth);
 
-		var oldAVMMC = this._childrenByName[name];
+		var oldAVMMC = this._childrenByName[name.toLowerCase()];
 
 		//console.log("attachMovie", name, avm2AwayDepth(depth));
 		var avmMc = <AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
@@ -1214,6 +1217,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public startDrag(lock?: boolean, left?: number, top?: number, right?: number, bottom?: number): void {
+		if(AVM1MovieClip.currentDraggedMC){
+			AVM1MovieClip.currentDraggedMC.stopDrag();
+		}
 		AVM1MovieClip.currentDraggedMC = this;
 		lock = alToBoolean(this.context, lock);
 		this._dragBounds = null;
@@ -1305,6 +1311,9 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 	public stopDragDelegate: (e) => void;
 	public stopDrag(e = null) {
+		if(AVM1MovieClip.currentDraggedMC && AVM1MovieClip.currentDraggedMC!=this){
+			AVM1MovieClip.currentDraggedMC.stopDrag();
+		}
 		this.isDragging = false;
 		AVM1MovieClip.currentDraggedMC = null;
 		AVM1Stage.stage.scene.mousePicker.dragEntity = null;
