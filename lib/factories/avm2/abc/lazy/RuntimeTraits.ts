@@ -59,14 +59,7 @@ export class RuntimeTraits {
         if (mn.mutable)
             return this.getTrait(mn.namespaces, mn.name)
         
-        let t = this.multinames[mn.id]
-        
-        if (t === undefined) {
-            t = this.getTrait(mn.namespaces, mn.name)
-            this.multinames[mn.id] = t
-        }
-        
-        return t
+        return this.multinames[mn.id] || (this.multinames[mn.id] = this.getTrait(mn.namespaces, mn.name));
     }
   
     /**
