@@ -953,7 +953,6 @@ export function compile(methodInfo: MethodInfo) {
     if (temp)
         js0.push("    let temp = undefined;")
 
-    js0.push("    let tk = undefined;")
     js0.push("    let tr = undefined;")
 
     let names: Multiname[] = []
@@ -968,6 +967,8 @@ export function compile(methodInfo: MethodInfo) {
         }
         return "name" + i
     }
+
+    js0.push("    let sec = context.sec;")
 
     let js = []
 
@@ -1020,17 +1021,17 @@ export function compile(methodInfo: MethodInfo) {
                     break
 
                 case Bytecode.GETSLOT:
-                    js.push("                " + stack0 + " = context.sec.box(" + stack0 + ").axGetSlot(" + param(0) + ");")
+                    js.push("                " + stack0 + " = sec.box(" + stack0 + ").axGetSlot(" + param(0) + ");")
                     break
                 case Bytecode.SETSLOT:
-                    js.push("                context.sec.box(" + stack1 + ").axSetSlot(" + param(0) + ", " + stack0 + ");")
+                    js.push("                sec.box(" + stack1 + ").axSetSlot(" + param(0) + ", " + stack0 + ");")
                     break
 
                 case Bytecode.GETGLOBALSCOPE:
                     js.push("                " + stackN + " = context.savedScope.global.object;")
                     break
                 case Bytecode.PUSHSCOPE:
-                    js.push("                " + scopeN + " = " + scope + ".extend(context.sec.box(" + stack0 + "));")
+                    js.push("                " + scopeN + " = " + scope + ".extend(sec.box(" + stack0 + "));")
                     break
                 case Bytecode.PUSHWITH:
                     js.push("                " + scopeN + " = context.pushwith(" + scope + ", " + stack0 + ");")
@@ -1043,10 +1044,10 @@ export function compile(methodInfo: MethodInfo) {
                     break
 
                 case Bytecode.NEXTNAME:
-                    js.push("                " + stack1 + " = context.sec.box(" + stack1 + ").axNextName(" + stack0 + ");")
+                    js.push("                " + stack1 + " = sec.box(" + stack1 + ").axNextName(" + stack0 + ");")
                     break
                 case Bytecode.NEXTVALUE:
-                    js.push("                " + stack1 + " = context.sec.box(" + stack1 + ").axNextValue(" + stack0 + ");")
+                    js.push("                " + stack1 + " = sec.box(" + stack1 + ").axNextValue(" + stack0 + ");")
                     break
                 case Bytecode.HASNEXT2:
                     js.push("                temp = context.hasnext2(" + local(param(0)) + ", " + local(param(1)) + ");")
@@ -1055,7 +1056,7 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + stackN + " = " + local(param(1)) + " > 0;")
                     break
                 case Bytecode.IN:
-                    js.push("                " + stack1 + " = (" + stack1 + " && " + stack1 + ".axClass === context.sec.AXQName) ? obj.axHasProperty(" + stack1 + ".name) : " + stack0 + ".axHasPublicProperty(" + stack1 + ");")
+                    js.push("                " + stack1 + " = (" + stack1 + " && " + stack1 + ".axClass === sec.AXQName) ? obj.axHasProperty(" + stack1 + ".name) : " + stack0 + ".axHasPublicProperty(" + stack1 + ");")
                     break
 
                 case Bytecode.DUP:
@@ -1260,7 +1261,7 @@ export function compile(methodInfo: MethodInfo) {
                     }
                     else {
                         js.push("                // " + abc.getMultiname(param(0)))
-                        js.push("                " + stackF(param(0)) + " = context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
+                        js.push("                " + stackF(param(0)) + " = sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
                     }
                     break
                 case Bytecode.CALLPROPLEX: {
@@ -1269,7 +1270,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 0; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0)) + " = context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], true);")
+                    js.push("                " + stackF(param(0)) + " = sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], true);")
                 }
                     break
                 case Bytecode.CALLPROPVOID: {
@@ -1278,7 +1279,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 0; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
+                    js.push("                sec.box(" + pp.shift() + ").axCallProperty(" + getname(param(1)) + ", [" + pp.join(", ") + "], false);")
                 }
                     break
                 case Bytecode.APPLYTYPE: {
@@ -1287,7 +1288,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0)) + " = context.sec.applyType(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0)) + " = sec.applyType(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
                 }
                     break
 
@@ -1302,11 +1303,11 @@ export function compile(methodInfo: MethodInfo) {
                     break
                 case Bytecode.NEWFUNCTION:
                     js.push("                // " + abc.getMethodInfo(param(0)))
-                    js.push("                " + stackN + " = context.sec.createFunction(context.abc.getMethodInfo(" + param(0) + "), " + scope + ", true);")
+                    js.push("                " + stackN + " = sec.createFunction(context.abc.getMethodInfo(" + param(0) + "), " + scope + ", true);")
                     break
                 case Bytecode.NEWCLASS:
                     js.push("                // " + abc.classes[param(0)])
-                    js.push("                " + stack0 + " = context.sec.createClass(context.abc.classes[" + param(0) + "], " + stack0 + ", " + scope + ");")
+                    js.push("                " + stack0 + " = sec.createClass(context.abc.classes[" + param(0) + "], " + stack0 + ", " + scope + ");")
                     break
                 case Bytecode.NEWARRAY: {
                     let pp = []
@@ -1314,11 +1315,11 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0) - 1) + " = context.sec.AXArray.axBox([" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0) - 1) + " = sec.AXArray.axBox([" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.NEWOBJECT:
-                    js.push("                temp = Object.create(context.sec.AXObject.tPrototype);")
+                    js.push("                temp = Object.create(sec.AXObject.tPrototype);")
 
                     for (let j: number = 1; j <= param(0); j++) {
                         js.push("                temp.axSetPublicProperty(" + stackF(2 * param(0) - 2 * j + 1) + ", " + stackF(2 * param(0) - 2 * j) + ");")
@@ -1329,10 +1330,10 @@ export function compile(methodInfo: MethodInfo) {
 
                     break
                 case Bytecode.NEWACTIVATION:
-                    js.push("                " + stackN + " = context.sec.createActivation(context.mi, " + scope + ");")
+                    js.push("                " + stackN + " = sec.createActivation(context.mi, " + scope + ");")
                     break
                 case Bytecode.NEWCATCH:
-                    js.push("                " + stackN + " = context.sec.createCatch(context.mi.getBody().catchBlocks[" + param(0) + "], " + scope + ");")
+                    js.push("                " + stackN + " = sec.createCatch(context.mi.getBody().catchBlocks[" + param(0) + "], " + scope + ");")
                     break
                 case Bytecode.CONSTRUCTSUPER: {
                     let pp = []
@@ -1349,7 +1350,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                " + stackF(param(0) + 1) + " = context.sec.box(" + stackF(param(0) + 1) + ").axCallSuper(context.runtimename(" + stackF(param(0)) + ", " + param(1) + "), context.savedScope, [" + pp.join(", ") + "]);")
+                    js.push("                " + stackF(param(0) + 1) + " = sec.box(" + stackF(param(0) + 1) + ").axCallSuper(context.runtimename(" + stackF(param(0)) + ", " + param(1) + "), context.savedScope, [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CALLSUPERVOID: {
@@ -1358,7 +1359,7 @@ export function compile(methodInfo: MethodInfo) {
                     for (let j: number = 1; j <= param(0); j++)
                         pp.push(stackF(param(0) - j))
 
-                    js.push("                context.sec.box(" + stackF(param(0)) + ").axCallSuper(" + getname(param(1)) + ", context.savedScope, [" + pp.join(", ") + "]);")
+                    js.push("                sec.box(" + stackF(param(0)) + ").axCallSuper(" + getname(param(1)) + ", context.savedScope, [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CONSTRUCTPROP: {
@@ -1377,7 +1378,7 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                if (tr) {")
                     js.push("                    " + stack0 + " = " + stack0 + "[tr];")
                     js.push("                } else {")
-                    js.push("                    " + stack0 + " = context.sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
+                    js.push("                    " + stack0 + " = sec.box(" + stack0 + ").axGetProperty(" + getname(param(0)) + ")")
                     js.push("                }")
                     break
                 case Bytecode.GETPROPERTY_DYN:
@@ -1399,16 +1400,16 @@ export function compile(methodInfo: MethodInfo) {
                     js.push("                " + stack1 + " = context.deleteproperty(context.runtimename(" + stack0 + ", " + param(0) + "), " + stack1 + ");")
                     break
                 case Bytecode.GETSUPER:
-                    js.push("                " + stack0 + " = context.sec.box(" + stack0 + ").axGetSuper(" + getname(param(0)) + ", context.savedScope);")
+                    js.push("                " + stack0 + " = sec.box(" + stack0 + ").axGetSuper(" + getname(param(0)) + ", context.savedScope);")
                     break
                 case Bytecode.GETSUPER_DYN:
-                    js.push("                " + stack1 + " = context.sec.box(" + stack1 + ").axGetSuper(context.runtimename(" + stack0 + ", " + param(0) + "), context.savedScope);")
+                    js.push("                " + stack1 + " = sec.box(" + stack1 + ").axGetSuper(context.runtimename(" + stack0 + ", " + param(0) + "), context.savedScope);")
                     break
                 case Bytecode.SETSUPER:
-                    js.push("                context.sec.box(" + stack1 + ").axSetSuper(" + getname(param(0)) + ", context.savedScope, " + stack0 + ");")
+                    js.push("                sec.box(" + stack1 + ").axSetSuper(" + getname(param(0)) + ", context.savedScope, " + stack0 + ");")
                     break
                 case Bytecode.SETSUPER_DYN:
-                    js.push("                context.sec.box(" + stack2 + ").axSetSuper(context.runtimename(" + stack1 + ", " + param(0) + "), context.savedScope, " + stack0 + ");")
+                    js.push("                sec.box(" + stack2 + ").axSetSuper(context.runtimename(" + stack1 + ", " + param(0) + "), context.savedScope, " + stack0 + ");")
                     break
                 case Bytecode.GETLEX:
                     var mn = abc.getMultiname(param(0))
