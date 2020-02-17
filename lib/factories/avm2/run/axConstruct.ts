@@ -1,9 +1,7 @@
 import { MovieClip, SceneImage2D, FrameScriptManager } from '@awayjs/scene';
-import { MovieClip as AS3MovieClip } from '../../as3webFlash/display/MovieClip';
 import { AssetBase, WaveAudio } from '@awayjs/core';
 import { BitmapImage2D } from '@awayjs/stage';
 import { OrphanManager } from '../../as3webFlash/display/DisplayObject';
-import {Event} from "../../as3webFlash/events/Event";
 
 
 export class ActiveLoaderContext {
