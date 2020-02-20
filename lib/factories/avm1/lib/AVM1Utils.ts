@@ -373,7 +373,7 @@ export function initializeAVM1Object(awayObject: any,
                 continue;
             }
             if(eventFlag==AVM1ClipEvents.Load){
-				awayObject.onLoadedAction=handler;
+				awayObject.onLoaded=handler;
                 continue;
             }
 

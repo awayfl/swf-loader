@@ -286,7 +286,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		this.attachCustomConstructor();
 		this.initialDepth = this.adaptee._depthID;
 
-		if (this.onLoaded || this.executeConstructor) {
+		if ((<any>this.adaptee).onLoaded || this.executeConstructor) {
 			FrameScriptManager.add_loaded_action_to_queue(this.adaptee);
 		}
 
@@ -301,7 +301,7 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		// 	if a avm1 variable for a registered child-name was defined via script, it always wins over the child registration. 
 		//	for example, after setting "testMC='something'" in script, trying to get "testMC" will return "something", 
 		//	and childs with the name "testMC" will no longer be accessible.
-		//	this is true for all datatypes. once a variable is set by script, the value set by script will be returned
+		//	this is true for all datatypes. once a variable is set by script, the value set by script will be returned.
 		//	also true if the we do something like "testMC=null"
 
 		//	if a avm1 script creates a variable as reference to a registered child, it behaves like this:
@@ -742,24 +742,17 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 	}
 
 	public createEmptyMovieClip(name, depth): AVM1MovieClip {
+
+		// 	creates a new empty movieclip.
+		//	if a mc already exists for the name, but at different depth, it will create a new movieclip, and also keep the existing alive
+		//	if a mc already exists at same depth, it will replace the existing movieclip with the new one
+
 		name = alToString(this.context, name);
-		var mc: MovieClip;
-		if (this.alHasProperty(name)) {
-			var existingObj = this.alGet(name);
-			if (existingObj && existingObj instanceof AVM1MovieClip) {
-				//existingObj.adaptee.reset();
-				//existingObj.adaptee.graphics.clear();
-				//this.adaptee.invalidate();
-				mc = existingObj.adaptee;
-			}
-			//return existingObj;
-		}
-		if (!mc) {
-			mc = new MovieClip();
+		var mc: MovieClip = new MovieClip();
 			mc.name = name;
 			mc.assetNamespace = this.adaptee.assetNamespace;
 			getAVM1Object(mc, <AVM1Context>this._avm1Context);
-		}
+		
 		//console.log("createEmptyMovieClip", name, avm2AwayDepth(depth));
 		var avmMC: AVM1MovieClip = <AVM1MovieClip>this._insertChildAtDepth(mc, avm2AwayDepth(depth));
 		avmMC.dynamicallyCreated = true;
