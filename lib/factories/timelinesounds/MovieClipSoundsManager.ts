@@ -2,6 +2,7 @@
 import { MovieClipSoundStream } from "./MovieClipSoundStream";
 import { MovieClip } from "@awayjs/scene";
 import { WaveAudio } from '@awayjs/core';
+import { release } from '../base/utilities/Debug';
 
 export class MovieClipSoundsManager {
     private lastFrameNum: number;
@@ -47,7 +48,7 @@ export class MovieClipSoundsManager {
 
     addSoundStreamBlock(frameNum: number, streamBlock: Uint8Array) {
         if(!this.soundStreamHead){
-            console.log("can not add soundstreamblock if no soundstreamHead exists")
+            release || console.log("can not add soundstreamblock if no soundstreamHead exists")
             return;
         }
         if (this._soundStreams.length==0 || (frameNum - this.lastFrameNum) > 1) {

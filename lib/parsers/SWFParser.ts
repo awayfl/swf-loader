@@ -59,6 +59,7 @@ import {__extends} from "tslib";
 import { ABCFile } from '../factories/avm2/abc/lazy/ABCFile';
 import { FlashSceneGraphFactory } from '../factories/as3webFlash/factories/FlashSceneGraphFactory';
 import { CompressionMethod } from "./CompressionMethod";
+import { release } from '../factories/base/utilities/Debug';
 var noTimelineDebug=true;
 var noExportsDebug=true;
 var noSceneGraphDebug=true;
@@ -347,7 +348,7 @@ export class SWFParser extends ParserBase
 			material=new MethodMaterial();
 			var myImage=this._awaySymbols[bitmapIndex];
 			if(!myImage || (!myImage.isAsset(BitmapImage2D) && !myImage.isAsset(SceneImage2D))){
-				console.log("error: can not find image for bitmapfill", myImage);
+				release || console.log("error: can not find image for bitmapfill", myImage);
 				myImage=new BitmapImage2D(512, 512, false, 0xff0000ff, true);
 			}
 			material.ambientMethod.texture=new ImageTexture2D(myImage);

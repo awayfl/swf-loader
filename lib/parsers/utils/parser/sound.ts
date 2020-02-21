@@ -15,6 +15,7 @@
  */
 
 import {SoundTag} from "../SWFTags"
+import { release } from '../../../factories/base/utilities/Debug';
 
 
 var SOUND_SIZE_8_BIT  = 0;
@@ -116,7 +117,7 @@ export function defineSound(tag: SoundTag) {
           16, !(new Uint8Array(new Uint16Array([1]).buffer))[0]);
       break;
     default:
-      console.log('Unsupported audio format: ' + tag.soundFormat);
+      release || console.log('Unsupported audio format: ' + tag.soundFormat);
   }
 
   var sound = {
@@ -258,7 +259,7 @@ export class SoundStream {
         stream.decode = SwfSoundStream_decode_MP3;
         break;
       default:
-        console.log('Unsupported audio stream format: ' + tag.streamCompression);
+        release || console.log('Unsupported audio stream format: ' + tag.streamCompression);
         return null;
     }
 

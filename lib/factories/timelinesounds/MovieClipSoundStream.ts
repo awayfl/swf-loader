@@ -3,6 +3,7 @@ import { SoundStream, packageWave } from "../../parsers/utils/parser/sound";
 import { WaveAudio } from '@awayjs/core';
 import { WaveAudioData } from '@awayjs/core';
 import { MovieClipSoundsManager } from './MovieClipSoundsManager';
+import { release } from '../base/utilities/Debug';
 
 export interface DecodedSound {
   streamId: number;
@@ -251,7 +252,7 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 
   queueData(frame: DecodedSound) {
     if (!frame.pcm) {
-      console.log("error in WebAudioAdapter.queueData - frame does not provide pcm data")
+      release || console.log("error in WebAudioAdapter.queueData - frame does not provide pcm data")
       return;
 
     }
@@ -300,7 +301,7 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
 
   queueData(frame: DecodedSound) {
     if (!frame.data) {
-      console.log("error in WebAudioAdapter.queueData - frame does not provide data")
+      release || console.log("error in WebAudioAdapter.queueData - frame does not provide data")
       return;
 
     }

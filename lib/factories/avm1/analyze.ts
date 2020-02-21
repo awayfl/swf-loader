@@ -17,6 +17,7 @@
 //module Shumway.AVM1 {
 
 import {ActionCode, ActionsDataParser, ParsedAction} from "./parser";
+import { release } from '../base/utilities/Debug';
 
 export interface ActionCodeBlock {
 	label: number;
@@ -129,7 +130,7 @@ export class ActionsDataAnalyzer {
 				}
 				if (branching) {
 					if (jumpPosition < 0 || jumpPosition > parser.length) {
-						console.error('jump outside the action block;');
+						release || console.error('jump outside the action block;');
 						jumpPosition = parser.length;
 					}
 					if (nonConditionalBranching) {

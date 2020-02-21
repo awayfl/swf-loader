@@ -72,6 +72,7 @@ import { ProgressEvent } from "../flash/events/ProgressEvent";
 import { SoundMixer } from "../flash/media/SoundMixer";
 import { TextSnapshot } from "../flash/text/TextSnapshot";
 import { URLVariables } from "../flash/net/URLVariables";
+import { release } from '../base/utilities/Debug';
 /*
 import { NativeMenu } from "./display/NativeMenu";
 import { NativeMenuItem } from "./display/NativeMenuItem";
@@ -318,5 +319,5 @@ M("flash.system.LoaderContext", LoaderContext);
 registerNativeFunction('flash.system.fscommand', fscommand);
 
 export function initLink(){
-  console.log("init link");
+  release || console.log("init link");
 }

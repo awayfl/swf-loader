@@ -16,6 +16,7 @@ import { StageScaleMode } from '../as3webFlash/display/StageScaleMode';
 import { StageAlign } from '../as3webFlash/display/StageAlign';
 import { AVM1EventProps } from './lib/AVM1EventHandler';
 import { MovieClipSoundsManager } from '../timelinesounds/MovieClipSoundsManager';
+import { release } from '../base/utilities/Debug';
 
 
 export interface FrameScript {
@@ -254,7 +255,7 @@ export class AVMAwayStage extends Sprite{
 				this._projection.fieldOfView = Math.atan(window.innerHeight/1000/2)*360/Math.PI;
 				break;
 			default:
-				console.log("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
+				release || console.log("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
 				break;
 		}
 		// todo: correctly implement all alignModes;
@@ -266,7 +267,7 @@ export class AVMAwayStage extends Sprite{
 			default:
 				//this._scene.renderer.view.y         = 0;
 				//this._scene.renderer.view.x         = 0;
-				console.log("Stage: only implemented StageAlign is TOP_LEFT");
+				release || console.log("Stage: only implemented StageAlign is TOP_LEFT");
 				break;
 		}
 		//console.log("test28");
@@ -1074,14 +1075,14 @@ export class AVMAwayStage extends Sprite{
 	 */
 	public get showDefaultContextMenu () : boolean{
 		//todo
-		console.log("showDefaultContextMenu not implemented yet in flash/AVMAwayStage");
+		release || console.log("showDefaultContextMenu not implemented yet in flash/AVMAwayStage");
 		return false;
 
 
 	}
 	public set showDefaultContextMenu (value:boolean){
 		//todo
-		console.log("showDefaultContextMenu not implemented yet in flash/AVMAwayStage");
+		release || console.log("showDefaultContextMenu not implemented yet in flash/AVMAwayStage");
 
 	}
 
