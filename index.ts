@@ -15,6 +15,7 @@ export {AVM1Globals, TraceLevel} from "./lib/factories/avm1/lib/AVM1Globals";
 export {IAVMRandomProvider} from "./lib/factories/avm1/IAVMRandomProvider";
 export {ISoftKeyboardManager} from "./lib/factories/avm1/ISoftKeyboardManager";
 export { AVM1Object } from "./lib/factories/avm1/runtime/AVM1Object";
+export { AVM1Button } from "./lib/factories/avm1/lib/AVM1Button";
 
 export {AVM1PropertyFlags} from "./lib/factories/avm1/runtime";
 export {AVM1PropertyDescriptor} from "./lib/factories/avm1/runtime/AVM1PropertyDescriptor";
