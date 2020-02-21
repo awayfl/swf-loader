@@ -88,7 +88,7 @@ export enum Bytecode {
     CALLMETHOD = 0x43,
     CALLSTATIC = 0x44,
     CALLSUPER = 0x45,
-    CALLSUPER_DYN = 0x45,
+    CALLSUPER_DYN = 0x0145,
     CALLPROPERTY = 0x46,
     CALLPROPERTY_DYN = 0x0146,
     RETURNVOID = 0x47,
@@ -1342,6 +1342,15 @@ export function compile(methodInfo: MethodInfo) {
                         pp.push(stackF(param(0) - j))
 
                     js.push("                context.savedScope.object.superClass.tPrototype.axInitializer.apply(" + stackF(param(0)) + ", [" + pp.join(", ") + "]);")
+                }
+                    break
+                case Bytecode.CALLSUPER: {
+                    let pp = []
+
+                    for (let j: number = 1; j <= param(0); j++)
+                        pp.push(stackF(param(0) - j))
+
+                    js.push("                " + stackF(param(0)) + " = sec.box(" + stackF(param(0)) + ").axCallSuper(" + getname(param(1)) + ", context.savedScope, [" + pp.join(", ") + "]);")
                 }
                     break
                 case Bytecode.CALLSUPER_DYN: {
