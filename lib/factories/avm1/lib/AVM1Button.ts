@@ -71,9 +71,7 @@ var buttonActionsMap:any={
 
 export class AVM1Button extends AVM1MovieClip {
 	private _requiredListeners: any;
-	private _actions: AVM1ButtonAction[];
-
-	static buttonPokiSDKActions:any={};
+	protected _actions: AVM1ButtonAction[];
 
 	static createAVM1Class(context: AVM1Context) : AVM1Object {
 		return wrapAVM1NativeClass(context, true, AVM1Button,
@@ -232,37 +230,18 @@ export class AVM1Button extends AVM1MovieClip {
 		}
 	}
 
-	private _mouseEventHandler(type: number) {
+	protected _mouseEventHandler(type: number) {
 		var actions = this._actions;
 		var actionsLength:number = actions.length;
 		for (var i = 0; i < actionsLength; i++) {
 			var action = actions[i];
 			if (action.stateTransitionFlags === type) {
-				console.log("press button", (<MovieClip>this.adaptee.parent).symbolID, this.adaptee.symbolID)
-				if(AVM1Button.buttonPokiSDKActions[this.adaptee.name]){
-					console.log("button has poki sdk action");
-					AudioManager.setVolume(0);
-					AVM1Button.buttonPokiSDKActions[this.adaptee.name](()=>{
-						AudioManager.setVolume(1);
-						this._runAction(action)
-					})				
-				}
-				else if(AVM1Button.buttonPokiSDKActions["all"]){
-					console.log("button has poki sdk action");
-					AudioManager.setVolume(0);
-					AVM1Button.buttonPokiSDKActions["all"](()=>{
-						AudioManager.setVolume(1);
-						this._runAction(action)
-					})		
-				}
-				else{
-					this._runAction(action);
-				}
+				this._runAction(action);				
 			}
 		}
 	}
 
-	private _runAction(action: AVM1ButtonAction) {
+	protected _runAction(action: AVM1ButtonAction) {
 		var avm1Context = this._avm1Context;// (<LoaderInfo>this.adaptee.loaderInfo)._avm1Context;
 		if(this.adaptee.parent){
 			(<AVM1Context>avm1Context).executeActions(action.actionsBlock,	getAVM1Object(this.adaptee.parent, this.context));

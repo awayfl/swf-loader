@@ -1294,12 +1294,6 @@ export class AVM1MovieClip extends AVM1SymbolBase<MovieClip> implements IMovieCl
 		}
 	}
 	public stop() {
-		if (AVM1MovieClip.pokiSDKonStopAction && AVM1MovieClip.pokiSDKonStopActionChildName && this.adaptee.getChildByName(AVM1MovieClip.pokiSDKonStopActionChildName)) {
-			AVM1MovieClip.pokiSDKonStopAction();//console.log("called stop on retry mc")
-		}
-		if (AVM1MovieClip.pokiSDKonStopAction && AVM1MovieClip.pokiSDKonStopActionChildName == "all") {
-			AVM1MovieClip.pokiSDKonStopAction();
-		}
 		return this.adaptee.stop();
 	}
 	public stopDragDelegate: (e) => void;

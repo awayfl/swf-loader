@@ -6,7 +6,7 @@ import { AVM1ContextImpl } from "../avm1/interpreter";
 import { SecurityDomain } from "../avm1/ISecurityDomain";
 import { LoaderInfo } from "../avm1/customAway/LoaderInfo";
 import { AssetLibrary, AudioManager, AssetEvent, LoaderEvent, URLLoaderEvent, URLRequest, ColorUtils, IAsset } from "@awayjs/core";
-import { MovieClip, Font, DefaultFontManager } from "@awayjs/scene";
+import { MovieClip, Font, DefaultFontManager, FrameScriptManager } from "@awayjs/scene";
 import { AVM1MovieClip } from "../avm1/lib/AVM1MovieClip";
 import { StageScaleMode } from '../as3webFlash/display/StageScaleMode';
 import { StageAlign } from '../as3webFlash/display/StageAlign';
@@ -21,6 +21,7 @@ export class PlayerAVM1 {
 	private _avm1SceneGraphFactory: AVM1SceneGraphFactory;
 	private _parser: SWFParser;
 	private _skipFrames: number=0;
+	private _skipFramesCallback: Function;
 	private showAdOnFrame: number=-1;
 	private _fontsLoadedCallback:Function=null;
 
@@ -60,14 +61,9 @@ export class PlayerAVM1 {
 		AssetLibrary.load(new URLRequest(url), null, null, this._parser);
 
 	}
-	public playSWF(buffer, url, skipFramesOnScene=0, buttonPokiSDKActions=null, actionOnStop=null) {
+	public playSWF(buffer, url, skipFramesOnScene=0, skipFramesCallback=null) {
 		this._skipFrames=skipFramesOnScene;
-		if(buttonPokiSDKActions)
-			AVM1Button.buttonPokiSDKActions=buttonPokiSDKActions;
-		if(actionOnStop){
-			AVM1MovieClip.pokiSDKonStopAction=actionOnStop.action;
-			AVM1MovieClip.pokiSDKonStopActionChildName=actionOnStop.childName;
-		}
+		this._skipFramesCallback=skipFramesCallback;
 		AudioManager.setVolume(1);
 		(<AVM1ContextImpl>this._avm1SceneGraphFactory.avm1Context).executionProhibited=false;
 		if(this._parser){
@@ -118,8 +114,21 @@ export class PlayerAVM1 {
 					this._stage.getLayer(0).addChild(<MovieClip>asset);
 					
 				(<AVM1MovieClip>(<MovieClip>asset).adapter).initAdapter();
-				if(this._skipFrames>0)
-					(<MovieClip>asset).currentFrameIndex=7;
+				if(this._skipFrames>0){
+					FrameScriptManager.execute_queue();
+					if(this._skipFramesCallback){
+						AudioManager.setVolume(0);
+						this._skipFramesCallback(()=>{
+							AudioManager.setVolume(1);
+							(<MovieClip>asset).currentFrameIndex=this._skipFrames;
+							(<MovieClip>asset).play();
+						})
+					}
+					else{
+						(<MovieClip>asset).currentFrameIndex=this._skipFrames;
+						(<MovieClip>asset).play();
+					}
+				}
 			}
 		}				
 	}
@@ -139,7 +148,8 @@ export class PlayerAVM1 {
 		AssetLibrary.removeEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoadCompleteDelegate);
 		AssetLibrary.removeEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
 		
-		window["hidePokiProgressBar"]();
+		if(window["hidePokiProgressBar"])
+			window["hidePokiProgressBar"]();
 		this._stage.rendererStageContainer.style.visibility="visible";
 	}
 }
