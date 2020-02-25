@@ -38,11 +38,6 @@
     "url": "https://github.com/awayfl/swf-loader/issues"
   },
   "homepage": "https://github.com/awayfl/swf-loader#readme",
-  "dependencies": {
-    "@types/random-seed": "^0.3.3",
-    "big.js": "^5.1.2",
-    "random-seed": "^0.3.0"
-  },
   "peerDependencies": {
     "@awayjs/core": "^0.8.0",
     "@awayjs/graphics": "^0.4.0",

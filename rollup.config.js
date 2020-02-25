@@ -35,9 +35,6 @@ module.exports = {
 			module: true
 		}),
 		commonjs({
-			namedExports: {
-				'node_modules/random-seed/index.js': [ 'create' ]
-			},
 			include: /node_modules/
 		}) ]
 };
