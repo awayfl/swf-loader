@@ -1,1 +1,0 @@
-export {TriangleCulling} from "@awayjs/graphics";

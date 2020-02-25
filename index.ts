@@ -1,36 +1,43 @@
 
 
-console.debug("AwayJS - SWF-viewer - 0.3.134");
+console.debug("AwayFL - SWF-Loader - 0.1.1");
 
 
 export {SWFParser} from "./lib/parsers/SWFParser";
 
-export {AVMAwayStage} from "./lib/factories/avm1/AVMAwayStage";
-export {AVM1SceneGraphFactory} from "./lib/factories/avm1/AVM1SceneGraphFactory";
-export {AVM1ContextImpl} from "./lib/factories/avm1/interpreter";
-export {LoaderInfo} from "./lib/factories/avm1/customAway/LoaderInfo";
-export {SecurityDomain} from "./lib/factories/avm1/ISecurityDomain";
-export {AVM1MovieClip} from "./lib/factories/avm1/lib/AVM1MovieClip";
-export {AVM1Globals, TraceLevel} from "./lib/factories/avm1/lib/AVM1Globals";
-export {IAVMRandomProvider} from "./lib/factories/avm1/IAVMRandomProvider";
-export {ISoftKeyboardManager} from "./lib/factories/avm1/ISoftKeyboardManager";
-export { AVM1Object } from "./lib/factories/avm1/runtime/AVM1Object";
-export { AVM1Button } from "./lib/factories/avm1/lib/AVM1Button";
 
-export {AVM1PropertyFlags} from "./lib/factories/avm1/runtime";
-export {AVM1PropertyDescriptor} from "./lib/factories/avm1/runtime/AVM1PropertyDescriptor";
-export {wrapAVM1NativeClass} from "./lib/factories/avm1/lib/AVM1Utils";
-export {AVM1Context} from "./lib/factories/avm1/context";
-export {Debug, release} from "./lib/factories/base/utilities/Debug";
-export {alIsFunction} from "./lib/factories/avm1/runtime";
+export {Debug, release, notImplemented, somewhatImplemented, warning, assert, assertUnreachable, unexpected, assertNotImplemented} from "./lib/factories/base/utilities/Debug";
 
 
-export {BaseVector} from "./lib/factories/avm2/natives/GenericVector";
-export {Player} from "./lib/factories/player/Player";
-export {PlayerAVM1} from "./lib/factories/player/PlayerAVM1";
+export {shumwayOptions} from "./lib/factories/base/settings";
+export {Option, OptionSet} from "./lib/factories/base/options";
 
-export { alIsArray } from './lib/factories/avm1/runtime';
 
-export { alNewObject } from './lib/factories/avm1/runtime';
+export { StageScaleMode } from './lib/factories/as3webFlash/display/StageScaleMode';
+export { StageAlign } from './lib/factories/as3webFlash/display/StageAlign';
+export { MovieClipSoundsManager } from './lib/factories/timelinesounds/MovieClipSoundsManager';
+export { MovieClipSoundStream } from './lib/factories/timelinesounds/MovieClipSoundStream';
 
-export { AVM1ArrayNative } from './lib/factories/avm1/natives';
+export {MapObject, isIndex, isNullOrUndefined, PromiseWrapper, isNumeric, isNumber, isString, toNumber, isObject, IndentingWriter, dumpLine, Bounds } from "./lib/factories/base/utilities";
+export {jsGlobal} from "./lib/factories/base/utilities/jsGlobal";
+
+export {AVM1ClipEvents} from "./lib/factories/base/SWFTags";
+
+export {ErrorTypes, Telemetry} from "./lib/factories/base/utilities/Telemetry";
+
+export { StringUtilities } from "./lib/factories/base/utilities/StringUtilities";
+export { NumberUtilities, roundHalfEven } from "./lib/factories/base/utilities/NumberUtilities";
+export { defineNonEnumerableProperty, getPropertyDescriptor, ObjectUtilities, hasOwnProperty, copyOwnPropertyDescriptors, copyPropertiesByList, hasOwnGetter, defineReadOnlyProperty, toKeyValueArray } from "./lib/factories/base/utilities/ObjectUtilities";
+export { popManyInto, pushMany } from "./lib/factories/base/utilities/ArrayUtilities";
+
+export { ClipboardService } from "./lib/factories/base/utilities/ClipboardService";
+
+export { clampS8U8, toS16 } from "./lib/factories/base/utilities/IntegerUtilities";
+
+export { flashlog } from "./lib/factories/base/flashlog";
+
+export { HashUtilities } from './lib/factories/base/utilities/HashUtilities';
+
+export { ExternalInterfaceService } from "./lib/factories/base/utilities/ExternalInterfaceService";
+
+export { FileLoadingService } from "./lib/factories/base/utilities/FileLoadingService";

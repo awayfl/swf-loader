@@ -1,1 +1,0 @@
-export {TextFieldAutoSize} from "@awayjs/scene";

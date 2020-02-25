@@ -1,20 +1,20 @@
 {
-  "name": "@awayjs/swf-viewer",
+  "name": "@awayfl/swf-loader",
   "version": "0.3.134",
   "description": "Viewer for playing swf files",
-  "main": "bundle/awayjs-swf-viewer.umd.js",
+  "main": "bundle/awayfl-swf-loader.umd.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "url": "http://www.away3d.com",
   "author": "Rob Bateman",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/awayjs/swf-viewer.git"
+    "url": "git+https://github.com/awayfl/swf-loader.git"
   },
   "scripts": {
     "rimraf": "rimraf",
     "rollup": "rollup -c",
-    "uglifyjs": "uglifyjs ./bundle/awayjs-swf-viewer.umd.js -o ./bundle/awayjs-swf-viewer.umd.min.js --source-map \"content='./bundle/awayjs-swf-viewer.umd.js.map'\" --mangle",
+    "uglifyjs": "uglifyjs ./bundle/awayfl-swf-loader.umd.js -o ./bundle/awayfl-swf-loader.umd.min.js --source-map \"content='./bundle/awayfl-swf-loader.umd.js.map'\" --mangle",
     "tsc": "tsc --lib ES2015.Symbol,DOM,ScriptHost,ES5,ES2015,ES2015.Iterable",
     "tsc:build": "npm run tsc || exit 0",
     "clean": "npm cache clean && npm run rimraf -- node_modules dist bundle",
@@ -35,32 +35,32 @@
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/awayjs/swf-viewer/issues"
+    "url": "https://github.com/awayfl/swf-loader/issues"
   },
-  "homepage": "https://github.com/awayjs/swf-viewer#readme",
+  "homepage": "https://github.com/awayfl/swf-loader#readme",
   "dependencies": {
     "@types/random-seed": "^0.3.3",
     "big.js": "^5.1.2",
     "random-seed": "^0.3.0"
   },
   "peerDependencies": {
-    "@awayjs/core": "^0.8.0",
-    "@awayjs/graphics": "^0.4.0",
-    "@awayjs/materials": "^0.5.0",
-    "@awayjs/renderer": "^0.10.0",
-    "@awayjs/scene": "^0.12.0",
-    "@awayjs/stage": "^0.10.0",
-    "@awayjs/view": "^0.5.0",
+    "@awayfl/core": "^0.8.0",
+    "@awayfl/graphics": "^0.4.0",
+    "@awayfl/materials": "^0.5.0",
+    "@awayfl/renderer": "^0.10.0",
+    "@awayfl/scene": "^0.12.0",
+    "@awayfl/stage": "^0.10.0",
+    "@awayfl/view": "^0.5.0",
     "tslib": "^1.9.0"
   },
   "devDependencies": {
-    "@awayjs/core": "^0.8.0",
-    "@awayjs/graphics": "^0.4.0",
-    "@awayjs/materials": "^0.5.0",
-    "@awayjs/renderer": "^0.10.0",
-    "@awayjs/scene": "^0.12.0",
-    "@awayjs/stage": "^0.10.0",
-    "@awayjs/view": "^0.5.0",
+    "@awayfl/core": "^0.8.0",
+    "@awayfl/graphics": "^0.4.0",
+    "@awayfl/materials": "^0.5.0",
+    "@awayfl/renderer": "^0.10.0",
+    "@awayfl/scene": "^0.12.0",
+    "@awayfl/stage": "^0.10.0",
+    "@awayfl/view": "^0.5.0",
     "rimraf": "^2.5.2",
     "rollup": "^0.57.1",
     "rollup-plugin-commonjs": "^9.1.0",

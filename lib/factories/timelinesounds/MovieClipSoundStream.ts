@@ -1,4 +1,4 @@
-import { ISecurityDomain } from "../avm1/ISecurityDomain";
+
 import { SoundStream, packageWave } from "../../parsers/utils/parser/sound";
 import { WaveAudio } from '@awayjs/core';
 import { WaveAudioData } from '@awayjs/core';

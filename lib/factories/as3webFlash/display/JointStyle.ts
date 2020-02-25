@@ -1,1 +1,0 @@
-export {JointStyle} from "@awayjs/graphics";

@@ -1,1 +1,0 @@
-export {CapsStyle} from "@awayjs/graphics";

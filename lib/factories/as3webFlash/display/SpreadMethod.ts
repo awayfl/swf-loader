@@ -1,1 +1,0 @@
-export {SpreadMethod} from "@awayjs/graphics";

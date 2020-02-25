@@ -5,10 +5,10 @@ var nodeResolve = require('rollup-plugin-node-resolve');
 module.exports = {
 	input: './dist/index.js',
 	output: {
-		name: 'AwayjsSwfViewer',
+		name: 'AwayflSwfLoader',
 		sourcemap: true,
 		format: 'umd',
-		file: './bundle/awayjs-swf-viewer.umd.js'
+		file: './bundle/awayfl-swf-loader.umd.js'
 	},
 	plugins: [
 		nodeResolve({

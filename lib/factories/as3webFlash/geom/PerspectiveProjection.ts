@@ -1,1 +1,0 @@
-export {PerspectiveProjection} from "@awayjs/core";

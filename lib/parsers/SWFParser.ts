@@ -56,8 +56,6 @@ import {
 	TextFlags,
 	getSwfTagCodeName} from "../parsers/utils/SWFTags";
 import {__extends} from "tslib";
-import { ABCFile } from '../factories/avm2/abc/lazy/ABCFile';
-import { FlashSceneGraphFactory } from '../factories/as3webFlash/factories/FlashSceneGraphFactory';
 import { CompressionMethod } from "./CompressionMethod";
 import { release } from '../factories/base/utilities/Debug';
 var noTimelineDebug=true;

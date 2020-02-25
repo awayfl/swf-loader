@@ -1,1 +1,0 @@
-export {InterpolationMethod} from "@awayjs/graphics";

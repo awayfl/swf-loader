@@ -1,1 +1,0 @@
-export {TextFormatAlign} from "@awayjs/scene";

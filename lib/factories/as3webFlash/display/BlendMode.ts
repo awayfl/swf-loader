@@ -1,1 +1,0 @@
-export {BlendMode} from "@awayjs/stage";

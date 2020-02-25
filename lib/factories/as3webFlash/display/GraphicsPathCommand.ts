@@ -1,1 +1,0 @@
-export {GraphicsPathCommand} from "@awayjs/graphics";

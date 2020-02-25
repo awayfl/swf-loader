@@ -1,1 +1,0 @@
-export {URLRequestMethod} from "@awayjs/core";
