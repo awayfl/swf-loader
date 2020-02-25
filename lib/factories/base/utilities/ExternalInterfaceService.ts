@@ -12,7 +12,7 @@ export interface IExternalInterfaceService {
 }
 
 export var ExternalInterfaceService: IExternalInterfaceService = {
-	enabled: false,
+	enabled: true,
 	callback:null,
 	initJS(callback: (functionName: string, args: any[]) => any) {
 		this.callback=callback;
