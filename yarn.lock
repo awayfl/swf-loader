@@ -31,6 +31,11 @@
   version "0.10.15"
   resolved "https://registry.yarnpkg.com/@awayjs/stage/-/stage-0.10.15.tgz#4f606bf3f518e2183ac5ab76e840a2b7396e0c66"
 
+"@awayjs/view@^0.5.0":
+  version "0.5.13"
+  resolved "https://registry.yarnpkg.com/@awayjs/view/-/view-0.5.13.tgz#3546cedfa0f7e2be9b6967510b411587334bc74b"
+  integrity sha512-9n9iFxLDjyi1r7l/HnGpxWVlAOb82T593uqZnC98Ip7RIFRtH27UoxaXQsTiwp+m/mBW3WP/A+0KXdndscgrvg==
+
 "@types/acorn@^4.0.3":
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/@types/acorn/-/acorn-4.0.5.tgz#e29fdf884695e77be4e99e67d748f5147255752d"
