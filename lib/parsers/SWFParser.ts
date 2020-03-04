@@ -1530,6 +1530,7 @@ export class SWFParser extends ParserBase
 			this._swfFile.compression = CompressionMethod.LZMA;
 		}
 		this._swfFile.swfVersion = initialBytes[3];
+		this._swfFile.mapSWFVersionToFPVersion();
 		
 		if(this._swfFile.swfVersion != 6){
 			//console.log("WARNING: SWF VERSION IS NOT 6", this._swfFile.swfVersion)
