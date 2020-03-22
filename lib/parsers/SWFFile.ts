@@ -2,7 +2,7 @@ import { CompressionMethod } from "./CompressionMethod";
 import { SWFFrame } from "./SWFFrame";
 import { EagerlyParsedDictionaryEntry } from "./EagerlyParsedDictionaryEntry";
 import { Bounds, DictionaryEntry, ABCBlock } from "@awayjs/graphics";
-import { IStringMap, INumberMap } from '@awayjs/core';
+
 
   export class SWFFile {
     public compression: number;//CompressionMethod;
@@ -54,7 +54,7 @@ import { IStringMap, INumberMap } from '@awayjs/core';
 		this.framesLoaded = 0;
     }
     public mapSWFVersionToFPVersion(){
-      var swfToFPVersion:INumberMap<string>={
+      var swfToFPVersion:NumberMap<string> ={
         6:"FP6",
         7:"FP7",
         8:"FP8",
