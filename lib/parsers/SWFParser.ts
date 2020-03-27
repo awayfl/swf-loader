@@ -2,7 +2,7 @@ import {WaveAudioParser, Rectangle, WaveAudio, URLLoaderDataFormat, IAsset, Pars
 
 import {Image2DParser, BitmapImage2D} from "@awayjs/stage";
 
-import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign, SceneImage2D} from "@awayjs/scene";
+import {MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign, SceneImage2D, Billboard} from "@awayjs/scene";
 
 import {Graphics, SwfTag} from "@awayjs/graphics";
 
@@ -892,6 +892,10 @@ export class SWFParser extends ParserBase
 								if(hasCharacter) {
 									//console.log("placeTag symbol id",placeObjectTag.symbolId )
 									awaySymbol = this._awaySymbols[placeObjectTag.symbolId];
+									
+									if(awaySymbol.isAsset(BitmapImage2D)) {
+										awaySymbol = Billboard.getNewBillboard(new MethodMaterial(<BitmapImage2D> awaySymbol));
+									}
 									flashSymbol = this.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if(awaySymbol.isAsset(Graphics)){
