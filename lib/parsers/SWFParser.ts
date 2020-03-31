@@ -780,11 +780,15 @@ export class SWFParser extends ParserBase
 					fl_len=swfFrames[i].labelNames.length;
 					for(fl=0;fl<fl_len; fl++){
 						labelName=swfFrames[i].labelNames[fl];
+						let originalLabelName=labelName;
 						if(this.swfFile.swfVersion<=9){
 							labelName=labelName.toLowerCase();
 						}
                         if(!awayTimeline._labels[labelName])
-						    awayTimeline._labels[labelName]=keyFrameCount;
+						    awayTimeline._labels[labelName]={
+								keyFrameIndex:keyFrameCount,
+								name:originalLabelName
+							}
 					}
 				}
 				if(!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length>0){
