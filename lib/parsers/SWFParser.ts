@@ -347,7 +347,7 @@ export class SWFParser extends ParserBase
 			var myImage=this._awaySymbols[bitmapIndex];
 			if(!myImage || (!myImage.isAsset(BitmapImage2D) && !myImage.isAsset(SceneImage2D))){
 				release || console.log("error: can not find image for bitmapfill", myImage);
-				myImage=new BitmapImage2D(512, 512, false, 0xff0000ff, true);
+				myImage=new BitmapImage2D(512, 512, true, 0xff0000ff, true);
 			}
 			material.ambientMethod.texture=new ImageTexture2D(myImage);
 			
