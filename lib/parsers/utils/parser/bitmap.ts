@@ -116,11 +116,13 @@ function parse24BPP(tag: BitmapTag): Uint8ClampedArray {
   //bytes are in ARGB format, so we need to convert to RGBA
   var view:Uint8ClampedArray = new Uint8ClampedArray(dataSize);
   var p:number = 0;
+  var alpha:number;
 
   for (var i = 0; i < dataSize; i+=4) {
-    view[p++] = bytes[i + 1]; // R
-    view[p++] = bytes[i + 2]; // G
-    view[p++] = bytes[i + 3]; // B
+    alpha = bytes[i]? 0xFF/bytes[i] : 0xFF;
+    view[p++] = bytes[i + 1]*alpha; // R
+    view[p++] = bytes[i + 2]*alpha; // G
+    view[p++] = bytes[i + 3]*alpha; // B
     view[p++] = bytes[i]; // A
   }
   assert (p === dataSize, "We should be at the end of the data buffer now.");
