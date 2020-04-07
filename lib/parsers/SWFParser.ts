@@ -71,6 +71,7 @@ var noSceneGraphDebug=true;
 export class SWFParser extends ParserBase
 {
 
+	public static SWFEncrypted: boolean = false;
 
 	private pendingUpdateDelays: number;
 	// Might be lower than frames.length if eagerly parsed assets pending resolution are blocking
@@ -1972,7 +1973,13 @@ export class SWFParser extends ParserBase
 				this.jumpToNextTag(tagLength);
 				break;
 			default:
-				if (tagCode > 100) {
+				if(tagCode==255){
+					console.log("Tag 255 present. SWF is encrypted");
+					SWFParser.SWFEncrypted=true;
+
+
+				}
+				else if (tagCode > 100) {
 					console.log("Encountered undefined tag " + tagCode + ", probably used for AVM1 " +
 						"obfuscation. See http://ijs.mtasa.com/files/swfdecrypt.cpp.");
 				} else {
