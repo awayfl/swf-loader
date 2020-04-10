@@ -15,6 +15,7 @@ export class SWFFrame {
 	initActionBlocks: InitActionBlock[];
 	exports: SymbolExport[];
 	buttonStateName: string;
+	
 	constructor(controlTags?: UnparsedTag[], labelNames?: string[],
 				soundStreamHead?: SoundStream,
 				soundStreamBlock?: Uint8Array,
