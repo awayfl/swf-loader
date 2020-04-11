@@ -62,7 +62,14 @@ var noTimelineDebug=true;
 var noExportsDebug=true;
 var noSceneGraphDebug=true;
 
-
+enum SWFParserProgressState{
+	STARTED,
+	SCANNED,
+	WAIT_FOR_DEPENDENCY,
+	WAIT_FOR_FACTORY,
+	FACTORY_AVAILABLE,
+	FINISHED
+}
 
 /**
  * SWFParser provides a parser for the SWF data type.
@@ -108,6 +115,7 @@ export class SWFParser extends ParserBase
 
 
 	private _factory:ISceneGraphFactory;
+	
 
 	//set to "true" to have some console.logs in the Console
 	private _parsed_header:boolean = false;
@@ -117,11 +125,23 @@ export class SWFParser extends ParserBase
 
 
 	private _debug:boolean = false;
-	private _startedParsing:boolean = false;
+	private _progressState:SWFParserProgressState;
 
 	private _swfFile:SWFFile;
 	public get swfFile():SWFFile{
 		return this._swfFile;
+	}
+	public get factory():ISceneGraphFactory{
+		return this._factory;
+	}
+	public set factory(value:ISceneGraphFactory){
+		this._factory=value;
+		this._progressState = SWFParserProgressState.FACTORY_AVAILABLE;
+	}
+
+	// will be overwritten by AVMhandlers to return Factory to SWFParser after it has been init
+	public onFactoryRequest(swfFile:SWFFile){
+		this.factory = new DefaultSceneGraphFactory();
 	}
 
 	public soundExports:any={};
@@ -137,9 +157,9 @@ export class SWFParser extends ParserBase
 
 		this._swfFile=new SWFFile();
 
-		this._factory = factory || new DefaultSceneGraphFactory();
+		this._factory = factory;
 
-
+		this._progressState = SWFParserProgressState.STARTED;
 
 	}
 
@@ -222,6 +242,7 @@ export class SWFParser extends ParserBase
 		this.externalDependenciesCount--;
 		if(this.externalDependenciesCount==0){
 			this.parseSymbolsToAwayJS();
+			this._progressState = SWFParserProgressState.FINISHED;
 		}
 
 	}
@@ -237,6 +258,7 @@ export class SWFParser extends ParserBase
 		this.externalDependenciesCount--;
 		if(this.externalDependenciesCount==0){
 			this.parseSymbolsToAwayJS();
+			this._progressState = SWFParserProgressState.FINISHED;
 		}
 
 	}
@@ -264,78 +286,100 @@ export class SWFParser extends ParserBase
 	public _pProceedParsing():boolean
 	{
 		//console.log("SWFParser - _pProceedParsing");
-		if (!this._startedParsing) {
+		if (this._progressState == SWFParserProgressState.STARTED) {
 
-			(<any>this._factory).url=this._iFileName;
-			this._startedParsing = true;
 			// get the bytedata
 
 			var byteData:ByteArray = this._pGetByteData();
 			var int8Array:Uint8Array=new Uint8Array(byteData.arraybytes);
 
-
 			// preparse all data. after this step we can deal with tag-objects rather than bytedata
 
 			this.initSWFLoading(int8Array, int8Array.length);
 
-			// now we have a list of symbols that we want to convert to awayjs-symbols
-
-			this._awaySymbols={};
-			this._mapMatsForBitmaps={};
-
-
-			if(this.abcBlocks.length && (<any>this._factory).executeABCBytes){
-				(<any>this._factory).executeABCBytes(this.abcBlocks);
+			
+			if(this._factory){
+				this.parseSymbols();
+			}
+			else{
+				if(!this.onFactoryRequest)
+					throw("Error in SWFParser. no factory and noFactoryRequest method exists.");
+					
+				this._progressState = SWFParserProgressState.WAIT_FOR_FACTORY;
+				this.onFactoryRequest(this._swfFile);
+				if(this._factory){
+					this.parseSymbols();
+				}
 			}
 
-			// this.eagerlyParsedSymbolsList can contain image/font data,
-			// that must be resolved externally before we can start creating assets for symbols
-			this.externalDependenciesCount=0;
-			if(this.eagerlyParsedSymbolsList.length>0){
-				//console.log("this.eagerlyParsedSymbolsList", this.eagerlyParsedSymbolsList);
-				//console.log("this.eagerlyParsedSymbolsMap", this.eagerlyParsedSymbolsMap);
-				for (var i = 0; i < this.eagerlyParsedSymbolsList.length; i++) {
-					var eagerlySymbol:any = this.eagerlyParsedSymbolsList[i];
-					if (eagerlySymbol) {
-						switch(eagerlySymbol.type) {
-							case "image":
-								//console.log("init image parsing", eagerlySymbol);
-								this._pAddDependency(eagerlySymbol.id.toString(), null, new Image2DParser(this._factory, eagerlySymbol.definition.alphaData), new Blob([eagerlySymbol.definition.data],{type: eagerlySymbol.definition.mimeType}), false, true);
-								this.externalDependenciesCount++;
-								break;
-							case "sound":
-								//console.log("init sound parsing", eagerlySymbol);
-								this._pAddDependency(eagerlySymbol.id.toString(), null, new WaveAudioParser(), new Blob([eagerlySymbol.definition.packaged.data],{type: eagerlySymbol.definition.packaged.mimeType}), false, true);
-								this.externalDependenciesCount++;
-								break;
-							case "font":
-								//console.log("encountered eagerly parsed font: ", eagerlySymbol);
-								break;
-							default:
-								console.log("encountered eagerly parsed unknown type: ", eagerlySymbol);
-								break;
-						}
+		}
+		else if (this._progressState == SWFParserProgressState.FACTORY_AVAILABLE) {
+			if(!this.onFactoryRequest)
+				throw("Error in SWFParser. no factory and noFactoryRequest method exists.");
+			if(this._factory){
+				this.parseSymbols();
+			}
+		}
+		
+		if (this._progressState != SWFParserProgressState.FINISHED) {
+			return  ParserBase.MORE_TO_PARSE;
+		}
+		return  ParserBase.PARSING_DONE;
+	}
 
+	private parseSymbols(){
+		(<any>this._factory).url=this._iFileName;
+		this._pContent = this._factory.createDisplayObjectContainer();
+		this._awaySymbols={};
+		this._mapMatsForBitmaps={};
+
+
+		if(this.abcBlocks.length && (<any>this._factory).executeABCBytes){
+			(<any>this._factory).executeABCBytes(this.abcBlocks);
+		}
+
+		// this.eagerlyParsedSymbolsList can contain image/font data,
+		// that must be resolved externally before we can start creating assets for symbols
+		this.externalDependenciesCount=0;
+		if(this.eagerlyParsedSymbolsList.length>0){
+			//console.log("this.eagerlyParsedSymbolsList", this.eagerlyParsedSymbolsList);
+			//console.log("this.eagerlyParsedSymbolsMap", this.eagerlyParsedSymbolsMap);
+			for (var i = 0; i < this.eagerlyParsedSymbolsList.length; i++) {
+				var eagerlySymbol:any = this.eagerlyParsedSymbolsList[i];
+				if (eagerlySymbol) {
+					switch(eagerlySymbol.type) {
+						case "image":
+							//console.log("init image parsing", eagerlySymbol);
+							this._pAddDependency(eagerlySymbol.id.toString(), null, new Image2DParser(this._factory, eagerlySymbol.definition.alphaData), new Blob([eagerlySymbol.definition.data],{type: eagerlySymbol.definition.mimeType}), false, true);
+							this.externalDependenciesCount++;
+							break;
+						case "sound":
+							//console.log("init sound parsing", eagerlySymbol);
+							this._pAddDependency(eagerlySymbol.id.toString(), null, new WaveAudioParser(), new Blob([eagerlySymbol.definition.packaged.data],{type: eagerlySymbol.definition.packaged.mimeType}), false, true);
+							this.externalDependenciesCount++;
+							break;
+						case "font":
+							//console.log("encountered eagerly parsed font: ", eagerlySymbol);
+							break;
+						default:
+							console.log("encountered eagerly parsed unknown type: ", eagerlySymbol);
+							break;
 					}
 
 				}
 
 			}
-			if(this.externalDependenciesCount>0){
-				this._pPauseAndRetrieveDependencies();
-			}
-			else{
-				this.parseSymbolsToAwayJS();
-			}
 
 		}
 		if(this.externalDependenciesCount>0){
-			return  ParserBase.MORE_TO_PARSE;
-
+			this._progressState = SWFParserProgressState.WAIT_FOR_DEPENDENCY;
+			this._pPauseAndRetrieveDependencies();
 		}
-		return  ParserBase.PARSING_DONE;
+		else{
+			this.parseSymbolsToAwayJS();
+			this._progressState = SWFParserProgressState.FINISHED;
+		}
 	}
-
 	private _awaySymbols:any;
 
 
@@ -1420,8 +1464,6 @@ export class SWFParser extends ParserBase
 	public _pStartParsing(frameLimit:number):void
 	{
 		//console.log("SWFParser - _pStartParsing");
-		//create a content object for Loaders
-		this._pContent = this._factory.createDisplayObjectContainer();
 
 		super._pStartParsing(frameLimit);
 
