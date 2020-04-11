@@ -13,6 +13,7 @@ import {
 	Bounds,
 	IDataDecoder,
 	ABCBlock,
+	EncryptedBlock,
 	ActionBlock,
 	InitActionBlock,
 	SymbolExport,
@@ -55,20 +56,26 @@ import {
 	PlaceObjectFlags,
 	TextFlags,
 	getSwfTagCodeName} from "../parsers/utils/SWFTags";
+
 import {__extends} from "tslib";
 import { CompressionMethod } from "./CompressionMethod";
 import { release } from '../factories/base/utilities/Debug';
+
 var noTimelineDebug=true;
 var noExportsDebug=true;
 var noSceneGraphDebug=true;
 
-enum SWFParserProgressState{
+const enum SWFParserProgressState{
 	STARTED,
 	SCANNED,
 	WAIT_FOR_DEPENDENCY,
 	WAIT_FOR_FACTORY,
 	FACTORY_AVAILABLE,
 	FINISHED
+}
+const enum SWF_ENCRYPTED_TAGS {
+	ENCRYPTED = 255,
+	ENCRYPTED_CODE_BLOCK = 253
 }
 
 /**
@@ -113,7 +120,6 @@ export class SWFParser extends ParserBase
 	private _currentInitActionBlocks: InitActionBlock[];
 	private _currentExports: SymbolExport[];
 
-
 	private _factory:ISceneGraphFactory;
 	
 
@@ -121,11 +127,11 @@ export class SWFParser extends ParserBase
 	private _parsed_header:boolean = false;
 	private _body:ByteArray;
 
-
-
-
 	private _debug:boolean = false;
 	private _progressState:SWFParserProgressState;
+
+	private _isEncrypted = false;
+	private _currentEncrActionBlocks: EncryptedBlock[]  = [];
 
 	private _swfFile:SWFFile;
 	public get swfFile():SWFFile{
@@ -1520,6 +1526,10 @@ export class SWFParser extends ParserBase
 		this._currentExports = null;
 		this._endTagEncountered = false;
 
+		// farm encrypted actions blocks (named as tag253 to action block)
+		this._isEncrypted = false;
+		this._currentEncrActionBlocks = null;
+
 		this.readHeaderAndInitialize(initialBytes);
 	}
 
@@ -1757,11 +1767,13 @@ export class SWFParser extends ParserBase
 	private scanTag(tag: UnparsedTag, rootTimelineMode: boolean): void {
 		var stream: Stream = this._dataStream;
 		var byteOffset = stream.pos;
+
 		assert(byteOffset === tag.byteOffset);
+
 		var tagCode = tag.tagCode;
 		var tagLength = tag.byteLength;
-		//console.info("Scanning tag " + getSwfTagCodeName(tagCode) + " (start: " + byteOffset +  ", end: " + (byteOffset + tagLength) + ")");
 
+		//console.info("Scanning tag " + getSwfTagCodeName(tagCode) + " (start: " + byteOffset +  ", end: " + (byteOffset + tagLength) + ")");
 
 		if (tagCode === SwfTagCode.CODE_DEFINE_SPRITE) {
 			// According to Chapter 13 of the SWF format spec, no nested definition tags are
@@ -1885,11 +1897,16 @@ export class SWFParser extends ParserBase
 				break;
 			case SwfTagCode.CODE_DO_INIT_ACTION:
 				if (this._swfFile.useAVM1) {
-					var initActionBlocks = this._currentInitActionBlocks ||
+					const initActionBlocks = this._currentInitActionBlocks ||
 						(this._currentInitActionBlocks = []);
-					var spriteId = this._dataView.getUint16(stream.pos, true);
-					var actionsData = this.swfData.subarray(byteOffset + 2, byteOffset + tagLength);
-					initActionBlocks.push({spriteId: spriteId, actionsData: actionsData});
+					const spriteId = this._dataView.getUint16(stream.pos, true);
+					const actionsData = this.swfData.subarray(byteOffset + 2, byteOffset + tagLength);
+					const encryptedData = this._isEncrypted ? this._currentEncrActionBlocks?.pop() : undefined;
+					
+					if(encryptedData) {
+						//console.log(`Pass enc data to tag ${tagCode}, pos ${stream.pos}`);
+					}
+					initActionBlocks.push({spriteId: spriteId, actionsData: actionsData, encryptedData});
 				}
 				this.jumpToNextTag(tagLength);
 				break;
@@ -1897,7 +1914,12 @@ export class SWFParser extends ParserBase
 				if (this._swfFile.useAVM1) {
 					var actionBlocks = this._currentActionBlocks || (this._currentActionBlocks = []);
 					var actionsData = this.swfData.subarray(stream.pos, stream.pos + tagLength);
-					actionBlocks.push({actionsData: actionsData, precedence: stream.pos});
+					const encryptedData = this._isEncrypted ? this._currentEncrActionBlocks?.pop() : undefined;
+
+					if(encryptedData) {
+						//console.log(`Pass enc data to tag ${tagCode}, pos ${stream.pos}`);
+					}
+					actionBlocks.push({actionsData: actionsData, precedence: stream.pos, encryptedData});
 				}
 				this.jumpToNextTag(tagLength);
 				break;
@@ -2014,14 +2036,22 @@ export class SWFParser extends ParserBase
 				//console.info("Ignored tag (these shouldn't occur) " + tagCode + ': ' + getSwfTagCodeName(tagCode));
 				this.jumpToNextTag(tagLength);
 				break;
-			default:
-				if(tagCode==255){
-					console.log("Tag 255 present. SWF is encrypted");
-					SWFParser.SWFEncrypted=true;
-
-
+			case SWF_ENCRYPTED_TAGS.ENCRYPTED:
+				console.log("Tag 255 present. SWF is encrypted");
+				SWFParser.SWFEncrypted = this._isEncrypted =  true;
+				this.jumpToNextTag(tagLength);
+				break;
+			case SWF_ENCRYPTED_TAGS.ENCRYPTED_CODE_BLOCK: {
+				if(this._isEncrypted) {
+					const block = this._currentEncrActionBlocks || (this._currentEncrActionBlocks = []);
+					const data = this.swfData.subarray(byteOffset + 2, byteOffset + tagLength);
+					block.push({ data, bytePos: byteOffset + 2, size: tagLength, rawTagId: tagCode});
 				}
-				else if (tagCode > 100) {
+				this.jumpToNextTag(tagLength);
+				break;
+			}
+			default:
+				if (tagCode > 100) {
 					console.log("Encountered undefined tag " + tagCode + ", probably used for AVM1 " +
 						"obfuscation. See http://ijs.mtasa.com/files/swfdecrypt.cpp.");
 				} else {
