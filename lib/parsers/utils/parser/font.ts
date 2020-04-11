@@ -554,7 +554,7 @@ export function defineFont(tag: FontTag, ns:string):any {
 
 
 
-		tessFontTableAJS.setChar(code.toString(), glyphAdvance, null, null, false , idx, glyphPath, tag.fileURL);
+		tessFontTableAJS.setChar(code.toString(), glyphAdvance, null, null, false , idx, glyphPath);
 		
 	/*	var vertexBuffer=GraphicsFactoryFills.pathToAttributesBuffer(glyphPath, true);
 		if(vertexBuffer){
