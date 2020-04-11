@@ -2,6 +2,14 @@
 
 console.debug("AwayFL - SWF-Loader - 0.4.8");
 
+export {SWFFile} from "./lib/parsers/SWFFile";
+
+export {AVMVERSION} from "./lib/factories/base/AVMVersion";
+
+export {AVMEvent} from "./lib/AVMEvent";
+export {AVMStage} from "./lib/AVMStage";
+export {IAVMHandler} from "./lib/IAVMHandler";
+export {IAVMStage} from "./lib/IAVMStage";
 
 export {SWFParser} from "./lib/parsers/SWFParser";
 
