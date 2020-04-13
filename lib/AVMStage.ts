@@ -84,7 +84,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._rendererStage.container.style.visibility = "hidden";
 		this._rendererStage.antiAlias = 0;
 		this._scene.renderer.renderableSorter = null;//new RenderableSort2D();
-		//this._scene.mousePicker.shapeFlag=true;
+		this._scene.forceMouseMove = true;
+		this._scene.mousePicker.shapeFlag=true;
 
 		this._projection = new PerspectiveProjection();
 		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
