@@ -612,10 +612,9 @@ export class SWFParser extends ParserBase {
 		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
 		var awayMc: MovieClip = this.framesToTimeline(rootSymbol, this._swfFile.frames, null, null);
 
-		for (var key in assetsToFinalize) {
-			assetsToFinalize[key]["fileurl"] = this._iFileName;
+		for (var key in assetsToFinalize)
 			this._pFinalizeAsset(assetsToFinalize[key]);
-		}
+
 		awayMc.isAVMScene = true;
 		this._pFinalizeAsset(awayMc, "scene");
 		DefaultFontManager.applySharedFonts(this._iFileName);
@@ -1562,7 +1561,6 @@ export class SWFParser extends ParserBase {
 		//  release || Debug.assert(handler, 'handler shall exists here');
 		var tagEnd = Math.min(unparsed.byteOffset + unparsed.byteLength, this._dataStream.end);
 		var tag = handler(this._dataStream, this._swfFile.swfVersion, unparsed.tagCode, tagEnd, this._jpegTables);
-		tag.fileURL = this._iFileName;
 		var finalPos = this._dataStream.pos;
 		if (finalPos !== tagEnd) {
 			this.emitTagSlopWarning(unparsed, tagEnd);
