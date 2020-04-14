@@ -13,6 +13,8 @@ import { AVMVERSION } from './factories/base/AVMVersion';
 import { AVMEvent } from './AVMEvent';
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
 
+
+
 export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	private _swfFile: SWFFile;
@@ -35,8 +37,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	private _scene: Scene;
 	private _rendererStage: Stage;
 
-	protected _gameConfig: any = null;
-	private _curFile: any = null;
+	protected _gameConfig: IGameConfig = null;
+	private _curFile: IResourceFile = null;
 
 
 	constructor() {
@@ -101,12 +103,21 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	}
 
+	public playSWF(buffer:any, url:string) {
+		
+		this._gameConfig = {
+			files:[{data:buffer, path:url, resourceType:ResourceType.GAME}]
+		}
+		this.addEventListener(LoaderEvent.LOAD_COMPLETE, (e) => this.play());
+		this.loadNextResource();	
+	}
+
 	public loadNextResource(event: LoaderEvent = null) {
 		this._curFile = this._gameConfig.files.shift();
 		if (this._curFile) {
 			let parser = new SWFParser();
 			parser._iFileName = this._curFile.path;
-			if (this._curFile.resourceType == "GAME") {
+			if (this._curFile.resourceType == ResourceType.GAME) {
 				if (this._swfFile) {
 					throw "Only playing of 1 SWF file is supported at the moment";
 				}
@@ -162,7 +173,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	public _onAssetComplete(event: AssetEvent) {
 		// atm we only addAssets to avmHandler that come from the game swf
 		// preloaded files are fonts, and are handled by DefaultManager outside of SWF
-		if (this._curFile.resourceType == "GAME")
+		if (this._curFile.resourceType == ResourceType.GAME)
 			this._avmHandler.addAsset(event.asset, true);
 		this.dispatchEvent(event);
 	}
@@ -409,4 +420,19 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._stageWidth = value;
 		this.resizeCallback();
 	}
+}
+
+// todo: move to own files:
+
+const enum ResourceType{
+	GAME="GAME",
+	FONTS="FONTS",
+}
+export interface IResourceFile{
+	resourceType?:ResourceType,
+	data?:any,
+	path:string
+}
+export interface IGameConfig{
+	files:IResourceFile[];
 }
