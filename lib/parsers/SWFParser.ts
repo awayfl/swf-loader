@@ -89,6 +89,8 @@ export class SWFParser extends ParserBase {
 
 	public static SWFEncrypted: boolean = false;
 
+	public static factory:ISceneGraphFactory = null;
+
 	private pendingUpdateDelays: number;
 	// Might be lower than frames.length if eagerly parsed assets pending resolution are blocking
 	// us from reporting the given frame as loaded.
@@ -144,12 +146,13 @@ export class SWFParser extends ParserBase {
 	}
 	public set factory(value: ISceneGraphFactory) {
 		this._factory = value;
+		SWFParser.factory = value;
 		this._progressState = SWFParserProgressState.FACTORY_AVAILABLE;
 	}
 
 	// will be overwritten by AVMhandlers to return Factory to SWFParser after it has been init
 	public onFactoryRequest(swfFile: SWFFile) {
-		this.factory = new DefaultSceneGraphFactory();
+		this.factory = SWFParser.factory || new DefaultSceneGraphFactory();
 	}
 
 	public soundExports: any = {};
