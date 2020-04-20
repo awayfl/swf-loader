@@ -68,7 +68,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._resizeCallbackDelegate = (event: any) => this.resizeCallback(event);
 		window.addEventListener("resize", this._resizeCallbackDelegate);
 
-		this._onLoadCompleteDelegate = (event: LoaderEvent) => this.onLoadComplete(event);
+		this._onLoaderStartDelegate = (event: LoaderEvent) => this.onLoaderStart(event);
+		this._onLoaderCompleteDelegate = (event: LoaderEvent) => this.onLoaderComplete(event);
 		this._onAssetCompleteDelegate = (event: AssetEvent) => this._onAssetComplete(event);
 		this._onLoadErrorDelegate = (event: URLLoaderEvent) => this._onLoadError(event);
 
@@ -108,7 +109,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._gameConfig = {
 			files:[{data:buffer, path:url, resourceType:ResourceType.GAME}]
 		}
-		this.addEventListener(LoaderEvent.LOAD_COMPLETE, (e) => this.play());
+		this.addEventListener(LoaderEvent.LOADER_COMPLETE, (e) => this.play());
 		this.loadNextResource();	
 	}
 
@@ -146,8 +147,9 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 				};
 			}
 			// Parser will not be provided with factory. DefaultSceneGraphFactory will be used
+			AssetLibrary.addEventListener(LoaderEvent.LOADER_START, this._onLoaderStartDelegate);
 			AssetLibrary.addEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
-			AssetLibrary.addEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoadCompleteDelegate);
+			AssetLibrary.addEventListener(LoaderEvent.LOADER_COMPLETE, this._onLoaderCompleteDelegate);
 			AssetLibrary.addEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
 			if (this._curFile.data) {
 				AssetLibrary.loadData(this._curFile.data, null, this._curFile.path, parser);
@@ -168,7 +170,10 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	public load() {
 		this.loadNextResource();
 	}
-
+	private _onLoaderStartDelegate: (event: LoaderEvent) => void;
+	public onLoaderStart(event: LoaderEvent) {
+		this.dispatchEvent(event);
+	}
 	private _onAssetCompleteDelegate: (event: AssetEvent) => void;
 	public _onAssetComplete(event: AssetEvent) {
 		// atm we only addAssets to avmHandler that come from the game swf
@@ -177,17 +182,17 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this._avmHandler.addAsset(event.asset, true);
 		this.dispatchEvent(event);
 	}
-	private _onLoadCompleteDelegate: (event: LoaderEvent) => void;
-	public onLoadComplete(event: LoaderEvent) {
+	private _onLoaderCompleteDelegate: (event: LoaderEvent) => void;
+	public onLoaderComplete(event: LoaderEvent) {
 		AssetLibrary.removeEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
-		AssetLibrary.removeEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoadCompleteDelegate);
+		AssetLibrary.removeEventListener(LoaderEvent.LOADER_COMPLETE, this._onLoaderCompleteDelegate);
 		AssetLibrary.removeEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
 		this.loadNextResource(event);
 	}
 	private _onLoadErrorDelegate: (event: URLLoaderEvent) => void;
 	public _onLoadError(event: URLLoaderEvent) {
 		AssetLibrary.removeEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
-		AssetLibrary.removeEventListener(LoaderEvent.LOAD_COMPLETE, this._onLoadCompleteDelegate);
+		AssetLibrary.removeEventListener(LoaderEvent.LOADER_COMPLETE, this._onLoaderCompleteDelegate);
 		AssetLibrary.removeEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
 		console.log("error loading swf");
 		this.dispatchEvent(event);
