@@ -2,7 +2,7 @@
 import {argumentsToString} from "../utilities";
 import {omitRepeatedWarnings} from "../settings";
 
-export var release:boolean = true;
+export var release:boolean = false;
 
 export class Debug{
 	public static release:boolean=release;
@@ -28,8 +28,6 @@ export function notImplemented(message: string) {
 export function somewhatImplemented(message: string) {
 	warning("AVM1 somewhatImplemented: " + message);
 }
-
-
 
 export function error(message: string) {
 	console.error(message);
@@ -104,3 +102,41 @@ export function unexpectedCase(message?: any) {
 	assert(false, "Unexpected Case: " + message);
 }
 
+interface IAwayDebug extends StringMap<IDebugMethodDeclaration> {}
+
+declare global {
+    interface Window { _AWAY_DEBUG_: IAwayDebug; }
+}
+
+// export WRITER API for capture AVM2 reports
+
+type TMethodType = 'undefined' | 'object' | 'boolean' | 'number' | 'string' | 'function';
+ 
+export interface IDebugMethodDeclaration {
+	name: string;
+	declaration?: Array<{name: string, type: TMethodType}>;
+	description?: string;	
+}
+
+export function registerDebugMethod(func: (...args: any[]) => any, methodInfo: IDebugMethodDeclaration) {
+	if(release) {
+		return;
+	}
+
+	const name = methodInfo.name;
+	delete methodInfo.name;
+
+	if(!methodInfo || !name) {
+		throw new Error("Method name should not be empty");
+	}
+
+	const api: Object = window._AWAY_DEBUG_ = (window._AWAY_DEBUG_ || {});
+
+	if(api.hasOwnProperty(name)) {
+		console.warn(`Overrides existed debug method definition: ${name}`);
+	}
+
+	Object.assign(func, methodInfo);
+
+	api[name] = func;
+}
