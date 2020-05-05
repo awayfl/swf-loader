@@ -595,6 +595,7 @@ export class SWFParser extends ParserBase {
 					case "binary":
 						if ((<any>this._factory).createBinarySymbol)
 							(<any>this._factory).createBinarySymbol(symbol);
+						this._awaySymbols[dictionary[i].id] = symbol;
 						break;
 					default:
 						console.log("unknown symbol type:", symbol.type, symbol);
@@ -755,6 +756,9 @@ export class SWFParser extends ParserBase {
 						}
 						else if (awayAsset.away) {
 							// this is a font. for now we do nothing (?)
+						}
+						else {
+							// this is a binary asset. should already be handled in AXSecurityDomain.createInitializerFunction
 						}
 					}
 					noExportsDebug || console.log("			added export", swfFrames[i].exports[key], asset.className, asset.symbolId, awayAsset);
