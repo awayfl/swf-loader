@@ -41,7 +41,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	private _curFile: IResourceFile = null;
 
 
-	constructor() {
+	constructor(gameConfig:IGameConfig) {
 
 		super();
 
@@ -58,6 +58,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._showFrameRate = false;
 		this._showFrameRateIntervalID = -1;
 
+		this._gameConfig=gameConfig;
 		// init awayengine
 		this.initAwayEninge();
 		this._scene.renderer.view.backgroundColor = 0xffffff;
@@ -439,5 +440,8 @@ export interface IResourceFile{
 	path:string
 }
 export interface IGameConfig{
+	showFPS?:boolean;
+	forceJIT?:boolean;
 	files:IResourceFile[];
+	[key:string]:any;
 }
