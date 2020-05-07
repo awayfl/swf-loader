@@ -50,7 +50,13 @@ export {
 } from "./lib/factories/base/utilities";
 export { jsGlobal } from "./lib/factories/base/utilities/jsGlobal";
 
-export { AVM1ClipEvents } from "./lib/factories/base/SWFTags";
+export { AVM1ClipEvents ,
+	ColorMatrixFilter,
+	ConvolutionFilter,
+GlowFilter,
+BlurFilter,
+FilterType
+} from "./lib/factories/base/SWFTags";
 
 export {
   ErrorTypes,

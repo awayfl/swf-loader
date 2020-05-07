@@ -20,7 +20,7 @@ import {ImageDefinition} from "./image";
 //import assertUnreachable = Shumway.Debug.assertUnreachable;
 //import roundToMultipleOfFour = Shumway.IntegerUtilities.roundToMultipleOfFour;
 
-import {BitmapTag, SwfTagCode} from "../SWFTags";
+import {BitmapTag, SwfTagCode} from "../../../factories/base/SWFTags"
 
 export const enum BitmapFormat {
   /**

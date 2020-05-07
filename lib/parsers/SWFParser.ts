@@ -2,7 +2,7 @@ import { WaveAudioParser, Rectangle, WaveAudio, URLLoaderDataFormat, IAsset, Par
 
 import { Image2DParser, BitmapImage2D } from "@awayjs/stage";
 
-import { MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TesselatedFontTable, TextFormat, TextFormatAlign, SceneImage2D, Billboard } from "@awayjs/scene";
+import { MorphSprite, DefaultFontManager, Sprite, ISceneGraphFactory, DefaultSceneGraphFactory, MovieClip, Timeline, TimelineActionType, TesselatedFontTable, TextFormat, TextFormatAlign, SceneImage2D, Billboard, IFilter } from "@awayjs/scene";
 
 import { Graphics, SwfTag } from "@awayjs/graphics";
 
@@ -58,7 +58,7 @@ import {
 	PlaceObjectFlags,
 	TextFlags,
 	getSwfTagCodeName
-} from "../parsers/utils/SWFTags";
+} from "../factories/base/SWFTags";
 
 import { __extends } from "tslib";
 import { CompressionMethod } from "./CompressionMethod";
@@ -672,6 +672,7 @@ export class SWFParser extends ParserBase {
 		var property_type_stream: number[] = [];
 		var property_index_stream: number[] = [];
 		var properties_stream_int: number[] = [];
+		var properties_stream_filters: IFilter[] = [];
 
 		var properties_stream_f32_mtx_scale_rot: number[] = [];
 		var properties_stream_f32_mtx_pos: number[] = [];
@@ -1255,7 +1256,7 @@ export class SWFParser extends ParserBase {
 							if ((updateCmd.swapGraphicsID != null && updateCmd.swapGraphicsID >= 0)) {
 
 								num_updated_props++;
-								property_type_stream.push(202);
+								property_type_stream.push(TimelineActionType.SWAP_GRAPHICS);
 								property_index_stream.push(properties_stream_int.length);
 								properties_stream_int.push(updateCmd.swapGraphicsID);
 							}
@@ -1264,10 +1265,10 @@ export class SWFParser extends ParserBase {
 							if (placeObjectTag != null && ((placeObjectTag.name && placeObjectTag.name != "") || (this._buttonIds[placeObjectTag.symbolId]) || (this._mcIds[placeObjectTag.symbolId]))) {
 								num_updated_props++;
 								if (this._buttonIds[placeObjectTag.symbolId]) {
-									property_type_stream.push(5);
+									property_type_stream.push(TimelineActionType.UPDATE_BUTTON_NAME);
 								}
 								else {
-									property_type_stream.push(4);
+									property_type_stream.push(TimelineActionType.UPDATE_NAME);
 								}
 								property_index_stream.push(properties_stream_strings.length);
 								properties_stream_strings.push(placeObjectTag.name);
@@ -1277,7 +1278,7 @@ export class SWFParser extends ParserBase {
 
 								num_updated_props++;
 
-								property_type_stream.push(1);//matrix type: 1=all, 11=no position, 12=no scale
+								property_type_stream.push(TimelineActionType.UPDATE_MTX);//matrix type: 1=all, 11=no position, 12=no scale
 								property_index_stream.push(properties_stream_f32_mtx_all.length / 6);
 
 								// todo: we can save memory by checking if only scale or position was changed,
@@ -1310,7 +1311,7 @@ export class SWFParser extends ParserBase {
 								if (exTransform) {
 									num_updated_props++;
 
-									property_type_stream.push(1);//matrix type: 1=all, 11=no position, 12=no scale
+									property_type_stream.push(TimelineActionType.UPDATE_MTX);//matrix type: 1=all, 11=no position, 12=no scale
 									property_index_stream.push(properties_stream_f32_mtx_all.length / 6);
 
 									properties_stream_f32_mtx_all[properties_stream_f32_mtx_all.length] = exTransform.a;
@@ -1324,7 +1325,7 @@ export class SWFParser extends ParserBase {
 
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasColorTransform) {
 								//console.log("PlaceObjectFlags.HasColorTransform", placeObjectTag.cxform);
-								property_type_stream.push(2);
+								property_type_stream.push(TimelineActionType.UPDATE_CMTX);
 								property_index_stream.push(properties_stream_f32_ct.length / 8);
 								num_updated_props++;
 								properties_stream_f32_ct[properties_stream_f32_ct.length] = placeObjectTag.cxform.redMultiplier / 255;
@@ -1339,7 +1340,7 @@ export class SWFParser extends ParserBase {
 
 							if (updateCmd.ratio != null && updateCmd.ratio >= 0) {
 								num_updated_props++;
-								property_type_stream.push(203);
+								property_type_stream.push(TimelineActionType.SET_RATIO);
 								property_index_stream.push(properties_stream_int.length);
 								properties_stream_int.push(updateCmd.ratio | 0);
 								//console.log("PlaceObjectFlags.HasRatio", placeObjectTag, child);
@@ -1347,7 +1348,7 @@ export class SWFParser extends ParserBase {
 
 							if (child.maskingChanged) {
 								num_updated_props++;
-								property_type_stream.push(3);
+								property_type_stream.push(TimelineActionType.UPDATE_MASKS);
 								property_index_stream.push(properties_stream_int.length);
 								properties_stream_int.push(child.masks.length);
 								for (let val of child.masks)
@@ -1356,16 +1357,25 @@ export class SWFParser extends ParserBase {
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasClipDepth) {
 
 								num_updated_props++;
-								property_type_stream.push(200);
+								property_type_stream.push(TimelineActionType.ENABLE_MASKMODE);
 								property_index_stream.push(0);
 
 							}
 
-							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasFilterList) { }
+							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasFilterList) {
+								//console.log("encountered filters", placeObjectTag.filters);
+								num_updated_props++;
+								property_type_stream.push(TimelineActionType.UPDATE_FILTERS);
+								property_index_stream.push(properties_stream_int.length);
+								properties_stream_int.push(properties_stream_filters.length);
+								properties_stream_int.push(placeObjectTag.filters.length);
+								for (let f=0; f<placeObjectTag.filters.length; f++)
+									properties_stream_filters.push(placeObjectTag.filters[f]);
+							}
 
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasVisible) {
 								num_updated_props++;
-								property_type_stream.push(6);
+								property_type_stream.push(TimelineActionType.UPDATE_VISIBLE);
 								property_index_stream.push(placeObjectTag.visibility ? 1 : 0);
 							}
 
@@ -1450,6 +1460,8 @@ export class SWFParser extends ParserBase {
 		awayTimeline.properties_stream_f32_mtx_all = new Float32Array(properties_stream_f32_mtx_all);
 		awayTimeline.properties_stream_f32_ct = new Float32Array(properties_stream_f32_ct);
 		awayTimeline.properties_stream_strings = properties_stream_strings;
+		awayTimeline.properties_stream_filters = properties_stream_filters;
+		
 
 		awayTimeline.init();
 

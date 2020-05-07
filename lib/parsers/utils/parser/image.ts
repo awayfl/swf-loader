@@ -15,7 +15,7 @@
  */
 
 import {assert, ImageType, Inflate} from "@awayjs/graphics";
-import {ImageTag} from "../SWFTags"
+import {ImageTag}  from "../../../factories/base/SWFTags"
 
 /**
  * Reads the next two bytes at the specified position.

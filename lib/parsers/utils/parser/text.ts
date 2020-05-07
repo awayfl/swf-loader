@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {TextTag} from "../SWFTags"
+import {TextTag} from "../../../factories/base/SWFTags"
 
 export function defineText(tag: TextTag):any {
   var bold = false;

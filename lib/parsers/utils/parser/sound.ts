@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {SoundTag} from "../SWFTags"
+import {SoundTag} from "../../../factories/base/SWFTags"
 import { release } from '../../../factories/base/utilities/Debug';
 
 

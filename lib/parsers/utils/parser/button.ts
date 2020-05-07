@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {ButtonTag, PlaceObjectFlags, ButtonCharacterFlags, SwfTagCode} from "../SWFTags"
+import {ButtonTag, PlaceObjectFlags, ButtonCharacterFlags, SwfTagCode} from "../../../factories/base/SWFTags"
 
 export function defineButton(tag: ButtonTag, dictionary: any): any {
   var characters = tag.characters;

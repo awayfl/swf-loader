@@ -61,7 +61,8 @@ import {
 	TextRecordFlags,
 	TextTag,
 	VideoFrameTag,
-    VideoStreamTag} from "../SWFTags";
+    VideoStreamTag,
+	FilterType} from "../../../factories/base/SWFTags";
 
 import {Stream} from "../stream";
 
@@ -252,24 +253,24 @@ function parseFilter(stream: Stream): Filter {
   var filter: Filter = <any>{};
   var type = filter.type = stream.readUi8();
   switch (type) {
-    case 0:
-    case 2:
-    case 3:
-    case 4:
-    case 7:
+    case FilterType.DROPSHADOW:
+    case FilterType.GLOW:
+    case FilterType.BEVEL:
+    case FilterType.GRADIENTGLOW:
+    case FilterType.GRADIENTBEVEL:
       var glow = <GlowFilter>filter;
       var count: number;
-      if (type === 4 || type === 7) {
-        count = stream.readUi8();
+      if (type === FilterType.GRADIENTGLOW || type === FilterType.GRADIENTBEVEL) {
+       	count = stream.readUi8();
       } else {
-        count = type === 3 ? 2 : 1;
+        count = type === FilterType.BEVEL ? 2 : 1;
       }
       var colors: number[] = glow.colors = [];
       var i = count;
       while (i--) {
         colors.push(parseRgba(stream));
       }
-      if (type === 4 || type === 7) {
+      if (type === FilterType.GRADIENTGLOW || type === FilterType.GRADIENTBEVEL) {
         var ratios: number[] = glow.ratios = [];
         var i = count;
         while (i--) {
@@ -278,7 +279,7 @@ function parseFilter(stream: Stream): Filter {
       }
       glow.blurX = stream.readFixed();
       glow.blurY = stream.readFixed();
-      if (type !== 2) {
+      if (type !== FilterType.GLOW) {
         glow.angle = stream.readFixed();
         glow.distance = stream.readFixed();
       }
@@ -286,21 +287,21 @@ function parseFilter(stream: Stream): Filter {
       glow.inner = !!stream.readUb(1);
       glow.knockout = !!stream.readUb(1);
       glow.compositeSource = !!stream.readUb(1);
-      if (type === 3 || type === 4 || type === 7) {
+      if (type === FilterType.BEVEL || type === FilterType.GRADIENTGLOW || type === FilterType.GRADIENTBEVEL) {
         glow.onTop = !!stream.readUb(1);
         glow.quality = stream.readUb(4);
       } else {
         glow.quality = stream.readUb(5);
       }
       return glow;
-    case 1:
+    case FilterType.BLUR:
       var blur = <BlurFilter>filter;
       blur.blurX = stream.readFixed();
       blur.blurY = stream.readFixed();
       blur.quality = stream.readUb(5);
       stream.readUb(3);
       return blur;
-    case 5:
+    case FilterType.CONVOLUTION:
       var conv = <ConvolutionFilter>filter;
       var matrixX = conv.matrixX = stream.readUi8();
       var matrixY = conv.matrixY = stream.readUi8();
@@ -316,7 +317,7 @@ function parseFilter(stream: Stream): Filter {
       conv.clamp = !!stream.readUb(1);
       conv.preserveAlpha = !!stream.readUb(1);
       return conv;
-    case 6:
+    case FilterType.COLORMATRIX:
       var cm = <ColorMatrixFilter>filter;
       var matrix: number[] = cm.matrix = [];
       var i = 20;

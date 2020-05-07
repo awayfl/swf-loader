@@ -13,8 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {SwfTag, DefinitionTag, Bbox, ShapeRecord, FillStyle} from "@awayjs/graphics";
+
 
 import {release} from "./utilities/Debug";
+import { IFilter } from '@awayjs/scene';
+
+
+export enum FilterType {
+	DROPSHADOW                = 0,
+	BLUR                      = 1,
+	GLOW                      = 2,
+	BEVEL                     = 3,
+	GRADIENTGLOW              = 4,
+	CONVOLUTION               = 5,
+	COLORMATRIX               = 6,
+	GRADIENTBEVEL             = 7,
+  }
 
 export const enum SwfTagCode {
 	CODE_END                               = 0,
@@ -171,12 +186,6 @@ export enum ControlTags {
 	CODE_VIDEO_FRAME                       = 61
 }
 
-export interface Bbox {
-	xMin: number;
-	xMax: number;
-	yMin: number;
-	yMax: number;
-}
 
 export interface Matrix {
 	a: number;
@@ -196,14 +205,6 @@ export interface ColorTransform {
 	greenOffset: number;
 	blueOffset: number;
 	alphaOffset: number;
-}
-
-export interface SwfTag {
-	code: number;
-}
-
-export interface DefinitionTag extends SwfTag {
-	id: number;
 }
 
 export interface DisplayListTag extends SwfTag {
@@ -275,8 +276,8 @@ export interface ClipEvents {
 	actionsBlock: Uint8Array;
 }
 
-export interface Filter {
-	type: number;
+export interface Filter extends IFilter {
+
 }
 
 export interface GlowFilter extends Filter {
@@ -567,9 +568,6 @@ export const enum ShapeFlags {
 	IsMorph               = 0x08
 }
 
-export interface FillStyle {
-	type: number;
-}
 
 export interface SolidFill extends FillStyle {
 	color: number;
@@ -617,25 +615,6 @@ export interface LineStyle {
 	colorMorph?: number;
 }
 
-export interface ShapeRecord {
-	type: number;
-	flags: number;
-	deltaX?: number;
-	deltaY?: number;
-	controlDeltaX?: number;
-	controlDeltaY?: number;
-	anchorDeltaX?: number;
-	anchorDeltaY?: number;
-	moveX?: number;
-	moveY?: number;
-	fillStyle0?: number;
-	fillStyle1?: number;
-	lineStyle?: number;
-	fillStyles?: FillStyle[];
-	lineStyles?: LineStyle[];
-	lineBits?: number;
-	fillBits?: number;
-}
 
 export const enum ShapeRecordFlags {
 	Move = 0x01,

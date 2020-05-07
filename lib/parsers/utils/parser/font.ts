@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {FontTag, FontFlags, SwfTagCode} from "../SWFTags"
+import {FontTag, FontFlags, SwfTagCode}  from "../../../factories/base/SWFTags"
 import {Font, TesselatedFontTable, DefaultFontManager, FontStyleName} from "@awayjs/scene"
 import {GraphicsPath, ShapeRecordFlags} from "@awayjs/graphics"
 import {AttributesBuffer} from "@awayjs/stage"

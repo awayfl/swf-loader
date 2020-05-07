@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {StaticTextTag} from "../SWFTags"
+import {StaticTextTag} from "../../../factories/base/SWFTags"
 
 export function defineLabel(tag: StaticTextTag):any {
   var label = {
