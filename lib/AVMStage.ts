@@ -36,6 +36,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	private _projection: PerspectiveProjection;
 	private _scene: Scene;
 	private _rendererStage: Stage;
+	
+	private _x: any;
+	private _y: any;
+	private _w: any;
+	private _h: any;
 
 	protected _gameConfig: IGameConfig = null;
 	private _curFile: IResourceFile = null;
@@ -57,6 +62,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._frameRate = 30;
 		this._showFrameRate = false;
 		this._showFrameRateIntervalID = -1;
+
+		this._x=gameConfig.x?gameConfig.x:0;
+		this._y=gameConfig.y?gameConfig.y:0;
+		this._w=gameConfig.w?gameConfig.w:"100%";
+		this._h=gameConfig.h?gameConfig.h:"100%";
 
 		this._gameConfig=gameConfig;
 		// init awayengine
@@ -225,34 +235,47 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._currentFps = 0;
 	}
 
-	private _resizeCallbackDelegate: (event: any) => void;
-	private resizeCallback(event: any = null): void {
+
+	
+	public setStageDimensions(x:any, y:any, w:any, h:any){
+		this._x=x;
+		this._y=y;
+		this._w=w;
+		this._h=h;
+		this.resizeStageInternal();
+	}
+
+	private resizeStageInternal(){
+
+		let x:number=(typeof this._x==="string")?parseFloat(this._x.replace("%", ""))/100*window.innerWidth:this._x;
+		let y:number=(typeof this._y==="string")?parseFloat(this._y.replace("%", ""))/100*window.innerHeight:this._y;
+		let w:number=(typeof this._w==="string")?parseFloat(this._w.replace("%", ""))/100*window.innerWidth:this._w;
+		let h:number=(typeof this._h==="string")?parseFloat(this._h.replace("%", ""))/100*window.innerHeight:this._h;
+		let newX = x;
+		let newY = y;
+		let newWidth = w;
+		let newHeight = h;
+
 		// todo: correctly implement all StageScaleModes;
-
-		var newWidth = window.innerWidth;
-		var newHeight = window.innerHeight;
-		var newX = 0;
-		var newY = 0;
-
 		switch (this._scaleMode) {
 			case StageScaleMode.NO_SCALE:
-				this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
+				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
 				break;
 			case StageScaleMode.SHOW_ALL:
-				newHeight = window.innerHeight;
+				newHeight = h;
 				newWidth = (this._stageWidth / this._stageHeight) * newHeight;
-				if (newWidth > window.innerWidth) {
-					newWidth = window.innerWidth;
+				if (newWidth > w) {
+					newWidth = w;
 					newHeight = newWidth * (this._stageHeight / this._stageWidth);
 				}
-				newX = (window.innerWidth - newWidth) / 2;
-				newY = (window.innerHeight - newHeight) / 2;
+				newX += (w - newWidth) / 2;
+				newY += (h - newHeight) / 2;
 				this._projection.fieldOfView = Math.atan(this._stageHeight / 1000 / 2) * 360 / Math.PI;
 				break;
 
 			case StageScaleMode.EXACT_FIT:
 			case StageScaleMode.NO_BORDER:
-				this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
+				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
 				break;
 			default:
 				console.log("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
@@ -261,12 +284,12 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		// todo: correctly implement all alignModes;
 		switch (this._align) {
 			case StageAlign.TOP_LEFT:
-				this._scene.renderer.view.y = 0;
-				this._scene.renderer.view.x = 0;
+				this._scene.view.x = newX;
+				this._scene.view.y = newY;
 				break;
 			default:
-				this._scene.renderer.view.y = 0;
-				this._scene.renderer.view.x = 0;
+				this._scene.view.x = newX;
+				this._scene.view.y = newY;
 				console.log("Stage: only implemented StageAlign is TOP_LEFT");
 				break;
 		}
@@ -276,17 +299,17 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._scene.view.width = newWidth;
 		this._scene.view.height = newHeight;
 
-		this._rendererStage.x = newX;
-		this._rendererStage.y = newY;
-		this._rendererStage.width = newWidth;
-		this._rendererStage.height = newHeight;
 
 		if (this._fpsTextField)
-			this._fpsTextField.style.left = window.innerWidth * 0.5 - 100 + 'px';
+			this._fpsTextField.style.left = newX + (w * 0.5 - 100 + 'px');
 
 		if (this._avmHandler) {
 			this._avmHandler.resizeStage();
 		}
+	}
+	private _resizeCallbackDelegate: (event: any) => void;
+	private resizeCallback(event: any = null): void {
+		this.resizeStageInternal();
 	}
 
 
@@ -440,6 +463,10 @@ export interface IResourceFile{
 	path:string
 }
 export interface IGameConfig{
+	x?:any;
+	y?:any;
+	w?:any;
+	h?:any;
 	showFPS?:boolean;
 	forceJIT?:boolean;
 	files:IResourceFile[];
