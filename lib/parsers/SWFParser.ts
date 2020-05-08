@@ -354,12 +354,26 @@ export class SWFParser extends ParserBase {
 					switch (eagerlySymbol.type) {
 						case "image":
 							//console.log("init image parsing", eagerlySymbol);
-							this._pAddDependency(eagerlySymbol.id.toString(), null, new Image2DParser(this._factory, eagerlySymbol.definition.alphaData), new Blob([eagerlySymbol.definition.data], { type: eagerlySymbol.definition.mimeType }), false, true);
+							this._pAddDependency(
+									eagerlySymbol.id.toString(), null, 
+									new Image2DParser(this._factory, eagerlySymbol.definition.alphaData), 
+									new Blob([eagerlySymbol.definition.data], { type: eagerlySymbol.definition.mimeType }), 
+									false, true);
 							this.externalDependenciesCount++;
 							break;
 						case "sound":
 							//console.log("init sound parsing", eagerlySymbol);
-							this._pAddDependency(eagerlySymbol.id.toString(), null, new WaveAudioParser(), new Blob([eagerlySymbol.definition.packaged.data], { type: eagerlySymbol.definition.packaged.mimeType }), false, true);
+							if(!eagerlySymbol.definition.packaged) {
+								console.warn("SWF-parser: Missed packaged data for sound-id:",eagerlySymbol.id.toString());
+								break;
+							}
+
+							this._pAddDependency(
+									eagerlySymbol.id.toString(), null, 
+									new WaveAudioParser(), 
+									new Blob([eagerlySymbol.definition.packaged.data], { type: eagerlySymbol.definition.packaged.mimeType }), 
+									false, true);
+							
 							this.externalDependenciesCount++;
 							break;
 						case "font":
