@@ -803,8 +803,11 @@ export function defineFont(tag: FontTag, ns:string):any {
 	//font.metrics = metrics;
 	//font.data = dataBuffer;
 	tessFontTableAJS.set_font_em_size(1024);
-	if(tessFontTableAJS.get_whitespace_width()==0)
+	
+	// whitespace can't be a 0, not overide it
+	if(whiteSpaceWidth){
 		tessFontTableAJS.set_whitespace_width(whiteSpaceWidth);
+	}
 
 	return font;
 }
