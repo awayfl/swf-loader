@@ -42,13 +42,27 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	private _w: any;
 	private _h: any;
 
+	private _isPaused: boolean;
+
 	protected _gameConfig: IGameConfig = null;
 	private _curFile: IResourceFile = null;
 
+	private static _instance: AVMStage = null;
+	public static instance():AVMStage
+	{
+		if(!AVMStage._instance)
+			throw("AVMStage._instance should exists but does not")
+		return AVMStage._instance;
+	}
 
 	constructor(gameConfig:IGameConfig) {
 
 		super();
+
+		if(AVMStage._instance)
+			throw("Only one AVMStage is allowed to be constructed");
+
+		AVMStage._instance = this;
 
 		this._time = 0;
 		this._currentFps = 0;
@@ -67,6 +81,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._y=gameConfig.y?gameConfig.y:0;
 		this._w=gameConfig.w?gameConfig.w:"100%";
 		this._h=gameConfig.h?gameConfig.h:"100%";
+
+		this._isPaused=false;
 
 		this._gameConfig=gameConfig;
 		// init awayengine
@@ -151,6 +167,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 					}
 					this._avmHandler.init(this, this._swfFile, (hasInit) => {
 						parser.factory = this._avmHandler.factory;
+						SWFParser.factory = this._avmHandler.factory;
 						if (hasInit)
 							this.dispatchEvent(new AVMEvent(AVMEvent.AVM_COMPLETE, avmName));
 					});
@@ -313,7 +330,26 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 
+	public pause(){
+		AudioManager.setVolume(0);
+		this._isPaused=true;
+	}
+	public unPause(){
+		AudioManager.setVolume(1);
+		this._isPaused=false;
+
+	}
+	public get isPaused():boolean{
+		return this._isPaused;
+	}
+	public set isPaused(value:boolean){
+		this._isPaused=value;
+	}
+
 	protected main_loop(dt: number) {
+		if(this._isPaused){
+			return;
+		}
 		if (!this._avmHandler) {
 			throw ("error - can not render when no avm-stage is available")
 		}
@@ -335,7 +371,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		}
 	}
 	protected showNextFrame(dt: number) {
-
+		if(this._isPaused){
+			MovieClipSoundsManager.enterFrame();
+			MovieClipSoundsManager.exitFrame();
+			return;
+		}
 		MovieClipSoundsManager.enterFrame();
 		this._scene.fireMouseEvents();
 
