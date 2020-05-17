@@ -64,10 +64,9 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
   var padding = roundToMultipleOfFour(width) - width;
   var colorTableLength = tag.colorTableSize + 1;
   var colorTableEntrySize = hasAlpha ? 4 : 3;
-  var colorTableSize = colorTableLength * colorTableEntrySize;
+  var colorTableSize = roundToMultipleOfFour(colorTableLength * colorTableEntrySize);
 
-
-  var outputDataSize = colorTableEntrySize * ((width + padding) * height);
+  var outputDataSize = colorTableSize * ((width + padding) * height);
 
   var bytes: Uint8Array = Inflate.inflate(tag.bmpData, outputDataSize, true);
 
