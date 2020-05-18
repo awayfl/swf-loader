@@ -5,7 +5,7 @@ import { IAVMHandler } from "./IAVMHandler";
 import { SWFFile } from "./parsers/SWFFile";
 import { StageAlign } from "./factories/as3webFlash/display/StageAlign";
 import { StageScaleMode } from "./factories/as3webFlash/display/StageScaleMode";
-import { Scene, Camera, DisplayObjectContainer, SceneGraphPartition, MovieClip } from "@awayjs/scene";
+import { Scene, Camera, DisplayObjectContainer, SceneGraphPartition, MovieClip, FrameScriptManager } from "@awayjs/scene";
 import { BasicPartition } from "@awayjs/view";
 import { Stage } from "@awayjs/stage";
 import { IAVMStage } from "./IAVMStage";
@@ -369,6 +369,15 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this.showNextFrame(this._time);
 			this._time -= frameMarker;
 		}
+	}
+	public requestRender() {
+		if (!this._scene || !this._scene.renderer) {
+			this._timer.stop();
+			return;
+		}
+		FrameScriptManager.execute_as3_constructors();
+		FrameScriptManager.execute_queue();
+		this._scene.render(true);
 	}
 	protected showNextFrame(dt: number) {
 		if(this._isPaused){
