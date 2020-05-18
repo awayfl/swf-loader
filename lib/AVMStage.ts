@@ -318,7 +318,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 
 		if (this._fpsTextField)
-			this._fpsTextField.style.left = newX + (w * 0.5 - 100 + 'px');
+			this._fpsTextField.style.left = (window.innerWidth * 0.5 - 50 + 'px');
 
 		if (this._avmHandler) {
 			this._avmHandler.resizeStage();
