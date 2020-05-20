@@ -25,8 +25,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	private _align: StageAlign;
 	private _scaleMode: StageScaleMode;
+	private _alignAllowUpdate: boolean;
+	private _scaleModeAllowUpdate: boolean;
 	private _stageWidth: number;
 	private _stageHeight: number;
+
 	private _frameRate: number;
 	private _showFrameRate: boolean;
 	private _showFrameRateIntervalID: number;
@@ -73,6 +76,16 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._stageHeight = 400;
 		this._scaleMode = StageScaleMode.SHOW_ALL;
 		this._align = StageAlign.TOP_LEFT;
+		this._scaleModeAllowUpdate = true;
+		this._alignAllowUpdate = true;
+		if(gameConfig.stageScaleMode){
+			this._scaleMode=gameConfig.stageScaleMode;
+			this._scaleModeAllowUpdate = false;
+		}
+		if(gameConfig.stageAlign){
+			this._align=gameConfig.stageAlign;
+			this._alignAllowUpdate = false;
+		}
 		this._frameRate = 30;
 		this._showFrameRate = false;
 		this._showFrameRateIntervalID = -1;
@@ -405,6 +418,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		return this._align;
 	}
 	public set align(value: StageAlign) {
+		if(!this._alignAllowUpdate)
+			return;		
 		this._align = value;
 		this.resizeCallback();
 	}
@@ -442,6 +457,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		return this._scaleMode;
 	}
 	public set scaleMode(value: StageScaleMode) {
+		if(!this._scaleModeAllowUpdate)
+			return;		
 		this._scaleMode = value;
 		this.resizeCallback();
 	}
