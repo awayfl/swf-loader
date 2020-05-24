@@ -3,6 +3,7 @@ import {argumentsToString} from "../utilities";
 import {omitRepeatedWarnings} from "../settings";
 
 export var release:boolean = true;
+export var debugable: boolean = true;
 
 export class Debug{
 	public static release:boolean=release;
@@ -119,7 +120,7 @@ export interface IDebugMethodDeclaration {
 }
 
 export function registerDebugMethod(func: (...args: any[]) => any, methodInfo: IDebugMethodDeclaration) {
-	if(release) {
+	if(!debugable) {
 		return;
 	}
 
