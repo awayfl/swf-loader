@@ -388,7 +388,6 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this._timer.stop();
 			return;
 		}
-		FrameScriptManager.execute_as3_constructors();
 		FrameScriptManager.execute_queue();
 		this._scene.render(true);
 	}
