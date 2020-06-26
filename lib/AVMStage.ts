@@ -12,6 +12,7 @@ import { IAVMStage } from "./IAVMStage";
 import { AVMVERSION } from './factories/base/AVMVersion';
 import { AVMEvent } from './AVMEvent';
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
+import { AVMTestHandler } from './AVMTestHandler';
 
 
 
@@ -19,6 +20,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	private _swfFile: SWFFile;
 	private _avmHandlers: StringMap<IAVMHandler>;
+	public avmTestHandler:AVMTestHandler;
 	protected _avmHandler: IAVMHandler;
 	private _timer: RequestAnimationFrame;
 	private _time: number;
@@ -98,6 +100,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._isPaused=false;
 
 		this._gameConfig=gameConfig;
+
 		// init awayengine
 		this.initAwayEninge();
 		this._scene.renderer.view.backgroundColor = 0xffffff;
@@ -113,6 +116,13 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._onAssetCompleteDelegate = (event: AssetEvent) => this._onAssetComplete(event);
 		this._onLoadErrorDelegate = (event: URLLoaderEvent) => this._onLoadError(event);
 
+		if(this._gameConfig.testConfig){
+			this.avmTestHandler=new AVMTestHandler(this._gameConfig.testConfig);
+		}
+
+	}
+	public get config():IGameConfig{
+		return this._gameConfig;
 	}
 
 	public registerAVMStageHandler(value: IAVMHandler) {
