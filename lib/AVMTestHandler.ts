@@ -49,6 +49,7 @@ export class AVMTestHandler implements IInputRecorder{
 				throw("ERROR IN AVMTEST.addMessage");
 		}
 		this.frames[this.frames.length-1].messages.push(message);
+		this.checkIfFinished();
 	}
 
 	public recordEvent(){
@@ -72,6 +73,19 @@ export class AVMTestHandler implements IInputRecorder{
 		}
 	}
 
+	public checkIfFinished() {
+		if(this.config.frames){
+			if (!this.config.frames[this.frames.length - 1]) {
+				this.finishTest();
+				return;
+			}
+			let len1 = this.config.frames[this.frames.length - 1].messages.length;
+			let len2 = this.frames[this.frames.length - 1].messages.length;
+			if(len2>=len1){
+				this.finishTest();
+			}
+		}
+	}
 	public finishTest(){
 		if(this._finished)
 			return;
@@ -82,12 +96,15 @@ export class AVMTestHandler implements IInputRecorder{
 				finalFrames[i]=this.frames[i];
 			}
 		}
+		var path = window.location.pathname;
+		var page = path.split("/").pop().replace(".html", "");
 		const data = {		
 			player:"awayflplayer",
 			duration: Date.now()-this.config.startRecTime,
 			date : new Date().toLocaleString(),
+			url:page,
 			swf: this.config.swfPath,
-			settings: this.config,
+			//settings: this.config,
 			frames: finalFrames,
 			seed: this.config.seed,	
 		}
@@ -108,6 +125,7 @@ export class AVMTestHandler implements IInputRecorder{
 			if (request.readyState == 4) {
 				if (request.status == 200 || request.status == 0) {
 					console.log("AWAYFLTEST END");
+					window.close();
 					//console.log(request.responseText)
 				} else {
 					serverError(request.statusText + "-" + request.readyState + "-" + request.responseText + "-" + request.status);
@@ -118,7 +136,7 @@ export class AVMTestHandler implements IInputRecorder{
 			serverError(request.statusText + "-" + request.readyState + "-" + request.responseText + "-" + request.status);
 		};
 		try {
-			request.open("POST", "http://localhost:" + this.config.port + "/upload", false);
+			request.open("POST", "http://localhost:" + this.config.port + "/upload", true);
 			request.send(formData);
 		}
 		catch (e) {
