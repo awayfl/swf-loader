@@ -185,6 +185,14 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 					this._avmHandler = this._avmHandlers[avmName];
 
+					if (this.avmTestHandler){//} && !this.avmTestHandler.config.onlyTraces) {
+						let loadedSWFMessage=`OBJECT loaderInfo : {'frameRate':${this._swfFile.frameRate}`;
+						loadedSWFMessage=`,'swfVersion':${this._swfFile.swfVersion}`;
+						loadedSWFMessage=`,'actionScriptVersion':${avmName==AVMVERSION.AVM1?"2":"3"}`;
+						loadedSWFMessage=`,'width':${this._stageWidth}`;
+						loadedSWFMessage=`,'width':${this._stageHeight}}`;
+						this.avmTestHandler.addMessage(loadedSWFMessage);
+					}
 					if (!this._avmHandler) {
 						throw ("no avm-stage installed for " + avmName);
 					}
