@@ -52,6 +52,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	protected _gameConfig: IGameConfig = null;
 	private _curFile: IResourceFile = null;
 
+	public static runtimeStartTime:number=0;
+
 	private static _instance: AVMStage = null;
 	public static instance():AVMStage
 	{
@@ -410,6 +412,9 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._scene.render(true);
 	}
 	protected showNextFrame(dt: number) {
+		if(AVMStage.runtimeStartTime==0){
+			AVMStage.runtimeStartTime=Date.now();
+		}
 		if(this._isPaused){
 			MovieClipSoundsManager.enterFrame();
 			MovieClipSoundsManager.exitFrame();
