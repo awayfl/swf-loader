@@ -7,7 +7,7 @@ import { StageAlign } from "./factories/as3webFlash/display/StageAlign";
 import { StageScaleMode } from "./factories/as3webFlash/display/StageScaleMode";
 import { Scene, Camera, DisplayObjectContainer, SceneGraphPartition, MovieClip, FrameScriptManager } from "@awayjs/scene";
 import { BasicPartition } from "@awayjs/view";
-import { Stage } from "@awayjs/stage";
+import { Stage, BitmapImage2D } from "@awayjs/stage";
 import { IAVMStage } from "./IAVMStage";
 import { AVMVERSION } from './factories/base/AVMVersion';
 import { AVMEvent } from './AVMEvent';
@@ -119,7 +119,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._onLoadErrorDelegate = (event: URLLoaderEvent) => this._onLoadError(event);
 
 		if(this._gameConfig.testConfig){
-			this.avmTestHandler=new AVMTestHandler(this._gameConfig.testConfig);
+			this.avmTestHandler=new AVMTestHandler(this._gameConfig.testConfig, this);
 		}
 
 	}
@@ -164,6 +164,58 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this.addEventListener(LoaderEvent.LOADER_COMPLETE, (e) => this.play());
 		this.loadNextResource();	
 	}
+	
+	public snapshot(callback:Function)
+	{
+
+		var myBitmap:BitmapImage2D=new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xffffffff, false);
+
+		this._scene.renderer.queueSnapshot(myBitmap);
+
+		this._scene.renderer.view.target = myBitmap;
+		this._scene.render();
+
+		this._scene.renderer.view.target = null	
+		myBitmap.invalidate();
+
+		// flip vertical:
+
+		
+		var oldData=myBitmap.data;
+		var myBitmap2:BitmapImage2D=new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xff00ffff, false);
+		var x = 0;
+		var y = 0;
+		var idx=0;
+		var color=0;
+		var awayPixels:number[]=[];
+		// get all pixels of our image (BitmapData)
+		for (y = 0; y< this._stageHeight; y++) {
+			for (x = 0; x < this._stageWidth; x++) {
+				idx=((this._stageHeight-1-y)*this._stageWidth+x)*4;
+				color=ColorUtils.ARGBtoFloat32(oldData[idx+3], oldData[idx], oldData[idx+1], oldData[idx+2]);
+				awayPixels[awayPixels.length]=color;
+				myBitmap2.setPixel32(x, y, color);
+			}
+		}
+
+		myBitmap2.invalidate();
+		var htmlImage:HTMLCanvasElement = document.createElement("canvas");
+		htmlImage.width = myBitmap2.width;
+		htmlImage.height = myBitmap2.height;
+		htmlImage.style.position = "absolute";
+		htmlImage.style.top = "0px";
+		htmlImage.style.left = "0px";
+		htmlImage.style.width = "100%";
+
+		var context:CanvasRenderingContext2D = htmlImage.getContext("2d");
+		var imageData:ImageData = context.getImageData(0, 0, myBitmap2.width, myBitmap2.height);
+		imageData.data.set(myBitmap2.data);
+		context.putImageData(imageData, 0, 0);	
+
+		if(callback)
+			callback(htmlImage);
+		
+	}
 
 	public loadNextResource(event: LoaderEvent = null) {
 		this._curFile = this._gameConfig.files.shift();
@@ -187,16 +239,17 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 					this._avmHandler = this._avmHandlers[avmName];
 
-					if (this.avmTestHandler){//} && !this.avmTestHandler.config.onlyTraces) {
-						let loadedSWFMessage=`OBJECT loaderInfo : {'frameRate':${this._swfFile.frameRate}`;
-						loadedSWFMessage=`,'swfVersion':${this._swfFile.swfVersion}`;
-						loadedSWFMessage=`,'actionScriptVersion':${avmName==AVMVERSION.AVM1?"2":"3"}`;
-						loadedSWFMessage=`,'width':${this._stageWidth}`;
-						loadedSWFMessage=`,'width':${this._stageHeight}}`;
-						this.avmTestHandler.addMessage(loadedSWFMessage);
+					if (this.avmTestHandler && !this.avmTestHandler.config.settings.onlyTraces) {
+						if(this._swfFile.useAVM1){
+							// in FP when using the shell.swf, avm1 traces are 1 frame behind
+							// so we mimmic that behavior here
+							this.avmTestHandler.nextFrame();
+						}
+						this.avmTestHandler.setSWF(this._swfFile);
 					}
+
 					if (!this._avmHandler) {
-						throw ("no avm-stage installed for " + avmName);
+						throw ("no avm-handler installed for " + avmName);
 					}
 					this._avmHandler.init(this, this._swfFile, (hasInit) => {
 						parser.factory = this._avmHandler.factory;
@@ -423,7 +476,14 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		MovieClipSoundsManager.enterFrame();
 		this._scene.fireMouseEvents();
 
+
 		this._avmHandler.enterFrame(dt);
+
+		if(this.avmTestHandler){
+			//this.avmTestHandler.takeSnapshot();
+			if (!this.avmTestHandler.config.onlyTraces)
+				this.avmTestHandler.nextFrame();
+		}
 
 		// actionscript might have disposed everything
 		// so lets check if that is the case and stop everything if its true
