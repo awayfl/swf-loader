@@ -300,7 +300,8 @@ export class SWFParser extends ParserBase {
 			// preparse all data. after this step we can deal with tag-objects rather than bytedata
 
 			this.initSWFLoading(int8Array, int8Array.length);
-
+			
+			this._swfFile.url=this._iFileName;
 
 			if (this._factory) {
 				this.parseSymbols();

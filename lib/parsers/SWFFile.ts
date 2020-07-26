@@ -8,6 +8,7 @@ import { Bounds, DictionaryEntry, ABCBlock } from "@awayjs/graphics";
     public compression: number;//CompressionMethod;
     public swfVersion: number;
     public fpVersion: string;
+    public url: string;
     public useAVM1: boolean;
     public backgroundColor: number;
     public bounds: Bounds;//80pro: todo
