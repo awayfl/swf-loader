@@ -286,8 +286,13 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	public _onAssetComplete(event: AssetEvent) {
 		// atm we only addAssets to avmHandler that come from the game swf
 		// preloaded files are fonts, and are handled by DefaultManager outside of SWF
-		if (this._curFile.resourceType == ResourceType.GAME)
+		if (this._curFile.resourceType == ResourceType.GAME){
+			
+			if(AVMStage.runtimeStartTime==0){
+				AVMStage.runtimeStartTime=Date.now();
+			}
 			this._avmHandler.addAsset(event.asset, true);
+		}
 		this.dispatchEvent(event);
 	}
 	private _onLoaderCompleteDelegate: (event: LoaderEvent) => void;
@@ -459,9 +464,6 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._scene.render(true);
 	}
 	protected showNextFrame(dt: number) {
-		if(AVMStage.runtimeStartTime==0){
-			AVMStage.runtimeStartTime=Date.now();
-		}
 		if(this._isPaused){
 			MovieClipSoundsManager.enterFrame();
 			MovieClipSoundsManager.exitFrame();
