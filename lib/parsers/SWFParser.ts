@@ -965,7 +965,11 @@ export class SWFParser extends ParserBase {
 									awaySymbol = this._awaySymbols[placeObjectTag.symbolId];
 
 									if (awaySymbol.isAsset(BitmapImage2D)) {
-										awaySymbol = Billboard.getNewBillboard(new MethodMaterial(<BitmapImage2D>awaySymbol));
+										// enable blending for symbols, because if you place image directly on stage
+										// it not enable blend mode 
+										const m = new MethodMaterial(<BitmapImage2D>awaySymbol);
+										m.alphaBlending = (<BitmapImage2D>awaySymbol).transparent;
+										awaySymbol = Billboard.getNewBillboard(m);
 									}
 									flashSymbol = this.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
