@@ -191,15 +191,15 @@ export class SWFParser extends ParserBase {
 	 * @return Whether or not the given data is supported.
 	 */
 	public static supportsData(data: any): boolean {
-		var magic = (data[0] << 16) | (data[1] << 8) | data[2];
+		
+		//console.log(data[0], data[1],data[2]);
+		let  isSWF:boolean= (data[0] === 67 || data[0] === 70 || data[0] === 90) && (data[1] === 87) && (data[2] === 83);
 
-		console.log("SWFParser supportsData data: ", data);
-		// check if header is 
-		if ((magic & 0xffff) === 0x5753) {
-			console.log("SWFParser supportsData result: ", true);
+		if (isSWF) {
+			//console.log("SWFParser supportsData result: ", true);
 			return true;
 		}
-		console.log("SWFParser supportsData result: ", false);
+		//console.log("SWFParser supportsData result: ", false);
 		return false;
 	}
 
