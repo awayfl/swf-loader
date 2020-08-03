@@ -87,7 +87,6 @@ const enum SWF_ENCRYPTED_TAGS {
  */
 export class SWFParser extends ParserBase {
 
-	public static SWFEncrypted: boolean = false;
 
 	public static factory:ISceneGraphFactory = null;
 
@@ -2064,7 +2063,7 @@ export class SWFParser extends ParserBase {
 				break;
 			case SWF_ENCRYPTED_TAGS.ENCRYPTED:
 				console.log("Tag 255 present. SWF is encrypted");
-				SWFParser.SWFEncrypted = this._isEncrypted = true;
+				this._isEncrypted = true;
 				this.jumpToNextTag(tagLength);
 				break;
 			case SWF_ENCRYPTED_TAGS.ENCRYPTED_CODE_BLOCK: {

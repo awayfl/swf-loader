@@ -62,6 +62,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		return AVMStage._instance;
 	}
 
+	public static forceINT:boolean = false;
+
 	constructor(gameConfig:IGameConfig) {
 
 		super();
@@ -93,6 +95,9 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		if(gameConfig.stageAlign){
 			this._align=gameConfig.stageAlign;
 			this._alignAllowUpdate = false;
+		}
+		if(gameConfig.forceINT){
+			AVMStage.forceINT=gameConfig.forceINT;
 		}
 		this._frameRate = 30;
 		this._showFrameRate = false;
