@@ -9,6 +9,7 @@ export { AVMStage } from "./lib/AVMStage";
 export { IAVMHandler } from "./lib/IAVMHandler";
 export { IAVMStage } from "./lib/IAVMStage";
 
+export {IRedirectRule, globalRedirectRules, matchRedirect } from "./lib/redirectResolver";
 export { SWFParser } from "./lib/parsers/SWFParser";
 
 export {
