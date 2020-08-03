@@ -1,5 +1,5 @@
 
-import { AssetEvent, LoaderEvent, AssetLibrary, URLRequest, URLLoaderEvent, RequestAnimationFrame, AudioManager, PerspectiveProjection, CoordinateSystem, ColorUtils } from "@awayjs/core"
+import { AssetEvent, LoaderEvent, AssetLibrary, URLRequest, URLLoaderEvent, RequestAnimationFrame, AudioManager, PerspectiveProjection, CoordinateSystem, ColorUtils, Loader, WaveAudioParser } from "@awayjs/core"
 import { SWFParser } from "./parsers/SWFParser"
 import { IAVMHandler } from "./IAVMHandler";
 import { SWFFile } from "./parsers/SWFFile";
@@ -7,7 +7,7 @@ import { StageAlign } from "./factories/as3webFlash/display/StageAlign";
 import { StageScaleMode } from "./factories/as3webFlash/display/StageScaleMode";
 import { Scene, Camera, DisplayObjectContainer, SceneGraphPartition, MovieClip, FrameScriptManager } from "@awayjs/scene";
 import { BasicPartition } from "@awayjs/view";
-import { Stage, BitmapImage2D } from "@awayjs/stage";
+import { Stage, BitmapImage2D, Image2DParser } from "@awayjs/stage";
 import { IAVMStage } from "./IAVMStage";
 import { AVMVERSION } from './factories/base/AVMVersion';
 import { AVMEvent } from './AVMEvent';
@@ -68,8 +68,12 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 		if(AVMStage._instance)
 			throw("Only one AVMStage is allowed to be constructed");
-
+			
 		AVMStage._instance = this;
+
+		Loader.enableParsers([
+			WaveAudioParser, SWFParser, Image2DParser
+		])
 
 		this._time = 0;
 		this._currentFps = 0;
