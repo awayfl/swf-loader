@@ -858,7 +858,7 @@ export class SWFParser extends ParserBase {
 					}
 				}
 				if (!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length > 0) {
-					awayTimeline.add_framescript(swfFrames[i].actionBlocks, i);
+					awayTimeline.add_framescript(swfFrames[i].actionBlocks, i, awayMc);
 				}
 				if (buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id != 0) {
 					awaySymbol = this._awaySymbols[buttonSound[keyFrameCount].id];
