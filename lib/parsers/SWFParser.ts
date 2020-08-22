@@ -81,20 +81,6 @@ const enum SWF_ENCRYPTED_TAGS {
 	ENCRYPTED_CODE_BLOCK = 253
 }
 
-const BLEND_MODES = [
-	"", "normal", "layer", 
-	"multiply", "screen", 
-	"lighten", "darken",
-	"difference", "add",
-	"subtract", "invert",
-	"alpha", "erase", "overlay",
-	"hardlight"
-]
-
-function mapBlendIdToString(id: number = 1): string {
-	return BLEND_MODES[id] || BLEND_MODES[1]; 
-}
-
 /**
  * SWFParser provides a parser for the SWF data type.
  * Based on Shumway
@@ -983,8 +969,6 @@ export class SWFParser extends ParserBase {
 										const m = new MethodMaterial(<BitmapImage2D>awaySymbol);
 										m.alphaBlending = (<BitmapImage2D>awaySymbol).transparent;
 										awaySymbol = Billboard.getNewBillboard(m);
-										// ?? why not??
-										//awaySymbol.blendMode = mapBlendIdToString(placeObjectTag.blendMode);
 									}
 									flashSymbol = this.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
@@ -998,8 +982,7 @@ export class SWFParser extends ParserBase {
 										// register a new instance for this object
 										graphicsSprite = this._factory.createSprite(null, <Graphics>awaySymbol, flashSymbol);
 										graphicsSprite.mouseEnabled = false;
-										graphicsSprite.blendMode = mapBlendIdToString(placeObjectTag.blendMode);
-										
+
 										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds
 										if (child && child.awayChild.isAsset(Sprite)) {
 											sessionID = child.sessionID;
@@ -1065,15 +1048,11 @@ export class SWFParser extends ParserBase {
 												clipDepth: 0,
 												depth: 0,
 												awayChild: graphicsSprite,
-												blendMode: mapBlendIdToString(placeObjectTag.blendMode),
 												name: placeObjectTag.name ? placeObjectTag.name : "noname"
 											}
-											cmds_add[cmds_add.length] = { 
-												sessionID: sessionID, 
-												depth: tag.depth, 
-												id: placeObjectTag.symbolId, 
-												name: placeObjectTag.name 
-											};
+											cmds_add[cmds_add.length] = { sessionID: sessionID, depth: tag.depth, id: placeObjectTag.symbolId, name: placeObjectTag.name };
+
+
 										}
 									}
 									else {
@@ -1117,17 +1096,11 @@ export class SWFParser extends ParserBase {
 											clipDepth: 0,
 											depth: 0,
 											awayChild: awaySymbol,
-											blendMode: mapBlendIdToString(placeObjectTag.blendMode),
 											name: placeObjectTag.name ? placeObjectTag.name : "noname"
 										}
 										if (doAdd) {
 											noTimelineDebug || console.log("				add", "session-id", sessionID, "depth", tag.depth, tag, awaySymbol);
-											cmds_add[cmds_add.length] = { 
-												sessionID: sessionID, 
-												depth: tag.depth, 
-												id: placeObjectTag.symbolId, 
-												name: placeObjectTag.name 
-											};
+											cmds_add[cmds_add.length] = { sessionID: sessionID, depth: tag.depth, id: placeObjectTag.symbolId, name: placeObjectTag.name };
 										}
 
 
@@ -1142,13 +1115,7 @@ export class SWFParser extends ParserBase {
 								}
 
 								if (child) {
-									cmds_update[cmds_update.length] = { 
-										child: child, 
-										placeObjectTag: placeObjectTag, 
-										swapGraphicsID: swapGraphicsID, 
-										ratio: ratio,
-										depth: tag.depth 
-									};
+									cmds_update[cmds_update.length] = { child: child, placeObjectTag: placeObjectTag, swapGraphicsID: swapGraphicsID, ratio: ratio, depth: tag.depth };
 									noTimelineDebug || console.log("				update", "session-id", child.sessionID, "hasCharacter", hasCharacter, "depth", tag.depth, "swapGraphicsID", swapGraphicsID, tag, awaySymbol);
 
 								}
@@ -1278,13 +1245,7 @@ export class SWFParser extends ParserBase {
 							}
 						}
 						if (!hasCmd) {
-							cmds_update[cmds_update.length] = { 
-								child: childsWithMaskChanges[m], 
-								placeObjectTag: null, 
-								swapGraphicsID: null, 
-								ratio: null, 
-								depth: null 
-							};
+							cmds_update[cmds_update.length] = { child: childsWithMaskChanges[m], placeObjectTag: null, swapGraphicsID: null, ratio: null, depth: null };
 
 						}
 					}
@@ -1434,6 +1395,12 @@ export class SWFParser extends ParserBase {
 								num_updated_props++;
 								property_type_stream.push(TimelineActionType.UPDATE_VISIBLE);
 								property_index_stream.push(placeObjectTag.visibility ? 1 : 0);
+							}
+
+							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasBlendMode) {
+								num_updated_props++;
+								property_type_stream.push(TimelineActionType.UPDATE_BLENDMODE);
+								property_index_stream.push(placeObjectTag.blendMode);
 							}
 
 							if (num_updated_props > 0) {
