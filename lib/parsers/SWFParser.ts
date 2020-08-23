@@ -63,6 +63,7 @@ import {
 import { __extends } from "tslib";
 import { CompressionMethod } from "./CompressionMethod";
 import { release } from '../factories/base/utilities/Debug';
+import { Stat } from '../stat/Stat';
 
 var noTimelineDebug = true;
 var noExportsDebug = true;
@@ -291,6 +292,8 @@ export class SWFParser extends ParserBase {
 		//console.log("SWFParser - _pProceedParsing");
 		if (this._progressState == SWFParserProgressState.STARTED) {
 
+			Stat.rec("parser").begin();
+
 			// get the bytedata
 
 			var byteData: ByteArray = this._pGetByteData();
@@ -328,10 +331,16 @@ export class SWFParser extends ParserBase {
 		if (this._progressState != SWFParserProgressState.FINISHED) {
 			return ParserBase.MORE_TO_PARSE;
 		}
+
+		Stat.rec("parser").end();
+
 		return ParserBase.PARSING_DONE;
 	}
 
 	private parseSymbols() {
+
+		Stat.rec("parser").rec("symbols").begin();
+
 		(<any>this._factory).url = this._iFileName;
 		this._pContent = this._factory.createDisplayObjectContainer();
 		this._awaySymbols = {};
@@ -396,6 +405,8 @@ export class SWFParser extends ParserBase {
 		else {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
+
+			Stat.rec("parser").rec("symbols").end();
 		}
 	}
 	private _awaySymbols: any;
@@ -424,7 +435,11 @@ export class SWFParser extends ParserBase {
 
 	private myTestSprite: Sprite;
 	private _mapMatsForBitmaps: any;
+
 	public parseSymbolsToAwayJS() {
+
+		Stat.rec("parser").rec("symbols").rec("away").begin();
+
 		var parser = new DOMParser();
 		var dictionary = this.dictionary;
 		var assetsToFinalize: any = {};
@@ -639,7 +654,9 @@ export class SWFParser extends ParserBase {
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);
 
+		Stat.rec("parser").rec("symbols").rec("away").end();
 	}
+
 	// helper for handling buttons
 	private _buttonIds: any = {};
 	private _mcIds: any = {};
@@ -650,6 +667,7 @@ export class SWFParser extends ParserBase {
 		if (!states && !swfFrames)
 			throw ("error when creating timeline - neither movieclip frames nor button-states present");
 
+		
 		//console.log("swfFrames", swfFrames);
 		var isButton: boolean = false;
 		var key: string;
@@ -1687,6 +1705,9 @@ export class SWFParser extends ParserBase {
 	}
 
 	private processFirstBatchOfDecompressedData(data: Uint8Array) {
+
+		Stat.rec("parser").rec("unzip").begin();
+
 		this.processDecompressedData(data);
 		this.parseHeaderContents();
 		this._decompressor.onData = this.processDecompressedData.bind(this);
@@ -1696,6 +1717,7 @@ export class SWFParser extends ParserBase {
 		// Make sure we don't cause an exception here when trying to set out-of-bound data by clamping the number of bytes
 		// to write to the remaining space in our buffer. If this is the case, we probably got a wrong file length from
 		// the SWF header. The Flash Player ignores data that goes over that given length, so should we.
+		Stat.rec("parser").rec("unzip").end();
 
 		var length = Math.min(data.length, this._uncompressedLength - this._uncompressedLoadedLength);
 		memCopy(this.swfData, data, this._uncompressedLoadedLength, 0, length);
@@ -1705,7 +1727,11 @@ export class SWFParser extends ParserBase {
 	private scanLoadedData() {
 		//SWF.enterTimeline('Scan loaded SWF file tags');
 		this._dataStream.pos = this._lastScanPosition;
+
+		Stat.rec("parser").rec("scanTags").begin();
 		this.scanTagsToOffset(this._uncompressedLoadedLength, true);
+		Stat.rec("parser").rec("scanTags").end();
+
 		this._lastScanPosition = this._dataStream.pos;
 		//SWF.leaveTimeline();
 	}
@@ -1713,6 +1739,7 @@ export class SWFParser extends ParserBase {
 	private scanTagsToOffset(endOffset: number, rootTimelineMode: boolean) {
 		// `parsePos` is always at the start of a tag at this point, because it only gets updated
 		// when a tag has been fully parsed.
+
 		var tempTag = new UnparsedTag(0, 0, 0);
 		var pos: number;
 		while ((pos = this._dataStream.pos) < endOffset - 1) {

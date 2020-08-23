@@ -9,7 +9,11 @@ export { AVMStage } from "./lib/AVMStage";
 export { IAVMHandler } from "./lib/IAVMHandler";
 export { IAVMStage } from "./lib/IAVMStage";
 
-export {IRedirectRule, globalRedirectRules, matchRedirect } from "./lib/redirectResolver";
+export {
+  IRedirectRule,
+  globalRedirectRules,
+  matchRedirect,
+} from "./lib/redirectResolver";
 export { SWFParser } from "./lib/parsers/SWFParser";
 
 export {
@@ -22,9 +26,8 @@ export {
   assertUnreachable,
   unexpected,
   assertNotImplemented,
-
   registerDebugMethod, // global _AWAY_DEBUG insterface
-  IDebugMethodDeclaration
+  IDebugMethodDeclaration,
 } from "./lib/factories/base/utilities/Debug";
 
 export { shumwayOptions } from "./lib/factories/base/settings";
@@ -51,12 +54,13 @@ export {
 } from "./lib/factories/base/utilities";
 export { jsGlobal } from "./lib/factories/base/utilities/jsGlobal";
 
-export { AVM1ClipEvents ,
-	ColorMatrixFilter,
-	ConvolutionFilter,
-GlowFilter,
-BlurFilter,
-FilterType
+export {
+  AVM1ClipEvents,
+  ColorMatrixFilter,
+  ConvolutionFilter,
+  GlowFilter,
+  BlurFilter,
+  FilterType,
 } from "./lib/factories/base/SWFTags";
 
 export {
@@ -99,3 +103,5 @@ export { HashUtilities } from "./lib/factories/base/utilities/HashUtilities";
 export { ExternalInterfaceService } from "./lib/factories/base/utilities/ExternalInterfaceService";
 
 export { FileLoadingService } from "./lib/factories/base/utilities/FileLoadingService";
+
+export { Stat, Record } from "./lib/stat/Stat";
