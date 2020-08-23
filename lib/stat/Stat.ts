@@ -127,8 +127,10 @@ export class Record {
 	}
 
 	get selfDuration() {
-		if(this._state !== RECORD_STATE.END) {
-			return 0;
+		const len = Object.keys(this._records).length;
+
+		if(!len) {
+			return this._endTime - this._startTime;
 		}
 
 		return this.endTime - this.startTime;
@@ -139,7 +141,7 @@ export class Record {
 			return 0;
 		}
 
-		return this.duration / (this.endTime - this.startTime);
+		return this.duration / this.selfDuration;
 	}
 
 	toString() {
