@@ -2393,34 +2393,74 @@ function readSWFLength(bytes: Uint8Array) {
 }
 
 function defineSymbol(swfTag, symbols, parser) {
+	
+	const d = Stat.rec('parser').rec('symbols').rec('define');
+	let rec;
+	let ret;
+
 	switch (swfTag.code) {
 		case SwfTagCode.CODE_DEFINE_BITS:
 		case SwfTagCode.CODE_DEFINE_BITS_JPEG2:
 		case SwfTagCode.CODE_DEFINE_BITS_JPEG3:
-		case SwfTagCode.CODE_DEFINE_BITS_JPEG4:
-			return defineImage(swfTag);
+		case SwfTagCode.CODE_DEFINE_BITS_JPEG4: 
+		{
+			rec = d.rec('image')
+			rec.begin();
+			ret = defineImage(swfTag);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_BITS_LOSSLESS:
 		case SwfTagCode.CODE_DEFINE_BITS_LOSSLESS2:
-			return defineBitmap(swfTag);
+		{
+			rec = d.rec('bitmap')
+			rec.begin();
+			ret = defineBitmap(swfTag);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_BUTTON:
 		case SwfTagCode.CODE_DEFINE_BUTTON2:
-			return defineButton(swfTag, symbols);
+		{
+			rec = d.rec('button')
+			rec.begin();
+			ret = defineButton(swfTag, symbols);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_EDIT_TEXT:
-			return defineText(swfTag);
+		{
+			rec = d.rec('text')
+			rec.begin();
+			ret = defineText(swfTag);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_FONT:
 		case SwfTagCode.CODE_DEFINE_FONT2:
 		case SwfTagCode.CODE_DEFINE_FONT3:
 		case SwfTagCode.CODE_DEFINE_FONT4:
-			return defineFont(swfTag, (<SWFParser>parser)._iFileName);
+		{
+			rec = d.rec('font')
+			rec.begin();
+			ret = defineFont(swfTag, (<SWFParser>parser)._iFileName);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_MORPH_SHAPE:
 		case SwfTagCode.CODE_DEFINE_MORPH_SHAPE2:
 		case SwfTagCode.CODE_DEFINE_SHAPE:
 		case SwfTagCode.CODE_DEFINE_SHAPE2:
 		case SwfTagCode.CODE_DEFINE_SHAPE3:
 		case SwfTagCode.CODE_DEFINE_SHAPE4:
-			return defineShape(swfTag, parser);
+		{
+			rec = d.rec('shape')
+			rec.begin();
+			ret = defineShape(swfTag, parser);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_SOUND:
-			return defineSound(swfTag);
+		{
+			rec = d.rec('sound')
+			rec.begin();
+			ret = defineSound(swfTag);
+			break;
+		}
 		case SwfTagCode.CODE_DEFINE_VIDEO_STREAM:
 			return {
 				type: 'video',
@@ -2442,10 +2482,18 @@ function defineSymbol(swfTag, symbols, parser) {
 			};
 		case SwfTagCode.CODE_DEFINE_TEXT:
 		case SwfTagCode.CODE_DEFINE_TEXT2:
-			return defineLabel(swfTag);
+		{
+			rec = d.rec('label')
+			rec.begin();			
+			ret = defineLabel(swfTag);
+			break;
+		}
 		default:
 			//console.log("define default symbol", swfTag, symbols, parser);
 			return swfTag;
 	}
+
+	rec.end();
+	return ret;
 }
 

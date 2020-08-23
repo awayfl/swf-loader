@@ -46,9 +46,6 @@ export class Record {
 	}
 
 	public end() {
-		if(!this._subrecord) {
-			return this._subs[this._subs.length - 1].end();
-		}
 
 		for(let key in this._records) {
 			this._records[key].end();
@@ -56,6 +53,10 @@ export class Record {
 
 		if(this._state !== RECORD_STATE.BEGIN) {
 			return;
+		}
+
+		if(!this._subrecord) {
+			return this._subs[this._subs.length - 1].end();
 		}
 
 		this._state = RECORD_STATE.END;
@@ -125,6 +126,14 @@ export class Record {
 		return duration;
 	}
 
+	get selfDuration() {
+		if(this._state !== RECORD_STATE.END) {
+			return 0;
+		}
+
+		return this.endTime - this.startTime;
+	}
+
 	get density() {
 		if(this._state == RECORD_STATE.DROP) {
 			return 0;
@@ -134,11 +143,11 @@ export class Record {
 	}
 
 	toString() {
-		const selfDuration = this.endTime - this.startTime;
-		return `Name: ${this.name}, duration: ${this.duration.toFixed(0)}ms, self: ${selfDuration.toFixed(0)}ms, density:${(this.density * 100).toFixed(0)}%`;
+		const selfDuration = this.selfDuration;
+		return `Name: ${this.name}, duration: ${this.duration.toFixed(2)}ms, self: ${selfDuration.toFixed(2)}ms, density:${(this.density * 100).toFixed(0)}%`;
 	}
 
-	toTable(ident: number = 0) {
+	toTable(ident: number = 0, filter: (r: Record) => boolean) {
 		let r = "  ".repeat(ident) + this.toString() + "\n";
 
 		if(this._subs.length === 1 && Object.keys(this._records).length === 1) {
@@ -152,7 +161,11 @@ export class Record {
 				continue;
 			}
 
-			r += rec.toTable(ident + 1);
+			if(filter && filter(rec)) {
+				continue;
+			}
+
+			r += rec.toTable(ident + 1, filter);
 		}
 
 		return r;
