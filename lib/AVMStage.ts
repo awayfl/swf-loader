@@ -464,14 +464,17 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this._time -= frameMarker;
 		}
 	}
+
 	public requestRender() {
 		if (!this._scene || !this._scene.renderer) {
 			this._timer.stop();
 			return;
 		}
+
 		FrameScriptManager.execute_queue();
-		this._scene.render(true);
+		this._scene.render(false);
 	}
+
 	protected showNextFrame(dt: number) {
 		if(this._isPaused){
 			MovieClipSoundsManager.enterFrame();
