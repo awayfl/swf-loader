@@ -977,9 +977,15 @@ export class SWFParser extends ParserBase {
 
 								// !hasCharacter && !child
 								//		something is wrong ?
+
 								if (hasCharacter) {
 									//console.log("placeTag symbol id",placeObjectTag.symbolId )
 									awaySymbol = this._awaySymbols[placeObjectTag.symbolId];
+
+									if(!awaySymbol) {
+										console.warn("Symbol missed:", placeObjectTag.symbolId);
+										break;
+									}
 
 									if (awaySymbol.isAsset(BitmapImage2D)) {
 										// enable blending for symbols, because if you place image directly on stage
@@ -2254,12 +2260,13 @@ export class SWFParser extends ParserBase {
 			this._swfFile.framesLoaded++;
 		}
 		this._swfFile.frames.push(new SWFFrame(this._currentControlTags,
-			this._currentFrameLabels.concat(),
-			this._currentSoundStreamHead,
-			this._currentSoundStreamBlock,
-			this._currentActionBlocks,
-			this._currentInitActionBlocks,
-			this._currentExports));
+				this._currentFrameLabels.concat(),
+				this._currentSoundStreamHead,
+				this._currentSoundStreamBlock,
+				this._currentActionBlocks,
+				this._currentInitActionBlocks,
+				this._currentExports));
+
 		this._currentFrameLabels.length = 0;
 		this._currentControlTags = null;
 		this._currentSoundStreamHead = null;
