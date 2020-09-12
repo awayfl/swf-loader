@@ -82,6 +82,20 @@ const enum SWF_ENCRYPTED_TAGS {
 	ENCRYPTED_CODE_BLOCK = 253
 }
 
+const enum SYMBOL_TYPE {
+	SHAPE = 'shape',
+	MORPH = 'morphshape',
+	FONT = "font",
+	SPRITE = "sprite",
+	TEXT = "text",
+	SOUND = "sound",
+	BUTTON = "button",
+	LABEL = "label",
+	IMAGE = "image",
+	BINARY = "binary",
+	VIDEO = "video"
+}
+
 /**
  * SWFParser provides a parser for the SWF data type.
  * Based on Shumway
@@ -449,7 +463,7 @@ export class SWFParser extends ParserBase {
 				var symbol = this.getSymbol(dictionary[i].id);
 				noSceneGraphDebug || console.log("symbol: ", dictionary[i].id, symbol.type, symbol);
 				switch (symbol.type) {
-					case "morphshape":
+					case SYMBOL_TYPE.MORPH:
 						//console.warn("Warning: SWF contains shapetweening!!!");
 						symbol.shape.name = symbol.id;
 						symbol.shape.name = "AwayJS_morphshape_" + symbol.id.toString();
@@ -457,19 +471,19 @@ export class SWFParser extends ParserBase {
 						this._awaySymbols[dictionary[i].id] = symbol.shape;
 						assetsToFinalize[dictionary[i].id] = symbol.shape;
 						break;
-					case "shape":
+					case SYMBOL_TYPE.SHAPE:
 						symbol.shape.name = "AwayJS_shape_" + symbol.id.toString();
 						symbol.shape.className = symbol.className;
 						this._awaySymbols[dictionary[i].id] = symbol.shape;
 						assetsToFinalize[dictionary[i].id] = symbol.shape;
 						break;
-					case "font":
+					case SYMBOL_TYPE.FONT:
 						//symbol.away._smybol=symbol;
 						symbol.away.className = symbol.className;
 						this._awaySymbols[dictionary[i].id] = symbol;
 						assetsToFinalize[symbol.name] = symbol.away;
 						break;
-					case "sprite":
+					case SYMBOL_TYPE.SPRITE:
 						noTimelineDebug || console.log("start parsing timeline: ", symbol);
 						var awayMc = this.framesToTimeline(symbol, symbol.frames, null, null);
 						(<any>awayMc).className = symbol.className;
@@ -483,7 +497,7 @@ export class SWFParser extends ParserBase {
 						this._awaySymbols[dictionary[i].id] = awayMc;
 						assetsToFinalize[dictionary[i].id] = awayMc;
 						break;
-					case "text":
+					case SYMBOL_TYPE.TEXT:
 						var awayText = this._factory.createTextField(symbol);
 						awayText._symbol = symbol;
 						awayText.textFormat = new TextFormat();
@@ -537,7 +551,7 @@ export class SWFParser extends ParserBase {
 						assetsToFinalize[dictionary[i].id] = awayText;
 						this._awaySymbols[dictionary[i].id] = awayText;
 						break;
-					case "sound":
+					case SYMBOL_TYPE.SOUND:
 						var awaySound: WaveAudio = (<WaveAudio>this._awaySymbols[dictionary[i].id]);
 
 						if (awaySound) {
@@ -551,7 +565,7 @@ export class SWFParser extends ParserBase {
 
 						}
 						break;
-					case "button":
+					case SYMBOL_TYPE.BUTTON:
 						noTimelineDebug || console.log("start parsing button: ", symbol);
 						var awayMc = this.framesToTimeline(symbol, null, symbol.states, symbol.buttonActions, this._buttonSounds[symbol.id]);
 						//awayMc._symbol=symbol;
@@ -569,7 +583,7 @@ export class SWFParser extends ParserBase {
 						this._awaySymbols[dictionary[i].id] = mySprite;
 						*/
 						break;
-					case "label":
+					case SYMBOL_TYPE.LABEL:
 						var awayText = this._factory.createTextField(symbol);
 						var font = null;
 						var invalid_font: boolean = false;
@@ -602,7 +616,7 @@ export class SWFParser extends ParserBase {
 						this._awaySymbols[dictionary[i].id] = awayText;
 						awayText.selectable = symbol.tag.flags ? !(symbol.tag.flags & TextFlags.NoSelect) : false;
 						break;
-					case "image":
+					case SYMBOL_TYPE.IMAGE:
 						var awayBitmap: BitmapImage2D = (<BitmapImage2D>this._awaySymbols[dictionary[i].id]);
 						if (!awayBitmap && symbol.definition) {
 							awayBitmap = new BitmapImage2D(symbol.definition.width, symbol.definition.height, true, 0xff0000, false);
@@ -621,7 +635,7 @@ export class SWFParser extends ParserBase {
 							assetsToFinalize[dictionary[i].id] = awayBitmap;
 						}
 						break;
-					case "binary":
+					case SYMBOL_TYPE.BINARY:
 						if ((<any>this._factory).createBinarySymbol)
 							(<any>this._factory).createBinarySymbol(symbol);
 						this._awaySymbols[dictionary[i].id] = symbol;
@@ -1867,7 +1881,7 @@ export class SWFParser extends ParserBase {
 
 			var unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
 			var definition = this.getParsedTag(unparsed);
-			var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'sound', definition);
+			var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, SYMBOL_TYPE.SOUND, definition);
 			/*if (!release && traceLevel.value > 0) {
 			  var style = flagsToFontStyle(definition.bold, definition.italic);
 			  console.info("Decoding embedded font " + definition.id + " with name '" + definition.name +
@@ -2133,7 +2147,7 @@ export class SWFParser extends ParserBase {
 		var dataView = this._dataView;
 		var timeline: any = {
 			id: spriteTag.id,
-			type: 'sprite',
+			type: SYMBOL_TYPE.SPRITE,
 			frames: []
 		};
 		var spriteTagEnd = spriteTag.byteOffset + spriteTag.byteLength;
@@ -2322,7 +2336,7 @@ export class SWFParser extends ParserBase {
 
 	private decodeEmbeddedFont(unparsed: UnparsedTag) {
 		var definition = this.getParsedTag(unparsed);
-		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'font', definition);
+		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, SYMBOL_TYPE.FONT, definition);
 		/*if (!release && traceLevel.value > 0) {
 		  var style = flagsToFontStyle(definition.bold, definition.italic);
 		  console.info("Decoding embedded font " + definition.id + " with name '" + definition.name +
@@ -2367,7 +2381,7 @@ export class SWFParser extends ParserBase {
 
 	private decodeEmbeddedImage(unparsed: UnparsedTag) {
 		var definition = this.getParsedTag(unparsed);
-		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, 'image', definition);
+		var symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, SYMBOL_TYPE.IMAGE, definition);
 		/*if (!release && traceLevel.value > 0) {
 		   console.info("Decoding embedded image " + definition.id + " of type " +
 			   getSwfTagCodeName(unparsed.tagCode) + " (start: " + unparsed.byteOffset +
@@ -2470,7 +2484,7 @@ function defineSymbol(swfTag, symbols, parser) {
 		}
 		case SwfTagCode.CODE_DEFINE_VIDEO_STREAM:
 			return {
-				type: 'video',
+				type: SYMBOL_TYPE.VIDEO,
 				id: swfTag.id,
 				width: swfTag.width,
 				height: swfTag.height,
@@ -2483,7 +2497,7 @@ function defineSymbol(swfTag, symbols, parser) {
 			return swfTag;
 		case SwfTagCode.CODE_DEFINE_BINARY_DATA:
 			return {
-				type: 'binary',
+				type: SYMBOL_TYPE.BINARY,
 				id: swfTag.id,
 				data: swfTag.data
 			};
