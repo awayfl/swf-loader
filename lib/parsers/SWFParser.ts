@@ -204,17 +204,8 @@ export class SWFParser extends ParserBase {
 	 * @param data The data block to potentially be parsed.
 	 * @return Whether or not the given data is supported.
 	 */
-	public static supportsData(data: any): boolean {
-		
-		//console.log(data[0], data[1],data[2]);
-		let  isSWF:boolean= (data[0] === 67 || data[0] === 70 || data[0] === 90) && (data[1] === 87) && (data[2] === 83);
-
-		if (isSWF) {
-			//console.log("SWFParser supportsData result: ", true);
-			return true;
-		}
-		//console.log("SWFParser supportsData result: ", false);
-		return false;
+	public static supportsData(data: Uint8Array): boolean {
+		return (data[0] === 67 || data[0] === 70 || data[0] === 90) && (data[1] === 87) && (data[2] === 83);
 	}
 
 	/**
@@ -230,17 +221,17 @@ export class SWFParser extends ParserBase {
 			var awaitedObject = this.eagerlyParsedSymbolsMap[resourceDependency.id];
 			if (awaitedObject) {
 				switch (awaitedObject.type) {
-					case "image":
+					case SYMBOL_TYPE.IMAGE:
 						//console.log("finished image parsing", resourceDependency);
 						var myBitmap: BitmapImage2D = (<BitmapImage2D>resourceDependency.assets[0]);
 						//myBitmap.width=awaitedObject.definition.width;
 						//myBitmap.height=awaitedObject.definition.height;
 						this._awaySymbols[resourceDependency.id] = myBitmap;
 						break;
-					case "font":
+					case SYMBOL_TYPE.FONT:
 						//console.log("finished font parsing", resourceDependency);
 						break;
-					case "sound":
+					case SYMBOL_TYPE.SOUND:
 						//console.log("finished sound parsing", resourceDependency);
 						var waveAudio: WaveAudio = (<WaveAudio>resourceDependency.assets[0]);
 						//myBitmap.width=awaitedObject.definition.width;
@@ -306,13 +297,22 @@ export class SWFParser extends ParserBase {
 		//console.log("SWFParser - _pProceedParsing");
 		if (this._progressState == SWFParserProgressState.STARTED) {
 
+			const byteData: ByteArray = this._pGetByteData();
+			const int8Array: Uint8Array = new Uint8Array(byteData.arraybytes);
+
+			if(!SWFParser.supportsData(int8Array)) {
+
+				const head = int8Array.slice(0, 3).reverse().reduce((acc, e) => acc += String.fromCharCode(e), "");
+
+				console.error("[SWF Parser] unknow file type:", head);
+
+				this.parsingFailure = true;
+				return false;	
+			}
+
 			Stat.rec("parser").begin();
 
 			// get the bytedata
-
-			var byteData: ByteArray = this._pGetByteData();
-			var int8Array: Uint8Array = new Uint8Array(byteData.arraybytes);
-
 			// preparse all data. after this step we can deal with tag-objects rather than bytedata
 
 			this.initSWFLoading(int8Array, int8Array.length);
