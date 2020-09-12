@@ -375,7 +375,7 @@ export class SWFParser extends ParserBase {
 				var eagerlySymbol: any = this.eagerlyParsedSymbolsList[i];
 				if (eagerlySymbol) {
 					switch (eagerlySymbol.type) {
-						case "image":
+						case SYMBOL_TYPE.IMAGE:
 							//console.log("init image parsing", eagerlySymbol);
 							this._pAddDependency(
 									eagerlySymbol.id.toString(), null, 
@@ -384,7 +384,7 @@ export class SWFParser extends ParserBase {
 									false, true);
 							this.externalDependenciesCount++;
 							break;
-						case "sound":
+						case SYMBOL_TYPE.SOUND:
 							//console.log("init sound parsing", eagerlySymbol);
 							if(!eagerlySymbol.definition.packaged) {
 								console.warn("SWF-parser: Missed packaged data for sound-id:",eagerlySymbol.id.toString());
@@ -399,7 +399,7 @@ export class SWFParser extends ParserBase {
 							
 							this.externalDependenciesCount++;
 							break;
-						case "font":
+						case SYMBOL_TYPE.FONT:
 							//console.log("encountered eagerly parsed font: ", eagerlySymbol);
 							break;
 						default:
@@ -617,7 +617,7 @@ export class SWFParser extends ParserBase {
 						awayText.selectable = symbol.tag.flags ? !(symbol.tag.flags & TextFlags.NoSelect) : false;
 						break;
 					case SYMBOL_TYPE.IMAGE:
-						var awayBitmap: BitmapImage2D = (<BitmapImage2D>this._awaySymbols[dictionary[i].id]);
+						let awayBitmap: BitmapImage2D = (<BitmapImage2D>this._awaySymbols[dictionary[i].id]);
 						if (!awayBitmap && symbol.definition) {
 							awayBitmap = new BitmapImage2D(symbol.definition.width, symbol.definition.height, true, 0xff0000, false);
 							if (symbol.definition.data.length != (4 * symbol.definition.width * symbol.definition.height)
@@ -639,6 +639,17 @@ export class SWFParser extends ParserBase {
 						if ((<any>this._factory).createBinarySymbol)
 							(<any>this._factory).createBinarySymbol(symbol);
 						this._awaySymbols[dictionary[i].id] = symbol;
+						break;
+					case SYMBOL_TYPE.VIDEO:
+						const dummyVideo = new BitmapImage2D(symbol.width, symbol.height, false, 0x00ff00, false);
+						dummyVideo._symbol = symbol;
+
+						(<any>dummyVideo).className = this.symbolClassesMap[symbol.id] ? this.symbolClassesMap[symbol.id] : symbol.className;
+						dummyVideo.name = (<any>dummyVideo).className;
+						assetsToFinalize[dictionary[i].id] = dummyVideo;
+
+						this._awaySymbols[dictionary[i].id] = dummyVideo;
+
 						break;
 					default:
 						console.log("unknown symbol type:", symbol.type, symbol);
