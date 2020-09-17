@@ -462,6 +462,8 @@ export class SWFParser extends ParserBase {
 				var s = performance.now();
 				var symbol = this.getSymbol(dictionary[i].id);
 				noSceneGraphDebug || console.log("symbol: ", dictionary[i].id, symbol.type, symbol);
+				
+				symbol.className && console.log(symbol.type, symbol.className);
 				switch (symbol.type) {
 					case SYMBOL_TYPE.MORPH:
 						//console.warn("Warning: SWF contains shapetweening!!!");
@@ -493,7 +495,7 @@ export class SWFParser extends ParserBase {
 						else {
 							this._mcIds[symbol.id] = true;
 						}
-						awayMc.name = "AwayJS_mc_" + symbol.id.toString();
+						awayMc.name = symbol.className ||  "AwayJS_mc_" + symbol.id.toString();
 						this._awaySymbols[dictionary[i].id] = awayMc;
 						assetsToFinalize[dictionary[i].id] = awayMc;
 						break;
@@ -632,13 +634,24 @@ export class SWFParser extends ParserBase {
 
 							(<any>awayBitmap).className = this.symbolClassesMap[symbol.id] ? this.symbolClassesMap[symbol.id] : symbol.className;
 							awayBitmap.name = (<any>awayBitmap).className;
+							
 							assetsToFinalize[dictionary[i].id] = awayBitmap;
 						}
 						break;
 					case SYMBOL_TYPE.BINARY:
 						if ((<any>this._factory).createBinarySymbol)
 							(<any>this._factory).createBinarySymbol(symbol);
-						this._awaySymbols[dictionary[i].id] = symbol;
+						
+						const bin = new ByteArray(symbol.data.byteLength);
+						
+						bin.setArrayBuffer(symbol.data.buffer);
+						
+						(<any>bin).name = symbol.className;
+						(<any>bin)._symbol = symbol;
+						
+						//assetsToFinalize[dictionary[i].id] = bin;
+						this._awaySymbols[dictionary[i].id] = bin;
+
 						break;
 					case SYMBOL_TYPE.VIDEO:
 						const dummyVideo = new BitmapImage2D(symbol.width, symbol.height, false, 0x00ff00, false);
