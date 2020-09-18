@@ -7,7 +7,7 @@ import {
 	ParserBase, 
 	ResourceDependency, 
 	ByteArray, 
-	ColorUtils 
+	ColorUtils, AssetBase 
 } from "@awayjs/core";
 
 import { Image2DParser, BitmapImage2D } from "@awayjs/stage";
@@ -88,6 +88,27 @@ import {
 import { CompressionMethod } from "./CompressionMethod";
 import { release } from '../factories/base/utilities/Debug';
 import { Stat } from '../stat/Stat';
+
+class GenericAsset<T> extends AssetBase {
+	public static assetType = '[asset Generic]';
+	public readonly isGeneric = true;
+
+	constructor(public _symbol: T, name: string, public readonly dataClass: new () => T) {
+		super(name);	
+	}
+
+	get assetType() {
+		return GenericAsset.assetType;
+	}
+
+	dispose() {
+		this._symbol = null;
+	}
+
+	clone(): GenericAsset<T> {
+		return new GenericAsset<T>(this._symbol, this.name, this.dataClass);
+	}
+}
 
 var noTimelineDebug = true;
 var noExportsDebug = true;
@@ -525,9 +546,10 @@ export class SWFParser extends ParserBase {
 				var symbol = this.getSymbol(dictionary[i].id) as ISymbol;
 				noSceneGraphDebug || console.log("symbol: ", dictionary[i].id, symbol.type, symbol);
 				
-				symbol.className && console.log(symbol.type, symbol.className);
+				//symbol.className && console.log(symbol.type, symbol.className);
 				switch (symbol.type) {
-					case SYMBOL_TYPE.MORPH:{
+					case SYMBOL_TYPE.MORPH:
+					{
 						const sh = symbol as IShapeSymbol;
 						//console.warn("Warning: SWF contains shapetweening!!!");
 						//symbol.shape.name = symbol.id;
@@ -538,7 +560,8 @@ export class SWFParser extends ParserBase {
 						assetsToFinalize[dictionary[i].id] = sh.shape;
 						break;
 					}
-					case SYMBOL_TYPE.SHAPE:{
+					case SYMBOL_TYPE.SHAPE:
+					{
 						const sh = symbol as IShapeSymbol;
 
 						sh.shape.name = "AwayJS_shape_" + symbol.id.toString();
@@ -554,14 +577,15 @@ export class SWFParser extends ParserBase {
 						this._awaySymbols[dictionary[i].id] = symbol;
 						assetsToFinalize[symbol.name] = symbol.away;
 						break;
-					case SYMBOL_TYPE.SPRITE:{
+					case SYMBOL_TYPE.SPRITE:
+					{
 						noTimelineDebug || console.log("start parsing timeline: ", symbol);
 
 						const ss = symbol as ISpriteSymbol;
 						const awayMc = this.framesToTimeline(symbol, ss.frames, null, null);
 	
 						(<any>awayMc).className = ss.className;
-						awayMc.name = ss.className ||  "AwayJS_mc_" + ss.id.toString();
+						awayMc.name = "AwayJS_mc_" + ss.id.toString();
 
 						if (awayMc.buttonMode) {
 							this._buttonIds[ss.id] = true;
@@ -574,7 +598,8 @@ export class SWFParser extends ParserBase {
 						
 						break;
 					}
-					case SYMBOL_TYPE.TEXT:{
+					case SYMBOL_TYPE.TEXT:
+					{
 						const ts = symbol as ITextSymbol;
 						const awayText = this._factory.createTextField(ts);
 						awayText._symbol = ts;
@@ -743,14 +768,11 @@ export class SWFParser extends ParserBase {
 							(<any>this._factory).createBinarySymbol(symbol);
 						
 						const bin = new ByteArray(bs.byteLength);
-						
+						const asset = new GenericAsset<ByteArray>(bin, bs.className, ByteArray);
 						bin.setArrayBuffer(bs.data.buffer);
-						
-						(<any>bin).name = symbol.className;
-						(<any>bin)._symbol = symbol;
-						
-						//assetsToFinalize[dictionary[i].id] = bin;
-						this._awaySymbols[dictionary[i].id] = bin;
+
+						//assetsToFinalize[dictionary[i].id] = asset;
+						this._awaySymbols[dictionary[i].id] = asset;
 
 						break;
 					}
@@ -785,8 +807,9 @@ export class SWFParser extends ParserBase {
 		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
 		var awayMc: MovieClip = this.framesToTimeline(rootSymbol, this._swfFile.frames, null, null);
 
-		for (var key in assetsToFinalize)
+		for (var key in assetsToFinalize) {
 			this._pFinalizeAsset(assetsToFinalize[key]);
+		}
 
 		awayMc.isAVMScene = true;
 		this._pFinalizeAsset(awayMc, "scene");
