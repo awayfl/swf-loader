@@ -2,39 +2,45 @@
 # yarn lockfile v1
 
 
-"@awayjs/core@^0.8.0":
-  version "0.8.10"
-  resolved "https://registry.yarnpkg.com/@awayjs/core/-/core-0.8.10.tgz#db1058634dafb9d2f7e639e4c5dd41db7339bddf"
+"@awayjs/core@^0.9.0":
+  version "0.9.11"
+  resolved "https://registry.yarnpkg.com/@awayjs/core/-/core-0.9.11.tgz#4bde202418d3c96871090d50d7f2013be3d6f6fd"
+  integrity sha512-n/B0zDHGBnhgXYiEuAMaB0ytGdg56d4ab06dwftM9B7BH+qluyxg+Y03epmFye6RTjOxQ3VUfqjVaGMoDksYfQ==
   dependencies:
     fs "0.0.1-security"
     tslib "^1.9.0"
 
-"@awayjs/graphics@^0.4.0":
-  version "0.4.19"
-  resolved "https://registry.yarnpkg.com/@awayjs/graphics/-/graphics-0.4.19.tgz#fcdfc4521ea40175cb2aa7a063e05455c8aafe84"
+"@awayjs/graphics@^0.5.0":
+  version "0.5.21"
+  resolved "https://registry.yarnpkg.com/@awayjs/graphics/-/graphics-0.5.21.tgz#0a001107133870c54443540831dfb4880fb4801e"
+  integrity sha512-QpW9KB/CeQGk/TTW7AyOPxUZu1UyyOKHZTPxzh/I0G2TCsQTtHarj7mJT4Ip5PTEowWyVaLHdcAAtVeOl1v/Aw==
   dependencies:
     tess2 "^1.0.0"
 
-"@awayjs/materials@^0.5.0":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@awayjs/materials/-/materials-0.5.6.tgz#4e8737e226ec807cb65f67b032a36c4089c830aa"
+"@awayjs/materials@^0.6.0":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@awayjs/materials/-/materials-0.6.2.tgz#10e2724d8030a678cb9bb85a533cd1b9b40ee6b6"
+  integrity sha512-BKG98u9RJcyrmYouUD9OaQDPobOWBoTK+jpUGADD0B4qghfLkNKF2WyCzypbn/J0L6c+dUJrczrb1F2gTwpFdQ==
 
-"@awayjs/renderer@^0.10.0":
-  version "0.10.8"
-  resolved "https://registry.yarnpkg.com/@awayjs/renderer/-/renderer-0.10.8.tgz#88674bac108750fa1196da6d8de6b1741bb93b0a"
+"@awayjs/renderer@^0.11.0":
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/@awayjs/renderer/-/renderer-0.11.2.tgz#66fef729c329695cfc6771abc60b7733f5851e3d"
+  integrity sha512-nOcGH20U9PBXH3v/3iRNADvskUYkfNFztWaO8c9tqY5unjwLqoCgZOwhFEX6dRHEwlYFezZzlZPqYmFNM0dcIg==
 
-"@awayjs/scene@^0.12.0":
-  version "0.12.48"
-  resolved "https://registry.yarnpkg.com/@awayjs/scene/-/scene-0.12.48.tgz#c3bbd37c2e6d060ec0269b3c2c085166ee566afc"
+"@awayjs/scene@^0.13.0":
+  version "0.13.82"
+  resolved "https://registry.yarnpkg.com/@awayjs/scene/-/scene-0.13.82.tgz#c434368ea801ea1569b286487669ed895ecc2363"
+  integrity sha512-UGBXzi4MK6U4asFvyc5gFrMLMpfmkNDu3Y8yjkewlJOQG8K7JzcD/9SoAkBpCZ7sN64t8Q0Jns9w4ldhPFqFMQ==
 
-"@awayjs/stage@^0.10.0":
-  version "0.10.15"
-  resolved "https://registry.yarnpkg.com/@awayjs/stage/-/stage-0.10.15.tgz#4f606bf3f518e2183ac5ab76e840a2b7396e0c66"
+"@awayjs/stage@^0.11.0":
+  version "0.11.26"
+  resolved "https://registry.yarnpkg.com/@awayjs/stage/-/stage-0.11.26.tgz#3aeea32649defe001f1b3cebddc9b3ab55546605"
+  integrity sha512-Z23tBgNgcoZpvvQUxIhRtxtm2lkUPWFqR2ua54D7cDtqSCXjcwr6V+BxlrM9k9CprTbOy1FTyxfsd+EUGpERwA==
 
-"@awayjs/view@^0.5.0":
-  version "0.5.13"
-  resolved "https://registry.yarnpkg.com/@awayjs/view/-/view-0.5.13.tgz#3546cedfa0f7e2be9b6967510b411587334bc74b"
-  integrity sha512-9n9iFxLDjyi1r7l/HnGpxWVlAOb82T593uqZnC98Ip7RIFRtH27UoxaXQsTiwp+m/mBW3WP/A+0KXdndscgrvg==
+"@awayjs/view@^0.6.0":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@awayjs/view/-/view-0.6.1.tgz#e0974fb6e6918a0e93a38c90b03f72083cd8c12f"
+  integrity sha512-rCzm/H9Gl4VtXiBsSS04Fr6PTuton9Rry9pvRdpcgPWk7L7QG6dW75rZ/BwmDkjXbZw1FWpbADZTdrz+4r1CRA==
 
 "@types/acorn@^4.0.3":
   version "4.0.5"
