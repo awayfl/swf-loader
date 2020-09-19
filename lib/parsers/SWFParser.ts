@@ -6,8 +6,7 @@ import {
 	IAsset, 
 	ParserBase, 
 	ResourceDependency, 
-	ByteArray, 
-	ColorUtils, AssetBase 
+	ByteArray,  AssetBase 
 } from "@awayjs/core";
 
 import { Image2DParser, BitmapImage2D } from "@awayjs/stage";
@@ -17,14 +16,10 @@ import {
 	Sprite, 
 	ISceneGraphFactory, 
 	DefaultSceneGraphFactory, 
-	MovieClip, 
-	TesselatedFontTable, 
-	TextFormat, 
+	MovieClip,
 	TextFormatAlign, 
 	SceneImage2D
 } from "@awayjs/scene";
-
-import { Bbox, Shape} from "@awayjs/graphics";
 
 import { MethodMaterial, ImageTexture2D } from "@awayjs/materials";
 import {
@@ -70,13 +65,11 @@ import {
 	ImageDefinitionTags,
 	FontDefinitionTags,
 	ControlTags,
-	TextFlags,
-	getSwfTagCodeName, 
-	TextTag,
-	BinaryDataTag, VideoStreamTag
+	getSwfTagCodeName
 } from "../factories/base/SWFTags";
 
-import { framesToTimeline } from "./framesToTimeline";
+import { ISymbol, SYMBOL_TYPE,  } from "./ISymbol"
+import { SymbolDecoder } from "./SymbolDecoder"
 
 import { CompressionMethod } from "./CompressionMethod";
 import { release } from '../factories/base/utilities/Debug';
@@ -120,59 +113,6 @@ const enum SWF_ENCRYPTED_TAGS {
 	ENCRYPTED_CODE_BLOCK = 253
 }
 
-const enum SYMBOL_TYPE {
-	SHAPE = 'shape',
-	MORPH = 'morphshape',
-	FONT = "font",
-	SPRITE = "sprite",
-	TEXT = "text",
-	SOUND = "sound",
-	BUTTON = "button",
-	LABEL = "label",
-	IMAGE = "image",
-	BINARY = "binary",
-	VIDEO = "video"
-}
-
-interface ISymbol extends UnparsedTag {
-	className: string;
-	name: string;
-	id: number;
-	type: SYMBOL_TYPE;
-	away: any;
-	tag: any;
-}
-
-interface IShapeSymbol extends ISymbol {
-	shape?: Shape & {className: string, };
-}
-interface ISpriteSymbol extends ISymbol {
-	frames: SWFFrame[];
-}
-
-interface ITextSymbol extends ISymbol {
-	tag: TextTag & {letterSpacing: number};
-	fillBounds: Bbox;
-}
-interface IButtonSymbol extends ISymbol {
-	states: any;
-	buttonActions: any;	
-}
-interface ILabelSymbol extends ITextSymbol {
-	records: any[];
-	matrix: number[];
-}
-interface IImageSymbol extends ISymbol {
-	definition: {
-		width: number;
-		height: number;
-		data: Uint8ClampedArray;
-	}
-}
-
-interface IBinarySymbol extends BinaryDataTag, ISymbol {};
-interface IVideoSymbol extends VideoStreamTag, ISymbol {};
-
 /**
  * SWFParser provides a parser for the SWF data type.
  * Based on Shumway
@@ -215,26 +155,38 @@ export class SWFParser extends ParserBase {
 	private _currentInitActionBlocks: InitActionBlock[];
 	private _currentExports: SymbolExport[];
 
+	private _awaySymbols: NumberMap<IAsset> = {};
+	public get awaySymbols()
+	{
+		return this._awaySymbols;
+	}
+
 	private _factory: ISceneGraphFactory;
+	private _symbolDecoder: SymbolDecoder;
+
+	public isButtonOrMc(symbolId: number) {
+		return this._buttonIds[symbolId] || this._mcIds[symbolId];
+	}
+
+	public getButtonId(symbolId: number) {
+		return this._buttonIds[symbolId];
+	}
 
 
-	//set to "true" to have some console.logs in the Console
-	private _parsed_header: boolean = false;
-	private _body: ByteArray;
-
-	private _debug: boolean = false;
 	private _progressState: SWFParserProgressState;
-
 	private _isEncrypted = false;
 	private _currentEncrActionBlocks: EncryptedBlock[] = [];
 
 	private _swfFile: SWFFile;
+
 	public get swfFile(): SWFFile {
 		return this._swfFile;
 	}
+
 	public get factory(): ISceneGraphFactory {
 		return this._factory;
 	}
+
 	public set factory(value: ISceneGraphFactory) {
 		this._factory = value;
 		SWFParser.factory = value;
@@ -257,11 +209,9 @@ export class SWFParser extends ParserBase {
 		super(URLLoaderDataFormat.ARRAY_BUFFER);
 
 		this._swfFile = new SWFFile();
-
 		this._factory = factory;
-
 		this._progressState = SWFParserProgressState.STARTED;
-
+		this._symbolDecoder = new SymbolDecoder(this);
 	}
 
 
@@ -500,9 +450,6 @@ export class SWFParser extends ParserBase {
 			Stat.rec("parser").rec("symbols").end();
 		}
 	}
-	private _awaySymbols: any;
-
-
 
 	public getMaterial(bitmapIndex: number): MethodMaterial {
 		var material: MethodMaterial = this._mapMatsForBitmaps[bitmapIndex];
@@ -513,7 +460,7 @@ export class SWFParser extends ParserBase {
 				release || console.log("error: can not find image for bitmapfill", myImage);
 				myImage = new BitmapImage2D(512, 512, true, 0xff0000ff, true);
 			}
-			material.ambientMethod.texture = new ImageTexture2D(myImage);
+			material.ambientMethod.texture = new ImageTexture2D(myImage as any);
 
 			material.alphaBlending = true;
 			material.useColorTransform = true;
@@ -530,282 +477,61 @@ export class SWFParser extends ParserBase {
 	public parseSymbolsToAwayJS() {
 
 		Stat.rec("parser").rec("symbols").rec("away").begin();
+		const assetsToFinalize: any = {};
 
-		var dictionary = this.dictionary;
-		var assetsToFinalize: any = {};
-		for (var i = 0; i < dictionary.length; i++) {
-			if (dictionary[i]) {
-				var s = performance.now();
-				var symbol = this.getSymbol(dictionary[i].id) as ISymbol;
-				noSceneGraphDebug || console.log("symbol: ", dictionary[i].id, symbol.type, symbol);
-				
-				//symbol.className && console.log(symbol.type, symbol.className);
-				switch (symbol.type) {
-					case SYMBOL_TYPE.MORPH:
-					{
-						const sh = symbol as IShapeSymbol;
-						//console.warn("Warning: SWF contains shapetweening!!!");
-						//symbol.shape.name = symbol.id;
-						sh.shape.name = "AwayJS_morphshape_" + symbol.id.toString();
-						sh.shape.className = symbol.className;
+		for (const entry of this.dictionary) {
+			if (!entry) {
+				continue;
+			}
+		
+			const symbol = this.getSymbol(entry.id) as ISymbol;
+			let asset: IAsset;
+			// Image symbols has'n ID but it required
+			symbol.id = entry.id;
 
-						this._awaySymbols[dictionary[i].id] = sh.shape;
-						assetsToFinalize[dictionary[i].id] = sh.shape;
-						break;
-					}
-					case SYMBOL_TYPE.SHAPE:
-					{
-						const sh = symbol as IShapeSymbol;
+			noSceneGraphDebug || console.log("symbol: ", entry.id, symbol.type, symbol);
 
-						sh.shape.name = "AwayJS_shape_" + symbol.id.toString();
-						sh.shape.className = symbol.className;
+			try {
+				asset = this._symbolDecoder.createAwaySymbol(symbol, null, null);
+			} catch(e) {
+				console.warn("[SWF Symbol parser error]", e);
+			}
 
-						this._awaySymbols[dictionary[i].id] = sh.shape;
-						assetsToFinalize[dictionary[i].id] = sh.shape;
-						break;
-					}
-					case SYMBOL_TYPE.FONT:
-						//symbol.away._smybol=symbol;
-						symbol.away.className = symbol.className;
-						this._awaySymbols[dictionary[i].id] = symbol;
-						assetsToFinalize[symbol.name] = symbol.away;
-						break;
-					case SYMBOL_TYPE.SPRITE:
-					{
-						noTimelineDebug || console.log("start parsing timeline: ", symbol);
+			if(!asset) {
+				continue;
+			}
 
-						const ss = symbol as ISpriteSymbol;
-						const awayMc = framesToTimeline(symbol, ss.frames, null, null);
-	
-						(<any>awayMc).className = ss.className;
-						awayMc.name = "AwayJS_mc_" + ss.id.toString();
+			// for FONT we finalize by name
+			if(symbol.type !== SYMBOL_TYPE.FONT) {
+				assetsToFinalize[entry.id] = this._awaySymbols[entry.id] = asset;
+			} else {
+				this._awaySymbols[entry.id] = asset;
+				assetsToFinalize[symbol.name] = symbol.away;
+			}
 
-						if (awayMc.buttonMode) {
-							this._buttonIds[ss.id] = true;
-						} else {
-							this._mcIds[ss.id] = true;
-						}
+			if(symbol.type === SYMBOL_TYPE.BUTTON || (<MovieClip>asset).buttonMode) {
+				this._buttonIds[symbol.id] = true;
+			}
 
-						this._awaySymbols[dictionary[i].id] = awayMc;
-						assetsToFinalize[dictionary[i].id] = awayMc;
-						
-						break;
-					}
-					case SYMBOL_TYPE.TEXT:
-					{
-						const ts = symbol as ITextSymbol;
-						const awayText = this._factory.createTextField(ts);
-						awayText._symbol = ts;
-						awayText.textFormat = new TextFormat();
-
-						(<any>awayText).className = ts.className;
-
-						const flashFont = this._awaySymbols[ts.tag.fontId];
-
-						if (flashFont) {
-							awayText.textFormat.font = flashFont.away;
-							awayText.textFormat.font_table = <TesselatedFontTable>flashFont.away.get_font_table(flashFont.fontStyleName, TesselatedFontTable.assetType);
-						}
-
-						const tag = ts.tag;
-						awayText.textFormat.size = tag.fontHeight / 20;
-						//awayText.textFormat.color = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
-						awayText.textColor = (tag.flags & TextFlags.HasColor) ? ColorUtils.f32_RGBA_To_f32_ARGB(tag.color) : 0xffffff;
-						awayText.textFormat.leftMargin = tag.leftMargin / 20;
-						awayText.textFormat.rightMargin = tag.rightMargin / 20;
-						awayText.textFormat.letterSpacing = tag.letterSpacing / 20;
-						awayText.textFormat.leading = tag.leading / 20;
-						awayText.textFormat.align = this.textFormatAlignMap[tag.align];
-
-						awayText.textOffsetX = ts.fillBounds.xMin / 20;
-						awayText.textOffsetY = ts.fillBounds.yMin / 20;
-						awayText.width = ((ts.fillBounds.xMax - ts.fillBounds.xMin) / 20);
-						awayText.height = (ts.fillBounds.yMax - ts.fillBounds.yMin) / 20;
-						awayText.border = !!(tag.flags & TextFlags.Border);
-						awayText.background = awayText.border;
-
-						awayText.multiline = (tag.flags & TextFlags.Multiline) ? true : false;
-						awayText.wordWrap = (tag.flags & TextFlags.WordWrap) ? true : false;
-						awayText.selectable = tag.flags ? !(tag.flags & TextFlags.NoSelect) : false;
-
-						if (tag.maxLength && tag.maxLength > 0) {
-							awayText.maxChars = tag.maxLength;
-						}
-						if (tag.flags & TextFlags.ReadOnly) {
-							awayText.type = "dynamic";
-						}
-						else {
-							awayText.type = "input";
-						}
-
-						if (tag.flags & TextFlags.Html) {
-							awayText.html = true;
-							if (tag.initialText && tag.initialText != "")
-								awayText.htmlText = tag.initialText;
-						}
-						else {
-							awayText.html = false;
-							if (tag.initialText && tag.initialText != "")
-								awayText.text = tag.initialText;
-						}
-						awayText.name = "tf_" + symbol.id.toString();
-						assetsToFinalize[dictionary[i].id] = awayText;
-						this._awaySymbols[dictionary[i].id] = awayText;
-						break;
-					}
-					case SYMBOL_TYPE.SOUND:
-					{
-						var awaySound: WaveAudio = (<WaveAudio>this._awaySymbols[dictionary[i].id]);
-
-						if (awaySound) {
-							(<any>awaySound).className = this.symbolClassesMap[symbol.id] ? this.symbolClassesMap[symbol.id] : null;
-							awaySound.name = (<any>awaySound).className;
-							assetsToFinalize[dictionary[i].id] = awaySound;
-							//awaySound.play(0,false);
-						}
-						else {
-							console.warn("SWF-parser: no sound loaded for sound-id:", dictionary[i].id);
-
-						}
-						break;
-					}
-					case SYMBOL_TYPE.BUTTON:
-					{
-						const bs = symbol as IButtonSymbol;
-						noTimelineDebug || console.log("start parsing button: ", bs);
-						var awayMc = framesToTimeline(bs, null, bs.states, bs.buttonActions, this._buttonSounds[symbol.id]);
-						//awayMc._symbol=symbol;
-						awayMc.name = "AwayJS_button_" + bs.id.toString();
-						(<any>awayMc).className = symbol.className;
-						assetsToFinalize[dictionary[i].id] = awayMc;
-						this._awaySymbols[dictionary[i].id] = awayMc;
-						this._buttonIds[bs.id] = true;
-						/*
-						var mySprite:SimpleButton=new SimpleButton();
-						console.log("Button:", symbol);
-						//var awayMc = this.framesToAwayTimeline(symbol.frames);
-						//mySprite._symbol=symbol;
-						this._pFinalizeAsset(mySprite, symbol.id);
-						this._awaySymbols[dictionary[i].id] = mySprite;
-						*/
-						break;
-					}
-					case SYMBOL_TYPE.LABEL:
-					{
-						const ls = symbol as ILabelSymbol;
-						const awayText = this._factory.createTextField(ls);
-						let font = null;
-						let invalid_font = false;
-						(<any>awayText).className = ls.className;
-						for (var r = 0; r < ls.records.length; r++) {
-							var record: any = ls.records[r];
-							if (record.fontId) {
-								font = this._awaySymbols[record.fontId];
-								if (font) {
-
-									//awayText.textFormat.font=font.away;
-									record.font_table = <TesselatedFontTable>font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType);
-									if (!record.font_table) {
-										invalid_font = true;
-										console.log("no font_table set");
-									}
-									//record.font_table=font.away.font_styles[0];
-								}
-							}
-						}
-						awayText.staticMatrix = ls.matrix;
-						awayText.textOffsetX = ls.fillBounds.xMin / 20;
-						awayText.textOffsetY = ls.fillBounds.yMin / 20;
-						awayText.width = (ls.fillBounds.xMax / 20 - ls.fillBounds.xMin / 20) - 1;
-						awayText.height = (ls.fillBounds.yMax / 20 - ls.fillBounds.yMin / 20) - 1;
-						
-						if (!invalid_font) {
-							awayText.setLabelData(ls);
-						}
-
-						awayText.name = "AwayJS_label_" + ls.id.toString();
-						assetsToFinalize[dictionary[i].id] = awayText;
-						this._awaySymbols[dictionary[i].id] = awayText;
-						awayText.selectable = ls.tag.flags ? !(ls.tag.flags & TextFlags.NoSelect) : false;
-						break;
-					}
-					case SYMBOL_TYPE.IMAGE:
-					{
-						const is = symbol as IImageSymbol;
-						let awayBitmap = (<BitmapImage2D>this._awaySymbols[dictionary[i].id]);
-						if (!awayBitmap && is.definition) {
-							const def = is.definition;
-							awayBitmap = new BitmapImage2D(def.width, def.height, true, 0xff0000, false);
-							if (def.data.length != (4 * def.width * def.height)
-								&& def.data.length != (3 * def.width * def.height)) 
-							{
-								def.data = new Uint8ClampedArray(4 * def.width * def.height);
-								//symbol.definition.data.fill
-							}
-							awayBitmap.setPixels(new Rectangle(0, 0, def.width, def.height), def.data);
-						}
-						if (awayBitmap) {
-							this._awaySymbols[dictionary[i].id] = awayBitmap;
-
-							(<any>awayBitmap).className = this.symbolClassesMap[symbol.id] ? this.symbolClassesMap[symbol.id] : symbol.className;
-							awayBitmap.name = (<any>awayBitmap).className;
-							
-							assetsToFinalize[dictionary[i].id] = awayBitmap;
-						}
-						break;
-					}
-					case SYMBOL_TYPE.BINARY: 
-					{
-						const bs = symbol as IBinarySymbol;
-						if ((<any>this._factory).createBinarySymbol)
-							(<any>this._factory).createBinarySymbol(symbol);
-						
-						const bin = new ByteArray(bs.byteLength);
-						const asset = new GenericAsset<ByteArray>(bin, bs.className, ByteArray);
-						bin.setArrayBuffer(bs.data.buffer);
-
-						//assetsToFinalize[dictionary[i].id] = asset;
-						this._awaySymbols[dictionary[i].id] = asset;
-
-						break;
-					}
-					case SYMBOL_TYPE.VIDEO:
-					{
-						const vs = symbol as IVideoSymbol;
-						const dummyVideo = new BitmapImage2D(vs.width, vs.height, false, 0x00ff00, false);
-						dummyVideo._symbol = vs;
-
-						(<any>dummyVideo).className = this.symbolClassesMap[vs.id] ? this.symbolClassesMap[vs.id] : vs.className;
-						dummyVideo.name = (<any>dummyVideo).className;
-						assetsToFinalize[dictionary[i].id] = dummyVideo;
-
-						this._awaySymbols[dictionary[i].id] = dummyVideo;
-
-						break;
-					}
-					default:
-						console.log("unknown symbol type:", symbol.type, symbol);
-						break;
-				}
+			if(symbol.type === SYMBOL_TYPE.SPRITE) {
+				this._mcIds[symbol.id] = true;
 			}
 		}
 
-		var rootSymbol: any = this.dictionary[0];
-		if (!rootSymbol) {
-			rootSymbol = {
-				id: 0,
-				className: this.symbolClassesMap[0]
-			};
-		}
-		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
-		var awayMc: MovieClip = framesToTimeline(rootSymbol, this._swfFile.frames, null, null);
+		const rootSymbol: any = this.dictionary[0] || {
+			id: 0,
+			className: this.symbolClassesMap[0]
+		};
 
+		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
+		const rootAsset = this._symbolDecoder.framesToTimeline(null, rootSymbol, this._swfFile.frames, null, null);
+		rootAsset.isAVMScene = true;
+		
 		for (var key in assetsToFinalize) {
 			this._pFinalizeAsset(assetsToFinalize[key]);
 		}
 
-		awayMc.isAVMScene = true;
-		this._pFinalizeAsset(awayMc, "scene");
+		this._pFinalizeAsset(rootAsset, "scene");
 		DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);

@@ -154,7 +154,7 @@ function parse15BPP(tag: BitmapTag): Uint8ClampedArray {
   return null;
 }
 
-export function defineBitmap(tag: BitmapTag): {definition: ImageDefinition; type: string} {
+export function defineBitmap(tag: BitmapTag): {definition: ImageDefinition; type: string, id: number} {
  // enterTimeline("defineBitmap");
   var data: Uint8ClampedArray;
   var type = ImageType.None;
@@ -186,6 +186,7 @@ export function defineBitmap(tag: BitmapTag): {definition: ImageDefinition; type
       dataType: type,
       image: null
     },
-    type: 'image'
+    type: 'image',
+    id: tag.id,
   };
 }
