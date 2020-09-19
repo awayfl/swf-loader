@@ -68,7 +68,7 @@ import {
 	getSwfTagCodeName
 } from "../factories/base/SWFTags";
 
-import { ISymbol, SYMBOL_TYPE,  } from "./ISymbol"
+import { IBinarySymbol, IButtonSymbol, ISymbol, SYMBOL_TYPE,  } from "./ISymbol"
 import { SymbolDecoder } from "./SymbolDecoder"
 
 import { CompressionMethod } from "./CompressionMethod";
@@ -154,25 +154,18 @@ export class SWFParser extends ParserBase {
 	private _currentActionBlocks: ActionBlock[];
 	private _currentInitActionBlocks: InitActionBlock[];
 	private _currentExports: SymbolExport[];
+	private _awayUnresolvedSymbols: NumberMap<IAsset> = {};
 
-	private _awaySymbols: NumberMap<IAsset> = {};
-	public get awaySymbols()
-	{
-		return this._awaySymbols;
+	public get awayUnresolvedSymbols() {
+		return this._awayUnresolvedSymbols;
+	}
+
+	public get awaySymbols() {
+		return this._symbolDecoder.awaySymbols;
 	}
 
 	private _factory: ISceneGraphFactory;
 	private _symbolDecoder: SymbolDecoder;
-
-	public isButtonOrMc(symbolId: number) {
-		return this._buttonIds[symbolId] || this._mcIds[symbolId];
-	}
-
-	public getButtonId(symbolId: number) {
-		return this._buttonIds[symbolId];
-	}
-
-
 	private _progressState: SWFParserProgressState;
 	private _isEncrypted = false;
 	private _currentEncrActionBlocks: EncryptedBlock[] = [];
@@ -253,7 +246,7 @@ export class SWFParser extends ParserBase {
 						var myBitmap: BitmapImage2D = (<BitmapImage2D>resourceDependency.assets[0]);
 						//myBitmap.width=awaitedObject.definition.width;
 						//myBitmap.height=awaitedObject.definition.height;
-						this._awaySymbols[resourceDependency.id] = myBitmap;
+						this._awayUnresolvedSymbols[resourceDependency.id] = myBitmap;
 						break;
 					case SYMBOL_TYPE.FONT:
 						//console.log("finished font parsing", resourceDependency);
@@ -263,7 +256,7 @@ export class SWFParser extends ParserBase {
 						var waveAudio: WaveAudio = (<WaveAudio>resourceDependency.assets[0]);
 						//myBitmap.width=awaitedObject.definition.width;
 						//myBitmap.height=awaitedObject.definition.height;
-						this._awaySymbols[resourceDependency.id] = waveAudio;
+						this._awayUnresolvedSymbols[resourceDependency.id] = waveAudio;
 						break;
 					default:
 						console.log("finished unknown parsing", resourceDependency);
@@ -384,7 +377,7 @@ export class SWFParser extends ParserBase {
 
 		(<any>this._factory).url = this._iFileName;
 		this._pContent = this._factory.createDisplayObjectContainer();
-		this._awaySymbols = {};
+		this._awayUnresolvedSymbols = {};
 		this._mapMatsForBitmaps = {};
 
 
@@ -455,7 +448,7 @@ export class SWFParser extends ParserBase {
 		var material: MethodMaterial = this._mapMatsForBitmaps[bitmapIndex];
 		if (!material) {
 			material = new MethodMaterial();
-			var myImage = this._awaySymbols[bitmapIndex];
+			var myImage = this.awaySymbols[bitmapIndex];
 			if (!myImage || (!myImage.isAsset(BitmapImage2D) && !myImage.isAsset(SceneImage2D))) {
 				release || console.log("error: can not find image for bitmapfill", myImage);
 				myImage = new BitmapImage2D(512, 512, true, 0xff0000ff, true);
@@ -473,9 +466,21 @@ export class SWFParser extends ParserBase {
 
 	private myTestSprite: Sprite;
 	private _mapMatsForBitmaps: any;
+	private _lockFinalize = false;
+
+	public registerAwayAsset(asset: IAsset, symbol: ISymbol) {
+		if(this._lockFinalize) return;
+
+		if(symbol.type !== SYMBOL_TYPE.FONT) {
+			this._pFinalizeAsset(asset);
+		} else {
+			this._pFinalizeAsset((symbol as any).away);
+		}
+	}
 
 	public parseSymbolsToAwayJS() {
-
+		this._lockFinalize = true;
+		
 		Stat.rec("parser").rec("symbols").rec("away").begin();
 		const assetsToFinalize: any = {};
 
@@ -486,11 +491,7 @@ export class SWFParser extends ParserBase {
 		
 			const symbol = this.getSymbol(entry.id) as ISymbol;
 			let asset: IAsset;
-			// Image symbols has'n ID but it required
-			symbol.id = entry.id;
-
-			noSceneGraphDebug || console.log("symbol: ", entry.id, symbol.type, symbol);
-
+	
 			try {
 				asset = this._symbolDecoder.createAwaySymbol(symbol, null, null);
 			} catch(e) {
@@ -503,20 +504,13 @@ export class SWFParser extends ParserBase {
 
 			// for FONT we finalize by name
 			if(symbol.type !== SYMBOL_TYPE.FONT) {
-				assetsToFinalize[entry.id] = this._awaySymbols[entry.id] = asset;
+				assetsToFinalize[entry.id] = asset;
 			} else {
-				this._awaySymbols[entry.id] = asset;
 				assetsToFinalize[symbol.name] = symbol.away;
 			}
-
-			if(symbol.type === SYMBOL_TYPE.BUTTON || (<MovieClip>asset).buttonMode) {
-				this._buttonIds[symbol.id] = true;
-			}
-
-			if(symbol.type === SYMBOL_TYPE.SPRITE) {
-				this._mcIds[symbol.id] = true;
-			}
 		}
+
+		this._lockFinalize = false;
 
 		const rootSymbol: any = this.dictionary[0] || {
 			id: 0,
@@ -538,10 +532,6 @@ export class SWFParser extends ParserBase {
 
 		Stat.rec("parser").rec("symbols").rec("away").end();
 	}
-
-	// helper for handling buttons
-	private _buttonIds: any = {};
-	private _mcIds: any = {};
 
 	public textFormatAlignMap: string[] = [TextFormatAlign.LEFT, TextFormatAlign.RIGHT, TextFormatAlign.CENTER, TextFormatAlign.JUSTIFY];
 
@@ -622,10 +612,12 @@ export class SWFParser extends ParserBase {
 		if (this.eagerlyParsedSymbolsMap[id]) {
 			return this.eagerlyParsedSymbolsMap[id];
 		}
-		var unparsed = this.dictionary[id];
+
+		const unparsed = this.dictionary[id];
 		if (!unparsed) {
 			return null;
 		}
+
 		var symbol;
 		if (unparsed.tagCode === SwfTagCode.CODE_DEFINE_SPRITE) {
 			// TODO: replace this whole silly `type` business with tagCode checking.
@@ -635,6 +627,11 @@ export class SWFParser extends ParserBase {
 		}
 		symbol.className = this.symbolClassesMap[id] || null;
 		symbol.env = this.env;
+
+		if(this._buttonSounds[symbol.id]) {
+			(<IButtonSymbol>symbol).buttonSounds = this._buttonSounds[symbol.id];
+		}
+
 		return symbol;
 	}
 
@@ -651,6 +648,7 @@ export class SWFParser extends ParserBase {
 		if (finalPos !== tagEnd) {
 			this.emitTagSlopWarning(unparsed, tagEnd);
 		}
+
 		var symbol = defineSymbol(tag, this.dictionary, this);
 		//SWF.leaveTimeline();
 		return symbol;

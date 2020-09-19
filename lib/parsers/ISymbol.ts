@@ -43,7 +43,7 @@ export interface ITextSymbol extends ISymbol {
 export interface IButtonSymbol extends ISymbol {
 	states: any;
     buttonActions: any;
-    sounds: any;
+    buttonSounds: any;
 }
 
 export interface ILabelSymbol extends ITextSymbol {

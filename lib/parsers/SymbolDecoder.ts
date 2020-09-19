@@ -1,15 +1,46 @@
-import { Billboard, IFilter, ISceneGraphFactory, MorphSprite, MovieClip, Sprite, TesselatedFontTable, TextField, TextFormat, TextFormatAlign, Timeline, TimelineActionType } from "@awayjs/scene";
-import { PlaceObjectFlags, PlaceObjectTag, SoundInfoFlags, SwfTagCode, TextFlags } from "../factories/base/SWFTags";
+import { 
+    Billboard, 
+    IFilter, 
+    ISceneGraphFactory, 
+    MorphSprite, 
+    MovieClip, 
+    Sprite, 
+    TesselatedFontTable, 
+    TextField, 
+    TextFormat, 
+    TextFormatAlign, 
+    Timeline, 
+    TimelineActionType 
+} from "@awayjs/scene";
+import { 
+    PlaceObjectFlags, 
+    PlaceObjectTag, 
+    SoundInfoFlags, 
+    SwfTagCode, 
+    TextFlags 
+} from "../factories/base/SWFTags";
+
+import { 
+    IBinarySymbol, 
+    IButtonSymbol, 
+    IImageSymbol, 
+    ILabelSymbol, 
+    IShapeSymbol, 
+    ISpriteSymbol, 
+    ISymbol, 
+    ITextSymbol, 
+    IVideoSymbol, 
+    SYMBOL_TYPE 
+} from './ISymbol';
+
 import { MovieClipSoundsManager } from "../factories/timelinesounds/MovieClipSoundsManager"
 import { BitmapImage2D } from "@awayjs/stage";
 import { MethodMaterial } from "@awayjs/materials";
 import { Graphics, Shape, UnparsedTag } from "@awayjs/graphics";
 import { SWFFrame } from "./SWFFrame";
-import { ArgumentError, ColorUtils, IAsset, Rectangle, WaveAudio } from "@awayjs/core";
+import { ColorUtils, IAsset, Rectangle, WaveAudio } from "@awayjs/core";
 import { Matrix, ColorTransform } from "../factories/base/SWFTags"
 import { SWFParser } from './SWFParser';
-import { Stat } from '../stat/Stat';
-import { IBinarySymbol, IButtonSymbol, IImageSymbol, ILabelSymbol, IShapeSymbol, ISpriteSymbol, ISymbol, ITextSymbol, IVideoSymbol, SYMBOL_TYPE } from './ISymbol';
 
 const noTimelineDebug = true;
 const noExportsDebug = true;
@@ -48,10 +79,19 @@ const TF_ALIGNS: string[] = [
 ];
 
 export class SymbolDecoder {
+
+    private _awaySymbols: NumberMap<IAsset> = {};
+    private _buttonIds: NumberMap<boolean> = {};
+    private _mcIds: NumberMap<boolean> = {};
+
     constructor(public parser: SWFParser) {}
 
     get factory() : ISceneGraphFactory {
         return this.parser.factory;
+    }
+
+    get awaySymbols() {
+        return this._awaySymbols;
     }
 
     private _createShape(symbol: IShapeSymbol, target?: Shape, name?: string): IAsset {
@@ -81,12 +121,11 @@ export class SymbolDecoder {
         (<any>awayMc).className = symbol.className;
         awayMc.name = name || "AwayJS_mc_" + symbol.id.toString();
 
-        /*
-        if (awayMc.buttonMode) {
+        if(awayMc.buttonMode) {
             this._buttonIds[symbol.id] = true;
         } else {
             this._mcIds[symbol.id] = true;
-        }*/
+        }
 
         return awayMc;
     }
@@ -99,7 +138,7 @@ export class SymbolDecoder {
 
         (<any>target).className = symbol.className;
 
-        const flashFont = this.parser.awaySymbols[symbol.tag.fontId] as any;
+        const flashFont = this.createAwaySymbol(symbol.tag.fontId) as any;
 
         if (flashFont) {
             target.textFormat.font = flashFont.away;
@@ -154,7 +193,7 @@ export class SymbolDecoder {
 
     private _createSound(symbol: ISymbol, target?: any, name?: string): IAsset {
     
-        const awaySound: WaveAudio = (<WaveAudio>this.parser.awaySymbols[symbol.id]);
+        const awaySound: WaveAudio = (<WaveAudio>this.parser.awayUnresolvedSymbols[symbol.id]);
 
         if (awaySound) {
             (<any>awaySound).className = this.parser.symbolClassesMap[symbol.id] || null;
@@ -169,16 +208,16 @@ export class SymbolDecoder {
 
     private _createButton(symbol: IButtonSymbol, target?: any, name?: string): IAsset {
         noTimelineDebug || console.log("start parsing button: ", symbol);
-        target = this.framesToTimeline(target, symbol, null, symbol.states, symbol.buttonActions, symbol.sounds);
+        target = this.framesToTimeline(target, symbol, null, symbol.states, symbol.buttonActions, symbol.buttonSounds);
         //awayMc._symbol=symbol;
         target.name = name || "AwayJS_button_" + symbol.id.toString();
         (<any>target).className = symbol.className;
         
+        this._buttonIds[symbol.id] = true;
         return target;
         /*
         assetsToFinalize[dictionary[i].id] = awayMc;
         this._awaySymbols[dictionary[i].id] = awayMc;
-        this._buttonIds[symbol.id] = true;
         */
 
         /*
@@ -200,7 +239,7 @@ export class SymbolDecoder {
         for (var r = 0; r < symbol.records.length; r++) {
             var record: any = symbol.records[r];
             if (record.fontId) {
-                font = this.parser.awaySymbols[record.fontId];
+                font = this.createAwaySymbol(record.fontId);
                 if (font) {
 
                     //awayText.textFormat.font=font.away;
@@ -236,7 +275,7 @@ export class SymbolDecoder {
 
     private _createImage(symbol: IImageSymbol, target?: BitmapImage2D, name?: string): IAsset 
     {
-        target = target || (<BitmapImage2D>this.parser.awaySymbols[symbol.id]);
+        target = target || (<BitmapImage2D>this.parser.awayUnresolvedSymbols[symbol.id]);
      
         if (!target && symbol.definition) {
             const def = symbol.definition;
@@ -283,83 +322,92 @@ export class SymbolDecoder {
         return dummyVideo;
     }
 
-    public createAwaySymbol(symbol: ISymbol, target?: IAsset, name?: string): IAsset
+    public createAwaySymbol<T extends IAsset = IAsset>(symbol: ISymbol | number, target?: IAsset, name?: string): T
     {
+        if(typeof symbol === 'number') {
+            symbol = this.parser.getSymbol(symbol) as ISymbol;
+        }
+
+        if(!symbol) {
+            throw new Error("Symbol can't be null");
+        }
+
+        if (!target) {
+            if(this._awaySymbols[symbol.id]) {
+                return this._awaySymbols[symbol.id] as T;
+            }
+        }
+
+        let asset: IAsset;
+
         //Stat.rec("parser").rec("symbols").rec("away").begin();
 
         //symbol.className && console.log(symbol.type, symbol.className);
         switch (symbol.type) {
             case SYMBOL_TYPE.MORPH:
             {
-                return this._createShape(symbol, target as Shape, name || "AwayJS_morphshape_" + symbol.id.toString());
+                asset = this._createShape(symbol, target as Shape, name || "AwayJS_morphshape_" + symbol.id.toString());
+                break;
             }
             case SYMBOL_TYPE.SHAPE:
             {
-                return this._createShape(symbol, target as Shape, name);
+                asset = this._createShape(symbol, target as Shape, name);
+                break;
             }
             case SYMBOL_TYPE.FONT:
             {
-                return this._createFont(symbol, target as any, name);
+                asset = this._createFont(symbol, target as any, name);
+                break;
             }
             case SYMBOL_TYPE.SPRITE:
             {        
-                return this._createSprite(symbol as ISpriteSymbol, target as MovieClip, name)
+                asset = this._createSprite(symbol as ISpriteSymbol, target as MovieClip, name)
+                break;
             }
             case SYMBOL_TYPE.TEXT:
             {
-                return this._createText(symbol as ITextSymbol, target as TextField, name)
+                asset = this._createText(symbol as ITextSymbol, target as TextField, name)
+                break;
             }
             case SYMBOL_TYPE.SOUND:
             {
-                return this._createSound(symbol, target, name);
+                asset = this._createSound(symbol, target, name);
+                break;
             }
             case SYMBOL_TYPE.BUTTON:
             {
-                return this._createButton(symbol as IButtonSymbol, target, name);
+                asset = this._createButton(symbol as IButtonSymbol, target, name);
+                break;
             }
             case SYMBOL_TYPE.LABEL:
             {
-                return this._createLabel(symbol as ILabelSymbol, target, name);
+                asset = this._createLabel(symbol as ILabelSymbol, target, name);
+                break;
             }
             case SYMBOL_TYPE.IMAGE:
             {
-                return this._createImage(symbol as IImageSymbol, target as BitmapImage2D, name);
+                asset = this._createImage(symbol as IImageSymbol, target as BitmapImage2D, name);
+                break;
             }
             case SYMBOL_TYPE.BINARY: 
             {
-                return this._createBinary(symbol as IBinarySymbol, target, name);
+                asset = this._createBinary(symbol as IBinarySymbol, target, name);
+                break;
             }
             case SYMBOL_TYPE.VIDEO:
             {
-                return this._createVideo(symbol as IVideoSymbol, target, name);
+                asset = this._createVideo(symbol as IVideoSymbol, target, name);
+                break;
             }
             default:
-                throw new ArgumentError("Unknown symbol type:" + symbol.type, 0);
+                throw Error ("Unknown symbol type:" + symbol.type);
         }
+ 
+        this._awaySymbols[symbol.id] = asset;
 
-
-        /*
-        var rootSymbol: any = this.dictionary[0];
-        if (!rootSymbol) {
-            rootSymbol = {
-                id: 0,
-                className: this.symbolClassesMap[0]
-            };
-        }
-        noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
-        var awayMc: MovieClip = this._symbolDecoder.framesToTimeline(null, rootSymbol, this._swfFile.frames, null, null);
+        this.parser.registerAwayAsset(asset, symbol);
         
-        for (var key in assetsToFinalize) {
-            this._pFinalizeAsset(assetsToFinalize[key]);
-        }*/
-
-        //awayMc.isAVMScene = true;
-        //this._pFinalizeAsset(awayMc, "scene");
-        //DefaultFontManager.applySharedFonts(this._iFileName);
-        //console.log("root-timeline: ", awayMc);
-        //console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);
-
-        //Stat.rec("parser").rec("symbols").rec("away").end();
+        return asset as T;
     
     }
 
@@ -501,7 +549,7 @@ export class SymbolDecoder {
                 for (key in swfFrames[i].exports) {
                     //console.log("\n\nfound export\n\n", swfFrames[i].exports[key]);
                     let asset = swfFrames[i].exports[key];
-                    let awayAsset = this.parser.awaySymbols[asset.symbolId];
+                    let awayAsset = this.createAwaySymbol(asset.symbolId);
                     if (!awayAsset) {
                         console.log("\n\nerror: no away-asset for export\n\n", swfFrames[i].exports[key]);
                     }
@@ -603,7 +651,7 @@ export class SymbolDecoder {
                     awayTimeline.add_framescript(swfFrames[i].actionBlocks, i, awayMc);
                 }
                 if (buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id != 0) {
-                    awaySymbol = this.parser.awaySymbols[buttonSound[keyFrameCount].id];
+                    awaySymbol = this.createAwaySymbol(buttonSound[keyFrameCount].id);
                     if (awaySymbol) {
                         awayTimeline.audioPool[audio_commands_cnt] = { cmd: SwfTagCode.CODE_START_SOUND, id: buttonSound[keyFrameCount].id, sound: awaySymbol, props: buttonSound[keyFrameCount].info };
                         cmds_startSounds.push(audio_commands_cnt++);
@@ -621,13 +669,23 @@ export class SymbolDecoder {
                         switch (tag.code) {
                             case SwfTagCode.CODE_START_SOUND:
                                 //console.log("CODE_START_SOUND", tag)
-                                awaySymbol = this.parser.awaySymbols[tag.soundId];
+                                awaySymbol = this.createAwaySymbol(tag.soundId);
                                 if (tag.soundInfo && (tag.soundInfo.flags & SoundInfoFlags.Stop)) {
-                                    awayTimeline.audioPool[audio_commands_cnt] = { cmd: SwfTagCode.CODE_STOP_SOUND, id: tag.soundId, sound: this.parser.awaySymbols[tag.soundId], props: tag.soundInfo };
+                                    awayTimeline.audioPool[audio_commands_cnt] = { 
+                                        cmd: SwfTagCode.CODE_STOP_SOUND, 
+                                        id: tag.soundId, 
+                                        sound: this.createAwaySymbol(tag.soundId), 
+                                        props: tag.soundInfo 
+                                    };
                                     noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i + 1);
                                 }
                                 else {
-                                    awayTimeline.audioPool[audio_commands_cnt] = { cmd: SwfTagCode.CODE_START_SOUND, id: tag.soundId, sound: this.parser.awaySymbols[tag.soundId], props: tag.soundInfo };
+                                    awayTimeline.audioPool[audio_commands_cnt] = { 
+                                        cmd: SwfTagCode.CODE_START_SOUND, 
+                                        id: tag.soundId, 
+                                        sound: this.createAwaySymbol(tag.soundId), 
+                                        props: tag.soundInfo 
+                                    };
                                     noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i + 1);
                                 }
                                 // todo: volume / pan / other properties
@@ -637,7 +695,12 @@ export class SymbolDecoder {
                                 //console.log("CODE_STOP_SOUND", tag)
                                 // todo
                                 //console.log("stopsound", tag.soundId, tag.soundInfo);
-                                awayTimeline.audioPool[audio_commands_cnt] = { cmd: SwfTagCode.CODE_STOP_SOUND, id: tag.soundId, sound: this.parser.awaySymbols[tag.soundId], props: tag.soundInfo };
+                                awayTimeline.audioPool[audio_commands_cnt] = { 
+                                    cmd: SwfTagCode.CODE_STOP_SOUND, 
+                                    id: tag.soundId, 
+                                    sound: this.createAwaySymbol(tag.soundId), 
+                                    props: tag.soundInfo 
+                                };
                                 noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i + 1);
                                 cmds_startSounds.push(audio_commands_cnt++);
                                 break;
@@ -704,7 +767,7 @@ export class SymbolDecoder {
 
                                 if (hasCharacter) {
                                     //console.log("placeTag symbol id",placeObjectTag.symbolId )
-                                    awaySymbol = this.parser.awaySymbols[placeObjectTag.symbolId];
+                                    awaySymbol = this.createAwaySymbol(placeObjectTag.symbolId);
 
                                     if(!awaySymbol) {
                                         console.warn("Symbol missed:", placeObjectTag.symbolId);
@@ -737,7 +800,7 @@ export class SymbolDecoder {
                                             // a child (sprite) already exists and the swapGraphicsId will be handled in the update command
                                         }
                                         else {
-                                            if (placeObjectTag != null && ((placeObjectTag.name && placeObjectTag.name != "") || this.parser.isButtonOrMc(placeObjectTag.symbolId))) {
+                                            if (placeObjectTag != null && ((placeObjectTag.name && placeObjectTag.name != "") || this._mcIds[placeObjectTag.symbolId] || this._buttonIds[placeObjectTag.symbolId])) {
 
                                                 if (!placeObjectTag.name || placeObjectTag.name == "")
                                                     placeObjectTag.name = "instance" + placeObjectTag.symbolId + "_" + instanceCNT++;
@@ -857,7 +920,7 @@ export class SymbolDecoder {
 
                                 if (placeObjectTag.flags & PlaceObjectFlags.HasRatio) {
                                     if (!awaySymbol)
-                                        awaySymbol = this.parser.awaySymbols[child.id];
+                                        awaySymbol = this.createAwaySymbol(child.id);
                                     if (awaySymbol.isAsset(MorphSprite))
                                         ratio = placeObjectTag.ratio;
                                 }
@@ -1027,10 +1090,10 @@ export class SymbolDecoder {
                                 propStreamInt.push(updateCmd.swapGraphicsID);
                             }
 
-
-                            if (placeObjectTag != null && ((placeObjectTag.name && placeObjectTag.name != "") || this.parser.isButtonOrMc(placeObjectTag.symbolId))) {
+                            let isButtonOrMc = this._buttonIds[placeObjectTag.symbolId] || this._mcIds[placeObjectTag.symbolId];
+                            if (placeObjectTag != null && ((placeObjectTag.name && placeObjectTag.name != "") || isButtonOrMc)) {
                                 num_updated_props++;
-                                if (this.parser.getButtonId(placeObjectTag.symbolId)) {
+                                if (this._buttonIds[placeObjectTag.symbolId]) {
                                     propStreamType.push(TimelineActionType.UPDATE_BUTTON_NAME);
                                 }
                                 else {
