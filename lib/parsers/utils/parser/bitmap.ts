@@ -68,19 +68,19 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
   var outputDataSize = colorTableSize + ((width + padding) * height);
 
   var bytes: Uint8Array = Inflate.inflate(tag.bmpData, outputDataSize, true);
-
-  var view:Uint8ClampedArray = new Uint8ClampedArray(width*height*4);
-
-
+  var view = new Uint32Array(width * height);
   var p = colorTableSize, i = 0, offset = 0;
+
   if (hasAlpha) {
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         offset = bytes[p++] << 2;
-        view[i++] = bytes[offset + 0]; // R
-        view[i++] = bytes[offset + 1]; // G
-        view[i++] = bytes[offset + 2]; // B
-        view[i++] = bytes[offset + 3]; // A
+        
+        view[i++] = (
+            bytes[offset + 3] << 24
+          | bytes[offset + 2] << 16 
+          | bytes[offset + 1] << 8 
+          | bytes[offset + 0]) >>> 0;
       }
       p += padding;
     }
@@ -88,43 +88,54 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         offset = bytes[p++] * colorTableEntrySize;
-        view[i++] = bytes[offset + 0]; // R
-        view[i++] = bytes[offset + 1]; // G
-        view[i++] = bytes[offset + 2]; // B
-        view[i++] = 0xff; // A
+
+        view[i++] = (
+          0xff << 24
+          | bytes[offset + 2] << 1
+          | bytes[offset + 1] << 8
+          | bytes[offset + 0]) >>> 0;
       }
       p += padding;
     }
   }
-  return view;
+
+  return new Uint8ClampedArray(view.buffer);
 }
 
 /**
  * Returns a Uint8ClampedArray of RGBA values.
  */
 function parse24BPP(tag: BitmapTag): Uint8ClampedArray {
-  var width = tag.width, height = tag.height;
-  var hasAlpha = tag.hasAlpha;
+  const width = tag.width;
+  const height = tag.height;
+  const hasAlpha = tag.hasAlpha;
 
   // Even without alpha, 24BPP is stored as 4 bytes, probably for alignment reasons.
-  var dataSize = height * width * 4;
-
-  var bytes: Uint8Array = Inflate.inflate(tag.bmpData, dataSize, true);
+  const dataSize = height * width * 4;
+  const bytes = Inflate.inflate(tag.bmpData, dataSize, true);
 
   //bytes are in ARGB format, so we need to convert to RGBA
-  var view:Uint8ClampedArray = new Uint8ClampedArray(dataSize);
-  var p:number = 0;
-  var alpha:number;
+  const view = new Uint32Array(bytes.buffer);
+  let p = 0;
 
-  for (var i = 0; i < dataSize; i+=4) {
-    alpha = bytes[i]? 0xFF/bytes[i] : 0xFF;
-    view[p++] = bytes[i + 1]*alpha; // R
-    view[p++] = bytes[i + 2]*alpha; // G
-    view[p++] = bytes[i + 3]*alpha; // B
-    view[p++] = bytes[i]; // A
+  // in => PMA ARGB, out => NPMA RGBA
+  // ?
+  // Unpremultiply
+  for (let i = 0, l = view.length; i < l; i ++) {
+
+    let c = view[i];
+    let a = c & 0xff; // A
+    let factor = a ? 0xFF / a : 1;
+
+    let b = ((c >> 24) & 0xff) * factor | 0; // B
+    let g = ((c >> 16) & 0xff) * factor | 0; // G
+    let r = ((c >> 8 ) & 0xff) * factor | 0; // R
+
+    view[i] = (a << 24 | b << 16 | g << 8 | r) >>> 0;
   }
-  assert (p === dataSize, "We should be at the end of the data buffer now.");
-  return view;
+
+  //assert (p * 4 === dataSize, "We should be at the end of the data buffer now.");
+  return new Uint8ClampedArray(bytes.buffer);
 }
 
 function parse15BPP(tag: BitmapTag): Uint8ClampedArray {
