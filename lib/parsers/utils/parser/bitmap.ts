@@ -91,7 +91,7 @@ function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
 
         view[i++] = (
           0xff << 24
-          | bytes[offset + 2] << 1
+          | bytes[offset + 2] << 16
           | bytes[offset + 1] << 8
           | bytes[offset + 0]) >>> 0;
       }
