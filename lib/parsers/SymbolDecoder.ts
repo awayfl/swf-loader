@@ -1090,8 +1090,8 @@ export class SymbolDecoder {
                                 propStreamInt.push(updateCmd.swapGraphicsID);
                             }
 
-                            let isButtonOrMc = this._buttonIds[placeObjectTag.symbolId] || this._mcIds[placeObjectTag.symbolId];
-                            if (placeObjectTag != null && ((placeObjectTag.name && placeObjectTag.name != "") || isButtonOrMc)) {
+                            let isButtonOrMc = placeObjectTag && (this._buttonIds[placeObjectTag.symbolId] || this._mcIds[placeObjectTag.symbolId]);
+                            if (placeObjectTag && ((placeObjectTag.name && placeObjectTag.name != "") || isButtonOrMc)) {
                                 num_updated_props++;
                                 if (this._buttonIds[placeObjectTag.symbolId]) {
                                     propStreamType.push(TimelineActionType.UPDATE_BUTTON_NAME);
