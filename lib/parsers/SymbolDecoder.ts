@@ -84,6 +84,11 @@ export class SymbolDecoder {
     private _buttonIds: NumberMap<boolean> = {};
     private _mcIds: NumberMap<boolean> = {};
 
+    /**
+     * @description Force reqursive decoding of nested symbols, disable it when sure that symbol exist
+     */
+    public reqursive: boolean = true;
+
     constructor(public parser: SWFParser) {}
 
     get factory() : ISceneGraphFactory {
@@ -138,7 +143,7 @@ export class SymbolDecoder {
 
         (<any>target).className = symbol.className;
 
-        const flashFont = this.createAwaySymbol(symbol.tag.fontId) as any;
+        const flashFont = (this.reqursive ? this.createAwaySymbol(symbol.tag.fontId) : this._awaySymbols[symbol.tag.fontId]) as any;
 
         if (flashFont) {
             target.textFormat.font = flashFont.away;
@@ -239,7 +244,7 @@ export class SymbolDecoder {
         for (var r = 0; r < symbol.records.length; r++) {
             var record: any = symbol.records[r];
             if (record.fontId) {
-                font = this.createAwaySymbol(record.fontId);
+                font = this.reqursive ?  this.createAwaySymbol(record.fontId) : this._awaySymbols[record.fontId];
                 if (font) {
 
                     //awayText.textFormat.font=font.away;
@@ -325,6 +330,11 @@ export class SymbolDecoder {
     public createAwaySymbol<T extends IAsset = IAsset>(symbol: ISymbol | number, target?: IAsset, name?: string): T
     {
         if(typeof symbol === 'number') {
+            // Return existed away symbol by ID, skip getSymbol
+            if(!target && this._awaySymbols[symbol]) {
+                return this._awaySymbols[symbol] as T;
+            }
+
             symbol = this.parser.getSymbol(symbol) as ISymbol;
         }
 
@@ -332,12 +342,11 @@ export class SymbolDecoder {
             throw new Error("Symbol can't be null");
         }
 
-        if (!target) {
-            if(this._awaySymbols[symbol.id]) {
-                return this._awaySymbols[symbol.id] as T;
-            }
+        // return existed away symbol by ID inside symbol
+        if(!target && this._awaySymbols[symbol.id]) {
+            return this._awaySymbols[symbol.id] as T;
         }
-
+    
         let asset: IAsset;
 
         //Stat.rec("parser").rec("symbols").rec("away").begin();
@@ -415,6 +424,10 @@ export class SymbolDecoder {
         if (!states && !swfFrames) {
             throw ("error when creating timeline - neither movieclip frames nor button-states present");
         }
+
+        const getSymbol = this.reqursive ? 
+            (id: number) => (this._awaySymbols[id] || this.createAwaySymbol(id)) : 
+            (id: number) => this._awaySymbols[id];
 
         //console.log("swfFrames", swfFrames);
         var isButton: boolean = false;
@@ -549,7 +562,7 @@ export class SymbolDecoder {
                 for (key in swfFrames[i].exports) {
                     //console.log("\n\nfound export\n\n", swfFrames[i].exports[key]);
                     let asset = swfFrames[i].exports[key];
-                    let awayAsset = this.createAwaySymbol(asset.symbolId);
+                    let awayAsset = getSymbol(asset.symbolId);
                     if (!awayAsset) {
                         console.log("\n\nerror: no away-asset for export\n\n", swfFrames[i].exports[key]);
                     }
@@ -651,7 +664,7 @@ export class SymbolDecoder {
                     awayTimeline.add_framescript(swfFrames[i].actionBlocks, i, awayMc);
                 }
                 if (buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id != 0) {
-                    awaySymbol = this.createAwaySymbol(buttonSound[keyFrameCount].id);
+                    awaySymbol = getSymbol(buttonSound[keyFrameCount].id);
                     if (awaySymbol) {
                         awayTimeline.audioPool[audio_commands_cnt] = { cmd: SwfTagCode.CODE_START_SOUND, id: buttonSound[keyFrameCount].id, sound: awaySymbol, props: buttonSound[keyFrameCount].info };
                         cmds_startSounds.push(audio_commands_cnt++);
@@ -669,12 +682,12 @@ export class SymbolDecoder {
                         switch (tag.code) {
                             case SwfTagCode.CODE_START_SOUND:
                                 //console.log("CODE_START_SOUND", tag)
-                                awaySymbol = this.createAwaySymbol(tag.soundId);
+                                awaySymbol = getSymbol(tag.soundId);
                                 if (tag.soundInfo && (tag.soundInfo.flags & SoundInfoFlags.Stop)) {
                                     awayTimeline.audioPool[audio_commands_cnt] = { 
                                         cmd: SwfTagCode.CODE_STOP_SOUND, 
                                         id: tag.soundId, 
-                                        sound: this.createAwaySymbol(tag.soundId), 
+                                        sound: getSymbol(tag.soundId), 
                                         props: tag.soundInfo 
                                     };
                                     noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i + 1);
@@ -683,7 +696,7 @@ export class SymbolDecoder {
                                     awayTimeline.audioPool[audio_commands_cnt] = { 
                                         cmd: SwfTagCode.CODE_START_SOUND, 
                                         id: tag.soundId, 
-                                        sound: this.createAwaySymbol(tag.soundId), 
+                                        sound: getSymbol(tag.soundId), 
                                         props: tag.soundInfo 
                                     };
                                     noTimelineDebug || console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol, i + 1);
@@ -698,7 +711,7 @@ export class SymbolDecoder {
                                 awayTimeline.audioPool[audio_commands_cnt] = { 
                                     cmd: SwfTagCode.CODE_STOP_SOUND, 
                                     id: tag.soundId, 
-                                    sound: this.createAwaySymbol(tag.soundId), 
+                                    sound: getSymbol(tag.soundId), 
                                     props: tag.soundInfo 
                                 };
                                 noTimelineDebug || console.log("stopsound", tag.soundId, tag.soundInfo, i + 1);
@@ -767,7 +780,7 @@ export class SymbolDecoder {
 
                                 if (hasCharacter) {
                                     //console.log("placeTag symbol id",placeObjectTag.symbolId )
-                                    awaySymbol = this.createAwaySymbol(placeObjectTag.symbolId);
+                                    awaySymbol = getSymbol(placeObjectTag.symbolId);
 
                                     if(!awaySymbol) {
                                         console.warn("Symbol missed:", placeObjectTag.symbolId);
@@ -920,7 +933,7 @@ export class SymbolDecoder {
 
                                 if (placeObjectTag.flags & PlaceObjectFlags.HasRatio) {
                                     if (!awaySymbol)
-                                        awaySymbol = this.createAwaySymbol(child.id);
+                                        awaySymbol = getSymbol(child.id);
                                     if (awaySymbol.isAsset(MorphSprite))
                                         ratio = placeObjectTag.ratio;
                                 }

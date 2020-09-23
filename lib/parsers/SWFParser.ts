@@ -479,24 +479,40 @@ export class SWFParser extends ParserBase {
 	}
 
 	public parseSymbolsToAwayJS() {
-		this._lockFinalize = true;
 		
 		Stat.rec("parser").rec("symbols").rec("away").begin();
+
+		let index = 0;
+		const total = Object.keys(this.dictionary).length;
+		const step = total / 100 | 0;
 		const assetsToFinalize: any = {};
 
+		// disable reqursive parser, because symbol requests one by one
+		this._symbolDecoder.reqursive = false;
+		// lock finalizer, because we dispatch it after parsing, we need it?
+		this._lockFinalize = true;
+
+		console.debug("[Away Symbols] Start");
 		for (const entry of this.dictionary) {
 			if (!entry) {
 				continue;
 			}
-		
+
+			index ++;
+			if(step && !(index % 100)) {
+				console.debug(`[Away Symbols] Decoded (${index}/${total}), ${(100 * index / total) | 0}`);
+			}
+
 			const symbol = this.getSymbol(entry.id) as ISymbol;
 			let asset: IAsset;
 	
-			try {
+			//try {
 				asset = this._symbolDecoder.createAwaySymbol(symbol, null, null);
+			/*
 			} catch(e) {
 				console.warn("[SWF Symbol parser error]", e);
 			}
+			*/
 
 			if(!asset) {
 				continue;
@@ -506,11 +522,10 @@ export class SWFParser extends ParserBase {
 			if(symbol.type !== SYMBOL_TYPE.FONT) {
 				assetsToFinalize[entry.id] = asset;
 			} else {
+				// invalid, because maybe a more that 1 fonts table to same name
 				assetsToFinalize[symbol.name] = symbol.away;
 			}
 		}
-
-		this._lockFinalize = false;
 
 		const rootSymbol: any = this.dictionary[0] || {
 			id: 0,
@@ -520,7 +535,8 @@ export class SWFParser extends ParserBase {
 		noTimelineDebug || console.log("start parsing root-timeline: ", rootSymbol);
 		const rootAsset = this._symbolDecoder.framesToTimeline(null, rootSymbol, this._swfFile.frames, null, null);
 		rootAsset.isAVMScene = true;
-		
+
+		// manualy send finalisation event after parsing
 		for (var key in assetsToFinalize) {
 			this._pFinalizeAsset(assetsToFinalize[key]);
 		}
@@ -529,6 +545,12 @@ export class SWFParser extends ParserBase {
 		DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);
+
+		// unlock
+		this._lockFinalize = false;
+
+		// enable recursive parser, finalizer will invoked to for nested symbols that not exist
+		this._symbolDecoder.reqursive = true;
 
 		Stat.rec("parser").rec("symbols").rec("away").end();
 	}
