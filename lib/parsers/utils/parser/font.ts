@@ -105,7 +105,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 	var fontName = tag.name || uniqueName;
 
 	if (fontName == "Helvetica") fontName = "arial";
-	var fontAJS: Font = DefaultFontManager.getFont(fontName, ns);
+	var fontAJS: Font = DefaultFontManager.defineFont(fontName, ns);
 	var font = {
 		type: "font",
 		id: tag.id,
