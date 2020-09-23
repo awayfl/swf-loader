@@ -369,7 +369,8 @@ export interface BinaryDataTag extends DefinitionTag {
 export interface FontTag extends DefinitionTag {
 	flags: number;
 	language?: number;
-	name?: string;
+	name: string;
+	fontStyleName?: string;
 	copyright?: string;
 	resolution?: number;
 	offsets?: number[];

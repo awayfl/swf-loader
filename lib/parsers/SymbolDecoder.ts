@@ -30,6 +30,7 @@ import {
     ISymbol, 
     ITextSymbol, 
     IVideoSymbol, 
+    IFontSymbol,
     SYMBOL_TYPE 
 } from './ISymbol';
 
@@ -80,6 +81,7 @@ const TF_ALIGNS: string[] = [
 
 export class SymbolDecoder {
 
+    private static _globalFontsCache: StringMap<ISymbol> = {};
     private _awaySymbols: NumberMap<IAsset> = {};
     private _buttonIds: NumberMap<boolean> = {};
     private _mcIds: NumberMap<boolean> = {};
@@ -112,8 +114,15 @@ export class SymbolDecoder {
         //assetsToFinalize[dictionary[i].id] = sh.shape;
     }
 
-    private _createFont(symbol: ISymbol, target?: any, name?: string): IAsset {
-        //symbol.away._smybol=symbol;
+    private _createFont(symbol: IFontSymbol, target?: any, name?: string): IAsset {
+        const fullName = symbol.name + "_" + (symbol.fontStyleName || "");
+        
+        if(SymbolDecoder._globalFontsCache[fullName]) {
+            console.warn("[Symbol decoder] Collided font table:", fullName);
+            debugger;
+        }
+
+        SymbolDecoder._globalFontsCache[fullName] = symbol;
         symbol.away.className = symbol.className;
         return symbol as any;
     }
@@ -365,7 +374,7 @@ export class SymbolDecoder {
             }
             case SYMBOL_TYPE.FONT:
             {
-                asset = this._createFont(symbol, target as any, name);
+                asset = this._createFont(symbol as IFontSymbol, target as any, name);
                 break;
             }
             case SYMBOL_TYPE.SPRITE:

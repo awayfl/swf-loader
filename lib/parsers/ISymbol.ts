@@ -2,7 +2,7 @@
 import { Bbox, Shape} from "@awayjs/graphics";
 import { SWFFrame } from "./SWFFrame";
 import { UnparsedTag } from "@awayjs/graphics";
-import { TextTag, BinaryDataTag, VideoStreamTag } from "../factories/base/SWFTags";
+import { TextTag, BinaryDataTag, VideoStreamTag, FontTag } from "../factories/base/SWFTags";
 
 export const enum SYMBOL_TYPE {
 	SHAPE = 'shape',
@@ -61,3 +61,4 @@ export interface IImageSymbol extends ISymbol {
 
 export interface IBinarySymbol extends BinaryDataTag, ISymbol {};
 export interface IVideoSymbol extends VideoStreamTag, ISymbol {};
+export interface IFontSymbol extends FontTag, ISymbol {};
