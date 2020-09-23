@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {FontTag, FontFlags, SwfTagCode}  from "../../../factories/base/SWFTags"
-import {Font, TesselatedFontTable, DefaultFontManager, FontStyleName} from "@awayjs/scene"
-import {GraphicsPath, ShapeRecordFlags} from "@awayjs/graphics"
-import {AttributesBuffer} from "@awayjs/stage"
+import { FontTag, FontFlags, SwfTagCode } from "../../../factories/base/SWFTags";
+import { Font, TesselatedFontTable, DefaultFontManager, FontStyleName } from "@awayjs/scene";
+import { GraphicsPath, ShapeRecordFlags } from "@awayjs/graphics";
+import { AttributesBuffer } from "@awayjs/stage";
 
 var pow = Math.pow;
 var min = Math.min;
@@ -50,7 +50,10 @@ function toString32(val) {
  * then the font coordinates were scaled by 20.
  */
 function isScaledFont2(glyphs) {
-	var xMin = 0, yMin = 0, xMax = 0, yMax = 0;
+	var xMin = 0,
+		yMin = 0,
+		xMax = 0,
+		yMax = 0;
 	for (var i = 0; i < glyphs.length; i++) {
 		var records = glyphs[i];
 		if (!records) {
@@ -64,7 +67,7 @@ function isScaledFont2(glyphs) {
 			record = records[j];
 			if (record.type) {
 				if (record.flags & ShapeRecordFlags.IsStraight) {
-					x += (record.deltaX || 0);
+					x += record.deltaX || 0;
 					y += -(record.deltaY || 0);
 				} else {
 					x += record.controlDeltaX;
@@ -97,38 +100,38 @@ function isScaledFont2(glyphs) {
 	return maxDimension > 5000;
 }
 
-export function defineFont(tag: FontTag, ns:string):any {
-	var uniqueName = 'swf-font-' + tag.id;
+export function defineFont(tag: FontTag, ns: string): any {
+	var uniqueName = "swf-font-" + tag.id;
 	var fontName = tag.name || uniqueName;
 
-	if(fontName=="Helvetica")fontName="arial";
-	var fontAJS:Font=DefaultFontManager.getFont(fontName, ns);
+	if (fontName == "Helvetica") fontName = "arial";
+	var fontAJS: Font = DefaultFontManager.getFont(fontName, ns);
 	var font = {
-		type: 'font',
+		type: "font",
 		id: tag.id,
 		name: fontName,
 		bold: !!(tag.flags & FontFlags.Bold),
 		italic: !!(tag.flags & FontFlags.Italic),
-		codes: null,
+		codes: tag.codes,
 		metrics: null,
 		data: tag.data,
 		originalSize: false,
-		away:fontAJS,
-		fontStyleName:FontStyleName.STANDART
+		away: fontAJS,
+		fontStyleName: FontStyleName.STANDART,
 	};
-	fontAJS.name=fontName;
-	var fontStyleName:string=FontStyleName.STANDART;
-	if(font.bold && !font.italic){
-		fontStyleName=FontStyleName.BOLD;
+	fontAJS.name = fontName;
+	var fontStyleName: string = FontStyleName.STANDART;
+	if (font.bold && !font.italic) {
+		fontStyleName = FontStyleName.BOLD;
+	} else if (!font.bold && font.italic) {
+		fontStyleName = FontStyleName.ITALIC;
+	} else if (font.bold && font.italic) {
+		fontStyleName = FontStyleName.BOLDITALIC;
 	}
-	else if(!font.bold && font.italic){
-		fontStyleName=FontStyleName.ITALIC;
-	}
-	else if(font.bold && font.italic){
-		fontStyleName=FontStyleName.BOLDITALIC;
-	}
-	font.fontStyleName=fontStyleName;
-	var tessFontTableAJS:TesselatedFontTable = <TesselatedFontTable>fontAJS.get_font_table(fontStyleName, TesselatedFontTable.assetType)
+	font.fontStyleName = fontStyleName;
+	var tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
+		fontAJS.get_font_table(fontStyleName, TesselatedFontTable.assetType)
+	);
 	//var tessFontTableAJS:TesselatedFontTable=new TesselatedFontTable();
 	//fontAJS.font_styles.push(tessFontTableAJS);
 
@@ -141,13 +144,13 @@ export function defineFont(tag: FontTag, ns:string):any {
 		return font;
 	}
 
-	var tables = { };
+	var tables = {};
 	var codes = [];
-	var glyphIndex = { };
+	var glyphIndex = {};
 	var ranges = [];
 
 	var originalCode;
-	var generateAdvancement = !('advance' in tag);
+	var generateAdvancement = !("advance" in tag);
 	var correction = 0;
 	var isFont2 = tag.code === SwfTagCode.CODE_DEFINE_FONT2;
 	var isFont3 = tag.code === SwfTagCode.CODE_DEFINE_FONT3;
@@ -185,7 +188,7 @@ export function defineFont(tag: FontTag, ns:string):any {
 			var start = code;
 			var end = start;
 			indices = [i - 1];
-			while (((code = codes[i]) !== undefined) && end + 1 === code) {
+			while ((code = codes[i]) !== undefined && end + 1 === code) {
 				++end;
 				indices.push(i);
 				++i;
@@ -213,23 +216,22 @@ export function defineFont(tag: FontTag, ns:string):any {
 		font.originalSize = true;
 	}
 	var ascent = Math.ceil(tag.ascent / resolution) || 1024;
-    var descent = -Math.ceil(tag.descent / resolution) || 0;
-    
-	if(tessFontTableAJS.ascent!=0){
-	}
-	else{
-		tessFontTableAJS.ascent=ascent;
-		tessFontTableAJS.descent=descent;
-    }
-    
-	var offsetY=tessFontTableAJS.ascent;
-	var leading = (tag.leading / resolution) || 0;
-	tables['OS/2'] = '';
+	var descent = -Math.ceil(tag.descent / resolution) || 0;
 
-	var startCount = '';
-	var endCount = '';
-	var idDelta = '';
-	var idRangeOffset = '';
+	if (tessFontTableAJS.ascent != 0) {
+	} else {
+		tessFontTableAJS.ascent = ascent;
+		tessFontTableAJS.descent = descent;
+	}
+
+	var offsetY = tessFontTableAJS.ascent;
+	var leading = tag.leading / resolution || 0;
+	tables["OS/2"] = "";
+
+	var startCount = "";
+	var endCount = "";
+	var idDelta = "";
+	var idRangeOffset = "";
 	var i = 0;
 	var range;
 	while ((range = ranges[i++])) {
@@ -238,41 +240,39 @@ export function defineFont(tag: FontTag, ns:string):any {
 		var code: number = range[2][0];
 		startCount += toString16(start);
 		endCount += toString16(end);
-		idDelta += toString16(((code - start) + 1) & 0xffff);
+		idDelta += toString16((code - start + 1) & 0xffff);
 		idRangeOffset += toString16(0);
 	}
-	endCount += '\xff\xff';
-	startCount += '\xff\xff';
-	idDelta += '\x00\x01';
-	idRangeOffset += '\x00\x00';
+	endCount += "\xff\xff";
+	startCount += "\xff\xff";
+	idDelta += "\x00\x01";
+	idRangeOffset += "\x00\x00";
 	var segCount = ranges.length + 1;
 	var searchRange = maxPower2(segCount) * 2;
-	var rangeShift = (2 * segCount) - searchRange;
+	var rangeShift = 2 * segCount - searchRange;
 	var format314 =
-		'\x00\x00' + // language
+		"\x00\x00" + // language
 		toString16(segCount * 2) + // segCountX2
 		toString16(searchRange) +
 		toString16(logE(segCount) / logE(2)) + // entrySelector
 		toString16(rangeShift) +
 		endCount +
-		'\x00\x00' + // reservedPad
+		"\x00\x00" + // reservedPad
 		startCount +
 		idDelta +
-		idRangeOffset
-	;
-	tables['cmap'] =
-		'\x00\x00' + // version
-		'\x00\x01' +  // numTables
-		'\x00\x03' + // platformID
-		'\x00\x01' + // encodingID
-		'\x00\x00\x00\x0c' + // offset
-		'\x00\x04' + // format
+		idRangeOffset;
+	tables["cmap"] =
+		"\x00\x00" + // version
+		"\x00\x01" + // numTables
+		"\x00\x03" + // platformID
+		"\x00\x01" + // encodingID
+		"\x00\x00\x00\x0c" + // offset
+		"\x00\x04" + // format
 		toString16(format314.length + 4) + // length
-		format314
-	;
+		format314;
 
-	var glyf = '\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x31\x00';
-	var loca = '\x00\x00';
+	var glyf = "\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x31\x00";
+	var loca = "\x00\x00";
 	var offset = 16;
 	var maxPoints = 0;
 	var xMins = [];
@@ -288,8 +288,8 @@ export function defineFont(tag: FontTag, ns:string):any {
 		var x = 0;
 		var y = 0;
 
-		var myFlags = '';
-		var myEndpts = '';
+		var myFlags = "";
+		var myEndpts = "";
 		var endPoint = 0;
 		var segments = [];
 		var segmentIndex = -1;
@@ -361,21 +361,21 @@ export function defineFont(tag: FontTag, ns:string):any {
 		rawData[code] = segments;
 	}
 
-	var whiteSpaceWidth=0;
+	var whiteSpaceWidth = 0;
 	i = 0;
-	var minx=99999999;
-	var maxx=-99999999;
-	var miny=99999999;
-	var maxy=-99999999;
+	var minx = 99999999;
+	var maxx = -99999999;
+	var miny = 99999999;
+	var maxy = -99999999;
 	while ((code = codes[i++]) !== undefined) {
-		var glyphPath:GraphicsPath=new GraphicsPath();
+		var glyphPath: GraphicsPath = new GraphicsPath();
 		var records = glyphs[glyphIndex[code]];
-		var idx=glyphIndex[code];
+		var idx = glyphIndex[code];
 		segments = rawData[code];
 		var numberOfContours = 1;
 		var endPoint = 0;
-		var endPtsOfContours = '';
-		var flags = '';
+		var endPtsOfContours = "";
+		var flags = "";
 		var x = 0;
 		var y = 0;
 		var xMin = 0;
@@ -383,8 +383,8 @@ export function defineFont(tag: FontTag, ns:string):any {
 		var yMin = 0;
 		var yMax = -1024;
 
-		var myFlags = '';
-		var myEndpts = '';
+		var myFlags = "";
+		var myEndpts = "";
 		var endPoint = 0;
 		var segmentIndex = -1;
 
@@ -403,7 +403,7 @@ export function defineFont(tag: FontTag, ns:string):any {
 		var dataIndex = 0;
 		var endPoint = 0;
 		var numberOfContours = 1;
-		var myEndpts = '';
+		var myEndpts = "";
 		for (j = 0; j < commands.length; j++) {
 			var command = commands[j];
 			if (command === 1) {
@@ -415,20 +415,20 @@ export function defineFont(tag: FontTag, ns:string):any {
 				ny = data[dataIndex++];
 				var dx = nx - x;
 				var dy = ny - y;
-				myFlags += '\x01';
-				if(minx>nx){
-					minx=nx
+				myFlags += "\x01";
+				if (minx > nx) {
+					minx = nx;
 				}
-				if(maxx<nx){
-					maxx=nx
+				if (maxx < nx) {
+					maxx = nx;
 				}
-				if(miny>ny){
-					miny=ny
+				if (miny > ny) {
+					miny = ny;
 				}
-				if(maxy<ny){
-					maxy=ny
+				if (maxy < ny) {
+					maxy = ny;
 				}
-				glyphPath.moveTo(nx, -1*ny+offsetY );
+				glyphPath.moveTo(nx, -1 * ny + offsetY);
 				x = nx;
 				y = ny;
 			} else if (command === 2) {
@@ -436,54 +436,54 @@ export function defineFont(tag: FontTag, ns:string):any {
 				ny = data[dataIndex++];
 				var dx = nx - x;
 				var dy = ny - y;
-				myFlags += '\x01';
+				myFlags += "\x01";
 				x = nx;
 				y = ny;
-				if(minx>nx){
-					minx=nx
+				if (minx > nx) {
+					minx = nx;
 				}
-				if(maxx<nx){
-					maxx=nx
+				if (maxx < nx) {
+					maxx = nx;
 				}
-				if(miny>ny){
-					miny=ny
+				if (miny > ny) {
+					miny = ny;
 				}
-				if(maxy<ny){
-					maxy=ny
+				if (maxy < ny) {
+					maxy = ny;
 				}
-				glyphPath.lineTo(nx, -1*ny+offsetY );
+				glyphPath.lineTo(nx, -1 * ny + offsetY);
 			} else if (command === 3) {
 				nx = data[dataIndex++];
 				ny = data[dataIndex++];
 				var cx = nx - x;
 				var cy = ny - y;
-				myFlags += '\x00';
+				myFlags += "\x00";
 				x = nx;
 				y = ny;
 				endPoint++;
 
-				var cx=nx;
-				var cy=ny;
+				var cx = nx;
+				var cy = ny;
 				nx = data[dataIndex++];
 				ny = data[dataIndex++];
 				var dx = nx - x;
 				var dy = ny - y;
-				myFlags += '\x01';
+				myFlags += "\x01";
 				x = nx;
 				y = ny;
-				if(minx>nx){
-					minx=nx
+				if (minx > nx) {
+					minx = nx;
 				}
-				if(maxx<nx){
-					maxx=nx
+				if (maxx < nx) {
+					maxx = nx;
 				}
-				if(miny>ny){
-					miny=ny
+				if (miny > ny) {
+					miny = ny;
 				}
-				if(maxy<ny){
-					maxy=ny
+				if (maxy < ny) {
+					maxy = ny;
 				}
-				glyphPath.curveTo(cx, -1*cy+offsetY, nx, -1*ny+offsetY);
+				glyphPath.curveTo(cx, -1 * cy + offsetY, nx, -1 * ny + offsetY);
 			}
 			endPoint++;
 			if (endPoint > maxPoints) {
@@ -506,7 +506,7 @@ export function defineFont(tag: FontTag, ns:string):any {
 
 		if (!j) {
 			xMin = xMax = yMin = yMax = 0;
-			flags += '\x31';
+			flags += "\x31";
 		}
 		/*
 		var entry =
@@ -538,32 +538,28 @@ export function defineFont(tag: FontTag, ns:string):any {
 		if (endPoint > maxPoints) {
 			maxPoints = endPoint;
 		}
-		var glyphAdvance:number=0;
+		var glyphAdvance: number = 0;
 		if (generateAdvancement) {
 			tag.advance.push((xMax - xMin) * resolution * 1.3);
-			glyphAdvance=(xMax - xMin);
+			glyphAdvance = xMax - xMin;
+		} else {
+			glyphAdvance = tag.advance[i - 1] / resolution;
 		}
-		else{
-			glyphAdvance=tag.advance[i-1]/resolution;
-		}
-		if(code==32){
+		if (code == 32) {
 			//console.log("32 = ", code, (xMax - xMin));
 			//console.log("32 = ", tag.advance[i-1]);
-			whiteSpaceWidth=tag.advance[i-1]/resolution;
+			whiteSpaceWidth = tag.advance[i - 1] / resolution;
 		}
 
+		tessFontTableAJS.setChar(code.toString(), glyphAdvance, null, null, false, idx, glyphPath);
 
-
-		tessFontTableAJS.setChar(code.toString(), glyphAdvance, null, null, false , idx, glyphPath);
-		
-	/*	var vertexBuffer=GraphicsFactoryFills.pathToAttributesBuffer(glyphPath, true);
+		/*	var vertexBuffer=GraphicsFactoryFills.pathToAttributesBuffer(glyphPath, true);
 		if(vertexBuffer){
 			//console.log("created glyph for ", String.fromCharCode(code))
 		}
 		else{
 			//console.log("failed to create glyph for ", String.fromCharCode(code))
 		}*/
-
 	}
 	//console.log("min-max x:", minx, maxx, "min-max y:", miny, maxy);
 	//console.log("FontTag.advanced = ", tag.advance.toString());
@@ -666,24 +662,22 @@ export function defineFont(tag: FontTag, ns:string):any {
 		var nPairs = kerning.length;
 		var searchRange = maxPower2(nPairs) * 2;
 		var kern =
-			'\x00\x00' + // version
-			'\x00\x01' + // nTables
-			'\x00\x00' + // subtable version
-			toString16(14 + (nPairs * 6)) + // length
-			'\x00\x01' + // coverage
+			"\x00\x00" + // version
+			"\x00\x01" + // nTables
+			"\x00\x00" + // subtable version
+			toString16(14 + nPairs * 6) + // length
+			"\x00\x01" + // coverage
 			toString16(nPairs) +
 			toString16(searchRange) +
 			toString16(logE(nPairs) / logE(2)) + // entrySelector
-			toString16((2 * nPairs) - searchRange) // rangeShift
-		;
+			toString16(2 * nPairs - searchRange); // rangeShift
 		var i = 0;
 		var record;
 		while ((record = kerning[i++])) {
 			kern +=
 				toString16(glyphIndex[record.code1]) + // left
 				toString16(glyphIndex[record.code2]) + // right
-				toString16(record.adjustment) // value
-			;
+				toString16(record.adjustment); // value
 		}
 		//tables['kern'] = kern;
 	}
@@ -803,12 +797,11 @@ export function defineFont(tag: FontTag, ns:string):any {
 	//font.metrics = metrics;
 	//font.data = dataBuffer;
 	tessFontTableAJS.set_font_em_size(1024);
-	
+
 	// whitespace can't be a 0, not overide it
-	if(whiteSpaceWidth){
+	if (whiteSpaceWidth) {
 		tessFontTableAJS.set_whitespace_width(whiteSpaceWidth);
 	}
 
 	return font;
 }
-
