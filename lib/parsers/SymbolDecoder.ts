@@ -1,5 +1,6 @@
 import { 
     Billboard, 
+	Font, 
     IFilter, 
     ISceneGraphFactory, 
     MorphSprite, 
@@ -81,7 +82,6 @@ const TF_ALIGNS: string[] = [
 
 export class SymbolDecoder {
 
-    private static _globalFontsCache: StringMap<ISymbol> = {};
     private _awaySymbols: NumberMap<IAsset> = {};
     private _buttonIds: NumberMap<boolean> = {};
     private _mcIds: NumberMap<boolean> = {};
@@ -115,15 +115,7 @@ export class SymbolDecoder {
     }
 
     private _createFont(symbol: IFontSymbol, target?: any, name?: string): IAsset {
-        const fullName = symbol.name + "_" + (symbol.fontStyleName || "");
-        
-        if(SymbolDecoder._globalFontsCache[fullName]) {
-            console.warn("[Symbol decoder] Collided font table:", fullName);
-            debugger;
-        }
-
-        SymbolDecoder._globalFontsCache[fullName] = symbol;
-        symbol.away.className = symbol.className;
+		symbol.away.className = symbol.className;
         return symbol as any;
     }
 
@@ -244,22 +236,24 @@ export class SymbolDecoder {
         */
     }
 
-    private _createLabel(symbol: ILabelSymbol, target?: any, name?: string): IAsset {        
+    private _createLabel(symbol: ILabelSymbol, target?: TextField, name?: string): IAsset {        
         target = target || this.factory.createTextField(symbol);
 
-        let font = null;
-        let invalid_font = false;
+        let font: IFontSymbol = null;
+        let fontExist = false;
         (<any>target).className = symbol.className;
         for (var r = 0; r < symbol.records.length; r++) {
             var record: any = symbol.records[r];
             if (record.fontId) {
-                font = this.reqursive ?  this.createAwaySymbol(record.fontId) : this._awaySymbols[record.fontId];
-                if (font) {
+                font = this.reqursive ?  (this.createAwaySymbol(record.fontId) as any) : this._awaySymbols[record.fontId];
 
+				if (font) {
                     //awayText.textFormat.font=font.away;
-                    record.font_table = <TesselatedFontTable>font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType);
-                    if (!record.font_table) {
-                        invalid_font = true;
+					record.font = font;
+					record.font_table = <TesselatedFontTable>font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType);
+					
+					if (!record.font_table) {
+                        fontExist = true;
                         console.log("no font_table set");
                     }
                     //record.font_table=font.away.font_styles[0];
@@ -273,7 +267,7 @@ export class SymbolDecoder {
         target.width = (symbol.fillBounds.xMax / 20 - symbol.fillBounds.xMin / 20) - 1;
         target.height = (symbol.fillBounds.yMax / 20 - symbol.fillBounds.yMin / 20) - 1;
         
-        if (!invalid_font) {
+        if (!fontExist) {
             target.setLabelData(symbol);
         }
 
@@ -399,7 +393,7 @@ export class SymbolDecoder {
             }
             case SYMBOL_TYPE.LABEL:
             {
-                asset = this._createLabel(symbol as ILabelSymbol, target, name);
+                asset = this._createLabel(symbol as ILabelSymbol, target as TextField, name);
                 break;
             }
             case SYMBOL_TYPE.IMAGE:
