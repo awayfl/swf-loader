@@ -1097,7 +1097,7 @@ function parseVideoFrameTag(stream: Stream, swfVersion: number,
   return tag;
 }
 
-export var tagHandlers: any = {
+export var tagHandlers: {[key:number]: (...args: any[]) => any} = {
   /* End */                            0: undefined,
   /* ShowFrame */                      1: undefined,
   /* DefineShape */                    2: parseDefineShapeTag,

@@ -1,5 +1,5 @@
 
-import { Bbox, Shape} from "@awayjs/graphics";
+import { Bbox, Shape, ShapeTag} from "@awayjs/graphics";
 import { SWFFrame } from "./SWFFrame";
 import { UnparsedTag } from "@awayjs/graphics";
 import { TextTag, BinaryDataTag, VideoStreamTag, FontTag } from "../factories/base/SWFTags";
@@ -27,7 +27,7 @@ export interface ISymbol extends UnparsedTag {
 	tag: any;
 }
 
-export interface IShapeSymbol extends ISymbol {
+export interface IShapeSymbol extends ISymbol, ShapeTag {
 	shape?: Shape & {className: string, };
 }
 

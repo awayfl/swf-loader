@@ -19,6 +19,8 @@ import {MorphSprite} from "@awayjs/scene"
 import {ShapeTag} from "@awayjs/graphics";
 
 import { SWFParser } from '../../SWFParser';
+import { ShapeFlags } from '../../../factories/base/SWFTags';
+import { SYMBOL_TYPE } from '../../ISymbol';
 
 /*
  * Applies the current segment1 to the paths of all styles specified in the last
@@ -67,24 +69,12 @@ function applySegmentToStyles(segment1: PathSegment, styles,
 export function defineShape(tag: ShapeTag, parser:SWFParser):any {
 	//console.log(fillPaths, linePaths);
 
-	tag.parser = parser;
-	//var shape = convertRecordsToShapeData(tag.records, tag.fillStyles, tag.lineStyles, tag.recordsMorph || null, parser);
-	var shape = new Graphics();
-	//shape.convertRecordsToShapeData(tag);
-	shape.queueShapeTag(tag);
+	const isMorph = tag.flags & ShapeFlags.IsMorph;
 
-	return {
-		type: tag.recordsMorph ? 'morphshape' : 'shape',
-		id: tag.id,
-		fillBounds: tag.fillBounds,
-		lineBounds: tag.lineBounds,
-		morphFillBounds: tag.fillBoundsMorph || null,
-		morphLineBounds: tag.lineBoundsMorph || null,
-		shape: tag.recordsMorph ? new MorphSprite(shape) : shape,//.toPlainObject(),
-		//shape_swf: shape.toPlainObject(),
-		//transferables: shape.buffers,
-		require: null
-	};
+	tag.parser = parser;
+	(tag as any).type = isMorph ? SYMBOL_TYPE.MORPH : SYMBOL_TYPE.SHAPE
+
+	return tag;
 }
 
 // function writeLineStyle(style: ShapeStyle, shape: ShapeData): void {

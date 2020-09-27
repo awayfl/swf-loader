@@ -103,15 +103,17 @@ export class SymbolDecoder {
 
     private _createShape(symbol: IShapeSymbol, target?: Shape, name?: string): IAsset {
         
-        const sh = symbol as IShapeSymbol;
-        //console.warn("Warning: SWF contains shapetweening!!!");
-        //symbol.shape.name = symbol.id;
-        sh.shape.name = name ||  "AwayJS_shape_" + symbol.id.toString();
-        sh.shape.className = symbol.className;
+		const shape = new Graphics();
+		shape.queueShapeTag(symbol);
+	
+        shape.name = name ||  "AwayJS_shape_" + symbol.id.toString();
+		(shape as any).className = symbol.className;
+		
+		if(symbol.type === SYMBOL_TYPE.MORPH) {
+			return new MorphSprite(shape);
+		}
 
-        return sh.shape;
-        //this._awaySymbols[dictionary[i].id] = sh.shape;
-        //assetsToFinalize[dictionary[i].id] = sh.shape;
+        return shape;
     }
 
     private _createFont(symbol: IFontSymbol, target?: any, name?: string): IAsset {
@@ -358,12 +360,12 @@ export class SymbolDecoder {
         switch (symbol.type) {
             case SYMBOL_TYPE.MORPH:
             {
-                asset = this._createShape(symbol, target as Shape, name || "AwayJS_morphshape_" + symbol.id.toString());
+                asset = this._createShape(symbol as IShapeSymbol, target as Shape, name || "AwayJS_morphshape_" + symbol.id.toString());
                 break;
             }
             case SYMBOL_TYPE.SHAPE:
             {
-                asset = this._createShape(symbol, target as Shape, name);
+                asset = this._createShape(symbol as IShapeSymbol, target as Shape, name);
                 break;
             }
             case SYMBOL_TYPE.FONT:
