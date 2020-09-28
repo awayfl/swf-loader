@@ -1095,7 +1095,7 @@ export class SWFParser extends ParserBase {
 				let scaleGridtag=this.getParsedTag(tag);
 				let unparsedSymbol=this.dictionary[scaleGridtag.symbolId];
 				(<any>unparsedSymbol).scalingGrid=scaleGridtag.splitter;
-				console.log("scaleGridtag", scaleGridtag, symbol);
+				//console.log("scaleGridtag", scaleGridtag, symbol);
 				break;
 			case SwfTagCode.CODE_DEFINE_BUTTON_CXFORM:
 			case SwfTagCode.CODE_DEFINE_FONT_INFO:
