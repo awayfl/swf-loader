@@ -101,9 +101,15 @@ export class SymbolDecoder {
         return this._awaySymbols;
     }
 
-    private _createShape(symbol: IShapeSymbol, target?: Shape, name?: string): IAsset {
+    private _createShape(symbol: IShapeSymbol & {lazyParser:() => any}, target?: Shape, name?: string): IAsset {
         
 		const shape = new Graphics();
+
+		/*
+		if(symbol.lazyParser) {
+			symbol.lazyParser();
+		}*/
+
 		shape.queueShapeTag(symbol);
 	
         shape.name = name ||  "AwayJS_shape_" + symbol.id.toString();

@@ -820,19 +820,50 @@ export function parseDefineSceneTag(stream: Stream, tagCode: number): SceneTag {
   return tag;
 }
 
-function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number): ShapeTag {
-  var tag: ShapeTag = <any>{ code: tagCode };
+function parseDefineShapeTagLazy(stream: Stream, tag: ShapeTag, swfVersion: number): ShapeTag {
+	const canHaveStrokes = 
+		tag.code === SwfTagCode.CODE_DEFINE_SHAPE4 || 
+		tag.code === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
+
+	const isMorph = !!(tag.flags & ShapeFlags.IsMorph);
+
+	tag.fillStyles = parseFillStyles(stream, swfVersion, tag.code, isMorph);
+	tag.lineStyles = parseLineStyles(stream, swfVersion, tag.code, isMorph, canHaveStrokes);
+	stream.align();
+
+	let fillBits = stream.readUb(4);
+	let lineBits = stream.readUb(4);
+
+	tag.records = parseShapeRecords(stream, swfVersion, tag.code, isMorph, fillBits, lineBits, canHaveStrokes);
+
+	if (isMorph) {
+		stream.align();
+		fillBits = stream.readUb(4);
+		lineBits = stream.readUb(4);
+		tag.recordsMorph = parseShapeRecords(stream, swfVersion, tag.code, isMorph, fillBits, lineBits, canHaveStrokes);
+	}
+
+	return tag;
+}
+
+function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number, tagEnd: number): ShapeTag {
+  const tag: ShapeTag = <any>{ code: tagCode };
+  let flags = 0;
+ 
   tag.id = stream.readUi16();
   tag.lineBounds = parseBbox(stream);
-  var flags = 0;
-  var isMorph = tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE ||
+   
+  const isMorph = tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE ||
       tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
-  if (isMorph) {
+  
+   if (isMorph) {
     flags |= ShapeFlags.IsMorph;
     tag.lineBoundsMorph = parseBbox(stream);
   }
-  var canHaveStrokes = tagCode === SwfTagCode.CODE_DEFINE_SHAPE4 ||
-      tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
+  
+  const canHaveStrokes = tagCode === SwfTagCode.CODE_DEFINE_SHAPE4 ||
+	  tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
+
   if (canHaveStrokes) {
     var fillBounds = tag.fillBounds = parseBbox(stream);
     if (isMorph) {
@@ -840,22 +871,22 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
     }
     flags |= stream.readUi8() & 0x07;
   }
+
   tag.flags = flags;
+
   if (isMorph) {
     stream.pos += 4;
   }
-  tag.fillStyles = parseFillStyles(stream, swfVersion, tagCode, isMorph);
-  tag.lineStyles = parseLineStyles(stream, swfVersion, tagCode, isMorph, canHaveStrokes);
-  stream.align();
-  var fillBits = stream.readUb(4);
-  var lineBits = stream.readUb(4);
-  tag.records = parseShapeRecords(stream, swfVersion, tagCode, isMorph, fillBits, lineBits, canHaveStrokes);
-  if (isMorph) {
-    stream.align();
-    fillBits = stream.readUb(4);
-    lineBits = stream.readUb(4);
-    tag.recordsMorph = parseShapeRecords(stream, swfVersion, tagCode, isMorph, fillBits, lineBits, canHaveStrokes);
+
+  const sub = stream.substream(stream.pos, stream.end);
+  
+  tag.lazyParser = () =>  {
+	  delete tag.lazyParser;
+	  return parseDefineShapeTagLazy(sub, tag, swfVersion);
   }
+
+  stream.pos = tagEnd;
+
   return tag;
 }
 
