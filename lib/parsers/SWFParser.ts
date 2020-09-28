@@ -653,6 +653,8 @@ export class SWFParser extends ParserBase {
 		if(this._buttonSounds[symbol.id]) {
 			(<IButtonSymbol>symbol).buttonSounds = this._buttonSounds[symbol.id];
 		}
+		if((<any>unparsed).scalingGrid)
+			symbol.scalingGrid=(<any>unparsed).scalingGrid;
 
 		return symbol;
 	}
@@ -1089,10 +1091,15 @@ export class SWFParser extends ParserBase {
 				stream.pos = tagEnd;
 
 				break;
+			case SwfTagCode.CODE_DEFINE_SCALING_GRID:
+				let scaleGridtag=this.getParsedTag(tag);
+				let unparsedSymbol=this.dictionary[scaleGridtag.symbolId];
+				(<any>unparsedSymbol).scalingGrid=scaleGridtag.splitter;
+				//console.log("scaleGridtag", scaleGridtag, symbol);
+				break;
 			case SwfTagCode.CODE_DEFINE_BUTTON_CXFORM:
 			case SwfTagCode.CODE_DEFINE_FONT_INFO:
 			case SwfTagCode.CODE_DEFINE_FONT_INFO2:
-			case SwfTagCode.CODE_DEFINE_SCALING_GRID:
 			case SwfTagCode.CODE_IMPORT_ASSETS:
 			case SwfTagCode.CODE_IMPORT_ASSETS2:
 				//console.log('Unsupported tag encountered ' + tagCode + ': ' + getSwfTagCodeName(tagCode));
