@@ -25,6 +25,7 @@ export interface ISymbol extends UnparsedTag {
 	type: SYMBOL_TYPE;
 	away: any;
 	tag: any;
+	scalingGrid?: any;
 }
 
 export interface IShapeSymbol extends ISymbol {
