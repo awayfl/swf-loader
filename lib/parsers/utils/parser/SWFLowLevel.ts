@@ -847,7 +847,7 @@ function parseDefineShapeTagLazy(stream: Stream, tag: ShapeTag, swfVersion: numb
 }
 
 function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number, tagEnd: number): ShapeTag {
-  const tag: ShapeTag = <any>{ code: tagCode };
+  const tag: ShapeTag = <any>{ code: tagCode, needParse: true };
   let flags = 0;
  
   tag.id = stream.readUi16();
@@ -880,9 +880,10 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 
   const sub = stream.substream(stream.pos, stream.end);
   
-  tag.lazyParser = () =>  {
-	  delete tag.lazyParser;
-	  return parseDefineShapeTagLazy(sub, tag, swfVersion);
+  tag.lazyParser = function() {
+	  this.needParse = false;
+	  this.lazyParser = () => this;
+	  return parseDefineShapeTagLazy(sub, this, swfVersion);
   }
 
   stream.pos = tagEnd;

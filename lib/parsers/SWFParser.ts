@@ -1439,8 +1439,8 @@ function readSWFLength(bytes: Uint8Array) {
 }
 
 function defineSymbol(swfTag, symbols, parser) {
-	
-	const d = Stat.rec('parser').rec('symbols').rec('define');
+	const noRec = true;
+	const d = noRec ?  null : Stat.rec('parser').rec('symbols').rec('define');
 	let rec;
 	let ret;
 
@@ -1450,31 +1450,43 @@ function defineSymbol(swfTag, symbols, parser) {
 		case SwfTagCode.CODE_DEFINE_BITS_JPEG3:
 		case SwfTagCode.CODE_DEFINE_BITS_JPEG4: 
 		{
-			rec = d.rec('image')
-			rec.begin();
+			if(!noRec){ 
+				rec = d.rec('image');
+				rec.begin(); 
+			}
+
 			ret = defineImage(swfTag);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_BITS_LOSSLESS:
 		case SwfTagCode.CODE_DEFINE_BITS_LOSSLESS2:
 		{
-			rec = d.rec('bitmap')
-			rec.begin();
+			if(!noRec){ 
+				rec = d.rec('bitmap');
+				rec.begin(); 
+			}
+			
 			ret = defineBitmap(swfTag);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_BUTTON:
 		case SwfTagCode.CODE_DEFINE_BUTTON2:
 		{
-			rec = d.rec('button')
-			rec.begin();
+			if(!noRec){ 
+				rec = d.rec('button');
+				rec.begin(); 
+			}
+
 			ret = defineButton(swfTag, symbols);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_EDIT_TEXT:
 		{
-			rec = d.rec('text')
-			rec.begin();
+			if(!noRec) {
+				rec = d.rec('text')
+				rec.begin();
+			}
+
 			ret = defineText(swfTag);
 			break;
 		}
@@ -1483,8 +1495,10 @@ function defineSymbol(swfTag, symbols, parser) {
 		case SwfTagCode.CODE_DEFINE_FONT3:
 		case SwfTagCode.CODE_DEFINE_FONT4:
 		{
-			rec = d.rec('font')
-			rec.begin();
+			if(!noRec){
+				rec = d.rec('font')
+				rec.begin();
+			}
 			ret = defineFont(swfTag, (<SWFParser>parser)._iFileName);
 			break;
 		}
@@ -1495,15 +1509,21 @@ function defineSymbol(swfTag, symbols, parser) {
 		case SwfTagCode.CODE_DEFINE_SHAPE3:
 		case SwfTagCode.CODE_DEFINE_SHAPE4:
 		{
-			rec = d.rec('shape')
-			rec.begin();
+			if(!noRec){
+				rec = d.rec('shape')
+				rec.begin();
+			}
+
 			ret = defineShape(swfTag, parser);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_SOUND:
 		{
-			rec = d.rec('sound')
-			rec.begin();
+			if(!noRec){
+				rec = d.rec('sound')
+				rec.begin();
+			}
+
 			ret = defineSound(swfTag);
 			break;
 		}
@@ -1529,8 +1549,11 @@ function defineSymbol(swfTag, symbols, parser) {
 		case SwfTagCode.CODE_DEFINE_TEXT:
 		case SwfTagCode.CODE_DEFINE_TEXT2:
 		{
-			rec = d.rec('label')
-			rec.begin();			
+			if(!noRec) {
+				rec = d.rec('label')
+				rec.begin();
+			}
+
 			ret = defineLabel(swfTag);
 			break;
 		}
@@ -1539,7 +1562,7 @@ function defineSymbol(swfTag, symbols, parser) {
 			return swfTag;
 	}
 
-	rec.end();
+	noRec || rec.end();
 	return ret;
 }
 

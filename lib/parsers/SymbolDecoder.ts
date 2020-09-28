@@ -291,18 +291,29 @@ export class SymbolDecoder {
 
     private _createImage(symbol: IImageSymbol, target?: BitmapImage2D, name?: string): IAsset 
     {
-        target = target || (<BitmapImage2D>this.parser.awayUnresolvedSymbols[symbol.id]);
-     
-        if (!target && symbol.definition) {
-            const def = symbol.definition;
-            target = new BitmapImage2D(def.width, def.height, true, 0xff0000, false);
-            if (def.data.length != (4 * def.width * def.height)
+		const useLazy = true;
+
+		target = target || (<BitmapImage2D>this.parser.awayUnresolvedSymbols[symbol.id]);
+
+		if (!target && symbol.definition) {
+			const def = symbol.definition;
+
+			target = new BitmapImage2D(def.width, def.height, true, null, false);
+			target.addLazySymbol(symbol);
+
+			if(!useLazy) {
+				target.applySymbol();
+			}
+
+			/*
+			if (def.data.length != (4 * def.width * def.height)
                 && def.data.length != (3 * def.width * def.height)) 
             {
                 def.data = new Uint8ClampedArray(4 * def.width * def.height);
                 //symbol.definition.data.fill
             }
-            target.setPixels(new Rectangle(0, 0, def.width, def.height), def.data);
+			target.setPixels(new Rectangle(0, 0, def.width, def.height), def.data);
+			*/
         }
         if (target) {
 
@@ -330,7 +341,7 @@ export class SymbolDecoder {
 
     public _createVideo(symbol: IVideoSymbol, target: any, name?: string): IAsset {
         const dummyVideo = new BitmapImage2D(symbol.width, symbol.height, false, 0x00ff00, false);
-        dummyVideo._symbol = symbol;
+        dummyVideo._symbol = symbol as any;
 
         (<any>dummyVideo).className = this.parser.symbolClassesMap[symbol.id] ? this.parser.symbolClassesMap[symbol.id] : symbol.className;
         dummyVideo.name = (<any>dummyVideo).className;

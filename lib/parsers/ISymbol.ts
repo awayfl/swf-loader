@@ -56,7 +56,9 @@ export interface IImageSymbol extends ISymbol {
 		width: number;
 		height: number;
 		data: Uint8ClampedArray;
-	}
+	},
+	needParse: boolean,
+	lazyParser: () => IImageSymbol;
 }
 
 export interface IBinarySymbol extends BinaryDataTag, ISymbol {};
