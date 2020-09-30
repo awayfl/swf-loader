@@ -169,35 +169,51 @@ export function defineBitmap(tag: BitmapTag): {definition: ImageDefinition; type
  // enterTimeline("defineBitmap");
   var data: Uint8ClampedArray;
   var type = ImageType.None;
+  var parserMethod: (tag) => Uint8ClampedArray;
+
   switch (tag.format) {
     case BitmapFormat.FORMAT_COLORMAPPED:
-      data = parseColorMapped(tag);
+	  parserMethod = parseColorMapped;
+	  //data = parseColorMapped(tag);
       type = ImageType.PremultipliedAlphaARGB;
       break;
     case BitmapFormat.FORMAT_24BPP:
-      data = parse24BPP(tag);
+	  parserMethod = parse24BPP;
+	  //data = parse24BPP(tag);
       type = ImageType.PremultipliedAlphaARGB;
       break;
     case BitmapFormat.FORMAT_15BPP:
-      data = parse15BPP(tag);
+	  parserMethod = parse15BPP;
+	  //data = parse15BPP(tag);
       type = ImageType.PremultipliedAlphaARGB;
       break;
     default:
       console.log('invalid bitmap format');
   }
+
   //leaveTimeline();
-  return {
+  const def =  {
     definition: {
       type: 'image',
       id: tag.id,
       width: tag.width,
       height: tag.height,
       mimeType: 'application/octet-stream',
-      data: data,
+      data: null,
       dataType: type,
       image: null
-    },
+	},
+	needParse: true,
+	lazyParser () {
+		this.needParse = false;
+		this.definition.data = parserMethod(tag);
+
+		this.lazyParser = () => this;
+		return def;
+	},
     type: 'image',
     id: tag.id,
   };
+
+  return def;
 }

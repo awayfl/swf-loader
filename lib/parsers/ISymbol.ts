@@ -1,5 +1,5 @@
 
-import { Bbox, Shape} from "@awayjs/graphics";
+import { Bbox, Shape, ShapeTag} from "@awayjs/graphics";
 import { SWFFrame } from "./SWFFrame";
 import { UnparsedTag } from "@awayjs/graphics";
 import { TextTag, BinaryDataTag, VideoStreamTag, FontTag } from "../factories/base/SWFTags";
@@ -28,7 +28,7 @@ export interface ISymbol extends UnparsedTag {
 	scalingGrid?: any;
 }
 
-export interface IShapeSymbol extends ISymbol {
+export interface IShapeSymbol extends ISymbol, ShapeTag {
 	shape?: Shape & {className: string, };
 }
 
@@ -57,7 +57,9 @@ export interface IImageSymbol extends ISymbol {
 		width: number;
 		height: number;
 		data: Uint8ClampedArray;
-	}
+	},
+	needParse: boolean,
+	lazyParser: () => IImageSymbol;
 }
 
 export interface IBinarySymbol extends BinaryDataTag, ISymbol {};

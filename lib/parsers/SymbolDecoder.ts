@@ -101,17 +101,25 @@ export class SymbolDecoder {
         return this._awaySymbols;
     }
 
-    private _createShape(symbol: IShapeSymbol, target?: Shape, name?: string): IAsset {
+    private _createShape(symbol: IShapeSymbol & {lazyParser:() => any}, target?: Shape, name?: string): IAsset {
         
-        const sh = symbol as IShapeSymbol;
-        //console.warn("Warning: SWF contains shapetweening!!!");
-        //symbol.shape.name = symbol.id;
-        sh.shape.name = name ||  "AwayJS_shape_" + symbol.id.toString();
-        sh.shape.className = symbol.className;
+		const shape = new Graphics();
 
-        return sh.shape;
-        //this._awaySymbols[dictionary[i].id] = sh.shape;
-        //assetsToFinalize[dictionary[i].id] = sh.shape;
+		/*
+		if(symbol.lazyParser) {
+			symbol.lazyParser();
+		}*/
+
+		shape.queueShapeTag(symbol);
+	
+        shape.name = name ||  "AwayJS_shape_" + symbol.id.toString();
+		(shape as any).className = symbol.className;
+		
+		if(symbol.type === SYMBOL_TYPE.MORPH) {
+			return new MorphSprite(shape);
+		}
+
+        return shape;
     }
 
     private _createFont(symbol: IFontSymbol, target?: any, name?: string): IAsset {
@@ -289,18 +297,29 @@ export class SymbolDecoder {
 
     private _createImage(symbol: IImageSymbol, target?: BitmapImage2D, name?: string): IAsset 
     {
-        target = target || (<BitmapImage2D>this.parser.awayUnresolvedSymbols[symbol.id]);
-     
-        if (!target && symbol.definition) {
-            const def = symbol.definition;
-            target = new BitmapImage2D(def.width, def.height, true, 0xff0000, false);
-            if (def.data.length != (4 * def.width * def.height)
+		const useLazy = true;
+
+		target = target || (<BitmapImage2D>this.parser.awayUnresolvedSymbols[symbol.id]);
+
+		if (!target && symbol.definition) {
+			const def = symbol.definition;
+
+			target = new BitmapImage2D(def.width, def.height, true, null, false);
+			target.addLazySymbol(symbol);
+
+			if(!useLazy) {
+				target.applySymbol();
+			}
+
+			/*
+			if (def.data.length != (4 * def.width * def.height)
                 && def.data.length != (3 * def.width * def.height)) 
             {
                 def.data = new Uint8ClampedArray(4 * def.width * def.height);
                 //symbol.definition.data.fill
             }
-            target.setPixels(new Rectangle(0, 0, def.width, def.height), def.data);
+			target.setPixels(new Rectangle(0, 0, def.width, def.height), def.data);
+			*/
         }
         if (target) {
 
@@ -328,7 +347,7 @@ export class SymbolDecoder {
 
     public _createVideo(symbol: IVideoSymbol, target: any, name?: string): IAsset {
         const dummyVideo = new BitmapImage2D(symbol.width, symbol.height, false, 0x00ff00, false);
-        dummyVideo._symbol = symbol;
+        dummyVideo._symbol = symbol as any;
 
         (<any>dummyVideo).className = this.parser.symbolClassesMap[symbol.id] ? this.parser.symbolClassesMap[symbol.id] : symbol.className;
         dummyVideo.name = (<any>dummyVideo).className;
@@ -364,12 +383,12 @@ export class SymbolDecoder {
         switch (symbol.type) {
             case SYMBOL_TYPE.MORPH:
             {
-                asset = this._createShape(symbol, target as Shape, name || "AwayJS_morphshape_" + symbol.id.toString());
+                asset = this._createShape(symbol as IShapeSymbol, target as Shape, name || "AwayJS_morphshape_" + symbol.id.toString());
                 break;
             }
             case SYMBOL_TYPE.SHAPE:
             {
-                asset = this._createShape(symbol, target as Shape, name);
+                asset = this._createShape(symbol as IShapeSymbol, target as Shape, name);
                 break;
             }
             case SYMBOL_TYPE.FONT:
