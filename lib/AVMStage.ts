@@ -14,7 +14,11 @@ import { AVMEvent } from './AVMEvent';
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
 import { AVMTestHandler } from './AVMTestHandler';
 
-
+export const enum StageDisplayState {
+	FULL_SCREEN = 'fullScreen',
+	FULL_SCREEN_INTERACTIVE = 'fullScreenInteractive',
+	NORMAL = 'normal',
+}
 
 export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
@@ -41,7 +45,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	private _projection: PerspectiveProjection;
 	private _scene: Scene;
 	private _rendererStage: Stage;
-	
+	private _displayState: StageDisplayState;
+
 	private _x: any;
 	private _y: any;
 	private _w: any;
@@ -131,6 +136,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this.avmTestHandler=new AVMTestHandler(this._gameConfig.testConfig, this);
 		}
 
+		document.addEventListener('fullscreenchange', this.onFullscreenChanged.bind(this));
 	}
 	public get config():IGameConfig{
 		return this._gameConfig;
@@ -138,6 +144,35 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	public registerAVMStageHandler(value: IAVMHandler) {
 		this._avmHandlers[value.avmVersion] = value;
+	}
+
+	public set displayState(v: StageDisplayState) {
+
+		switch(v) {
+			case StageDisplayState.FULL_SCREEN_INTERACTIVE:
+			case StageDisplayState.FULL_SCREEN:
+				if(Element.prototype.requestFullscreen) {
+					document.body.requestFullscreen().then(()=>{
+						this._displayState = v;
+					})
+				}
+				break;
+			default:
+				this._displayState = v;
+				if(document.fullscreenEnabled) { 
+					document.exitFullscreen();
+				}
+		}
+	}
+
+	public get displayState() {
+		return this._displayState;
+	}
+
+	private onFullscreenChanged(e) {
+		if(!document.fullscreenEnabled) {
+			 this._displayState = StageDisplayState.NORMAL;
+		}
 	}
 
 	private initAwayEninge() {
