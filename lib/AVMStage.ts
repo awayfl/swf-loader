@@ -147,6 +147,10 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public set displayState(v: StageDisplayState) {
+		if(!document.fullscreenEnabled) {
+			this._displayState  = StageDisplayState.NORMAL;
+			return;
+		}
 
 		switch(v) {
 			case StageDisplayState.FULL_SCREEN_INTERACTIVE:
@@ -159,7 +163,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 				break;
 			default:
 				this._displayState = v;
-				if(document.fullscreenEnabled) { 
+				if(document.fullscreenElement) { 
 					document.exitFullscreen();
 				}
 		}
@@ -170,7 +174,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	private onFullscreenChanged(e) {
-		if(!document.fullscreenEnabled) {
+		if(!document.fullscreenElement) {
 			 this._displayState = StageDisplayState.NORMAL;
 		}
 	}
