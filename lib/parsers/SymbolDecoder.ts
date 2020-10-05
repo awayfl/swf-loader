@@ -677,8 +677,9 @@ export class SymbolDecoder {
                     fl_len = swfFrames[i].labelNames.length;
                     for (fl = 0; fl < fl_len; fl++) {
                         labelName = swfFrames[i].labelNames[fl];
-                        let originalLabelName = labelName;
-                        if (this.parser.swfFile.swfVersion <= 9) {
+						let originalLabelName = labelName;
+						
+                        if (this.parser.swfFile.useAVM1) {
                             labelName = labelName.toLowerCase();
                         }
                         if (!awayTimeline._labels[labelName])
