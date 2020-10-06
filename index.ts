@@ -14,6 +14,7 @@ export {
   globalRedirectRules,
   matchRedirect,
 } from "./lib/redirectResolver";
+export { SWFABCExtractor } from "./lib/parsers/SWFABCExtractor";
 export { SWFParser } from "./lib/parsers/SWFParser";
 
 export {
