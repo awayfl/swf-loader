@@ -1,4 +1,4 @@
-console.debug("AwayFL - SWF-Loader - 0.4.59");
+console.debug("AwayFL - SWF-Loader - 0.4.60");
 
 export { SWFFile } from "./lib/parsers/SWFFile";
 
