@@ -1,4 +1,4 @@
-console.debug("AwayFL - SWF-Loader - 0.4.58");
+console.debug("AwayFL - SWF-Loader - 0.4.60");
 
 export { SWFFile } from "./lib/parsers/SWFFile";
 
@@ -14,6 +14,7 @@ export {
   globalRedirectRules,
   matchRedirect,
 } from "./lib/redirectResolver";
+export { SWFABCExtractor } from "./lib/parsers/SWFABCExtractor";
 export { SWFParser } from "./lib/parsers/SWFParser";
 
 export {
