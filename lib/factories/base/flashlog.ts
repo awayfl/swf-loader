@@ -17,7 +17,7 @@
 // Produces similar output as flashlog.txt It can be produced by the
 // debug builds of Flash Player.
 // See https://github.com/mozilla/shumway/wiki/Trace-Output-with-Flash-Player-Debugger
-import {abstractMethod} from "./utilities/Debug";
+import { abstractMethod } from './utilities/Debug';
 
 export class FlashLog {
 	public isAS3TraceOn: boolean = true;
@@ -44,4 +44,3 @@ export class FlashLog {
 }
 
 export var flashlog: FlashLog = null;
-

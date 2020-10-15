@@ -1,14 +1,14 @@
 
-import { AssetEvent, LoaderEvent, AssetLibrary, URLRequest, URLLoaderEvent, RequestAnimationFrame, AudioManager, PerspectiveProjection, CoordinateSystem, ColorUtils, Loader, WaveAudioParser } from "@awayjs/core"
-import { SWFParser } from "./parsers/SWFParser"
-import { IAVMHandler } from "./IAVMHandler";
-import { SWFFile } from "./parsers/SWFFile";
-import { StageAlign } from "./factories/as3webFlash/display/StageAlign";
-import { StageScaleMode } from "./factories/as3webFlash/display/StageScaleMode";
-import { Scene, Camera, DisplayObjectContainer, SceneGraphPartition, MovieClip, FrameScriptManager } from "@awayjs/scene";
-import { BasicPartition } from "@awayjs/view";
-import { Stage, BitmapImage2D, Image2DParser } from "@awayjs/stage";
-import { IAVMStage } from "./IAVMStage";
+import { AssetEvent, LoaderEvent, AssetLibrary, URLRequest, URLLoaderEvent, RequestAnimationFrame, AudioManager, PerspectiveProjection, CoordinateSystem, ColorUtils, Loader, WaveAudioParser } from '@awayjs/core';
+import { SWFParser } from './parsers/SWFParser';
+import { IAVMHandler } from './IAVMHandler';
+import { SWFFile } from './parsers/SWFFile';
+import { StageAlign } from './factories/as3webFlash/display/StageAlign';
+import { StageScaleMode } from './factories/as3webFlash/display/StageScaleMode';
+import { Scene, Camera, DisplayObjectContainer, SceneGraphPartition, MovieClip, FrameScriptManager } from '@awayjs/scene';
+import { BasicPartition } from '@awayjs/view';
+import { Stage, BitmapImage2D, Image2DParser } from '@awayjs/stage';
+import { IAVMStage } from './IAVMStage';
 import { AVMVERSION } from './factories/base/AVMVersion';
 import { AVMEvent } from './AVMEvent';
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -24,7 +24,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	private _swfFile: SWFFile;
 	private _avmHandlers: StringMap<IAVMHandler>;
-	public avmTestHandler:AVMTestHandler;
+	public avmTestHandler: AVMTestHandler;
 	protected _avmHandler: IAVMHandler;
 	private _timer: RequestAnimationFrame;
 	private _time: number;
@@ -57,30 +57,29 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	protected _gameConfig: IGameConfig = null;
 	private _curFile: IResourceFile = null;
 
-	public static runtimeStartTime:number=0;
+	public static runtimeStartTime: number=0;
 
 	private static _instance: AVMStage = null;
-	public static instance():AVMStage
-	{
-		if(!AVMStage._instance)
-			throw("AVMStage._instance should exists but does not")
+	public static instance(): AVMStage {
+		if (!AVMStage._instance)
+			throw ('AVMStage._instance should exists but does not');
 		return AVMStage._instance;
 	}
 
-	public static forceINT:boolean = false;
+	public static forceINT: boolean = false;
 
-	constructor(gameConfig:IGameConfig) {
+	constructor(gameConfig: IGameConfig) {
 
 		super();
 
-		if(AVMStage._instance)
-			throw("Only one AVMStage is allowed to be constructed");
-			
+		if (AVMStage._instance)
+			throw ('Only one AVMStage is allowed to be constructed');
+
 		AVMStage._instance = this;
 
 		Loader.enableParsers([
 			WaveAudioParser, SWFParser, Image2DParser
-		])
+		]);
 
 		this._time = 0;
 		this._currentFps = 0;
@@ -93,29 +92,29 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._align = StageAlign.TOP_LEFT;
 		this._scaleModeAllowUpdate = true;
 		this._alignAllowUpdate = true;
-		if(gameConfig.stageScaleMode){
-			this._scaleMode=gameConfig.stageScaleMode;
+		if (gameConfig.stageScaleMode) {
+			this._scaleMode = gameConfig.stageScaleMode;
 			this._scaleModeAllowUpdate = false;
 		}
-		if(gameConfig.stageAlign){
-			this._align=gameConfig.stageAlign;
+		if (gameConfig.stageAlign) {
+			this._align = gameConfig.stageAlign;
 			this._alignAllowUpdate = false;
 		}
-		if(gameConfig.forceINT){
-			AVMStage.forceINT=gameConfig.forceINT;
+		if (gameConfig.forceINT) {
+			AVMStage.forceINT = gameConfig.forceINT;
 		}
 		this._frameRate = 30;
 		this._showFrameRate = false;
 		this._showFrameRateIntervalID = -1;
 
-		this._x=gameConfig.x?gameConfig.x:0;
-		this._y=gameConfig.y?gameConfig.y:0;
-		this._w=gameConfig.w?gameConfig.w:"100%";
-		this._h=gameConfig.h?gameConfig.h:"100%";
+		this._x = gameConfig.x ? gameConfig.x : 0;
+		this._y = gameConfig.y ? gameConfig.y : 0;
+		this._w = gameConfig.w ? gameConfig.w : '100%';
+		this._h = gameConfig.h ? gameConfig.h : '100%';
 
-		this._isPaused=false;
+		this._isPaused = false;
 
-		this._gameConfig=gameConfig;
+		this._gameConfig = gameConfig;
 
 		// init awayengine
 		this.initAwayEninge();
@@ -125,20 +124,21 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 		// resize event listens on window
 		this._resizeCallbackDelegate = (event: any) => this.resizeCallback(event);
-		window.addEventListener("resize", this._resizeCallbackDelegate);
+		window.addEventListener('resize', this._resizeCallbackDelegate);
 
 		this._onLoaderStartDelegate = (event: LoaderEvent) => this.onLoaderStart(event);
 		this._onLoaderCompleteDelegate = (event: LoaderEvent) => this.onLoaderComplete(event);
 		this._onAssetCompleteDelegate = (event: AssetEvent) => this._onAssetComplete(event);
 		this._onLoadErrorDelegate = (event: URLLoaderEvent) => this._onLoadError(event);
 
-		if(this._gameConfig.testConfig){
-			this.avmTestHandler=new AVMTestHandler(this._gameConfig.testConfig, this);
+		if (this._gameConfig.testConfig) {
+			this.avmTestHandler = new AVMTestHandler(this._gameConfig.testConfig, this);
 		}
 
 		document.addEventListener('fullscreenchange', this.onFullscreenChanged.bind(this));
 	}
-	public get config():IGameConfig{
+
+	public get config(): IGameConfig {
 		return this._gameConfig;
 	}
 
@@ -147,23 +147,23 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public set displayState(v: StageDisplayState) {
-		if(!document.fullscreenEnabled) {
+		if (!document.fullscreenEnabled) {
 			this._displayState  = StageDisplayState.NORMAL;
 			return;
 		}
 
-		switch(v) {
+		switch (v) {
 			case StageDisplayState.FULL_SCREEN_INTERACTIVE:
 			case StageDisplayState.FULL_SCREEN:
-				if(Element.prototype.requestFullscreen) {
+				if (Element.prototype.requestFullscreen) {
 					document.body.requestFullscreen().then(()=>{
 						this._displayState = v;
-					})
+					});
 				}
 				break;
 			default:
 				this._displayState = v;
-				if(document.fullscreenElement) { 
+				if (document.fullscreenElement) {
 					document.exitFullscreen();
 				}
 		}
@@ -174,7 +174,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	private onFullscreenChanged(e) {
-		if(!document.fullscreenElement) {
+		if (!document.fullscreenElement) {
 			 this._displayState = StageDisplayState.NORMAL;
 		}
 	}
@@ -184,17 +184,17 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		//create the view
 		this._scene = new Scene(new BasicPartition(new DisplayObjectContainer()));
 		this._rendererStage = this.scene.view.stage;
-		this._rendererStage.container.style.visibility = "hidden";
+		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
 		this._scene.renderer.renderableSorter = null;//new RenderableSort2D();
 		this._scene.forceMouseMove = true;
-		this._scene.mousePicker.shapeFlag=true;
+		this._scene.mousePicker.shapeFlag = true;
 
 		this._projection = new PerspectiveProjection();
 		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
 		this._projection.originX = -1;
 		this._projection.originY = 1;
-		var camera: Camera = new Camera();
+		const camera: Camera = new Camera();
 		camera.projection = this._projection;
 		this._scene.camera = camera;
 		this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
@@ -204,44 +204,43 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	}
 
-	public playSWF(buffer:any, url:string) {
-		
-		this._gameConfig = {
-			files:[{data:buffer, path:url, resourceType:ResourceType.GAME}]
-		}
-		this.addEventListener(LoaderEvent.LOADER_COMPLETE, (e) => this.play());
-		this.loadNextResource();	
-	}
-	
-	public snapshot(callback:Function)
-	{
+	public playSWF(buffer: any, url: string) {
 
-		let myBitmap:BitmapImage2D=new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xffffffff, false);
+		this._gameConfig = {
+			files:[{ data:buffer, path:url, resourceType:ResourceType.GAME }]
+		};
+		this.addEventListener(LoaderEvent.LOADER_COMPLETE, (e) => this.play());
+		this.loadNextResource();
+	}
+
+	public snapshot(callback: Function) {
+
+		const myBitmap: BitmapImage2D = new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xffffffff, false);
 
 		this._scene.renderer.queueSnapshot(myBitmap);
 		this._scene.renderer.view.target = myBitmap;
 		this._scene.render();
-		this._scene.renderer.view.target = null	
+		this._scene.renderer.view.target = null;
 		myBitmap.invalidate();
 
 		// flip vertical:
 
-		let oldData=myBitmap.data;
-		let myBitmap2:BitmapImage2D=new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xff00ffff, false);
+		const oldData = myBitmap.data;
+		const myBitmap2: BitmapImage2D = new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xff00ffff, false);
 		let x = 0;
 		let y = 0;
-		let idx=0;
-		let color=0;
-		for (y = 0; y< this._stageHeight; y++) {
+		let idx = 0;
+		let color = 0;
+		for (y = 0; y < this._stageHeight; y++) {
 			for (x = 0; x < this._stageWidth; x++) {
-				idx=((this._stageHeight-1-y)*this._stageWidth+x)*4;
-				color=ColorUtils.ARGBtoFloat32(oldData[idx+3], oldData[idx], oldData[idx+1], oldData[idx+2]);
+				idx = ((this._stageHeight - 1 - y) * this._stageWidth + x) * 4;
+				color = ColorUtils.ARGBtoFloat32(oldData[idx + 3], oldData[idx], oldData[idx + 1], oldData[idx + 2]);
 				myBitmap2.setPixel32(x, y, color);
 			}
 		}
 
 		myBitmap2.invalidate();
-		let htmlCanvas:HTMLCanvasElement = document.createElement("canvas");
+		const htmlCanvas: HTMLCanvasElement = document.createElement('canvas');
 		htmlCanvas.width = myBitmap2.width;
 		htmlCanvas.height = myBitmap2.height;
 		/*htmlCanvas.style.position = "absolute";
@@ -249,24 +248,24 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		htmlCanvas.style.left = "0px";
 		htmlCanvas.style.width = "100%";*/
 
-		let context:CanvasRenderingContext2D = htmlCanvas.getContext("2d");
-		let imageData:ImageData = context.getImageData(0, 0, myBitmap2.width, myBitmap2.height);
+		const context: CanvasRenderingContext2D = htmlCanvas.getContext('2d');
+		const imageData: ImageData = context.getImageData(0, 0, myBitmap2.width, myBitmap2.height);
 		imageData.data.set(myBitmap2.data);
-		context.putImageData(imageData, 0, 0);	
+		context.putImageData(imageData, 0, 0);
 
-		if(callback)
+		if (callback)
 			callback(htmlCanvas);
-		
+
 	}
 
 	public loadNextResource(event: LoaderEvent = null) {
 		this._curFile = this._gameConfig.files.shift();
 		if (this._curFile) {
-			let parser = new SWFParser();
+			const parser = new SWFParser();
 			parser._iFileName = this._curFile.path;
 			if (this._curFile.resourceType == ResourceType.GAME) {
 				if (this._swfFile) {
-					throw "Only playing of 1 SWF file is supported at the moment";
+					throw 'Only playing of 1 SWF file is supported at the moment';
 				}
 				parser.onFactoryRequest = (swfFile) => {
 					this._swfFile = swfFile;
@@ -277,7 +276,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 					this.stageWidth = this._swfFile.bounds.width / 20;
 					this.stageHeight = this._swfFile.bounds.height / 20;
 
-					var avmName: AVMVERSION = this._swfFile.useAVM1 ? AVMVERSION.AVM1 : AVMVERSION.AVM2;
+					const avmName: AVMVERSION = this._swfFile.useAVM1 ? AVMVERSION.AVM1 : AVMVERSION.AVM2;
 
 					this._avmHandler = this._avmHandlers[avmName];
 
@@ -291,7 +290,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 					}
 
 					if (!this._avmHandler) {
-						throw ("no avm-handler installed for " + avmName);
+						throw ('no avm-handler installed for ' + avmName);
 					}
 					this._avmHandler.init(this, this._swfFile, (hasInit) => {
 						parser.factory = this._avmHandler.factory;
@@ -309,40 +308,42 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			AssetLibrary.addEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
 			if (this._curFile.data) {
 				AssetLibrary.loadData(this._curFile.data, null, this._curFile.path, parser);
-			}
-			else {
+			} else {
 				AssetLibrary.load(new URLRequest(this._curFile.path), null, this._curFile.path, parser);
 			}
-		}
-		else {
+		} else {
 			if (!this._swfFile) {
-				throw ("no valid SWFFile was loaded!");
+				throw ('no valid SWFFile was loaded!');
 			}
 			if (event) {
 				this.dispatchEvent(event);
 			}
 		}
 	}
+
 	public load() {
 		this.loadNextResource();
 	}
+
 	private _onLoaderStartDelegate: (event: LoaderEvent) => void;
 	public onLoaderStart(event: LoaderEvent) {
 		this.dispatchEvent(event);
 	}
+
 	private _onAssetCompleteDelegate: (event: AssetEvent) => void;
 	public _onAssetComplete(event: AssetEvent) {
 		// atm we only addAssets to avmHandler that come from the game swf
 		// preloaded files are fonts, and are handled by DefaultManager outside of SWF
-		if (this._curFile.resourceType == ResourceType.GAME){
-			
-			if(AVMStage.runtimeStartTime==0){
-				AVMStage.runtimeStartTime=Date.now();
+		if (this._curFile.resourceType == ResourceType.GAME) {
+
+			if (AVMStage.runtimeStartTime == 0) {
+				AVMStage.runtimeStartTime = Date.now();
 			}
 			this._avmHandler.addAsset(event.asset, true);
 		}
 		this.dispatchEvent(event);
 	}
+
 	private _onLoaderCompleteDelegate: (event: LoaderEvent) => void;
 	public onLoaderComplete(event: LoaderEvent) {
 		AssetLibrary.removeEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
@@ -350,12 +351,13 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		AssetLibrary.removeEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
 		this.loadNextResource(event);
 	}
+
 	private _onLoadErrorDelegate: (event: URLLoaderEvent) => void;
 	public _onLoadError(event: URLLoaderEvent) {
 		AssetLibrary.removeEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
 		AssetLibrary.removeEventListener(LoaderEvent.LOADER_COMPLETE, this._onLoaderCompleteDelegate);
 		AssetLibrary.removeEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
-		console.log("error loading swf");
+		console.log('error loading swf');
 		this.dispatchEvent(event);
 	}
 
@@ -365,9 +367,9 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._timer = new RequestAnimationFrame(this.main_loop, this);
 		this._timer.start();
 
-		let rootMC: MovieClip = <MovieClip>this.getChildAt(0);
+		const rootMC: MovieClip = <MovieClip> this.getChildAt(0);
 		if (!rootMC) {
-			console.warn("warning: AVMPlayer.play called, but no scene is loaded");
+			console.warn('warning: AVMPlayer.play called, but no scene is loaded');
 			return;
 		}
 		if (offset) {
@@ -376,31 +378,29 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 		// manually move playhead to next frame, so we immediatly render something
 		this.showNextFrame(0);
-		this._rendererStage.container.style.visibility = "visible";
+		this._rendererStage.container.style.visibility = 'visible';
 	}
 
 	public updateFPS(): void {
-		this._fpsTextField.style.visibility = (!this._currentFps || !this._frameRate) ? "hidden" : "visible";
-		this._fpsTextField.innerText = this._currentFps.toFixed(2) + '/' + this._frameRate + " fps";
+		this._fpsTextField.style.visibility = (!this._currentFps || !this._frameRate) ? 'hidden' : 'visible';
+		this._fpsTextField.innerText = this._currentFps.toFixed(2) + '/' + this._frameRate + ' fps';
 		this._currentFps = 0;
 	}
 
-
-	
-	public setStageDimensions(x:any, y:any, w:any, h:any){
-		this._x=x;
-		this._y=y;
-		this._w=w;
-		this._h=h;
+	public setStageDimensions(x: any, y: any, w: any, h: any) {
+		this._x = x;
+		this._y = y;
+		this._w = w;
+		this._h = h;
 		this.resizeStageInternal();
 	}
 
-	private resizeStageInternal(){
+	private resizeStageInternal() {
 
-		let x:number=(typeof this._x==="string")?parseFloat(this._x.replace("%", ""))/100*window.innerWidth:this._x;
-		let y:number=(typeof this._y==="string")?parseFloat(this._y.replace("%", ""))/100*window.innerHeight:this._y;
-		let w:number=(typeof this._w==="string")?parseFloat(this._w.replace("%", ""))/100*window.innerWidth:this._w;
-		let h:number=(typeof this._h==="string")?parseFloat(this._h.replace("%", ""))/100*window.innerHeight:this._h;
+		const x: number = (typeof this._x === 'string') ? parseFloat(this._x.replace('%', '')) / 100 * window.innerWidth : this._x;
+		const y: number = (typeof this._y === 'string') ? parseFloat(this._y.replace('%', '')) / 100 * window.innerHeight : this._y;
+		const w: number = (typeof this._w === 'string') ? parseFloat(this._w.replace('%', '')) / 100 * window.innerWidth : this._w;
+		const h: number = (typeof this._h === 'string') ? parseFloat(this._h.replace('%', '')) / 100 * window.innerHeight : this._h;
 		let newX = x;
 		let newY = y;
 		let newWidth = w;
@@ -428,7 +428,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
 				break;
 			default:
-				console.log("Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL");
+				console.log('Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL');
 				break;
 		}
 		// todo: correctly implement all alignModes;
@@ -440,7 +440,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			default:
 				this._scene.view.x = newX;
 				this._scene.view.y = newY;
-				console.log("Stage: only implemented StageAlign is TOP_LEFT");
+				console.log('Stage: only implemented StageAlign is TOP_LEFT');
 				break;
 		}
 
@@ -449,7 +449,6 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._scene.view.width = newWidth;
 		this._scene.view.height = newHeight;
 
-
 		if (this._fpsTextField)
 			this._fpsTextField.style.left = (window.innerWidth * 0.5 - 50 + 'px');
 
@@ -457,45 +456,47 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this._avmHandler.resizeStage();
 		}
 	}
+
 	private _resizeCallbackDelegate: (event: any) => void;
 	private resizeCallback(event: any = null): void {
 		this.resizeStageInternal();
 	}
 
-
-	public pause(){
+	public pause() {
 		AudioManager.setVolume(0);
-		this._isPaused=true;
+		this._isPaused = true;
 	}
-	public unPause(){
+
+	public unPause() {
 		AudioManager.setVolume(1);
-		this._isPaused=false;
+		this._isPaused = false;
 
 	}
-	public get isPaused():boolean{
+
+	public get isPaused(): boolean {
 		return this._isPaused;
 	}
-	public set isPaused(value:boolean){
-		this._isPaused=value;
+
+	public set isPaused(value: boolean) {
+		this._isPaused = value;
 	}
 
 	protected main_loop(dt: number) {
-		if(this._isPaused){
+		if (this._isPaused) {
 			return;
 		}
 		if (!this._avmHandler) {
-			throw ("error - can not render when no avm-stage is available")
+			throw ('error - can not render when no avm-stage is available');
 		}
 		if (!this._scene || !this._scene.renderer) {
 			this._timer.stop();
 			return;
 		}
 
-		var frameMarker: number = Math.floor(1000 / this._frameRate);
+		const frameMarker: number = Math.floor(1000 / this._frameRate);
 		this._time += Math.min(dt, frameMarker);
 
 		if (this._time >= frameMarker) {
-
 
 			this._currentFps++;
 
@@ -515,21 +516,20 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	protected showNextFrame(dt: number) {
-		if(this._isPaused){
+		if (this._isPaused) {
 			MovieClipSoundsManager.enterFrame();
 			MovieClipSoundsManager.exitFrame();
 			return;
 		}
 		MovieClipSoundsManager.enterFrame();
-		if(this.avmTestHandler){
+		if (this.avmTestHandler) {
 			this.avmTestHandler.dispatchEvents();
 		}
 		this._scene.fireMouseEvents();
 
-
 		this._avmHandler.enterFrame(dt);
 
-		if(this.avmTestHandler){
+		if (this.avmTestHandler) {
 			this.avmTestHandler.nextFrame();
 		}
 
@@ -542,38 +542,42 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 		this._scene.render(true);
 
-
 		MovieClipSoundsManager.exitFrame();
 	}
 
 	public get align(): StageAlign {
 		return this._align;
 	}
+
 	public set align(value: StageAlign) {
-		if(!this._alignAllowUpdate)
-			return;		
+		if (!this._alignAllowUpdate)
+			return;
 		this._align = value;
 		this.resizeCallback();
 	}
 
 	public get accessibilityImplementation(): any {
-		console.log("AVMStage: get accessibilityImplementation not implemented");
+		console.log('AVMStage: get accessibilityImplementation not implemented');
 		return this._align;
 	}
+
 	public set accessibilityImplementation(value: any) {
 		//todo: any is AccessibilityImplementation
-		console.log("AVMStage:  accessibilityImplementation not implemented");
+		console.log('AVMStage:  accessibilityImplementation not implemented');
 	}
 
 	public get color(): number {
 		return this._scene.renderer.view.backgroundColor;
 	}
+
 	public set color(value: number) {
 		this._scene.renderer.view.backgroundColor = value;
 	}
+
 	public get frameRate(): number {
 		return this._frameRate;
 	}
+
 	public set frameRate(value: number) {
 		this._frameRate = value;
 	}
@@ -581,6 +585,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	public get mouseX(): number {
 		return this._scene.getLocalMouseX(this);
 	}
+
 	public get mouseY(): number {
 		return this._scene.getLocalMouseY(this);
 	}
@@ -588,19 +593,22 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	public get scaleMode(): StageScaleMode {
 		return this._scaleMode;
 	}
+
 	public set scaleMode(value: StageScaleMode) {
-		if(!this._scaleModeAllowUpdate)
-			return;		
+		if (!this._scaleModeAllowUpdate)
+			return;
 		this._scaleMode = value;
 		this.resizeCallback();
 	}
+
 	public get scene(): Scene {
-		return this._scene
+		return this._scene;
 	}
 
 	public get showFrameRate(): boolean {
 		return this._showFrameRate;
 	}
+
 	public set showFrameRate(value: boolean) {
 		if (value == this._showFrameRate)
 			return;
@@ -620,11 +628,10 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			this._fpsTextField.style.color = '#ffffff';
 			this._fpsTextField.style.fontSize = '16';
 			this._fpsTextField.style.visibility = 'hidden';
-			this._fpsTextField.innerHTML = "";
+			this._fpsTextField.innerHTML = '';
 			document.body.appendChild(this._fpsTextField);
 			this._showFrameRateIntervalID = setInterval(() => this.updateFPS(), 1000);
-		}
-		else {
+		} else {
 			if (this._showFrameRateIntervalID) {
 				clearInterval(this._showFrameRateIntervalID);
 				this._showFrameRateIntervalID = -1;
@@ -633,16 +640,20 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			}
 		}
 	}
+
 	public get stageHeight(): number {
 		return this._stageHeight;
 	}
+
 	public set stageHeight(value: number) {
 		this._stageHeight = value;
 		this.resizeCallback();
 	}
+
 	public get stageWidth(): number {
 		return this._stageWidth;
 	}
+
 	public set stageWidth(value: number) {
 		this._stageWidth = value;
 		this.resizeCallback();
@@ -652,21 +663,21 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 // todo: move to own files:
 
 const enum ResourceType{
-	GAME="GAME",
-	FONTS="FONTS",
+	GAME='GAME',
+	FONTS='FONTS',
 }
 export interface IResourceFile{
-	resourceType?:ResourceType,
-	data?:any,
-	path:string
+	resourceType?: ResourceType,
+	data?: any,
+	path: string
 }
 export interface IGameConfig{
-	x?:any;
-	y?:any;
-	w?:any;
-	h?:any;
-	showFPS?:boolean;
-	forceJIT?:boolean;
-	files:IResourceFile[];
-	[key:string]:any;
+	x?: any;
+	y?: any;
+	w?: any;
+	h?: any;
+	showFPS?: boolean;
+	forceJIT?: boolean;
+	files: IResourceFile[];
+	[key: string]: any;
 }

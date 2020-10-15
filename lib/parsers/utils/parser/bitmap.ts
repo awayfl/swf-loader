@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-import {assert, ImageType, roundToMultipleOfFour, Inflate} from "@awayjs/graphics";
-import {ImageDefinition} from "./image";
+import { assert, ImageType, roundToMultipleOfFour, Inflate } from '@awayjs/graphics';
+import { ImageDefinition } from './image';
 //import notImplemented = Shumway.Debug.notImplemented;
 //import assertUnreachable = Shumway.Debug.assertUnreachable;
 //import roundToMultipleOfFour = Shumway.IntegerUtilities.roundToMultipleOfFour;
 
-import {BitmapTag, SwfTagCode} from "../../../factories/base/SWFTags"
+import { BitmapTag, SwfTagCode } from '../../../factories/base/SWFTags';
 
 export const enum BitmapFormat {
-  /**
+	/**
    * 8-bit color mapped image.
    */
-  FORMAT_COLORMAPPED  = 3,
+	FORMAT_COLORMAPPED  = 3,
 
-  /**
+	/**
    * 15-bit RGB image.
    */
-  FORMAT_15BPP        = 4,
+	FORMAT_15BPP        = 4,
 
-  /**
+	/**
    * 24-bit RGB image, however stored as 4 byte value 0x00RRGGBB.
    */
-  FORMAT_24BPP        = 5
+	FORMAT_24BPP        = 5
 }
 
-/** @const */ var FACTOR_5BBP = 255 / 31;
+/** @const */ const FACTOR_5BBP = 255 / 31;
 
 /*
  * Returns a Uint8ClampedArray of RGBA values. The source image is color mapped meaning
@@ -58,90 +58,90 @@ export const enum BitmapFormat {
  * is aligned.
  */
 function parseColorMapped(tag: BitmapTag): Uint8ClampedArray {
-  var width = tag.width, height = tag.height;
-  var hasAlpha = tag.hasAlpha;
+	const width = tag.width, height = tag.height;
+	const hasAlpha = tag.hasAlpha;
 
-  var padding = roundToMultipleOfFour(width) - width;
-  var colorTableLength = tag.colorTableSize + 1;
-  var colorTableEntrySize = hasAlpha ? 4 : 3;  
-  var colorTableSize = colorTableLength * colorTableEntrySize;
-  var outputDataSize = colorTableSize + ((width + padding) * height);
+	const padding = roundToMultipleOfFour(width) - width;
+	const colorTableLength = tag.colorTableSize + 1;
+	const colorTableEntrySize = hasAlpha ? 4 : 3;
+	const colorTableSize = colorTableLength * colorTableEntrySize;
+	const outputDataSize = colorTableSize + ((width + padding) * height);
 
-  var bytes: Uint8Array = Inflate.inflate(tag.bmpData, outputDataSize, true);
-  var view = new Uint32Array(width * height);
-  var p = colorTableSize, i = 0, offset = 0;
+	const bytes: Uint8Array = Inflate.inflate(tag.bmpData, outputDataSize, true);
+	const view = new Uint32Array(width * height);
+	let p = colorTableSize, i = 0, offset = 0;
 
-  if (hasAlpha) {
-    for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        offset = bytes[p++] << 2;
-        
-        view[i++] = (
-            bytes[offset + 3] << 24
-          | bytes[offset + 2] << 16 
-          | bytes[offset + 1] << 8 
-          | bytes[offset + 0]) >>> 0;
-      }
-      p += padding;
-    }
-  } else {
-    for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        offset = bytes[p++] * colorTableEntrySize;
+	if (hasAlpha) {
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				offset = bytes[p++] << 2;
 
-        view[i++] = (
-          0xff << 24
+				view[i++] = (
+					bytes[offset + 3] << 24
           | bytes[offset + 2] << 16
           | bytes[offset + 1] << 8
           | bytes[offset + 0]) >>> 0;
-      }
-      p += padding;
-    }
-  }
+			}
+			p += padding;
+		}
+	} else {
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				offset = bytes[p++] * colorTableEntrySize;
 
-  return new Uint8ClampedArray(view.buffer);
+				view[i++] = (
+					0xff << 24
+          | bytes[offset + 2] << 16
+          | bytes[offset + 1] << 8
+          | bytes[offset + 0]) >>> 0;
+			}
+			p += padding;
+		}
+	}
+
+	return new Uint8ClampedArray(view.buffer);
 }
 
 /**
  * Returns a Uint8ClampedArray of RGBA values.
  */
 function parse24BPP(tag: BitmapTag): Uint8ClampedArray {
-  const width = tag.width;
-  const height = tag.height;
-  const hasAlpha = tag.hasAlpha;
+	const width = tag.width;
+	const height = tag.height;
+	const hasAlpha = tag.hasAlpha;
 
-  // Even without alpha, 24BPP is stored as 4 bytes, probably for alignment reasons.
-  const dataSize = height * width * 4;
-  const bytes = Inflate.inflate(tag.bmpData, dataSize, true);
+	// Even without alpha, 24BPP is stored as 4 bytes, probably for alignment reasons.
+	const dataSize = height * width * 4;
+	const bytes = Inflate.inflate(tag.bmpData, dataSize, true);
 
-  //bytes are in ARGB format, so we need to convert to RGBA
-  const view = new Uint32Array(bytes.buffer);
-  let p = 0;
+	//bytes are in ARGB format, so we need to convert to RGBA
+	const view = new Uint32Array(bytes.buffer);
+	const p = 0;
 
-  // in => PMA ARGB, out => NPMA RGBA
-  // ?
-  // Unpremultiply
-  for (let i = 0, l = view.length; i < l; i ++) {
+	// in => PMA ARGB, out => NPMA RGBA
+	// ?
+	// Unpremultiply
+	for (let i = 0, l = view.length; i < l; i++) {
 
-    let c = view[i];
-    let a = c & 0xff; // A
-    let factor = a ? 0xFF / a : 1;
+		const c = view[i];
+		const a = c & 0xff; // A
+		const factor = a ? 0xFF / a : 1;
 
-    let b = ((c >> 24) & 0xff) * factor | 0; // B
-    let g = ((c >> 16) & 0xff) * factor | 0; // G
-    let r = ((c >> 8 ) & 0xff) * factor | 0; // R
+		const b = ((c >> 24) & 0xff) * factor | 0; // B
+		const g = ((c >> 16) & 0xff) * factor | 0; // G
+		const r = ((c >> 8) & 0xff) * factor | 0; // R
 
-    view[i] = (a << 24 | b << 16 | g << 8 | r) >>> 0;
-  }
+		view[i] = (a << 24 | b << 16 | g << 8 | r) >>> 0;
+	}
 
-  //assert (p * 4 === dataSize, "We should be at the end of the data buffer now.");
-  return new Uint8ClampedArray(bytes.buffer);
+	//assert (p * 4 === dataSize, "We should be at the end of the data buffer now.");
+	return new Uint8ClampedArray(bytes.buffer);
 }
 
 function parse15BPP(tag: BitmapTag): Uint8ClampedArray {
-  console.log("parse15BPP");
-  //notImplemented("parse15BPP");
-  /*
+	console.log('parse15BPP');
+	//notImplemented("parse15BPP");
+	/*
    case FORMAT_15BPP:
    var colorType = 0x02;
    var bytesPerLine = ((width * 2) + 3) & ~3;
@@ -162,58 +162,58 @@ function parse15BPP(tag: BitmapTag): Uint8ClampedArray {
    }
    break;
    */
-  return null;
+	return null;
 }
 
 export function defineBitmap(tag: BitmapTag): {definition: ImageDefinition; type: string, id: number} {
- // enterTimeline("defineBitmap");
-  var data: Uint8ClampedArray;
-  var type = ImageType.None;
-  var parserMethod: (tag) => Uint8ClampedArray;
+	// enterTimeline("defineBitmap");
+	let data: Uint8ClampedArray;
+	let type = ImageType.None;
+	let parserMethod: (tag) => Uint8ClampedArray;
 
-  switch (tag.format) {
-    case BitmapFormat.FORMAT_COLORMAPPED:
+	switch (tag.format) {
+		case BitmapFormat.FORMAT_COLORMAPPED:
 	  parserMethod = parseColorMapped;
 	  //data = parseColorMapped(tag);
-      type = ImageType.PremultipliedAlphaARGB;
-      break;
-    case BitmapFormat.FORMAT_24BPP:
+			type = ImageType.PremultipliedAlphaARGB;
+			break;
+		case BitmapFormat.FORMAT_24BPP:
 	  parserMethod = parse24BPP;
 	  //data = parse24BPP(tag);
-      type = ImageType.PremultipliedAlphaARGB;
-      break;
-    case BitmapFormat.FORMAT_15BPP:
+			type = ImageType.PremultipliedAlphaARGB;
+			break;
+		case BitmapFormat.FORMAT_15BPP:
 	  parserMethod = parse15BPP;
 	  //data = parse15BPP(tag);
-      type = ImageType.PremultipliedAlphaARGB;
-      break;
-    default:
-      console.log('invalid bitmap format');
-  }
+			type = ImageType.PremultipliedAlphaARGB;
+			break;
+		default:
+			console.log('invalid bitmap format');
+	}
 
-  //leaveTimeline();
-  const def =  {
-    definition: {
-      type: 'image',
-      id: tag.id,
-      width: tag.width,
-      height: tag.height,
-      mimeType: 'application/octet-stream',
-      data: null,
-      dataType: type,
-      image: null
-	},
-	needParse: true,
-	lazyParser () {
-		this.needParse = false;
-		this.definition.data = parserMethod(tag);
+	//leaveTimeline();
+	const def =  {
+		definition: {
+			type: 'image',
+			id: tag.id,
+			width: tag.width,
+			height: tag.height,
+			mimeType: 'application/octet-stream',
+			data: null,
+			dataType: type,
+			image: null
+		},
+		needParse: true,
+		lazyParser () {
+			this.needParse = false;
+			this.definition.data = parserMethod(tag);
 
-		this.lazyParser = () => this;
-		return def;
-	},
-    type: 'image',
-    id: tag.id,
-  };
+			this.lazyParser = () => this;
+			return def;
+		},
+		type: 'image',
+		id: tag.id,
+	};
 
-  return def;
+	return def;
 }

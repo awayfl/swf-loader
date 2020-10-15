@@ -1,5 +1,4 @@
 
-
 export const enum SystemResourceId {
 	BuiltinAbc = 0,
 	PlayerglobalAbcs = 1,
@@ -13,8 +12,7 @@ export interface ISystemResourcesLoadingService {
 
 export var instance: ISystemResourcesLoadingService;
 
-
-export let SystemResourcesLoadingService={
+export const SystemResourcesLoadingService = {
 	//SystemResourceId:SystemResourceId,
 	//ISystemResourcesLoadingService:ISystemResourcesLoadingService
 };

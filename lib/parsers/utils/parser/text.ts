@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-import {TextTag} from "../../../factories/base/SWFTags"
+import { TextTag } from '../../../factories/base/SWFTags';
 
-export function defineText(tag: TextTag):any {
-  var bold = false;
-  var italic = false;
+export function defineText(tag: TextTag): any {
+	const bold = false;
+	const italic = false;
 
-  return {
-    type: 'text',
-    id: tag.id,
-    fillBounds: tag.bbox,
-    variableName: tag.variableName, // for AVM1
-    tag: tag,
-    bold: bold,
-    italic: italic
-  };
+	return {
+		type: 'text',
+		id: tag.id,
+		fillBounds: tag.bbox,
+		variableName: tag.variableName, // for AVM1
+		tag: tag,
+		bold: bold,
+		italic: italic
+	};
 }
-

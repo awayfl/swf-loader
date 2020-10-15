@@ -17,27 +17,27 @@
 import {
 	ILocalConnectionSender, LocalConnectionCloseResult,
 	LocalConnectionConnectResult
-} from "./utilities/LocalConnectionService";
+} from './utilities/LocalConnectionService';
 
-var ShumwayEnvironment = {
-  DEBUG: 'test',
-  DEVELOPMENT: 'dev',
-  RELEASE: 'release',
-  TEST: 'test'
+const ShumwayEnvironment = {
+	DEBUG: 'test',
+	DEVELOPMENT: 'dev',
+	RELEASE: 'release',
+	TEST: 'test'
 };
 
-export var ShumwayCom={
-  "getWeakMapKeys":function (param:any){return null},
+export var ShumwayCom = {
+	'getWeakMapKeys':function (param: any) {return null;},
 
-}
+};
 /*
 export declare var ShumwayCom {
   environment: string // ShumwayEnvironment;
-  
+
   createSpecialInflate?: () => SpecialInflate;
   createRtmpSocket?: (options: {host: string; port: number; ssl: boolean}) => RtmpSocket;
   createRtmpXHR?: () => RtmpXHR;
-  
+
   createSpecialStorage: () => SpecialStorage;
   getWeakMapKeys: (weakMap) => Array<any>;
   fallback: () => void;
@@ -64,59 +64,58 @@ export declare var ShumwayCom {
   setAsyncMessageCallback: (callback: (data: any) => void) => void;
 
   getLocalConnectionService: () => LocalConnectionService;
-  
+
   processFrame?: () => void;
   processFSCommand?: (command: string, args: any) => void;
   print?: (msg: string) => void;
 };
 */
 
-
 interface SpecialStorage {
-  getItem(key: string): string;
-  setItem(key: string, value: string): void;
-  removeItem(key: string): void;
+	getItem(key: string): string;
+	setItem(key: string, value: string): void;
+	removeItem(key: string): void;
 }
 
 interface SpecialInflate {
-  setDataCallback(callback: (data: Uint8Array) => void): void;
-  push(data: Uint8Array);
-  close();
+	setDataCallback(callback: (data: Uint8Array) => void): void;
+	push(data: Uint8Array);
+	close();
 }
 
 interface LocalConnectionService {
-  createLocalConnection: (connectionName: string,
-                          callback: (methodName: string, argsBuffer: ArrayBuffer) => any
-                         ) => LocalConnectionConnectResult;
-  hasLocalConnection: (connectionName: string) => boolean;
-  closeLocalConnection: (connectionName: string) => LocalConnectionCloseResult;
-  sendLocalConnectionMessage: (connectionName: string, methodName: string,
-                               argsBuffer: ArrayBuffer, sender: ILocalConnectionSender,
-                               senderDomain: string, senderIsSecure: boolean) => void;
-  allowDomainsForLocalConnection: (connectionName: string, domains: string[],
-                                   secure: boolean) => void;
+	createLocalConnection: (connectionName: string,
+		callback: (methodName: string, argsBuffer: ArrayBuffer) => any
+	) => LocalConnectionConnectResult;
+	hasLocalConnection: (connectionName: string) => boolean;
+	closeLocalConnection: (connectionName: string) => LocalConnectionCloseResult;
+	sendLocalConnectionMessage: (connectionName: string, methodName: string,
+		argsBuffer: ArrayBuffer, sender: ILocalConnectionSender,
+		senderDomain: string, senderIsSecure: boolean) => void;
+	allowDomainsForLocalConnection: (connectionName: string, domains: string[],
+		secure: boolean) => void;
 }
 
 interface RtmpSocket {
-  setOpenCallback(callback: () => void): void;
-  setDataCallback(callback: (e: {data: ArrayBuffer}) => void): void;
-  setDrainCallback(callback: () => void): void;
-  setErrorCallback(callback: (e: any) => void): void;
-  setCloseCallback(callback: () => void): void;
+	setOpenCallback(callback: () => void): void;
+	setDataCallback(callback: (e: {data: ArrayBuffer}) => void): void;
+	setDrainCallback(callback: () => void): void;
+	setErrorCallback(callback: (e: any) => void): void;
+	setCloseCallback(callback: () => void): void;
 
-  send(buffer: ArrayBuffer, offset: number, count: number): boolean;
-  close(): void;
+	send(buffer: ArrayBuffer, offset: number, count: number): boolean;
+	close(): void;
 }
 
 interface RtmpXHR {
-  status: number;
-  response: any;
-  responseType: string;
+	status: number;
+	response: any;
+	responseType: string;
 
-  setLoadCallback(callback: () => void): void;
-  setErrorCallback(callback: () => void): void;
+	setLoadCallback(callback: () => void): void;
+	setErrorCallback(callback: () => void): void;
 
-  open(method: string, path: string, async?: boolean): void;
-  setRequestHeader(header: string, value: string): void;
-  send(data?: any): void;
+	open(method: string, path: string, async?: boolean): void;
+	setRequestHeader(header: string, value: string): void;
+	send(data?: any): void;
 }

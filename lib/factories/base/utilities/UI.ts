@@ -2,7 +2,7 @@
 /*
  * Converts a |MouseCursor| number to a CSS |cursor| property value.
  */
-export function toCSSCursor(mouseCursor:number) {
+export function toCSSCursor(mouseCursor: number) {
 	switch (mouseCursor) {
 		case 0: // MouseCursor.AUTO
 			return 'auto';
@@ -18,6 +18,6 @@ export function toCSSCursor(mouseCursor:number) {
 	}
 
 }
-export let UI={
+export const UI = {
 	toCSSCursor:toCSSCursor
 };

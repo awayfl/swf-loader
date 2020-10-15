@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import {jsGlobal} from "./utilities/jsGlobal";
-import {CharacterCodes} from "./utilities/Shumway";
-import {assert, Debug} from "./utilities/Debug";
-import {clamp} from "./utilities/NumberUtilities";
-import {RGBAToARGB, rgbaToCSSStyle} from "./utilities/ColorUtilities";
-import {base64EncodeBytes} from "./utilities/StringUtilities";
-import {ShumwayCom} from "./external";
-import {Shumway} from "./utilities/Shumway";
+import { jsGlobal } from './utilities/jsGlobal';
+import { CharacterCodes } from './utilities/Shumway';
+import { assert, Debug } from './utilities/Debug';
+import { clamp } from './utilities/NumberUtilities';
+import { RGBAToARGB, rgbaToCSSStyle } from './utilities/ColorUtilities';
+import { base64EncodeBytes } from './utilities/StringUtilities';
+import { ShumwayCom } from './external';
+import { Shumway } from './utilities/Shumway';
 //import {Promise} from 'es6-promise'
 // Our polyfills for some DOM things make testing this slightly more onerous than it ought to be.
-var inBrowser = typeof window !=='undefined' && 'document' in window && 'plugins' in window.document;
-var inFirefox = typeof navigator !== 'undefined' && navigator.userAgent.indexOf('Firefox') >= 0;
+const inBrowser = typeof window !== 'undefined' && 'document' in window && 'plugins' in window.document;
+const inFirefox = typeof navigator !== 'undefined' && navigator.userAgent.indexOf('Firefox') >= 0;
 
-declare var putstr;
+declare let putstr;
 // declare var print;
 // declare var console;
 // declare var performance;
@@ -35,14 +35,14 @@ declare var putstr;
 // declare var document;
 // declare var getComputedStyle;
 
-/** @define {boolean} */ var release = false;
-/** @define {boolean} */ var profile = false;
+/** @define {boolean} */ const release = false;
+/** @define {boolean} */ const profile = false;
 
-declare var dump: (message: string) => void;
+declare let dump: (message: string) => void;
 
 export function dumpLine(line: string) {
-	if (!release && typeof dump !== "undefined") {
-		dump(line + "\n");
+	if (!release && typeof dump !== 'undefined') {
+		dump(line + '\n');
 	}
 }
 
@@ -56,7 +56,7 @@ if (!jsGlobal.performance.now) {
 	};
 }
 
-var START_TIME = performance.now();
+const START_TIME = performance.now();
 
 declare global {
 	interface String {
@@ -67,7 +67,6 @@ declare global {
 		endsWith(s: string): boolean;
 	}
 }
-
 
 interface Function {
 	boundTo: boolean;
@@ -152,7 +151,6 @@ declare var Uint8ClampedArray: {
 	BYTES_PER_ELEMENT: number;
 };
 
-
 /**
  * The buffer length required to contain any unsigned 32-bit integer.
  */
@@ -162,15 +160,15 @@ declare var Uint8ClampedArray: {
 /** @const */ export var UINT32_MAX_MOD_10 = 0x5; // UINT32_MAX % 10
 
 export function isString(value): boolean {
-	return typeof value === "string";
+	return typeof value === 'string';
 }
 
 export function isFunction(value): boolean {
-	return typeof value === "function";
+	return typeof value === 'function';
 }
 
 export function isNumber(value): boolean {
-	return typeof value === "number";
+	return typeof value === 'number';
 }
 
 export function isInteger(value): boolean {
@@ -182,11 +180,11 @@ export function isArray(value): boolean {
 }
 
 export function isNumberOrString(value): boolean {
-	return typeof value === "number" || typeof value === "string";
+	return typeof value === 'number' || typeof value === 'string';
 }
 
 export function isObject(value): boolean {
-	return typeof value === "object" || typeof value === 'function';
+	return typeof value === 'object' || typeof value === 'function';
 }
 
 export function toNumber(x): number {
@@ -203,15 +201,15 @@ export function isNumericString(value: string): boolean {
  * Whether the specified |value| is a number or the string representation of a number.
  */
 export function isNumeric(value: any): boolean {
-	if (typeof value === "number") {
+	if (typeof value === 'number') {
 		return true;
 	}
-	if (typeof value === "string") {
+	if (typeof value === 'string') {
 		// |value| is rarely numeric (it's usually an identifier), and the
 		// isIndex()/isNumericString() pair is slow and expensive, so we do a
 		// quick check for obvious non-numericalness first. Just checking if the
 		// first char is a 7-bit identifier char catches most cases.
-		var c = value.charCodeAt(0);
+		const c = value.charCodeAt(0);
 		if ((65 <= c && c <= 90) ||     // 'A'..'Z'
 			(97 <= c && c <= 122) ||    // 'a'..'z'
 			(c === 36) ||               // '$'
@@ -230,35 +228,35 @@ export function isNumeric(value: any): boolean {
 export function isIndex(value: any): boolean {
 	// js/src/vm/String.cpp JSFlatString::isIndexSlow
 	// http://dxr.mozilla.org/mozilla-central/source/js/src/vm/String.cpp#474
-	var index = 0;
-	if (typeof value === "number") {
+	let index = 0;
+	if (typeof value === 'number') {
 		index = (value | 0);
 		if (value === index && index >= 0) {
 			return true;
 		}
 		return value >>> 0 === value;
 	}
-	if (typeof value !== "string") {
+	if (typeof value !== 'string') {
 		return false;
 	}
-	var length = value.length;
+	const length = value.length;
 	if (length === 0) {
 		return false;
 	}
-	if (value === "0") {
+	if (value === '0') {
 		return true;
 	}
 	// Is there any way this will fit?
 	if (length > UINT32_CHAR_BUFFER_LENGTH) {
 		return false;
 	}
-	var i = 0;
+	let i = 0;
 	index = value.charCodeAt(i++) - CharacterCodes._0;
 	if (index < 1 || index > 9) {
 		return false;
 	}
-	var oldIndex = 0;
-	var c = 0;
+	let oldIndex = 0;
+	let c = 0;
 	while (i < length) {
 		c = value.charCodeAt(i++) - CharacterCodes._0;
 		if (c < 0 || c > 9) {
@@ -282,9 +280,9 @@ export function isNullOrUndefined(value) {
 }
 
 export function argumentsToString(args: IArguments) {
-	var resultList = [];
-	for (var i = 0; i < args.length; i++) {
-		var arg = args[i];
+	const resultList = [];
+	for (let i = 0; i < args.length; i++) {
+		const arg = args[i];
 		try {
 			var argStr;
 			if (typeof arg !== 'object' || !arg) {
@@ -327,12 +325,12 @@ export class Random {
 	}
 
 	public static next(): number {
-		var s = this._state;
-		var r0 = (Math.imul(18273, s[0] & 0xFFFF) + (s[0] >>> 16)) | 0;
+		const s = this._state;
+		const r0 = (Math.imul(18273, s[0] & 0xFFFF) + (s[0] >>> 16)) | 0;
 		s[0] = r0;
-		var r1 = (Math.imul(36969, s[1] & 0xFFFF) + (s[1] >>> 16)) | 0;
+		const r1 = (Math.imul(36969, s[1] & 0xFFFF) + (s[1] >>> 16)) | 0;
 		s[1] = r1;
-		var x = ((r0 << 16) + (r1 & 0xFFFF)) | 0;
+		const x = ((r0 << 16) + (r1 & 0xFFFF)) | 0;
 		// Division by 0x100000000 through multiplication by reciprocal.
 		return (x < 0 ? (x + 0x100000000) : x) * 2.3283064365386962890625e-10;
 	}
@@ -346,10 +344,10 @@ export class Random {
  * This should only be called if you need fake time.
  */
 export function installTimeWarper() {
-	var RealDate = Date;
+	const RealDate = Date;
 
 	// Go back in time.
-	var fakeTime = 1428107694580; // 3-Apr-2015
+	let fakeTime = 1428107694580; // 3-Apr-2015
 
 	// Overload
 	jsGlobal.Date = function (yearOrTimevalue, month, date, hour, minute, second, millisecond) {
@@ -379,10 +377,10 @@ function polyfillWeakMap() {
 	if (typeof jsGlobal.WeakMap === 'function') {
 		return; // weak map is supported
 	}
-	var id = 0;
+	let id = 0;
 	function WeakMap() {
 		this.id = '$weakmap' + (id++);
-	};
+	}
 	WeakMap.prototype = {
 		has: function(obj) {
 			return obj.hasOwnProperty(this.id);
@@ -412,7 +410,7 @@ export interface IReferenceCountable {
 	_removeReference();
 }
 
-var useReferenceCounting = true;
+const useReferenceCounting = true;
 
 export class WeakList<T extends IReferenceCountable> {
 	private _map: WeakMap<T, number>;
@@ -420,7 +418,7 @@ export class WeakList<T extends IReferenceCountable> {
 	private _list: T [];
 	private _id: number;
 	constructor() {
-		if (typeof ShumwayCom !== "undefined" && ShumwayCom.getWeakMapKeys) {
+		if (typeof ShumwayCom !== 'undefined' && ShumwayCom.getWeakMapKeys) {
 			this._map = new WeakMap<T, number>();
 			this._id = 0;
 			this._newAdditions = [];
@@ -428,6 +426,7 @@ export class WeakList<T extends IReferenceCountable> {
 			this._list = [];
 		}
 	}
+
 	clear() {
 		if (this._map) {
 			this._map.clear();
@@ -435,6 +434,7 @@ export class WeakList<T extends IReferenceCountable> {
 			this._list.length = 0;
 		}
 	}
+
 	push(value: T) {
 		if (this._map) {
 			release || assert(!this._map.has(value));
@@ -448,6 +448,7 @@ export class WeakList<T extends IReferenceCountable> {
 			this._list.push(value);
 		}
 	}
+
 	remove(value: T) {
 		if (this._map) {
 			release || assert(this._map.has(value));
@@ -458,12 +459,13 @@ export class WeakList<T extends IReferenceCountable> {
 			release || assert(this._list.indexOf(value) === -1);
 		}
 	}
+
 	forEach(callback: (value: T) => void) {
 		if (this._map) {
-			var newAdditionsToKeys : T[] = [];
+			const newAdditionsToKeys: T[] = [];
 			this._newAdditions.push(newAdditionsToKeys);
-			var map = this._map;
-			var keys: T[] = ShumwayCom.getWeakMapKeys(map);
+			const map = this._map;
+			const keys: T[] = ShumwayCom.getWeakMapKeys(map);
 			// The keys returned by ShumwayCom.getWeakMapKeys are not guaranteed to
 			// be in insertion order. Therefore we have to sort them manually.
 			keys.sort(function (a: T, b: T) {
@@ -484,8 +486,8 @@ export class WeakList<T extends IReferenceCountable> {
 			this._newAdditions.splice(this._newAdditions.indexOf(newAdditionsToKeys), 1);
 			return;
 		}
-		var list = this._list;
-		var zeroCount = 0;
+		const list = this._list;
+		let zeroCount = 0;
 		for (var i = 0; i < list.length; i++) {
 			var value = list[i];
 			if (!value) {
@@ -499,7 +501,7 @@ export class WeakList<T extends IReferenceCountable> {
 			}
 		}
 		if (zeroCount > 16 && zeroCount > (list.length >> 2)) {
-			var newList = [];
+			const newList = [];
 			for (var i = 0; i < list.length; i++) {
 				var value = list[i];
 				if (value && value._referenceCount > 0) {
@@ -509,6 +511,7 @@ export class WeakList<T extends IReferenceCountable> {
 			this._list = newList;
 		}
 	}
+
 	get length(): number {
 		if (this._map) {
 			// TODO: Implement this.
@@ -525,7 +528,6 @@ export const enum Numbers {
 	MinI16 = -0x8000
 }
 
-
 export const enum LogLevel {
 	Error = 0x1,
 	Warn = 0x2,
@@ -534,8 +536,6 @@ export const enum LogLevel {
 	Info = 0x10,
 	All = 0x1f
 }
-
-
 
 export class IndentingWriter {
 	public static PURPLE = '33[94m'; //\033[94m';
@@ -565,53 +565,53 @@ export class IndentingWriter {
 	}
 
 	constructor(suppressOutput: boolean = false, out?) {
-		this._tab = "  ";
-		this._padding = "";
+		this._tab = '  ';
+		this._padding = '';
 		this._suppressOutput = suppressOutput;
 		this._out = out || IndentingWriter._consoleOut;
 		this._outNoNewline = out || IndentingWriter._consoleOutNoNewline;
 	}
 
-	write(str: string = "", writePadding = false) {
+	write(str: string = '', writePadding = false) {
 		if (!this._suppressOutput) {
-			this._outNoNewline((writePadding ? this._padding : "") + str);
+			this._outNoNewline((writePadding ? this._padding : '') + str);
 		}
 	}
 
-	writeLn(str: string = "") {
+	writeLn(str: string = '') {
 		if (!this._suppressOutput) {
 			this._out(this._padding + str);
 		}
 	}
 
-	writeObject(str: string = "", object?: Object) {
+	writeObject(str: string = '', object?: Object) {
 		if (!this._suppressOutput) {
 			this._out(this._padding + str, object);
 		}
 	}
 
-	writeTimeLn(str: string = "") {
+	writeTimeLn(str: string = '') {
 		if (!this._suppressOutput) {
-			this._out(this._padding + performance.now().toFixed(2) + " " + str);
+			this._out(this._padding + performance.now().toFixed(2) + ' ' + str);
 		}
 	}
 
 	writeComment(str: string) {
-		var lines = (str || '').split("\n");
+		const lines = (str || '').split('\n');
 		if (lines.length === 1) {
-			this.writeLn("// " + lines[0]);
+			this.writeLn('// ' + lines[0]);
 		} else {
-			this.writeLn("/**");
-			for (var i = 0; i < lines.length; i++) {
-				this.writeLn(" * " + lines[i]);
+			this.writeLn('/**');
+			for (let i = 0; i < lines.length; i++) {
+				this.writeLn(' * ' + lines[i]);
 			}
-			this.writeLn(" */");
+			this.writeLn(' */');
 		}
 	}
 
 	writeLns(str: string) {
-		var lines = (str || '').split("\n");
-		for (var i = 0; i < lines.length; i++) {
+		const lines = (str || '').split('\n');
+		for (let i = 0; i < lines.length; i++) {
 			this.writeLn(lines[i]);
 		}
 	}
@@ -681,8 +681,8 @@ export class IndentingWriter {
 	}
 
 	colorLns(color: string, str: string) {
-		var lines = (str || '').split("\n");
-		for (var i = 0; i < lines.length; i++) {
+		const lines = (str || '').split('\n');
+		for (let i = 0; i < lines.length; i++) {
 			this.colorLn(color, lines[i]);
 		}
 	}
@@ -718,19 +718,19 @@ export class IndentingWriter {
 
 	writeArray(arr: any[], detailed: boolean = false, noNumbers: boolean = false) {
 		detailed = detailed || false;
-		for (var i = 0, j = arr.length; i < j; i++) {
-			var prefix = "";
+		for (let i = 0, j = arr.length; i < j; i++) {
+			let prefix = '';
 			if (detailed) {
 				if (arr[i] === null) {
-					prefix = "null";
+					prefix = 'null';
 				} else if (arr[i] === undefined) {
-					prefix = "undefined";
+					prefix = 'undefined';
 				} else {
 					prefix = arr[i].constructor.name;
 				}
-				prefix += " ";
+				prefix += ' ';
 			}
-			var number = noNumbers ? "" : ("" + i).padRight(' ', 4);
+			const number = noNumbers ? '' : ('' + i).padRight(' ', 4);
 			this.writeLn(number + prefix + arr[i]);
 		}
 	}
@@ -749,6 +749,7 @@ export class CircularBuffer {
 		this._mask = this._size - 1;
 		this.array = new Type(this._size);
 	}
+
 	public get (i) {
 		return this.array[i];
 	}
@@ -757,8 +758,8 @@ export class CircularBuffer {
 		if (this.isEmpty()) {
 			return;
 		}
-		var i = this.index === 0 ? this._size - 1 : this.index - 1;
-		var end = (this.start - 1) & this._mask;
+		let i = this.index === 0 ? this._size - 1 : this.index - 1;
+		const end = (this.start - 1) & this._mask;
 		while (i !== end) {
 			if (visitor(this.array[i], i)) {
 				break;
@@ -790,25 +791,25 @@ export class CircularBuffer {
 }
 
 export class ColorStyle {
-	static TabToolbar = "#252c33";
-	static Toolbars = "#343c45";
-	static HighlightBlue = "#1d4f73";
-	static LightText = "#f5f7fa";
-	static ForegroundText = "#b6babf";
-	static Black = "#000000";
-	static VeryDark = "#14171a";
-	static Dark = "#181d20";
-	static Light = "#a9bacb";
-	static Grey = "#8fa1b2";
-	static DarkGrey = "#5f7387";
-	static Blue = "#46afe3";
-	static Purple = "#6b7abb";
-	static Pink = "#df80ff";
-	static Red = "#eb5368";
-	static Orange = "#d96629";
-	static LightOrange = "#d99b28";
-	static Green = "#70bf53";
-	static BlueGrey = "#5e88b0";
+	static TabToolbar = '#252c33';
+	static Toolbars = '#343c45';
+	static HighlightBlue = '#1d4f73';
+	static LightText = '#f5f7fa';
+	static ForegroundText = '#b6babf';
+	static Black = '#000000';
+	static VeryDark = '#14171a';
+	static Dark = '#181d20';
+	static Light = '#a9bacb';
+	static Grey = '#8fa1b2';
+	static DarkGrey = '#5f7387';
+	static Blue = '#46afe3';
+	static Purple = '#6b7abb';
+	static Pink = '#df80ff';
+	static Red = '#eb5368';
+	static Orange = '#d96629';
+	static LightOrange = '#d99b28';
+	static Green = '#70bf53';
+	static BlueGrey = '#5e88b0';
 
 	private static _randomStyleCache;
 	private static _nextStyle = 0;
@@ -816,78 +817,78 @@ export class ColorStyle {
 	static randomStyle() {
 		if (!ColorStyle._randomStyleCache) {
 			ColorStyle._randomStyleCache = [
-				"#ff5e3a",
-				"#ff9500",
-				"#ffdb4c",
-				"#87fc70",
-				"#52edc7",
-				"#1ad6fd",
-				"#c644fc",
-				"#ef4db6",
-				"#4a4a4a",
-				"#dbddde",
-				"#ff3b30",
-				"#ff9500",
-				"#ffcc00",
-				"#4cd964",
-				"#34aadc",
-				"#007aff",
-				"#5856d6",
-				"#ff2d55",
-				"#8e8e93",
-				"#c7c7cc",
-				"#5ad427",
-				"#c86edf",
-				"#d1eefc",
-				"#e0f8d8",
-				"#fb2b69",
-				"#f7f7f7",
-				"#1d77ef",
-				"#d6cec3",
-				"#55efcb",
-				"#ff4981",
-				"#ffd3e0",
-				"#f7f7f7",
-				"#ff1300",
-				"#1f1f21",
-				"#bdbec2",
-				"#ff3a2d"
+				'#ff5e3a',
+				'#ff9500',
+				'#ffdb4c',
+				'#87fc70',
+				'#52edc7',
+				'#1ad6fd',
+				'#c644fc',
+				'#ef4db6',
+				'#4a4a4a',
+				'#dbddde',
+				'#ff3b30',
+				'#ff9500',
+				'#ffcc00',
+				'#4cd964',
+				'#34aadc',
+				'#007aff',
+				'#5856d6',
+				'#ff2d55',
+				'#8e8e93',
+				'#c7c7cc',
+				'#5ad427',
+				'#c86edf',
+				'#d1eefc',
+				'#e0f8d8',
+				'#fb2b69',
+				'#f7f7f7',
+				'#1d77ef',
+				'#d6cec3',
+				'#55efcb',
+				'#ff4981',
+				'#ffd3e0',
+				'#f7f7f7',
+				'#ff1300',
+				'#1f1f21',
+				'#bdbec2',
+				'#ff3a2d'
 			];
 		}
-		return ColorStyle._randomStyleCache[(ColorStyle._nextStyle ++) % ColorStyle._randomStyleCache.length];
+		return ColorStyle._randomStyleCache[(ColorStyle._nextStyle++) % ColorStyle._randomStyleCache.length];
 	}
 
 	private static _gradient = [
-		"#FF0000",  // Red
-		"#FF1100",
-		"#FF2300",
-		"#FF3400",
-		"#FF4600",
-		"#FF5700",
-		"#FF6900",
-		"#FF7B00",
-		"#FF8C00",
-		"#FF9E00",
-		"#FFAF00",
-		"#FFC100",
-		"#FFD300",
-		"#FFE400",
-		"#FFF600",
-		"#F7FF00",
-		"#E5FF00",
-		"#D4FF00",
-		"#C2FF00",
-		"#B0FF00",
-		"#9FFF00",
-		"#8DFF00",
-		"#7CFF00",
-		"#6AFF00",
-		"#58FF00",
-		"#47FF00",
-		"#35FF00",
-		"#24FF00",
-		"#12FF00",
-		"#00FF00"   // Green
+		'#FF0000',  // Red
+		'#FF1100',
+		'#FF2300',
+		'#FF3400',
+		'#FF4600',
+		'#FF5700',
+		'#FF6900',
+		'#FF7B00',
+		'#FF8C00',
+		'#FF9E00',
+		'#FFAF00',
+		'#FFC100',
+		'#FFD300',
+		'#FFE400',
+		'#FFF600',
+		'#F7FF00',
+		'#E5FF00',
+		'#D4FF00',
+		'#C2FF00',
+		'#B0FF00',
+		'#9FFF00',
+		'#8DFF00',
+		'#7CFF00',
+		'#6AFF00',
+		'#58FF00',
+		'#47FF00',
+		'#35FF00',
+		'#24FF00',
+		'#12FF00',
+		'#00FF00'   // Green
 	];
 
 	static gradientColor(value) {
@@ -896,8 +897,8 @@ export class ColorStyle {
 
 	static contrastStyle(rgb: string): string {
 		// http://www.w3.org/TR/AERT#color-contrast
-		var c = parseInt(rgb.substr(1), 16);
-		var yiq = (((c >> 16) * 299) + (((c >> 8) & 0xff) * 587) + ((c & 0xff) * 114)) / 1000;
+		const c = parseInt(rgb.substr(1), 16);
+		const yiq = (((c >> 16) * 299) + (((c >> 8) & 0xff) * 587) + ((c & 0xff) * 114)) / 1000;
 		return (yiq >= 128) ? '#000000' : '#ffffff';
 	}
 
@@ -1019,14 +1020,14 @@ export class Bounds {
 	}
 
 	public getBaseWidth(angle: number): number {
-		var u = Math.abs(Math.cos(angle));
-		var v = Math.abs(Math.sin(angle));
+		const u = Math.abs(Math.cos(angle));
+		const v = Math.abs(Math.sin(angle));
 		return u * (this.xMax - this.xMin) + v * (this.yMax - this.yMin);
 	}
 
 	public getBaseHeight(angle: number): number {
-		var u = Math.abs(Math.cos(angle));
-		var v = Math.abs(Math.sin(angle));
+		const u = Math.abs(Math.cos(angle));
+		const v = Math.abs(Math.sin(angle));
 		return v * (this.xMax - this.xMin) + u * (this.yMax - this.yMin);
 	}
 
@@ -1050,12 +1051,12 @@ export class Bounds {
 	}
 
 	toString(): string {
-		return "{ " +
-			"xMin: " + this.xMin + ", " +
-			"xMin: " + this.yMin + ", " +
-			"xMax: " + this.xMax + ", " +
-			"xMax: " + this.yMax +
-			" }";
+		return '{ ' +
+			'xMin: ' + this.xMin + ', ' +
+			'xMin: ' + this.yMin + ', ' +
+			'xMax: ' + this.xMax + ', ' +
+			'xMax: ' + this.yMax +
+			' }';
 	}
 }
 
@@ -1194,14 +1195,14 @@ export class DebugBounds {
 	}
 
 	public getBaseWidth(angle: number): number {
-		var u = Math.abs(Math.cos(angle));
-		var v = Math.abs(Math.sin(angle));
+		const u = Math.abs(Math.cos(angle));
+		const v = Math.abs(Math.sin(angle));
 		return u * (this._xMax - this._xMin) + v * (this._yMax - this._yMin);
 	}
 
 	public getBaseHeight(angle: number): number {
-		var u = Math.abs(Math.cos(angle));
-		var v = Math.abs(Math.sin(angle));
+		const u = Math.abs(Math.cos(angle));
+		const v = Math.abs(Math.sin(angle));
 		return v * (this._xMax - this._xMin) + u * (this._yMax - this._yMin);
 	}
 
@@ -1214,24 +1215,24 @@ export class DebugBounds {
 	}
 
 	toString(): string {
-		return "{ " +
-			"xMin: " + this._xMin + ", " +
-			"yMin: " + this._yMin + ", " +
-			"xMax: " + this._xMax + ", " +
-			"yMax: " + this._yMax +
-			" }";
+		return '{ ' +
+			'xMin: ' + this._xMin + ', ' +
+			'yMin: ' + this._yMin + ', ' +
+			'xMax: ' + this._xMax + ', ' +
+			'yMax: ' + this._yMax +
+			' }';
 	}
 
 	private assertValid(): void {
-//      release || assert(this._xMax >= this._xMin);
-//      release || assert(this._yMax >= this._yMin);
+		//      release || assert(this._xMax >= this._xMin);
+		//      release || assert(this._yMax >= this._yMin);
 	}
 }
 
 /**
  * Override Bounds with a slower by safer version, don't do this in release mode.
  */
-	// Shumway.Bounds = DebugBounds;
+// Shumway.Bounds = DebugBounds;
 
 export class Color {
 	public r: number;
@@ -1244,6 +1245,7 @@ export class Color {
 		this.b = b;
 		this.a = a;
 	}
+
 	static FromARGB(argb: number) {
 		return new Color (
 			(argb >> 16 & 0xFF) / 255,
@@ -1252,21 +1254,26 @@ export class Color {
 			(argb >> 24 & 0xFF) / 255
 		);
 	}
+
 	static FromRGBA(rgba: number) {
 		return Color.FromARGB(RGBAToARGB(rgba));
 	}
+
 	public toRGBA() {
 		return (this.r * 255) << 24 | (this.g * 255) << 16 | (this.b * 255) << 8 | (this.a * 255);
 	}
+
 	public toCSSStyle() {
 		return rgbaToCSSStyle(this.toRGBA());
 	}
+
 	set (other: Color) {
 		this.r = other.r;
 		this.g = other.g;
 		this.b = other.b;
 		this.a = other.a;
 	}
+
 	public static Red   = new Color(1, 0, 0, 1);
 	public static Green = new Color(0, 1, 0, 1);
 	public static Blue  = new Color(0, 0, 1, 1);
@@ -1277,6 +1284,7 @@ export class Color {
 	public static randomColor(alpha: number = 1): Color {
 		return new Color(Math.random(), Math.random(), Math.random(), alpha);
 	}
+
 	public static parseColor(color: string) {
 		if (!Color.colorCache) {
 			Color.colorCache = Object.create(null);
@@ -1285,14 +1293,14 @@ export class Color {
 			return Color.colorCache[color];
 		}
 		// TODO: Obviously slow, but it will do for now.
-		var span = document.createElement('span');
+		const span = document.createElement('span');
 		document.body.appendChild(span);
 		span.style.backgroundColor = color;
-		var rgb = getComputedStyle(span).backgroundColor;
+		const rgb = getComputedStyle(span).backgroundColor;
 		document.body.removeChild(span);
-		var m = /^rgb\((\d+), (\d+), (\d+)\)$/.exec(rgb);
+		let m = /^rgb\((\d+), (\d+), (\d+)\)$/.exec(rgb);
 		if (!m) m = /^rgba\((\d+), (\d+), (\d+), ([\d.]+)\)$/.exec(rgb);
-		var result = new Color(0, 0, 0, 0);
+		const result = new Color(0, 0, 0, 0);
 		result.r = parseFloat(m[1]) / 255;
 		result.g = parseFloat(m[2]) / 255;
 		result.b = parseFloat(m[3]) / 255;
@@ -1306,10 +1314,10 @@ export function registerCSSFont(id: number, data: Uint8Array, forceFontInit: boo
 		Debug.warning('Cannot register CSS font outside the browser');
 		return;
 	}
-	var head = document.head;
+	const head = document.head;
 	head.insertBefore(document.createElement('style'), head.firstChild);
-	var style = <CSSStyleSheet>document.styleSheets[0];
-	var rule = '@font-face{font-family:swffont' + id + ';src:url(data:font/opentype;base64,' +
+	const style = <CSSStyleSheet>document.styleSheets[0];
+	const rule = '@font-face{font-family:swffont' + id + ';src:url(data:font/opentype;base64,' +
 		base64EncodeBytes(data) + ')' + '}';
 	style.insertRule(rule, style.cssRules.length);
 	// In at least Chrome, the browser only decodes a font once it's used in the page at all.
@@ -1319,16 +1327,14 @@ export function registerCSSFont(id: number, data: Uint8Array, forceFontInit: boo
 	// take hold, the font is available for actual use on canvas.
 	// TODO: remove the need for magic by implementing this in terms of the font loading API.
 	if (forceFontInit) {
-		var node = document.createElement('div');
+		const node = document.createElement('div');
 		node.style.fontFamily = 'swffont' + id;
 		node.innerHTML = 'hello';
 		document.body.appendChild(node);
-		var dummyHeight = node.clientHeight;
+		const dummyHeight = node.clientHeight;
 		document.body.removeChild(node);
 	}
 }
-
-
 
 export class Callback {
 	private _queues: any;
@@ -1339,7 +1345,7 @@ export class Callback {
 	public register(type, callback) {
 		assert(type);
 		assert(callback);
-		var queue = this._queues[type];
+		let queue = this._queues[type];
 		if (queue) {
 			if (queue.indexOf(callback) > -1) {
 				return;
@@ -1353,11 +1359,11 @@ export class Callback {
 	public unregister(type: string, callback) {
 		assert(type);
 		assert(callback);
-		var queue = this._queues[type];
+		const queue = this._queues[type];
 		if (!queue) {
 			return;
 		}
-		var i = queue.indexOf(callback);
+		const i = queue.indexOf(callback);
 		if (i !== -1) {
 			queue.splice(i, 1);
 		}
@@ -1367,26 +1373,26 @@ export class Callback {
 	}
 
 	public notify(type: string, args) {
-		var queue = this._queues[type];
+		let queue = this._queues[type];
 		if (!queue) {
 			return;
 		}
 		queue = queue.slice();
 		var args = Array.prototype.slice.call(arguments, 0);
-		for (var i = 0; i < queue.length; i++) {
-			var callback = queue[i];
+		for (let i = 0; i < queue.length; i++) {
+			const callback = queue[i];
 			callback.apply(null, args);
 		}
 	}
 
 	public notify1(type: string, value) {
-		var queue = this._queues[type];
+		let queue = this._queues[type];
 		if (!queue) {
 			return;
 		}
 		queue = queue.slice();
-		for (var i = 0; i < queue.length; i++) {
-			var callback = queue[i];
+		for (let i = 0; i < queue.length; i++) {
+			const callback = queue[i];
 			callback(type, value);
 		}
 	}
@@ -1417,17 +1423,16 @@ export enum ImageType {
 
 export function getMIMETypeForImageType(type: ImageType): string {
 	switch (type) {
-		case ImageType.JPEG: return "image/jpeg";
-		case ImageType.PNG: return "image/png";
-		case ImageType.GIF: return "image/gif";
-		default: return "text/plain";
+		case ImageType.JPEG: return 'image/jpeg';
+		case ImageType.PNG: return 'image/png';
+		case ImageType.GIF: return 'image/gif';
+		default: return 'text/plain';
 	}
 }
 
-
 export class PromiseWrapper<T> {
 	public promise: Promise<T>;
-	public resolve: (result:T) => void;
+	public resolve: (result: T) => void;
 	public reject: (reason) => void;
 
 	then(onFulfilled, onRejected) {
@@ -1442,13 +1447,10 @@ export class PromiseWrapper<T> {
 	}
 }
 
-
-
-declare var exports;
-if (typeof exports !== "undefined") {
-	exports["Shumway"] = Shumway;
+declare let exports;
+if (typeof exports !== 'undefined') {
+	exports['Shumway'] = Shumway;
 }
-
 
 /**
  * Extend builtin prototypes.
@@ -1467,52 +1469,52 @@ if (typeof exports !== "undefined") {
 	}
 
 	function removeColors(s) {
-		return s.replace(/\033\[[0-9]*m/g, "");
+		return s.replace(/\033\[[0-9]*m/g, '');
 	}
 
-	extendBuiltin(String.prototype, "padRight", function (c, n) {
-		var str = this;
-		var length = removeColors(str).length;
+	extendBuiltin(String.prototype, 'padRight', function (c, n) {
+		let str = this;
+		const length = removeColors(str).length;
 		if (!c || length >= n) {
 			return str;
 		}
-		var max = (n - length) / c.length;
-		for (var i = 0; i < max; i++) {
+		const max = (n - length) / c.length;
+		for (let i = 0; i < max; i++) {
 			str += c;
 		}
 		return str;
 	});
 
-	extendBuiltin(String.prototype, "padLeft", function (c, n) {
-		var str = this;
-		var length = str.length;
+	extendBuiltin(String.prototype, 'padLeft', function (c, n) {
+		let str = this;
+		const length = str.length;
 		if (!c || length >= n) {
 			return str;
 		}
-		var max = (n - length) / c.length;
-		for (var i = 0; i < max; i++) {
+		const max = (n - length) / c.length;
+		for (let i = 0; i < max; i++) {
 			str = c + str;
 		}
 		return str;
 	});
 
-	extendBuiltin(String.prototype, "trim", function () {
-		return this.replace(/^\s+|\s+$/g,"");
+	extendBuiltin(String.prototype, 'trim', function () {
+		return this.replace(/^\s+|\s+$/g,'');
 	});
 
-	extendBuiltin(String.prototype, "endsWith", function (str) {
+	extendBuiltin(String.prototype, 'endsWith', function (str) {
 		return this.indexOf(str, this.length - str.length) !== -1;
 	});
 
-	extendBuiltin(Array.prototype, "replace", function(x, y) {
+	extendBuiltin(Array.prototype, 'replace', function(x, y) {
 		if (x === y) {
 			return 0;
 		}
-		var count = 0;
-		for (var i = 0; i < this.length; i++) {
+		let count = 0;
+		for (let i = 0; i < this.length; i++) {
 			if (this[i] === x) {
 				this[i] = y;
-				count ++;
+				count++;
 			}
 		}
 		return count;

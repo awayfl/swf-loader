@@ -1,10 +1,9 @@
 
-
-import {concat9} from "./StringUtilities";
-import {Cache} from "./Cache";
-import {ImageType} from "../utilities";
-import {assert, release, somewhatImplemented} from "./Debug";
-import {swap32} from "./IntegerUtilities";
+import { concat9 } from './StringUtilities';
+import { Cache } from './Cache';
+import { ImageType } from '../utilities';
+import { assert, release, somewhatImplemented } from './Debug';
+import { swap32 } from './IntegerUtilities';
 
 export function RGBAToARGB(rgba: number): number {
 	return ((rgba >> 8) & 0x00ffffff) | ((rgba & 0xff) << 24);
@@ -17,11 +16,11 @@ export function ARGBToRGBA(argb: number): number {
 /**
  * Cache frequently used rgba -> css style conversions.
  */
-var rgbaToCSSStyleCache = new Cache(1024);
+const rgbaToCSSStyleCache = new Cache(1024);
 
 export function rgbaToCSSStyle(rgba: number): string {
-	var result = rgbaToCSSStyleCache.get(rgba);
-	if (typeof result === "string") {
+	let result = rgbaToCSSStyleCache.get(rgba);
+	if (typeof result === 'string') {
 		return result;
 	}
 	result = concat9('rgba(', rgba >> 24 & 0xff, ',', rgba >> 16 & 0xff, ',', rgba >> 8 & 0xff, ',', (rgba & 0xff) / 0xff, ')');
@@ -32,26 +31,26 @@ export function rgbaToCSSStyle(rgba: number): string {
 /**
  * Cache frequently used css -> rgba styles conversions.
  */
-var cssStyleToRGBACache = new Cache(1024);
+const cssStyleToRGBACache = new Cache(1024);
 
 export function cssStyleToRGBA(style: string) {
-	var result = cssStyleToRGBACache.get(style);
-	if (typeof result === "number") {
+	let result = cssStyleToRGBACache.get(style);
+	if (typeof result === 'number') {
 		return result;
 	}
 	result =  0xff0000ff; // Red
-	if (style[0] === "#") {
+	if (style[0] === '#') {
 		if (style.length === 7) {
 			result = (parseInt(style.substring(1), 16) << 8) | 0xff;
 		}
-	} else if (style[0] === "r") {
+	} else if (style[0] === 'r') {
 		// We don't parse all types of rgba(....) color styles. We only handle the
 		// ones we generate ourselves.
-		var values = style.substring(5, style.length - 1).split(",");
-		var r = parseInt(values[0]);
-		var g = parseInt(values[1]);
-		var b = parseInt(values[2]);
-		var a = parseFloat(values[3]);
+		const values = style.substring(5, style.length - 1).split(',');
+		const r = parseInt(values[0]);
+		const g = parseInt(values[1]);
+		const b = parseInt(values[2]);
+		const a = parseFloat(values[3]);
 		result = (r & 0xff) << 24 |
 			(g & 0xff) << 16 |
 			(b & 0xff) << 8  |
@@ -81,10 +80,10 @@ export function clampByte(value: number) {
  * Unpremultiplies the given |pARGB| color value.
  */
 export function unpremultiplyARGB(pARGB: number) {
-	var b = (pARGB >>  0) & 0xff;
-	var g = (pARGB >>  8) & 0xff;
-	var r = (pARGB >> 16) & 0xff;
-	var a = (pARGB >> 24) & 0xff;
+	let b = (pARGB >>  0) & 0xff;
+	let g = (pARGB >>  8) & 0xff;
+	let r = (pARGB >> 16) & 0xff;
+	const a = (pARGB >> 24) & 0xff;
 	r = Math.imul(255, r) / a & 0xff;
 	g = Math.imul(255, g) / a & 0xff;
 	b = Math.imul(255, b) / a & 0xff;
@@ -95,17 +94,17 @@ export function unpremultiplyARGB(pARGB: number) {
  * Premultiplies the given |pARGB| color value.
  */
 export function premultiplyARGB(uARGB: number) {
-	var b = (uARGB >>  0) & 0xff;
-	var g = (uARGB >>  8) & 0xff;
-	var r = (uARGB >> 16) & 0xff;
-	var a = (uARGB >> 24) & 0xff;
+	let b = (uARGB >>  0) & 0xff;
+	let g = (uARGB >>  8) & 0xff;
+	let r = (uARGB >> 16) & 0xff;
+	const a = (uARGB >> 24) & 0xff;
 	r = ((Math.imul(r, a) + 127) / 255) | 0;
 	g = ((Math.imul(g, a) + 127) / 255) | 0;
 	b = ((Math.imul(b, a) + 127) / 255) | 0;
 	return a << 24 | r << 16 | g << 8 | b;
 }
 
-var premultiplyTable: Uint8Array;
+let premultiplyTable: Uint8Array;
 
 /**
  * All possible alpha values and colors 256 * 256 = 65536 entries. Experiments
@@ -117,7 +116,7 @@ var premultiplyTable: Uint8Array;
  *
  * TODO: Figure out if memory / speed tradeoff is worth it.
  */
-var unpremultiplyTable: Uint8Array;
+let unpremultiplyTable: Uint8Array;
 
 /**
  * Make sure to call this before using the |unpremultiplyARGBUsingTableLookup| or
@@ -127,8 +126,8 @@ var unpremultiplyTable: Uint8Array;
 export function ensureUnpremultiplyTable() {
 	if (!unpremultiplyTable) {
 		unpremultiplyTable = new Uint8Array(256 * 256);
-		for (var c = 0; c < 256; c++) {
-			for (var a = 0; a < 256; a++) {
+		for (let c = 0; c < 256; c++) {
+			for (let a = 0; a < 256; a++) {
 				unpremultiplyTable[(a << 8) + c] = Math.imul(255, c) / a;
 			}
 		}
@@ -142,17 +141,17 @@ export function getUnpremultiplyTable(): Uint8Array {
 
 export function tableLookupUnpremultiplyARGB(pARGB): number {
 	pARGB = pARGB | 0;
-	var a = (pARGB >> 24) & 0xff;
+	const a = (pARGB >> 24) & 0xff;
 	if (a === 0) {
 		return 0;
 	} else if (a === 0xff) {
 		return pARGB;
 	}
-	var b = (pARGB >>  0) & 0xff;
-	var g = (pARGB >>  8) & 0xff;
-	var r = (pARGB >> 16) & 0xff;
-	var o = a << 8;
-	var T = unpremultiplyTable;
+	let b = (pARGB >>  0) & 0xff;
+	let g = (pARGB >>  8) & 0xff;
+	let r = (pARGB >> 16) & 0xff;
+	const o = a << 8;
+	const T = unpremultiplyTable;
 	r = T[o + r];
 	g = T[o + g];
 	b = T[o + b];
@@ -176,16 +175,16 @@ export function tableLookupUnpremultiplyARGB(pARGB): number {
  * compute GA and BR without unpacking them.
  */
 declare interface Math{
-	imul(a,b):number;
+	imul(a,b): number;
 }
 
 export function blendPremultipliedBGRA(tpBGRA: number, spBGRA: number) {
-	var sA  = spBGRA & 0xff;
-	var sGA = spBGRA      & 0x00ff00ff;
-	var sBR = spBGRA >> 8 & 0x00ff00ff;
-	var tGA = tpBGRA      & 0x00ff00ff;
-	var tBR = tpBGRA >> 8 & 0x00ff00ff;
-	var A  = 256 - sA;
+	const sA  = spBGRA & 0xff;
+	const sGA = spBGRA      & 0x00ff00ff;
+	const sBR = spBGRA >> 8 & 0x00ff00ff;
+	let tGA = tpBGRA      & 0x00ff00ff;
+	let tBR = tpBGRA >> 8 & 0x00ff00ff;
+	const A  = 256 - sA;
 	tGA = Math.imul(tGA, A) >> 8;
 	tBR = Math.imul(tBR, A) >> 8;
 	return ((sBR + tBR & 0x00ff00ff) << 8) | (sGA + tGA & 0x00ff00ff);
@@ -193,9 +192,9 @@ export function blendPremultipliedBGRA(tpBGRA: number, spBGRA: number) {
 
 export function convertImage(sourceFormat: ImageType, targetFormat: ImageType, source: Int32Array, target: Int32Array) {
 	if (source !== target) {
-		release || assert(source.buffer !== target.buffer, "Can't handle overlapping views.");
+		release || assert(source.buffer !== target.buffer, 'Can\'t handle overlapping views.');
 	}
-	var length = source.length;
+	const length = source.length;
 	if (sourceFormat === targetFormat) {
 		if (source === target) {
 			return;
@@ -210,18 +209,18 @@ export function convertImage(sourceFormat: ImageType, targetFormat: ImageType, s
 		targetFormat === ImageType.StraightAlphaRGBA) {
 		ensureUnpremultiplyTable();
 		for (var i = 0; i < length; i++) {
-			var pBGRA = source[i];
-			var a = pBGRA & 0xff;
+			const pBGRA = source[i];
+			const a = pBGRA & 0xff;
 			if (a === 0) {
 				target[i] = 0;
 			} else if (a === 0xff) {
 				target[i] = 0xff000000 | ((pBGRA >> 8) & 0x00ffffff);
 			} else {
-				var b = (pBGRA >> 24) & 0xff;
-				var g = (pBGRA >> 16) & 0xff;
-				var r = (pBGRA >>  8) & 0xff;
-				var o = a << 8;
-				var T = unpremultiplyTable;
+				let b = (pBGRA >> 24) & 0xff;
+				let g = (pBGRA >> 16) & 0xff;
+				let r = (pBGRA >>  8) & 0xff;
+				const o = a << 8;
+				const T = unpremultiplyTable;
 				r = T[o + r];
 				g = T[o + g];
 				b = T[o + b];
@@ -236,14 +235,14 @@ export function convertImage(sourceFormat: ImageType, targetFormat: ImageType, s
 	} else if (sourceFormat === ImageType.StraightAlphaRGBA &&
 		targetFormat === ImageType.PremultipliedAlphaARGB) {
 		for (var i = 0; i < length; i++) {
-			var uABGR = source[i];
-			var uARGB = (uABGR & 0xFF00FF00)  | // A_G_
+			const uABGR = source[i];
+			const uARGB = (uABGR & 0xFF00FF00)  | // A_G_
 				(uABGR >> 16) & 0xff  | // A_GB
 				(uABGR & 0xff) << 16;   // ARGR
 			target[i] = swap32(premultiplyARGB(uARGB));
 		}
 	} else {
-		release || somewhatImplemented("Image Format Conversion: " + ImageType[sourceFormat] + " -> " + ImageType[targetFormat]);
+		release || somewhatImplemented('Image Format Conversion: ' + ImageType[sourceFormat] + ' -> ' + ImageType[targetFormat]);
 		// Copy the buffer over for now, we should at least get some image output.
 		for (var i = 0; i < length; i++) {
 			target[i] = source[i];
@@ -252,9 +251,7 @@ export function convertImage(sourceFormat: ImageType, targetFormat: ImageType, s
 	// leaveTimeline("convertImage");
 }
 
-
-
-export let ColorUtilitites={
+export const ColorUtilitites = {
 	RGBAToARGB:RGBAToARGB,
 	ARGBToRGBA:ARGBToRGBA,
 	cssStyleToRGBACache:cssStyleToRGBACache,

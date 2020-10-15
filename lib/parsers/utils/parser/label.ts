@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {StaticTextTag} from "../../../factories/base/SWFTags"
+import { StaticTextTag } from '../../../factories/base/SWFTags';
 
-export function defineLabel(tag: StaticTextTag):any {
-  var label = {
-    type: 'label',
-    id: tag.id,
-    fillBounds: tag.bbox,
-    matrix: tag.matrix,
-    tag: {
-      hasText: true,
-      initialText: '',
-      html: true,
-      readonly: true
-    },
-    records: tag.records,
-    coords: null,
-    static: true,
-    require: null
-  };
-  return label;
+export function defineLabel(tag: StaticTextTag): any {
+	const label = {
+		type: 'label',
+		id: tag.id,
+		fillBounds: tag.bbox,
+		matrix: tag.matrix,
+		tag: {
+			hasText: true,
+			initialText: '',
+			html: true,
+			readonly: true
+		},
+		records: tag.records,
+		coords: null,
+		static: true,
+		require: null
+	};
+	return label;
 }
-

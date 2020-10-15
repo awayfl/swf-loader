@@ -25,7 +25,7 @@ export interface ILocalConnectionService {
 	createConnection(connectionName: string,
 					 receiver: ILocalConnectionReceiver): LocalConnectionConnectResult;
 	closeConnection(connectionName: string,
-					receiver: ILocalConnectionReceiver): LocalConnectionCloseResult;
+		receiver: ILocalConnectionReceiver): LocalConnectionCloseResult;
 	send(connectionName: string, methodName: string, args: ArrayBuffer,
 		 sender: ILocalConnectionSender, senderDomain: string, senderIsSecure: boolean): void;
 	allowDomains(connectionName: string, receiver: ILocalConnectionReceiver, domains: string[],

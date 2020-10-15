@@ -1,16 +1,16 @@
-import { IInputRecorder, MouseManager } from "@awayjs/scene";
+import { IInputRecorder, MouseManager } from '@awayjs/scene';
 import { SWFFile } from './parsers/SWFFile';
-var hasshownServerError: boolean = false;
+let hasshownServerError: boolean = false;
 function serverError(error: any) {
 	if (hasshownServerError)
 		return;
 	hasshownServerError = true;
-	alert("Can not connect to Server. Is Server.js running ?");
+	alert('Can not connect to Server. Is Server.js running ?');
 
 }
 export enum TEST_MODE {
-	TESTING = "TESTING",
-	RECORDING = "RECORDING"
+	TESTING = 'TESTING',
+	RECORDING = 'RECORDING'
 }
 export class AVMTestHandler implements IInputRecorder {
 	public frames: IAVMTestFrame[];
@@ -37,21 +37,22 @@ export class AVMTestHandler implements IInputRecorder {
 		this._finished = false;
 		this.snapshotCnt = 0;
 
-		if(this.config.recordtest)
+		if (this.config.recordtest)
 			MouseManager.inputRecorder = this;
 		//if(this.config.mode==TEST_MODE.RECORDING){
 		//	if recording, we must have a way to stop the recording,
 		//	so we listen for a keyboard sortcut here on window
-		window.addEventListener("keydown", (event) => {
+		window.addEventListener('keydown', (event) => {
 			if (event.ctrlKey && event.keyCode == 69) {
 				this.finishTest();
 			}
 		});
 		//}
 	}
+
 	/**
 	 * called from trace-function, to collect all traces for a frame
-	 * @param message 
+	 * @param message
 	 */
 	public addMessage(message: string) {
 		if (this._finished)
@@ -72,13 +73,13 @@ export class AVMTestHandler implements IInputRecorder {
 
 	public recordEvent(event: any) {
 
-		if(this.config.settings.snapShotOnMouseDown && event.type=="mousedown")
-			this.takeSnapshot();
-			
-		if(this.config.settings.snapShotOnMouseUP && event.type=="mouseup")
+		if (this.config.settings.snapShotOnMouseDown && event.type == 'mousedown')
 			this.takeSnapshot();
 
-		if(!this.config.recordtest)
+		if (this.config.settings.snapShotOnMouseUP && event.type == 'mouseup')
+			this.takeSnapshot();
+
+		if (!this.config.recordtest)
 			return;
 		// todo allow to filter out all mousemove commands
 
@@ -90,7 +91,7 @@ export class AVMTestHandler implements IInputRecorder {
 		if (!this.events[this.frameIdx])
 			this.events[this.frameIdx] = [];
 
-		let jsonEvent = {
+		const jsonEvent = {
 			type: event.type,
 			screenX: event.screenX,
 			screenY: event.screenY,
@@ -99,71 +100,71 @@ export class AVMTestHandler implements IInputRecorder {
 			ctrlKey: event.ctrlKey,
 			altKey: event.altKey,
 			shiftKey: event.shiftKey
-		}
+		};
 
 		this.events[this.frameIdx].push(jsonEvent);
 	}
 
-
 	public dispatchEvents() {
-		if(this.config.recordtest)
+		if (this.config.recordtest)
 			return;
 		if (this.config.events && this.config.events[this.frameIdx]) {
 			for (let i = 0; i < this.config.events[this.frameIdx].length; i++) {
-				let jsonEvent = this.config.events[this.frameIdx][i];
+				const jsonEvent = this.config.events[this.frameIdx][i];
 				jsonEvent.preventDefault = () => { };
 				switch (jsonEvent.type) {
-					case "click":
+					case 'click':
 						MouseManager.getInstance(null).onClick(jsonEvent);
 						break;
-					case "dblclick":
+					case 'dblclick':
 						MouseManager.getInstance(null).onDoubleClick(jsonEvent);
 						break;
-					case "touchstart":
+					case 'touchstart':
 						MouseManager.getInstance(null).onMouseDown(jsonEvent);
 						break;
-					case "mousedown":
-						if(this.config.settings.snapShotOnMouseDown)
-							this.takeSnapshot();			
+					case 'mousedown':
+						if (this.config.settings.snapShotOnMouseDown)
+							this.takeSnapshot();
 						MouseManager.getInstance(null).onMouseDown(jsonEvent);
 						break;
-					case "touchmove":
+					case 'touchmove':
 						MouseManager.getInstance(null).onMouseMove(jsonEvent);
 						break;
-					case "mousemove":
+					case 'mousemove':
 						MouseManager.getInstance(null).onMouseMove(jsonEvent);
 						break;
-					case "mouseup":
-						if(this.config.settings.snapShotOnMouseUP)
+					case 'mouseup':
+						if (this.config.settings.snapShotOnMouseUP)
 							this.takeSnapshot();
 						MouseManager.getInstance(null).onMouseUp(jsonEvent);
 						break;
-					case "touchend":
+					case 'touchend':
 						MouseManager.getInstance(null).onMouseUp(jsonEvent);
 						break;
-					case "touchend":
+					case 'touchend':
 						MouseManager.getInstance(null).onClick(jsonEvent);
 						break;
-					case "mousewheel":
+					case 'mousewheel':
 						MouseManager.getInstance(null).onMouseWheel(jsonEvent);
 						break;
-					case "mouseover":
+					case 'mouseover':
 						MouseManager.getInstance(null).onMouseOver(jsonEvent);
 						break;
-					case "mouseout":
+					case 'mouseout':
 						MouseManager.getInstance(null).onMouseOut(jsonEvent);
 						break;
-					case "keydown":
+					case 'keydown':
 						MouseManager.getInstance(null).onKeyDown(jsonEvent);
 						break;
-					case "keyup":
+					case 'keyup':
 						MouseManager.getInstance(null).onKeyUp(jsonEvent);
 						break;
-						
+
 				}
 			}
 		}
 	}
+
 	public closeBrowserTab() {
 		if (!this._finished)
 			return;
@@ -171,21 +172,22 @@ export class AVMTestHandler implements IInputRecorder {
 			this.finishAndUploadTest();
 		}
 	}
+
 	public takeSnapshot() {
 		if (this._finished)
 			return;
-		let myThis = this;
-		let snapShotFrame = this.snapshotCnt++;
-		this.addMessage("AWAYFLTEST SNAPSHOT " + snapShotFrame);
+		const myThis = this;
+		const snapShotFrame = this.snapshotCnt++;
+		this.addMessage('AWAYFLTEST SNAPSHOT ' + snapShotFrame);
 		this._avmStage.snapshot(htmlCanvas => {
 
 			htmlCanvas.toBlob((blob) => onBlob(blob));
 			function onBlob(blob) {
-				console.log("snapshot done");
+				console.log('snapshot done');
 
 				const formData = new FormData();
-				var fileName = "snapshot_" + snapShotFrame + ".png";
-				formData.append("file", blob, fileName);
+				const fileName = 'snapshot_' + snapShotFrame + '.png';
+				formData.append('file', blob, fileName);
 
 				const request = new XMLHttpRequest();
 				request.onreadystatechange = function (oEvent) {
@@ -196,23 +198,23 @@ export class AVMTestHandler implements IInputRecorder {
 							myThis.closeBrowserTab();
 							//console.log(request.responseText)
 						} else {
-							serverError(request.statusText + "-" + request.readyState + "-" + request.responseText + "-" + request.status);
+							serverError(request.statusText + '-' + request.readyState + '-' + request.responseText + '-' + request.status);
 						}
 					}
 				};
 				request.onerror = function (e) {
-					serverError(request.statusText + "-" + request.readyState + "-" + request.responseText + "-" + request.status);
+					serverError(request.statusText + '-' + request.readyState + '-' + request.responseText + '-' + request.status);
 				};
 				try {
-					request.open("POST", "http://localhost:" + myThis.config.port + "/uploadImage", true);
+					request.open('POST', 'http://localhost:' + myThis.config.port + '/uploadImage', true);
 					request.send(formData);
+				} catch (e) {
+					serverError('Could not save json on server. The Server.js is probably not running. Error: ' + e);
 				}
-				catch (e) {
-					serverError("Could not save json on server. The Server.js is probably not running. Error: " + e);
-				}
-			};
+			}
 		});
 	}
+
 	/**
 	 * called from onEnter on stage
 	 */
@@ -231,8 +233,7 @@ export class AVMTestHandler implements IInputRecorder {
 					messages: [],
 					frameIdx: this.frameIdx,
 				});
-			}
-			else {
+			} else {
 				this.frames[this.frames.length - 1].frameIdx = this.frameIdx;
 			}
 		}
@@ -259,14 +260,15 @@ export class AVMTestHandler implements IInputRecorder {
 			}
 			if (currentRecordetFrame == this.config.frames.length - 1) {
 				// last of the recordet frames, if test frame has same number of messages, test is complete
-				let len1 = this.config.frames[currentRecordetFrame].messages.length;
-				let len2 = this.frames[this.frames.length - 1].messages.length;
+				const len1 = this.config.frames[currentRecordetFrame].messages.length;
+				const len2 = this.frames[this.frames.length - 1].messages.length;
 				if (len2 >= len1) {
 					this.finishTest();
 				}
 			}
 		}
 	}
+
 	public finishTest() {
 		if (this._finished)
 			return;
@@ -278,11 +280,11 @@ export class AVMTestHandler implements IInputRecorder {
 		if (this.frames[this.frames.length - 1].messages.length == 0) {
 			this.frames.pop();
 		}
-		let myThis = this;
-		var path = window.location.pathname;
-		var page = path.split("/").pop().replace(".html", "");
+		const myThis = this;
+		const path = window.location.pathname;
+		const page = path.split('/').pop().replace('.html', '');
 		const data = {
-			player: "awayflplayer",
+			player: 'awayflplayer',
 			duration: Date.now() - this.config.startRecTime,
 			date: new Date().toLocaleString(),
 			url: page,
@@ -292,44 +294,40 @@ export class AVMTestHandler implements IInputRecorder {
 			frames: this.frames,
 			events: this.events,
 			seed: this.config.seed,
-		}
+		};
 		const json = JSON.stringify(data);
 		const formData = new FormData();
-		const blob = new Blob([json], { type: "text/xml" });
+		const blob = new Blob([json], { type: 'text/xml' });
 		if (this.config.recordtest) {
-			var fileName = this.config.swfPath.replace(/\\/g, "/");
-			formData.append("file", blob, fileName);
-			formData.append("record", "true");
-		}
-		else {
-			var fileName = this.config.swfPath.replace(/\\/g, "/") + "/" + this.config.testPath;
-			formData.append("file", blob, fileName);
+			var fileName = this.config.swfPath.replace(/\\/g, '/');
+			formData.append('file', blob, fileName);
+			formData.append('record', 'true');
+		} else {
+			var fileName = this.config.swfPath.replace(/\\/g, '/') + '/' + this.config.testPath;
+			formData.append('file', blob, fileName);
 		}
 		const request = new XMLHttpRequest();
 		request.onreadystatechange = function (oEvent) {
 			if (request.readyState == 4) {
 				if (request.status == 200 || request.status == 0) {
-					console.log("AWAYFLTEST END");
+					console.log('AWAYFLTEST END');
 					//window.close();
 					//console.log(request.responseText)
 				} else {
-					serverError(request.statusText + "-" + request.readyState + "-" + request.responseText + "-" + request.status);
+					serverError(request.statusText + '-' + request.readyState + '-' + request.responseText + '-' + request.status);
 				}
 			}
 		};
 		request.onerror = function (e) {
-			serverError(request.statusText + "-" + request.readyState + "-" + request.responseText + "-" + request.status);
+			serverError(request.statusText + '-' + request.readyState + '-' + request.responseText + '-' + request.status);
 		};
 		try {
-			request.open("POST", "http://localhost:" + this.config.port + "/upload", true);
+			request.open('POST', 'http://localhost:' + this.config.port + '/upload', true);
 			request.send(formData);
-		}
-		catch (e) {
-			serverError("Could not save json on server. The Server.js is probably not running. Error: " + e);
+		} catch (e) {
+			serverError('Could not save json on server. The Server.js is probably not running. Error: ' + e);
 		}
 	}
-
-
 
 }
 export interface IAVMTestConfig {

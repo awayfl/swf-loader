@@ -15,7 +15,7 @@
  */
 
 //module Shumway {
-declare var XMLHttpRequest;
+declare let XMLHttpRequest;
 
 export interface BinaryFileReaderProgressInfo {
 	loaded: number;
@@ -37,12 +37,12 @@ export class BinaryFileReader {
 	}
 
 	readAll(progress: (response: any, loaded: number, total: number) => void,
-			complete: (response: any, error?: any) => void) {
-		var url = this.url;
-		var xhr = this.xhr = new XMLHttpRequest({mozSystem: true});
-		var async = true;
-		xhr.open(this.method || "GET", this.url, async);
-		xhr.responseType = "arraybuffer";
+		complete: (response: any, error?: any) => void) {
+		const url = this.url;
+		const xhr = this.xhr = new XMLHttpRequest({ mozSystem: true });
+		const async = true;
+		xhr.open(this.method || 'GET', this.url, async);
+		xhr.responseType = 'arraybuffer';
 		if (progress) {
 			xhr.onprogress = function (event) {
 				progress(xhr.response, event.loaded, event.total);
@@ -51,7 +51,7 @@ export class BinaryFileReader {
 		xhr.onreadystatechange = function (event) {
 			if (xhr.readyState === 4) {
 				if (xhr.status !== 200 && xhr.status !== 0 || xhr.response === null) {
-					unexpected("Path: " + url + " not found.");
+					unexpected('Path: ' + url + ' not found.');
 					complete(null, xhr.statusText);
 					return;
 				}
@@ -59,36 +59,36 @@ export class BinaryFileReader {
 			}
 		};
 		if (this.mimeType) {
-			xhr.setRequestHeader("Content-Type", this.mimeType);
+			xhr.setRequestHeader('Content-Type', this.mimeType);
 		}
 		xhr.send(this.data || null);
 	}
 
 	readChunked(chunkSize: number /* int */,
-				ondata: (data: Uint8Array, progress:BinaryFileReaderProgressInfo) => void,
-				onerror: (err: any) => void,
-				onopen?: () => void,
-				oncomplete?: () => void,
-				onhttpstatus?: (location: string, status: string, responseHeaders: any) => void) {
+		ondata: (data: Uint8Array, progress: BinaryFileReaderProgressInfo) => void,
+		onerror: (err: any) => void,
+		onopen?: () => void,
+		oncomplete?: () => void,
+		onhttpstatus?: (location: string, status: string, responseHeaders: any) => void) {
 		if (chunkSize <= 0) {
 			this.readAsync(ondata, onerror, onopen, oncomplete, onhttpstatus);
 			return;
 		}
 
-		var position = 0;
-		var buffer = new Uint8Array(chunkSize);
-		var read = 0, total;
+		let position = 0;
+		const buffer = new Uint8Array(chunkSize);
+		let read = 0, total;
 		this.readAsync(
 			function (data: Uint8Array, progress: BinaryFileReaderProgressInfo) {
 				total = progress.total;
-				var left = data.length, offset = 0;
+				let left = data.length, offset = 0;
 				while (position + left >= chunkSize) {
-					var tailSize = chunkSize - position;
+					const tailSize = chunkSize - position;
 					buffer.set(data.subarray(offset, offset + tailSize), position);
 					offset += tailSize;
 					left -= tailSize;
 					read += chunkSize;
-					ondata(buffer, {loaded: read, total: total});
+					ondata(buffer, { loaded: read, total: total });
 					position = 0;
 				}
 				buffer.set(data.subarray(offset), position);
@@ -99,7 +99,7 @@ export class BinaryFileReader {
 			function () {
 				if (position > 0) {
 					read += position;
-					ondata(buffer.subarray(0, position), {loaded: read, total: total});
+					ondata(buffer.subarray(0, position), { loaded: read, total: total });
 					position = 0;
 				}
 				oncomplete && oncomplete();
@@ -107,18 +107,18 @@ export class BinaryFileReader {
 			onhttpstatus);
 	}
 
-	readAsync(ondata: (data: Uint8Array, progress:BinaryFileReaderProgressInfo) => void,
+	readAsync(ondata: (data: Uint8Array, progress: BinaryFileReaderProgressInfo) => void,
 			  onerror: (err: any) => void,
 			  onopen?: () => void,
 			  oncomplete?: () => void,
 			  onhttpstatus?: (location: string, status: string, responseHeaders: any) => void) {
-		var xhr = this.xhr = new XMLHttpRequest({mozSystem: true});
-		var url = this.url;
-		var loaded = 0;
-		var total = 0;
-		xhr.open(this.method || "GET", url, true);
+		const xhr = this.xhr = new XMLHttpRequest({ mozSystem: true });
+		const url = this.url;
+		let loaded = 0;
+		let total = 0;
+		xhr.open(this.method || 'GET', url, true);
 		xhr.responseType = 'moz-chunked-arraybuffer';
-		var isNotProgressive = xhr.responseType !== 'moz-chunked-arraybuffer';
+		const isNotProgressive = xhr.responseType !== 'moz-chunked-arraybuffer';
 		if (isNotProgressive) {
 			xhr.responseType = 'arraybuffer';
 		}
@@ -128,7 +128,7 @@ export class BinaryFileReader {
 			}
 			loaded = e.loaded;
 			total = e.total;
-			var bytes = new Uint8Array(xhr.response);
+			const bytes = new Uint8Array(xhr.response);
 			// The event's `loaded` and `total` properties are sometimes lower than the actual
 			// number of loaded bytes. In that case, increase them to that value.
 			loaded = Math.max(loaded, bytes.byteLength);
@@ -145,13 +145,12 @@ export class BinaryFileReader {
 				// Note: Just checking that `xhr.response` is set doesn't work, as Firefox enables
 				// chunked loading, and in that mode `response` is only set in the `onprogress` handler.
 				if (xhr.status !== 200 && xhr.status !== 0 ||
-					xhr.response === null && (total === 0 || loaded !== total))
-				{
+					xhr.response === null && (total === 0 || loaded !== total)) {
 					onerror(xhr.statusText);
 					return;
 				}
 				if (isNotProgressive) {
-					var buffer = xhr.response;
+					const buffer = xhr.response;
 					ondata(new Uint8Array(buffer), { loaded: buffer.byteLength, total: buffer.byteLength });
 				}
 			}
@@ -162,7 +161,7 @@ export class BinaryFileReader {
 			}
 		};
 		if (this.mimeType) {
-			xhr.setRequestHeader("Content-Type", this.mimeType);
+			xhr.setRequestHeader('Content-Type', this.mimeType);
 		}
 		xhr.send(this.data || null);
 		if (onopen) {
@@ -178,4 +177,3 @@ export class BinaryFileReader {
 	}
 }
 //}
-

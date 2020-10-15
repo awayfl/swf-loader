@@ -1,5 +1,4 @@
 
-
 export interface FileLoadingRequest {
 	url: string;
 	data: any;
@@ -26,8 +25,4 @@ export interface IFileLoadingService {
 	navigateTo(url: string, target: string);
 }
 
-export var FileLoadingService:IFileLoadingService;
-
-
-
-
+export var FileLoadingService: IFileLoadingService;

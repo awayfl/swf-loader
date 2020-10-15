@@ -1,11 +1,11 @@
 
-import {SoundStream} from "../parsers/utils/parser/sound";
+import { SoundStream } from '../parsers/utils/parser/sound';
 
 import {
 	ActionBlock,
 	InitActionBlock,
 	SymbolExport,
-	UnparsedTag} from "@awayjs/graphics";
+	UnparsedTag } from '@awayjs/graphics';
 export class SWFFrame {
 	controlTags: UnparsedTag[];
 	labelNames: string[];
@@ -15,13 +15,13 @@ export class SWFFrame {
 	initActionBlocks: InitActionBlock[];
 	exports: SymbolExport[];
 	buttonStateName: string;
-	
+
 	constructor(controlTags?: UnparsedTag[], labelNames?: string[],
-				soundStreamHead?: SoundStream,
-				soundStreamBlock?: Uint8Array,
-				actionBlocks?: ActionBlock[],
-				initActionBlocks?: InitActionBlock[],
-				exports?: SymbolExport[]) {
+		soundStreamHead?: SoundStream,
+		soundStreamBlock?: Uint8Array,
+		actionBlocks?: ActionBlock[],
+		initActionBlocks?: InitActionBlock[],
+		exports?: SymbolExport[]) {
 		controlTags && Object.freeze(controlTags);
 		this.controlTags = controlTags;
 		this.labelNames = labelNames;
@@ -31,7 +31,7 @@ export class SWFFrame {
 		this.actionBlocks = actionBlocks;
 		initActionBlocks && Object.freeze(initActionBlocks);
 		this.initActionBlocks = initActionBlocks;
-		this.buttonStateName="";
+		this.buttonStateName = '';
 		exports && Object.freeze(exports);
 		this.exports = exports;
 	}

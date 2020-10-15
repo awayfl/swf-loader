@@ -10,14 +10,14 @@ export class Record {
 	private _subs: Record[] = [];
 	private _state: RECORD_STATE = RECORD_STATE.NONE;
 
-	constructor(public name: string, private _subrecord = false) {};
+	constructor(public name: string, private _subrecord = false) {}
 
 	public rec(name: string, subrecrod = false): Record {
-		if(this._subrecord) {
-			throw "Suprecord can't support nested records!";
+		if (this._subrecord) {
+			throw 'Suprecord can\'t support nested records!';
 		}
 		let sub = this._subs[this._subs.length - 1];
-		if(!(sub && sub._state === RECORD_STATE.BEGIN)) {
+		if (!(sub && sub._state === RECORD_STATE.BEGIN)) {
 			sub = this;
 		}
 
@@ -25,20 +25,20 @@ export class Record {
 	}
 
 	public begin() {
-		if(this._state !== RECORD_STATE.NONE) {
+		if (this._state !== RECORD_STATE.NONE) {
 			return;
 		}
 
-		if(!this._subrecord) {
+		if (!this._subrecord) {
 
-			if(this._subs[this._subs.length - 1]) {
+			if (this._subs[this._subs.length - 1]) {
 				this._subs[this._subs.length - 1].end();
 			}
 
-			const sub = this.rec(this.name + "_" + this._subs.length, true);
+			const sub = this.rec(this.name + '_' + this._subs.length, true);
 			this._subs.push(sub);
 
-			return sub.begin()
+			return sub.begin();
 		}
 
 		this._state = RECORD_STATE.BEGIN;
@@ -47,15 +47,15 @@ export class Record {
 
 	public end() {
 
-		for(let key in this._records) {
+		for (const key in this._records) {
 			this._records[key].end();
 		}
 
-		if(this._state !== RECORD_STATE.BEGIN) {
+		if (this._state !== RECORD_STATE.BEGIN) {
 			return;
 		}
 
-		if(!this._subrecord) {
+		if (!this._subrecord) {
 			return this._subs[this._subs.length - 1].end();
 		}
 
@@ -68,7 +68,7 @@ export class Record {
 	public drop() {
 		this.end();
 
-		if(!this._subrecord) {
+		if (!this._subrecord) {
 			return this._subs[this._subs.length - 1].drop();
 		}
 
@@ -77,14 +77,14 @@ export class Record {
 	}
 
 	get startTime(): number {
-		if(this._state == RECORD_STATE.DROP) {
+		if (this._state == RECORD_STATE.DROP) {
 			return 0;
 		}
 
 		let startTime = this._startTime || Number.MAX_VALUE;
 
-		for(let key in this._records) {
-			let r = this._records[key];
+		for (const key in this._records) {
+			const r = this._records[key];
 			startTime = Math.min(startTime, r.startTime);
 		}
 
@@ -92,14 +92,14 @@ export class Record {
 	}
 
 	get endTime(): number {
-		if(this._state == RECORD_STATE.DROP) {
+		if (this._state == RECORD_STATE.DROP) {
 			return 0;
 		}
 
 		let endTime = this._endTime || -Number.MAX_VALUE;
 
-		for(let key in this._records) {
-			let r = this._records[key];
+		for (const key in this._records) {
+			const r = this._records[key];
 			endTime = Math.max(endTime, r.endTime);
 		}
 
@@ -107,19 +107,19 @@ export class Record {
 	}
 
 	get duration(): number {
-		if(this._state == RECORD_STATE.DROP) {
+		if (this._state == RECORD_STATE.DROP) {
 			return 0;
 		}
 
 		const len = Object.keys(this._records).length;
 
-		if(!len) {
+		if (!len) {
 			return this._endTime - this._startTime;
 		}
 
 		let duration = 0;
 
-		for(let key in this._records) {
+		for (const key in this._records) {
 			duration += this._records[key].duration;
 		}
 
@@ -129,7 +129,7 @@ export class Record {
 	get selfDuration() {
 		const len = Object.keys(this._records).length;
 
-		if(!len) {
+		if (!len) {
 			return this._endTime - this._startTime;
 		}
 
@@ -137,7 +137,7 @@ export class Record {
 	}
 
 	get density() {
-		if(this._state == RECORD_STATE.DROP) {
+		if (this._state == RECORD_STATE.DROP) {
 			return 0;
 		}
 
@@ -150,20 +150,20 @@ export class Record {
 	}
 
 	toTable(ident: number = 0, filter: (r: Record) => boolean) {
-		let r = "  ".repeat(ident) + this.toString() + "\n";
+		let r = '  '.repeat(ident) + this.toString() + '\n';
 
-		if(this._subs.length === 1 && Object.keys(this._records).length === 1) {
+		if (this._subs.length === 1 && Object.keys(this._records).length === 1) {
 			return r;
 		}
 
-		for(let key in this._records) {
+		for (const key in this._records) {
 			const rec = this._records[key];
 
-			if(rec._state === RECORD_STATE.DROP) {
+			if (rec._state === RECORD_STATE.DROP) {
 				continue;
 			}
 
-			if(filter && filter(rec)) {
+			if (filter && filter(rec)) {
 				continue;
 			}
 
@@ -177,13 +177,13 @@ export class Record {
 export class Stat extends Record {
 	private static _instance: Stat;
 	constructor() {
-		super("ROOT");
+		super('ROOT');
 		//@ts-ignore
 		window.AWAY_ROOT_STAT = this;
 	}
 
 	static rec(name: string) {
-		if(!this._instance) {
+		if (!this._instance) {
 			this._instance = new Stat();
 		}
 

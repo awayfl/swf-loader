@@ -18,8 +18,7 @@
 /* LzmaSpec.c -- LZMA Reference Decoder
  2013-07-28 : Igor Pavlov : Public domain */
 
-
-import {IDataDecoder} from "./utilities/ArrayUtilities";
+import { IDataDecoder } from './utilities/ArrayUtilities';
 
 class InputStream {
 	available: number;
@@ -33,14 +32,14 @@ class InputStream {
 	}
 
 	append(data: Uint8Array) {
-		var length = this.pos + this.available;
-		var needLength = length + data.length;
+		const length = this.pos + this.available;
+		const needLength = length + data.length;
 		if (needLength > this.buffer.length) {
-			var newLength = this.buffer.length * 2;
+			let newLength = this.buffer.length * 2;
 			while (newLength < needLength) {
 				newLength *= 2;
 			}
-			var newBuffer = new Uint8Array(newLength);
+			const newBuffer = new Uint8Array(newLength);
 			newBuffer.set(this.buffer);
 			this.buffer = newBuffer;
 		}
@@ -58,7 +57,7 @@ class InputStream {
 
 	readByte(): number {
 		if (this.available <= 0) {
-			throw new Error("Unexpected end of file");
+			throw new Error('Unexpected end of file');
 		}
 		this.available--;
 		return this.buffer[this.pos++];
@@ -131,15 +130,15 @@ class OutWindow {
 	}
 
 	copyMatch(dist: number, len: number): void {
-		var pos = this.pos;
-		var size = this.size;
-		var buffer = this.buf;
-		var getPos = dist <= pos ? pos - dist : size - dist + pos;
-		var left = len;
+		let pos = this.pos;
+		const size = this.size;
+		const buffer = this.buf;
+		let getPos = dist <= pos ? pos - dist : size - dist + pos;
+		let left = len;
 		while (left > 0) {
-			var chunk = Math.min(Math.min(left, size - pos), size - getPos);
-			for (var i = 0; i < chunk; i++) {
-				var b = buffer[getPos++];
+			const chunk = Math.min(Math.min(left, size - pos), size - getPos);
+			for (let i = 0; i < chunk; i++) {
+				const b = buffer[getPos++];
 				buffer[pos++] = b;
 			}
 			if (pos === size) {
@@ -166,20 +165,20 @@ class OutWindow {
 	}
 }
 
-var kNumBitModelTotalBits = 11;
-var kNumMoveBits = 5;
+const kNumBitModelTotalBits = 11;
+const kNumMoveBits = 5;
 
-var PROB_INIT_VAL = ((1 << kNumBitModelTotalBits) >> 1);
+const PROB_INIT_VAL = ((1 << kNumBitModelTotalBits) >> 1);
 
 function createProbsArray(length: number): Uint16Array {
-	var p = new Uint16Array(length);
-	for (var i = 0; i < length; i++) {
+	const p = new Uint16Array(length);
+	for (let i = 0; i < length; i++) {
 		p[i] = PROB_INIT_VAL;
 	}
 	return p;
 }
 
-var kTopValue = 1 << 24;
+const kTopValue = 1 << 24;
 
 class RangeDecoder {
 	inStream: InputStream;
@@ -200,8 +199,8 @@ class RangeDecoder {
 		}
 
 		this.range = 0xFFFFFFFF | 0;
-		var code = 0;
-		for (var i = 0; i < 4; i++) {
+		let code = 0;
+		for (let i = 0; i < 4; i++) {
 			code = (code << 8) | this.inStream.readByte();
 		}
 
@@ -216,13 +215,13 @@ class RangeDecoder {
 	}
 
 	decodeDirectBits(numBits: number): number {
-		var res = 0;
-		var range = this.range;
-		var code = this.code;
+		let res = 0;
+		let range = this.range;
+		let code = this.code;
 		do {
 			range = (range >>> 1) | 0;
 			code = (code - range) | 0;
-			var t = code >> 31; // if high bit set -1, otherwise 0
+			const t = code >> 31; // if high bit set -1, otherwise 0
 			code = (code + (range & t)) | 0;
 
 			if (code === range) {
@@ -242,11 +241,11 @@ class RangeDecoder {
 	}
 
 	decodeBit(prob: Uint16Array, index: number): number {
-		var range = this.range;
-		var code = this.code;
-		var v = prob[index];
-		var bound = (range >>> kNumBitModelTotalBits) * v; // keep unsigned
-		var symbol;
+		let range = this.range;
+		let code = this.code;
+		let v = prob[index];
+		const bound = (range >>> kNumBitModelTotalBits) * v; // keep unsigned
+		let symbol;
 		if ((code >>> 0) < bound) {
 			v = (v + (((1 << kNumBitModelTotalBits) - v) >> kNumMoveBits)) | 0;
 			range = bound | 0;
@@ -272,10 +271,10 @@ class RangeDecoder {
 
 function bitTreeReverseDecode(probs: Uint16Array, offset: number,
 							  numBits: number, rc: RangeDecoder): number {
-	var m = 1;
-	var symbol = 0;
-	for (var i = 0; i < numBits; i++) {
-		var bit = rc.decodeBit(probs, m + offset);
+	let m = 1;
+	let symbol = 0;
+	for (let i = 0; i < numBits; i++) {
+		const bit = rc.decodeBit(probs, m + offset);
 		m = (m << 1) + bit;
 		symbol |= bit << i;
 	}
@@ -292,8 +291,8 @@ class BitTreeDecoder {
 	}
 
 	decode(rc: RangeDecoder) {
-		var m = 1;
-		for (var i = 0; i < this.numBits; i++) {
+		let m = 1;
+		for (let i = 0; i < this.numBits; i++) {
 			m = (m << 1) + rc.decodeBit(this.probs, m);
 		}
 		return m - (1 << this.numBits);
@@ -305,23 +304,23 @@ class BitTreeDecoder {
 }
 
 function createBitTreeDecoderArray(numBits: number, length: number): BitTreeDecoder[] {
-	var p: BitTreeDecoder[] = [];
+	const p: BitTreeDecoder[] = [];
 	p.length = length;
-	for (var i = 0; i < length; i++) {
+	for (let i = 0; i < length; i++) {
 		p[i] = new BitTreeDecoder(numBits);
 	}
 	return p;
 }
 
-var kNumPosBitsMax = 4;
+const kNumPosBitsMax = 4;
 
-var kNumStates = 12;
-var kNumLenToPosStates = 4;
-var kNumAlignBits = 4;
-var kStartPosModelIndex = 4;
-var kEndPosModelIndex = 14;
-var kNumFullDistances = 1 << (kEndPosModelIndex >> 1);
-var kMatchMinLen = 2;
+const kNumStates = 12;
+const kNumLenToPosStates = 4;
+const kNumAlignBits = 4;
+const kStartPosModelIndex = 4;
+const kEndPosModelIndex = 14;
+const kNumFullDistances = 1 << (kEndPosModelIndex >> 1);
+const kMatchMinLen = 2;
 
 class LenDecoder {
 	choice: Uint16Array;
@@ -366,9 +365,9 @@ function updateState_ShortRep(state: number): number {
 	return state < 7 ? 9 : 11;
 }
 
-var LZMA_DIC_MIN = 1 << 12;
+const LZMA_DIC_MIN = 1 << 12;
 
-var MAX_DECODE_BITS_CALLS = 48;
+const MAX_DECODE_BITS_CALLS = 48;
 
 class LzmaDecoderInternal {
 	rangeDec: RangeDecoder;
@@ -402,16 +401,16 @@ class LzmaDecoderInternal {
 	}
 
 	decodeProperties(properties: Uint8Array) {
-		var d = properties[0];
+		let d = properties[0];
 		if (d >= (9 * 5 * 5)) {
-			throw new Error("Incorrect LZMA properties");
+			throw new Error('Incorrect LZMA properties');
 		}
 		this.lc = d % 9;
 		d = (d / 9) | 0;
 		this.pb = (d / 5) | 0;
 		this.lp = d % 5;
 		this.dictSizeInProperties = 0;
-		for (var i = 0; i < 4; i++) {
+		for (let i = 0; i < 4; i++) {
 			this.dictSizeInProperties |= properties[i + 1] << (8 * i);
 		}
 		this.dictSize = this.dictSizeInProperties;
@@ -435,24 +434,24 @@ class LzmaDecoderInternal {
 	}
 
 	decodeLiteral(state: number, rep0: number): number {
-		var outWindow = this.outWindow;
-		var rangeDec = this.rangeDec;
+		const outWindow = this.outWindow;
+		const rangeDec = this.rangeDec;
 
-		var prevByte = 0;
+		let prevByte = 0;
 		if (!outWindow.isEmpty()) {
 			prevByte = outWindow.getByte(1);
 		}
 
-		var symbol = 1;
-		var litState = ((outWindow.totalPos & ((1 << this.lp) - 1)) << this.lc) + (prevByte >> (8 - this.lc));
-		var probsIndex = 0x300 * litState;
+		let symbol = 1;
+		const litState = ((outWindow.totalPos & ((1 << this.lp) - 1)) << this.lc) + (prevByte >> (8 - this.lc));
+		const probsIndex = 0x300 * litState;
 
 		if (state >= 7) {
-			var matchByte = outWindow.getByte(rep0 + 1);
+			let matchByte = outWindow.getByte(rep0 + 1);
 			do {
-				var matchBit = (matchByte >> 7) & 1;
+				const matchBit = (matchByte >> 7) & 1;
 				matchByte <<= 1;
-				var bit = rangeDec.decodeBit(this.litProbs, probsIndex + (((1 + matchBit) << 8) + symbol));
+				const bit = rangeDec.decodeBit(this.litProbs, probsIndex + (((1 + matchBit) << 8) + symbol));
 				symbol = (symbol << 1) | bit;
 				if (matchBit !== bit) {
 					break;
@@ -467,17 +466,17 @@ class LzmaDecoderInternal {
 	}
 
 	decodeDistance(len: number) {
-		var lenState = len;
+		let lenState = len;
 		if (lenState > kNumLenToPosStates - 1) {
 			lenState = kNumLenToPosStates - 1;
 		}
-		var rangeDec = this.rangeDec;
-		var posSlot = this.posSlotDecoder[lenState].decode(rangeDec);
+		const rangeDec = this.rangeDec;
+		const posSlot = this.posSlotDecoder[lenState].decode(rangeDec);
 		if (posSlot < 4) {
 			return posSlot;
 		}
-		var numDirectBits = (posSlot >> 1) - 1;
-		var dist = (2 | (posSlot & 1)) << numDirectBits;
+		const numDirectBits = (posSlot >> 1) - 1;
+		let dist = (2 | (posSlot & 1)) << numDirectBits;
 		if (posSlot < kEndPosModelIndex) {
 			dist =
 				(dist + bitTreeReverseDecode(this.posDecoders, dist - posSlot, numDirectBits, rangeDec)) | 0;
@@ -522,27 +521,27 @@ class LzmaDecoderInternal {
 	}
 
 	decode(notFinal: boolean): number {
-		var rangeDec = this.rangeDec;
-		var outWindow = this.outWindow;
-		var pb = this.pb;
-		var dictSize = this.dictSize;
-		var markerIsMandatory = this.markerIsMandatory;
-		var leftToUnpack = this.leftToUnpack;
+		const rangeDec = this.rangeDec;
+		const outWindow = this.outWindow;
+		const pb = this.pb;
+		const dictSize = this.dictSize;
+		const markerIsMandatory = this.markerIsMandatory;
+		let leftToUnpack = this.leftToUnpack;
 
-		var isMatch = this.isMatch;
-		var isRep = this.isRep;
-		var isRepG0 = this.isRepG0;
-		var isRepG1 = this.isRepG1;
-		var isRepG2 = this.isRepG2;
-		var isRep0Long = this.isRep0Long;
-		var lenDecoder = this.lenDecoder;
-		var repLenDecoder = this.repLenDecoder;
+		const isMatch = this.isMatch;
+		const isRep = this.isRep;
+		const isRepG0 = this.isRepG0;
+		const isRepG1 = this.isRepG1;
+		const isRepG2 = this.isRepG2;
+		const isRep0Long = this.isRep0Long;
+		const lenDecoder = this.lenDecoder;
+		const repLenDecoder = this.repLenDecoder;
 
-		var rep0 = this.reps[0];
-		var rep1 = this.reps[1];
-		var rep2 = this.reps[2];
-		var rep3 = this.reps[3];
-		var state = this.state;
+		let rep0 = this.reps[0];
+		let rep1 = this.reps[1];
+		let rep2 = this.reps[2];
+		let rep3 = this.reps[3];
+		let state = this.state;
 
 		while (true) {
 			// Based on worse case scenario one byte consumed per decodeBit calls,
@@ -560,7 +559,7 @@ class LzmaDecoderInternal {
 				}
 			}
 
-			var posState = outWindow.totalPos & ((1 << pb) - 1);
+			const posState = outWindow.totalPos & ((1 << pb) - 1);
 
 			if (rangeDec.decodeBit(isMatch, (state << kNumPosBitsMax) + posState) === 0) {
 				if (leftToUnpack === 0) {
@@ -627,7 +626,7 @@ class LzmaDecoderInternal {
 				}
 			}
 			len += kMatchMinLen;
-			var isError = false;
+			let isError = false;
 			if (leftToUnpack !== undefined && leftToUnpack < len) {
 				len = leftToUnpack;
 				isError = true;
@@ -658,9 +657,9 @@ var LZMA_RES_FINISHED_WITH_MARKER = 1;
 var LZMA_RES_FINISHED_WITHOUT_MARKER = 2;
 var LZMA_RES_NOT_COMPLETE = 3;
 
-var SWF_LZMA_HEADER_LENGTH = 17;
-var STANDARD_LZMA_HEADER_LENGTH = 13;
-var EXTRA_LZMA_BYTES_NEEDED = 5;
+const SWF_LZMA_HEADER_LENGTH = 17;
+const STANDARD_LZMA_HEADER_LENGTH = 13;
+const EXTRA_LZMA_BYTES_NEEDED = 5;
 
 enum LzmaDecoderState {
 	WAIT_FOR_LZMA_HEADER = 0,
@@ -687,13 +686,13 @@ export class LzmaDecoder implements IDataDecoder {
 
 	public push(data: Uint8Array) {
 		if (this._state < LzmaDecoderState.PROCESS_DATA) {
-			var buffered = this.buffer ? this.buffer.length : 0;
-			var headerBytesExpected =
+			const buffered = this.buffer ? this.buffer.length : 0;
+			const headerBytesExpected =
 				(this._state === LzmaDecoderState.WAIT_FOR_SWF_HEADER ?
 					SWF_LZMA_HEADER_LENGTH : STANDARD_LZMA_HEADER_LENGTH) +
 				EXTRA_LZMA_BYTES_NEEDED;
 			if (buffered + data.length < headerBytesExpected) {
-				var newBuffer = new Uint8Array(buffered + data.length);
+				const newBuffer = new Uint8Array(buffered + data.length);
 				if (buffered > 0) {
 					newBuffer.set(this.buffer);
 				}
@@ -702,7 +701,7 @@ export class LzmaDecoder implements IDataDecoder {
 				return;
 			}
 
-			var header = new Uint8Array(headerBytesExpected);
+			const header = new Uint8Array(headerBytesExpected);
 			if (buffered > 0) {
 				header.set(this.buffer);
 			}
@@ -724,11 +723,10 @@ export class LzmaDecoder implements IDataDecoder {
 					(header[6] << 16) | (header[7] << 24)) >>> 0) - 8;
 			} else {
 				this._decoder.decodeProperties(header.subarray(0, 5));
-				var unpackSize = 0;
-				var unpackSizeDefined = false;
-				for (var i = 0; i < 8; i++)
-				{
-					var b = header[5 + i];
+				let unpackSize = 0;
+				let unpackSizeDefined = false;
+				for (let i = 0; i < 8; i++) {
+					const b = header[5 + i];
 					if (b !== 0xFF) {
 						unpackSizeDefined = true;
 					}
@@ -747,7 +745,7 @@ export class LzmaDecoder implements IDataDecoder {
 
 		try {
 			this._inStream.append(data);
-			var res = this._decoder.decode(true);
+			const res = this._decoder.decode(true);
 			this._inStream.compact();
 
 			if (res !== LZMA_RES_NOT_COMPLETE) {
@@ -766,7 +764,7 @@ export class LzmaDecoder implements IDataDecoder {
 		}
 		this._state = LzmaDecoderState.CLOSED;
 		try {
-			var res = this._decoder.decode(false);
+			const res = this._decoder.decode(false);
 			this._checkError(res);
 		} catch (e) {
 			this._decoder.flushOutput();
@@ -784,18 +782,18 @@ export class LzmaDecoder implements IDataDecoder {
 	}
 
 	private _checkError(res) {
-		var error;
+		let error;
 		if (res === LZMA_RES_ERROR) {
-			error = "LZMA decoding error";
+			error = 'LZMA decoding error';
 		} else if (res === LZMA_RES_NOT_COMPLETE) {
-			error = "Decoding is not complete";
+			error = 'Decoding is not complete';
 		} else if (res === LZMA_RES_FINISHED_WITH_MARKER) {
 			if (this._decoder.unpackSize !== undefined &&
 				this._decoder.unpackSize !== this._outStream.processed) {
-				error = "Finished with end marker before than specified size";
+				error = 'Finished with end marker before than specified size';
 			}
 		} else {
-			error = "Internal LZMA Error";
+			error = 'Internal LZMA Error';
 		}
 
 		if (error) {

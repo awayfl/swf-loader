@@ -14,56 +14,55 @@
  * limitations under the License.
  */
 
-import {ButtonTag, PlaceObjectFlags, ButtonCharacterFlags, SwfTagCode} from "../../../factories/base/SWFTags"
+import { ButtonTag, PlaceObjectFlags, ButtonCharacterFlags, SwfTagCode } from '../../../factories/base/SWFTags';
 
 export function defineButton(tag: ButtonTag, dictionary: any): any {
-  var characters = tag.characters;
-  var states = {
-    up: [],
-    over: [],
-    down: [],
-    hitTest: []
-  };
-  var i = 0, character;
-  while ((character = characters[i++])) {
-    var characterItem = dictionary[character.symbolId];
-    // The Flash Player ignores references to undefined symbols here. So should we.
-    // TODO: What should happen if the symbol gets defined later in the file?
-    if (characterItem) {
-      var cmd = {
+	const characters = tag.characters;
+	const states = {
+		up: [],
+		over: [],
+		down: [],
+		hitTest: []
+	};
+	let i = 0, character;
+	while ((character = characters[i++])) {
+		const characterItem = dictionary[character.symbolId];
+		// The Flash Player ignores references to undefined symbols here. So should we.
+		// TODO: What should happen if the symbol gets defined later in the file?
+		if (characterItem) {
+			const cmd = {
 		  symbolId: characterItem.id,
 		  code: SwfTagCode.CODE_PLACE_OBJECT,
 		  depth: character.depth,
 		  flags: 0,
 		  matrix:null,
 		  cxform:null
-      };
-      if(character.matrix){
+			};
+			if (character.matrix) {
 		  cmd.flags |= PlaceObjectFlags.HasMatrix;
 		  cmd.matrix = character.matrix;
 	  }
-		if(character.cxform){
-			cmd.flags |= PlaceObjectFlags.HasColorTransform;
-			cmd.cxform = character.cxform;
+			if (character.cxform) {
+				cmd.flags |= PlaceObjectFlags.HasColorTransform;
+				cmd.cxform = character.cxform;
+			}
+			if (character.flags & ButtonCharacterFlags.StateUp)
+				states.up.push(cmd);
+			if (character.flags & ButtonCharacterFlags.StateOver)
+				states.over.push(cmd);
+			if (character.flags & ButtonCharacterFlags.StateDown)
+				states.down.push(cmd);
+			if (character.flags & ButtonCharacterFlags.StateHitTest)
+				states.hitTest.push(cmd);
+		} else {
+			console.log('undefined character in button ' + tag.id);
 		}
-      if (character.flags & ButtonCharacterFlags.StateUp)
-        states.up.push(cmd);
-      if (character.flags & ButtonCharacterFlags.StateOver)
-        states.over.push(cmd);
-      if (character.flags & ButtonCharacterFlags.StateDown)
-        states.down.push(cmd);
-      if (character.flags & ButtonCharacterFlags.StateHitTest)
-        states.hitTest.push(cmd);
-    } else {
-        console.log('undefined character in button ' + tag.id);
-    }
-  }
-  var button = {
-    type: 'button',
-    id: tag.id,
-    buttonActions: tag.buttonActions,
-    states: states
-  };
-  return button;
+	}
+	const button = {
+		type: 'button',
+		id: tag.id,
+		buttonActions: tag.buttonActions,
+		states: states
+	};
+	return button;
 }
-

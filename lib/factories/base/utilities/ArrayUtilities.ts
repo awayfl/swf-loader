@@ -1,8 +1,8 @@
 
-import {nearestPowerOfTwo} from "./IntegerUtilities";
-import {assert, release} from "./Debug";
+import { nearestPowerOfTwo } from './IntegerUtilities';
+import { assert, release } from './Debug';
 
-export class ArrayUtilities{
+export class ArrayUtilities {
 	public static popManyInto=popManyInto;
 	public static popMany=popMany;
 	public static popManyIntoVoid=popManyIntoVoid;
@@ -28,7 +28,7 @@ export class ArrayUtilities{
  */
 export function popManyInto(src: any [], count: number, dst: any []) {
 	release || assert(src.length >= count);
-	for (var i = count - 1; i >= 0; i--) {
+	for (let i = count - 1; i >= 0; i--) {
 		dst[i] = src.pop();
 	}
 	dst.length = count;
@@ -36,8 +36,8 @@ export function popManyInto(src: any [], count: number, dst: any []) {
 
 export function popMany<T>(array: T [], count: number): T [] {
 	release || assert(array.length >= count);
-	var start = array.length - count;
-	var result = array.slice(start, this.length);
+	const start = array.length - count;
+	const result = array.slice(start, this.length);
 	array.length = start;
 	return result;
 }
@@ -51,7 +51,7 @@ export function popManyIntoVoid(array: any [], count: number) {
 }
 
 export function pushMany(dst: any [], src: any []) {
-	for (var i = 0; i < src.length; i++) {
+	for (let i = 0; i < src.length; i++) {
 		dst.push(src[i]);
 	}
 }
@@ -70,7 +70,7 @@ export function peek(array: any []) {
 }
 
 export function indexOf<T>(array: T [], value: T): number {
-	for (var i = 0, j = array.length; i < j; i++) {
+	for (let i = 0, j = array.length; i < j; i++) {
 		if (array[i] === value) {
 			return i;
 		}
@@ -82,7 +82,7 @@ export function equals<T>(a: T [], b: T []): boolean {
 	if (a.length !== b.length) {
 		return false;
 	}
-	for (var i = 0; i < a.length; i++) {
+	for (let i = 0; i < a.length; i++) {
 		if (a[i] !== b[i]) {
 			return false;
 		}
@@ -91,7 +91,7 @@ export function equals<T>(a: T [], b: T []): boolean {
 }
 
 export function pushUnique<T>(array: T [], value: T): number {
-	for (var i = 0, j = array.length; i < j; i++) {
+	for (let i = 0, j = array.length; i < j; i++) {
 		if (array[i] === value) {
 			return i;
 		}
@@ -101,8 +101,8 @@ export function pushUnique<T>(array: T [], value: T): number {
 }
 
 export function unique<T>(array: T []): T [] {
-	var result = [];
-	for (var i = 0; i < array.length; i++) {
+	const result = [];
+	for (let i = 0; i < array.length; i++) {
 		pushUnique(result, array[i]);
 	}
 	return result;
@@ -113,14 +113,13 @@ export function copyFrom(dst: any [], src: any []) {
 	pushMany(dst, src);
 }
 
-
 /**
  * Makes sure that a typed array has the requested capacity. If required, it creates a new
  * instance of the array's class with a power-of-two capacity at least as large as required.
  */
 export function ensureTypedArrayCapacity<T extends TypedArray>(array: T, capacity: number): T {
 	if (array.length < capacity) {
-		var oldArray = array;
+		const oldArray = array;
 		array = new (<any>array).constructor(nearestPowerOfTwo(capacity));
 		array.set(oldArray, 0);
 	}
@@ -152,4 +151,3 @@ export interface IDataDecoder {
 	push(data: Uint8Array);
 	close();
 }
-

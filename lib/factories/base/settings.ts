@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {Option, OptionSet} from "./options";
+import { Option, OptionSet } from './options';
 
-export var ROOT: string = "Shumway Options";
+export var ROOT: string = 'Shumway Options';
 export var shumwayOptions = new OptionSet(ROOT);
 
 export function setSettings(settings: any) {
@@ -27,9 +27,6 @@ export function getSettings() {
 	return shumwayOptions.getSettings();
 }
 
+export var loggingOptions = shumwayOptions.register(new OptionSet('Logging Options'));
 
-
-export var loggingOptions = shumwayOptions.register(new OptionSet("Logging Options"));
-
-export var omitRepeatedWarnings = loggingOptions.register(new Option("wo", "warnOnce", "boolean", true, 'Omit Repeated Warnings'));
-
+export var omitRepeatedWarnings = loggingOptions.register(new Option('wo', 'warnOnce', 'boolean', true, 'Omit Repeated Warnings'));

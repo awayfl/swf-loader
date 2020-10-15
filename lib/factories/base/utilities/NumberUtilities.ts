@@ -19,7 +19,7 @@ export function clamp(value: number, min: number, max: number) {
  */
 export function roundHalfEven(value: number): number {
 	if (Math.abs(value % 1) === 0.5) {
-		var floor = Math.floor(value);
+		const floor = Math.floor(value);
 		return floor % 2 === 0 ? floor : Math.ceil(value);
 	}
 	return Math.round(value);
@@ -40,11 +40,10 @@ export function epsilonEquals(value: number, other: number): boolean {
 	return Math.abs(value - other) < 0.0000001;
 }
 
-export let NumberUtilities={
+export const NumberUtilities = {
 	pow2:pow2,
 	clamp:clamp,
 	roundHalfEven:roundHalfEven,
 	altTieBreakRound:altTieBreakRound,
 	epsilonEquals:epsilonEquals
 };
-

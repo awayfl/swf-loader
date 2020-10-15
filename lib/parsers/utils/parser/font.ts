@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import { FontTag, FontFlags, SwfTagCode } from "../../../factories/base/SWFTags";
-import { Font, TesselatedFontTable, DefaultFontManager, FontStyleName } from "@awayjs/scene";
-import { GraphicsPath, ShapeRecordFlags } from "@awayjs/graphics";
-import { AttributesBuffer } from "@awayjs/stage";
+import { FontTag, FontFlags, SwfTagCode } from '../../../factories/base/SWFTags';
+import { Font, TesselatedFontTable, DefaultFontManager, FontStyleName } from '@awayjs/scene';
+import { GraphicsPath, ShapeRecordFlags } from '@awayjs/graphics';
+import { AttributesBuffer } from '@awayjs/stage';
 
-var pow = Math.pow;
-var min = Math.min;
-var max = Math.max;
-var logE = Math.log;
-var fromCharCode = String.fromCharCode;
+const pow = Math.pow;
+const min = Math.min;
+const max = Math.max;
+const logE = Math.log;
+const fromCharCode = String.fromCharCode;
 
-var nextFontId = 1;
+const nextFontId = 1;
 
 function maxPower2(num) {
-	var maxPower = 0;
-	var val = num;
+	let maxPower = 0;
+	let val = num;
 	while (val >= 2) {
 		val /= 2;
 		++maxPower;
@@ -50,20 +50,20 @@ function toString32(val) {
  * then the font coordinates were scaled by 20.
  */
 function isScaledFont2(glyphs) {
-	var xMin = 0,
+	let xMin = 0,
 		yMin = 0,
 		xMax = 0,
 		yMax = 0;
-	for (var i = 0; i < glyphs.length; i++) {
-		var records = glyphs[i];
+	for (let i = 0; i < glyphs.length; i++) {
+		const records = glyphs[i];
 		if (!records) {
 			continue;
 		}
 		var record;
-		var x = 0;
-		var y = 0;
+		let x = 0;
+		let y = 0;
 
-		for (var j = 0; j < records.length; j++) {
+		for (let j = 0; j < records.length; j++) {
 			record = records[j];
 			if (record.type) {
 				if (record.flags & ShapeRecordFlags.IsStraight) {
@@ -96,18 +96,18 @@ function isScaledFont2(glyphs) {
 			}
 		}
 	}
-	var maxDimension = Math.max(xMax - xMin, yMax - yMin);
+	const maxDimension = Math.max(xMax - xMin, yMax - yMin);
 	return maxDimension > 5000;
 }
 
 export function defineFont(tag: FontTag, ns: string): any {
-	var uniqueName = "swf-font-" + tag.id;
-	var fontName = tag.name || uniqueName;
+	const uniqueName = 'swf-font-' + tag.id;
+	let fontName = tag.name || uniqueName;
 
-	if (fontName == "Helvetica") fontName = "arial";
-	var fontAJS: Font = DefaultFontManager.defineFont(fontName, ns);
-	var font = {
-		type: "font",
+	if (fontName == 'Helvetica') fontName = 'arial';
+	const fontAJS: Font = DefaultFontManager.defineFont(fontName, ns);
+	const font = {
+		type: 'font',
 		id: tag.id,
 		name: fontName,
 		bold: !!(tag.flags & FontFlags.Bold),
@@ -120,7 +120,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 		fontStyleName: FontStyleName.STANDART,
 	};
 	fontAJS.name = fontName;
-	var fontStyleName: string = FontStyleName.STANDART;
+	let fontStyleName: string = FontStyleName.STANDART;
 	if (font.bold && !font.italic) {
 		fontStyleName = FontStyleName.BOLD;
 	} else if (!font.bold && font.italic) {
@@ -129,7 +129,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 		fontStyleName = FontStyleName.BOLDITALIC;
 	}
 	font.fontStyleName = fontStyleName;
-	var tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
+	const tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
 		fontAJS.get_font_table(fontStyleName, TesselatedFontTable.assetType)
 	);
 	//var tessFontTableAJS:TesselatedFontTable=new TesselatedFontTable();
@@ -137,29 +137,29 @@ export function defineFont(tag: FontTag, ns: string): any {
 
 	//console.log("parsed font = ", fontName, fontStyleName);
 
-	var glyphs = tag.glyphs;
-	var glyphCount = glyphs ? glyphs.length : 0;
+	const glyphs = tag.glyphs;
+	const glyphCount = glyphs ? glyphs.length : 0;
 
 	if (!glyphCount) {
 		return font;
 	}
 
-	var tables = {};
-	var codes = [];
-	var glyphIndex = {};
-	var ranges = [];
+	const tables = {};
+	const codes = [];
+	const glyphIndex = {};
+	const ranges = [];
 
-	var originalCode;
-	var generateAdvancement = !("advance" in tag);
-	var correction = 0;
-	var isFont2 = tag.code === SwfTagCode.CODE_DEFINE_FONT2;
-	var isFont3 = tag.code === SwfTagCode.CODE_DEFINE_FONT3;
+	let originalCode;
+	const generateAdvancement = !('advance' in tag);
+	const correction = 0;
+	const isFont2 = tag.code === SwfTagCode.CODE_DEFINE_FONT2;
+	const isFont3 = tag.code === SwfTagCode.CODE_DEFINE_FONT3;
 
 	if (generateAdvancement) {
 		tag.advance = [];
 	}
 
-	var maxCode = Math.max.apply(null, tag.codes) || 35;
+	let maxCode = Math.max.apply(null, tag.codes) || 35;
 
 	if (tag.codes) {
 		for (var i = 0; i < tag.codes.length; i++) {
@@ -197,7 +197,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 		}
 	} else {
 		indices = [];
-		var UAC_OFFSET = 0xe000;
+		const UAC_OFFSET = 0xe000;
 		for (var i = 0; i < glyphCount; i++) {
 			code = UAC_OFFSET + i;
 			//console.log(code);
@@ -209,14 +209,14 @@ export function defineFont(tag: FontTag, ns: string): any {
 		originalCode = codes.concat();
 	}
 
-	var resolution = tag.resolution || 1;
+	let resolution = tag.resolution || 1;
 	if (isFont2 && isScaledFont2(glyphs)) {
 		// some DefineFont2 without layout using DefineFont3 resolution, why?
 		resolution = 20;
 		font.originalSize = true;
 	}
-	var ascent = Math.ceil(tag.ascent / resolution) || 1024;
-	var descent = -Math.ceil(tag.descent / resolution) || 0;
+	const ascent = Math.ceil(tag.ascent / resolution) || 1024;
+	let descent = -Math.ceil(tag.descent / resolution) || 0;
 
 	if (tessFontTableAJS.ascent != 0) {
 	} else {
@@ -224,16 +224,16 @@ export function defineFont(tag: FontTag, ns: string): any {
 		tessFontTableAJS.descent = descent;
 	}
 
-	var offsetY = tessFontTableAJS.ascent;
-	var leading = tag.leading / resolution || 0;
-	tables["OS/2"] = "";
+	const offsetY = tessFontTableAJS.ascent;
+	const leading = tag.leading / resolution || 0;
+	tables['OS/2'] = '';
 
-	var startCount = "";
-	var endCount = "";
-	var idDelta = "";
-	var idRangeOffset = "";
+	let startCount = '';
+	let endCount = '';
+	let idDelta = '';
+	let idRangeOffset = '';
 	var i = 0;
-	var range;
+	let range;
 	while ((range = ranges[i++])) {
 		var start: number = range[0];
 		var end: number = range[1];
@@ -243,53 +243,53 @@ export function defineFont(tag: FontTag, ns: string): any {
 		idDelta += toString16((code - start + 1) & 0xffff);
 		idRangeOffset += toString16(0);
 	}
-	endCount += "\xff\xff";
-	startCount += "\xff\xff";
-	idDelta += "\x00\x01";
-	idRangeOffset += "\x00\x00";
-	var segCount = ranges.length + 1;
+	endCount += '\xff\xff';
+	startCount += '\xff\xff';
+	idDelta += '\x00\x01';
+	idRangeOffset += '\x00\x00';
+	const segCount = ranges.length + 1;
 	var searchRange = maxPower2(segCount) * 2;
-	var rangeShift = 2 * segCount - searchRange;
-	var format314 =
-		"\x00\x00" + // language
+	const rangeShift = 2 * segCount - searchRange;
+	const format314 =
+		'\x00\x00' + // language
 		toString16(segCount * 2) + // segCountX2
 		toString16(searchRange) +
 		toString16(logE(segCount) / logE(2)) + // entrySelector
 		toString16(rangeShift) +
 		endCount +
-		"\x00\x00" + // reservedPad
+		'\x00\x00' + // reservedPad
 		startCount +
 		idDelta +
 		idRangeOffset;
-	tables["cmap"] =
-		"\x00\x00" + // version
-		"\x00\x01" + // numTables
-		"\x00\x03" + // platformID
-		"\x00\x01" + // encodingID
-		"\x00\x00\x00\x0c" + // offset
-		"\x00\x04" + // format
+	tables['cmap'] =
+		'\x00\x00' + // version
+		'\x00\x01' + // numTables
+		'\x00\x03' + // platformID
+		'\x00\x01' + // encodingID
+		'\x00\x00\x00\x0c' + // offset
+		'\x00\x04' + // format
 		toString16(format314.length + 4) + // length
 		format314;
 
-	var glyf = "\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x31\x00";
-	var loca = "\x00\x00";
-	var offset = 16;
-	var maxPoints = 0;
-	var xMins = [];
-	var xMaxs = [];
-	var yMins = [];
-	var yMaxs = [];
-	var maxContours = 0;
+	const glyf = '\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x31\x00';
+	const loca = '\x00\x00';
+	const offset = 16;
+	let maxPoints = 0;
+	const xMins = [];
+	const xMaxs = [];
+	const yMins = [];
+	const yMaxs = [];
+	let maxContours = 0;
 	var i = 0;
 	var code: number;
-	var rawData = {};
+	const rawData = {};
 	while ((code = codes[i++]) !== undefined) {
 		var records = glyphs[glyphIndex[code]];
 		var x = 0;
 		var y = 0;
 
-		var myFlags = "";
-		var myEndpts = "";
+		var myFlags = '';
+		var myEndpts = '';
 		var endPoint = 0;
 		var segments = [];
 		var segmentIndex = -1;
@@ -326,8 +326,8 @@ export function defineFont(tag: FontTag, ns: string): any {
 					segmentIndex++;
 					segments[segmentIndex] = { data: [], commands: [], xMin: 0, xMax: 0, yMin: 0, yMax: 0 };
 					segments[segmentIndex].commands.push(1);
-					var moveX = record.moveX / resolution;
-					var moveY = -record.moveY / resolution;
+					const moveX = record.moveX / resolution;
+					const moveY = -record.moveY / resolution;
 					var dx = moveX - x;
 					var dy = moveY - y;
 					x = moveX;
@@ -361,35 +361,35 @@ export function defineFont(tag: FontTag, ns: string): any {
 		rawData[code] = segments;
 	}
 
-	var whiteSpaceWidth = 0;
+	let whiteSpaceWidth = 0;
 	i = 0;
-	var minx = 99999999;
-	var maxx = -99999999;
-	var miny = 99999999;
-	var maxy = -99999999;
+	let minx = 99999999;
+	let maxx = -99999999;
+	let miny = 99999999;
+	let maxy = -99999999;
 	while ((code = codes[i++]) !== undefined) {
-		var glyphPath: GraphicsPath = new GraphicsPath();
+		const glyphPath: GraphicsPath = new GraphicsPath();
 		var records = glyphs[glyphIndex[code]];
-		var idx = glyphIndex[code];
+		const idx = glyphIndex[code];
 		segments = rawData[code];
 		var numberOfContours = 1;
 		var endPoint = 0;
-		var endPtsOfContours = "";
-		var flags = "";
+		const endPtsOfContours = '';
+		let flags = '';
 		var x = 0;
 		var y = 0;
-		var xMin = 0;
-		var xMax = -1024;
-		var yMin = 0;
-		var yMax = -1024;
+		let xMin = 0;
+		let xMax = -1024;
+		let yMin = 0;
+		let yMax = -1024;
 
-		var myFlags = "";
-		var myEndpts = "";
+		var myFlags = '';
+		var myEndpts = '';
 		var endPoint = 0;
 		var segmentIndex = -1;
 
-		var data = [];
-		var commands = [];
+		let data = [];
+		let commands = [];
 
 		for (j = 0; j < segments.length; j++) {
 			data = data.concat(segments[j].data);
@@ -398,14 +398,14 @@ export function defineFont(tag: FontTag, ns: string): any {
 
 		x = 0;
 		y = 0;
-		var nx = 0;
-		var ny = 0;
-		var dataIndex = 0;
+		let nx = 0;
+		let ny = 0;
+		let dataIndex = 0;
 		var endPoint = 0;
 		var numberOfContours = 1;
-		var myEndpts = "";
+		var myEndpts = '';
 		for (j = 0; j < commands.length; j++) {
-			var command = commands[j];
+			const command = commands[j];
 			if (command === 1) {
 				if (endPoint) {
 					++numberOfContours;
@@ -415,7 +415,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 				ny = data[dataIndex++];
 				var dx = nx - x;
 				var dy = ny - y;
-				myFlags += "\x01";
+				myFlags += '\x01';
 				if (minx > nx) {
 					minx = nx;
 				}
@@ -436,7 +436,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 				ny = data[dataIndex++];
 				var dx = nx - x;
 				var dy = ny - y;
-				myFlags += "\x01";
+				myFlags += '\x01';
 				x = nx;
 				y = ny;
 				if (minx > nx) {
@@ -457,7 +457,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 				ny = data[dataIndex++];
 				var cx = nx - x;
 				var cy = ny - y;
-				myFlags += "\x00";
+				myFlags += '\x00';
 				x = nx;
 				y = ny;
 				endPoint++;
@@ -468,7 +468,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 				ny = data[dataIndex++];
 				var dx = nx - x;
 				var dy = ny - y;
-				myFlags += "\x01";
+				myFlags += '\x01';
 				x = nx;
 				y = ny;
 				if (minx > nx) {
@@ -506,7 +506,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 
 		if (!j) {
 			xMin = xMax = yMin = yMax = 0;
-			flags += "\x31";
+			flags += '\x31';
 		}
 		/*
 		var entry =
@@ -538,7 +538,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 		if (endPoint > maxPoints) {
 			maxPoints = endPoint;
 		}
-		var glyphAdvance: number = 0;
+		let glyphAdvance: number = 0;
 		if (generateAdvancement) {
 			tag.advance.push((xMax - xMin) * resolution * 1.3);
 			glyphAdvance = xMax - xMin;
@@ -567,7 +567,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 	//tables['glyf'] = glyf;
 
 	if (!isFont3) {
-		var minYmin = Math.min.apply(null, yMins);
+		const minYmin = Math.min.apply(null, yMins);
 		if (minYmin < 0) {
 			descent = descent || minYmin;
 		}
@@ -658,15 +658,15 @@ export function defineFont(tag: FontTag, ns: string): any {
 	*/
 
 	if (tag.kerning && tag.kerning.length) {
-		var kerning = tag.kerning;
-		var nPairs = kerning.length;
+		const kerning = tag.kerning;
+		const nPairs = kerning.length;
 		var searchRange = maxPower2(nPairs) * 2;
-		var kern =
-			"\x00\x00" + // version
-			"\x00\x01" + // nTables
-			"\x00\x00" + // subtable version
+		let kern =
+			'\x00\x00' + // version
+			'\x00\x01' + // nTables
+			'\x00\x00' + // subtable version
 			toString16(14 + nPairs * 6) + // length
-			"\x00\x01" + // coverage
+			'\x00\x01' + // coverage
 			toString16(nPairs) +
 			toString16(searchRange) +
 			toString16(logE(nPairs) / logE(2)) + // entrySelector

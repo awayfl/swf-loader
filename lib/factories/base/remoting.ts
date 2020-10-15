@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ShumwayCom} from "./external";
-import {ImageType} from "./utilities";
-import {DataBuffer} from "@awayjs/graphics";
+import { ShumwayCom } from './external';
+import { ImageType } from './utilities';
+import { DataBuffer } from '@awayjs/graphics';
 import { notImplemented } from './utilities/Debug';
 
 export interface IRemotable {
@@ -281,7 +281,7 @@ export class WindowTransportPeer implements ITransportPeer  {
 
 	set onSyncMessage(callback: (msg: any) => any) {
 		this.window.addEventListener('syncmessage', function (e) {
-			var wrappedMessage = (<any>e).detail;
+			const wrappedMessage = (<any>e).detail;
 			wrappedMessage.result = callback(wrappedMessage.msg);
 		});
 	}
@@ -295,8 +295,8 @@ export class WindowTransportPeer implements ITransportPeer  {
 	}
 
 	sendSyncMessage(msg: any, transfers?: any[]): any {
-		var event = this.target.document.createEvent('CustomEvent');
-		var wrappedMessage = {
+		const event = this.target.document.createEvent('CustomEvent');
+		const wrappedMessage = {
 			msg: msg,
 			result: undefined
 		};
@@ -312,23 +312,22 @@ export class WindowTransportPeer implements ITransportPeer  {
  */
 export class ShumwayComTransportPeer implements ITransportPeer  {
 	set onAsyncMessage(callback: (msg: any) => void) {
-		notImplemented("ShumwayComTransportPeer.onAsyncMessage not implemented yet");
+		notImplemented('ShumwayComTransportPeer.onAsyncMessage not implemented yet');
 		//ShumwayCom.setAsyncMessageCallback(callback);
 	}
 
 	set onSyncMessage(callback: (msg: any) => any) {
-		notImplemented("ShumwayComTransportPeer.onSyncMessage not implemented yet");
+		notImplemented('ShumwayComTransportPeer.onSyncMessage not implemented yet');
 		//ShumwayCom.setSyncMessageCallback(callback);
 	}
 
 	postAsyncMessage(msg: any, transfers?: any[]): void {
-		notImplemented("ShumwayComTransportPeer.postAsyncMessage not implemented yet");
+		notImplemented('ShumwayComTransportPeer.postAsyncMessage not implemented yet');
 		//ShumwayCom.postAsyncMessage(msg);
 	}
 
 	sendSyncMessage(msg: any, transfers?: any[]): any {
-		notImplemented("ShumwayComTransportPeer.sendSyncMessage not implemented yet");
+		notImplemented('ShumwayComTransportPeer.sendSyncMessage not implemented yet');
 		return null;//ShumwayCom.sendSyncMessage(msg);
 	}
 }
-

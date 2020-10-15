@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {assert, release} from "./utilities/Debug";
-import {isObject} from "./utilities";
+import { assert, release } from './utilities/Debug';
+import { isObject } from './utilities';
 
 /**
  * Option and Argument Management
@@ -41,7 +41,6 @@ import {isObject} from "./utilities";
  * }});
  */
 
-
 export class Argument {
 	shortName: string;
 	longName: string;
@@ -59,12 +58,13 @@ export class Argument {
 		this.parseFn = options.parse;
 		this.value = options.defaultValue;
 	}
+
 	public parse(value) {
-		if (this.type === "boolean") {
-			release || assert(typeof value === "boolean");
+		if (this.type === 'boolean') {
+			release || assert(typeof value === 'boolean');
 			this.value = value;
-		} else  if (this.type === "number") {
-			release || assert(!isNaN(value), value + " is not a number");
+		} else  if (this.type === 'number') {
+			release || assert(!isNaN(value), value + ' is not a number');
 			this.value = parseInt(value, 10);
 		} else {
 			this.value = value;
@@ -80,19 +80,22 @@ export class ArgumentParser {
 	constructor() {
 		this.args = [];
 	}
+
 	public addArgument(shortName, longName, type, options) {
-		var argument = new Argument(shortName, longName, type, options);
+		const argument = new Argument(shortName, longName, type, options);
 		this.args.push(argument);
 		return argument;
 	}
+
 	public addBoundOption(option) {
-		var options = {parse: function (x) {
+		const options = { parse: function (x) {
 			option.value = x;
-		}};
+		} };
 		this.args.push(new Argument(option.shortName, option.longName, option.type, options));
 	}
+
 	public addBoundOptionSet(optionSet) {
-		var self = this;
+		const self = this;
 		optionSet.options.forEach(function (x) {
 			if (OptionSet.isOptionSet(x)) {
 				self.addBoundOptionSet(x);
@@ -102,35 +105,37 @@ export class ArgumentParser {
 			}
 		});
 	}
+
 	public getUsage () {
-		var str = "";
+		let str = '';
 		this.args.forEach(function (x) {
 			if (!x.positional) {
-				str += "[-" + x.shortName + "|--" + x.longName + (x.type === "boolean" ? "" : " " + x.type[0].toUpperCase()) + "]";
+				str += '[-' + x.shortName + '|--' + x.longName + (x.type === 'boolean' ? '' : ' ' + x.type[0].toUpperCase()) + ']';
 			} else {
 				str += x.longName;
 			}
-			str += " ";
+			str += ' ';
 		});
 		return str;
 	}
+
 	public parse (args) {
-		var nonPositionalArgumentMap = {};
-		var positionalArgumentList = [];
+		const nonPositionalArgumentMap = {};
+		const positionalArgumentList = [];
 		this.args.forEach(function (x) {
 			if (x.positional) {
 				positionalArgumentList.push(x);
 			} else {
-				nonPositionalArgumentMap["-" + x.shortName] = x;
-				nonPositionalArgumentMap["--" + x.longName] = x;
+				nonPositionalArgumentMap['-' + x.shortName] = x;
+				nonPositionalArgumentMap['--' + x.longName] = x;
 			}
 		});
 
-		var leftoverArguments = [];
+		let leftoverArguments = [];
 
 		while (args.length) {
-			var argString = args.shift();
-			var argument = null, value = argString;
+			const argString = args.shift();
+			let argument = null, value = argString;
 			if (argString == '--') {
 				leftoverArguments = leftoverArguments.concat(args);
 				break;
@@ -140,12 +145,12 @@ export class ArgumentParser {
 				if (!argument) {
 					continue;
 				}
-				if (argument.type !== "boolean") {
+				if (argument.type !== 'boolean') {
 					value = args.shift();
-					release || assert(value !== "-" && value !== "--", "Argument " + argString + " must have a value.");
+					release || assert(value !== '-' && value !== '--', 'Argument ' + argString + ' must have a value.');
 				} else {
-					if (args.length && ["yes", "no", "true", "false", "t", "f"].indexOf(args[0]) >= 0) {
-						value = ["yes", "true", "t"].indexOf(args.shift()) >= 0;
+					if (args.length && ['yes', 'no', 'true', 'false', 't', 'f'].indexOf(args[0]) >= 0) {
+						value = ['yes', 'true', 't'].indexOf(args.shift()) >= 0;
 					} else {
 						value = true;
 					}
@@ -159,7 +164,7 @@ export class ArgumentParser {
 				argument.parse(value);
 			}
 		}
-		release || assert(positionalArgumentList.length === 0, "Missing positional arguments.");
+		release || assert(positionalArgumentList.length === 0, 'Missing positional arguments.');
 		return leftoverArguments;
 	}
 }
@@ -188,11 +193,12 @@ export class OptionSet {
 		this.settings = settings || {};
 		this.options = [];
 	}
+
 	public register(option) {
 		if (OptionSet.isOptionSet(option)) {
 			// check for duplicate option sets (bail if found)
-			for (var i = 0; i < this.options.length; i++) {
-				var optionSet = this.options[i];
+			for (let i = 0; i < this.options.length; i++) {
+				const optionSet = this.options[i];
 				if (OptionSet.isOptionSet(optionSet) && optionSet.name === option.name) {
 					return optionSet;
 				}
@@ -201,7 +207,7 @@ export class OptionSet {
 		this.options.push(option);
 		if (this.settings) {
 			if (OptionSet.isOptionSet(option)) {
-				var optionSettings = this.settings[option.name];
+				const optionSettings = this.settings[option.name];
 				if (isObject(optionSettings)) {
 					option.settings = optionSettings.settings;
 					option.open = optionSettings.open;
@@ -209,12 +215,12 @@ export class OptionSet {
 			} else {
 				// build_bundle chokes on this:
 				// if (!isNullOrUndefined(this.settings[option.longName])) {
-				if (typeof this.settings[option.longName] !== "undefined") {
+				if (typeof this.settings[option.longName] !== 'undefined') {
 					switch (option.type) {
-						case "boolean":
+						case 'boolean':
 							option.value = !!this.settings[option.longName];
 							break;
-						case "number":
+						case 'number':
 							option.value = +this.settings[option.longName];
 							break;
 						default:
@@ -226,15 +232,17 @@ export class OptionSet {
 		}
 		return option;
 	}
+
 	public trace(writer) {
-		writer.enter(this.name + " {");
+		writer.enter(this.name + ' {');
 		this.options.forEach(function (option) {
 			option.trace(writer);
 		});
-		writer.leave("}");
+		writer.leave('}');
 	}
+
 	public getSettings() {
-		var settings = {};
+		const settings = {};
 		this.options.forEach(function(option) {
 			if (OptionSet.isOptionSet(option)) {
 				settings[option.name] = {
@@ -247,6 +255,7 @@ export class OptionSet {
 		});
 		return settings;
 	}
+
 	public setSettings(settings: any) {
 		if (!settings) {
 			return;
@@ -276,7 +285,7 @@ export class Option {
 	/**
 	 * Dat GUI control.
 	 */
-		// TODO remove, player will not have access to the DOM
+	// TODO remove, player will not have access to the DOM
 	ctrl: any;
 	// config:
 	//  { range: { min: 1, max: 5, step: 1 } }
@@ -291,13 +300,14 @@ export class Option {
 		this.description = description;
 		this.config = config;
 	}
+
 	public parse (value) {
 		this.value = value;
 	}
+
 	public trace (writer) {
-		writer.writeLn(("-" + this.shortName + "|--" + this.longName).padRight(" ", 30) +
-			" = " + this.type + " " + this.value + " [" + this.defaultValue + "]" +
-			" (" + this.description + ")");
+		writer.writeLn(('-' + this.shortName + '|--' + this.longName).padRight(' ', 30) +
+			' = ' + this.type + ' ' + this.value + ' [' + this.defaultValue + ']' +
+			' (' + this.description + ')');
 	}
 }
-

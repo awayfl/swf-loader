@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {Graphics} from "@awayjs/graphics"
-import {MorphSprite} from "@awayjs/scene"
-import {ShapeTag} from "@awayjs/graphics";
+import { Graphics } from '@awayjs/graphics';
+import { MorphSprite } from '@awayjs/scene';
+import { ShapeTag } from '@awayjs/graphics';
 
 import { SWFParser } from '../../SWFParser';
 import { ShapeFlags } from '../../../factories/base/SWFTags';
@@ -66,13 +66,13 @@ function applySegmentToStyles(segment1: PathSegment, styles,
 }
 */
 
-export function defineShape(tag: ShapeTag, parser:SWFParser):any {
+export function defineShape(tag: ShapeTag, parser: SWFParser): any {
 	//console.log(fillPaths, linePaths);
 
 	const isMorph = tag.flags & ShapeFlags.IsMorph;
 
 	tag.parser = parser;
-	(tag as any).type = isMorph ? SYMBOL_TYPE.MORPH : SYMBOL_TYPE.SHAPE
+	(tag as any).type = isMorph ? SYMBOL_TYPE.MORPH : SYMBOL_TYPE.SHAPE;
 
 	return tag;
 }
@@ -115,4 +115,3 @@ export function defineShape(tag: ShapeTag, parser:SWFParser):any {
 // function writeMorphBitmap(style: ShapeStyle, shape: ShapeData) {
 // 	shape.writeMorphBitmap(style.transform);
 // }
-

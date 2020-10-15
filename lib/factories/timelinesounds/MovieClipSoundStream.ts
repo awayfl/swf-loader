@@ -1,5 +1,5 @@
 
-import { SoundStream, packageWave } from "../../parsers/utils/parser/sound";
+import { SoundStream, packageWave } from '../../parsers/utils/parser/sound';
 import { WaveAudio } from '@awayjs/core';
 import { WaveAudioData } from '@awayjs/core';
 import { MovieClipSoundsManager } from './MovieClipSoundsManager';
@@ -13,7 +13,7 @@ export interface DecodedSound {
 	seek?: number;
 }
 
-var MP3_MIME_TYPE = 'audio/mpeg';
+const MP3_MIME_TYPE = 'audio/mpeg';
 
 interface ISoundStreamAdapter {
 	currentTime: number;
@@ -56,13 +56,13 @@ class HTMLAudioElementAdapter implements ISoundStreamAdapter {
       element.currentTime = time;
     }
   }
-  
+
   get isPlaying(): boolean {
     return false;
   }
   stop(){
   }
-  
+
   get paused(): boolean {
     return this._element.paused;
   }
@@ -210,6 +210,7 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 	get currentTime(): number {
 		return this._sound.currentTime;
 	}
+
 	get sound(): WaveAudio {
 		return this._sound;
 	}
@@ -224,6 +225,7 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 		this._sound.play(time);
 		//}
 	}
+
 	stop() {
 		if (this._sound)
 			this._sound.stop();
@@ -239,6 +241,7 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 	get isPlaying(): boolean {
 		return this._sound.isPlaying;
 	}
+
 	get isReady(): boolean {
 		return !!this._sound;
 	}
@@ -252,7 +255,7 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 
 	queueData(frame: DecodedSound) {
 		if (!frame.pcm) {
-			release || console.log("error in WebAudioAdapter.queueData - frame does not provide pcm data")
+			release || console.log('error in WebAudioAdapter.queueData - frame does not provide pcm data');
 			return;
 
 		}
@@ -260,18 +263,18 @@ class WebAudioAdapter implements ISoundStreamAdapter {
 	}
 
 	finish() {
-		var totalLength = 0;
+		let totalLength = 0;
 		for (var i = 0; i < this._frameData.length; i++) {
 			totalLength += this._frameData[i].data.length;
 		}
-		var finalBytes = new Int8Array(totalLength);
+		const finalBytes = new Int8Array(totalLength);
 		for (var i = 0; i < this._frameData.length; i++) {
 			finalBytes.set(this._frameData[i].data, this._position);
 			this._position += this._frameData[i].data.length;
 		}
 
-		var packagedWave = packageWave(finalBytes, this._data.sampleRate, this._data.channels, this._data.streamSize, false);
-		var sound = new WaveAudio(new WaveAudioData(packagedWave.data.buffer));
+		const packagedWave = packageWave(finalBytes, this._data.sampleRate, this._data.channels, this._data.streamSize, false);
+		const sound = new WaveAudio(new WaveAudioData(packagedWave.data.buffer));
 
 		this._sound = sound;
 	}
@@ -301,20 +304,19 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
 
 	queueData(frame: DecodedSound) {
 		if (!frame.data) {
-			release || console.log("error in WebAudioAdapter.queueData - frame does not provide data")
+			release || console.log('error in WebAudioAdapter.queueData - frame does not provide data');
 			return;
 
 		}
 		this._frameData.push(frame);
 	}
 
-
 	finish() {
-		var totalLength = 0;
+		let totalLength = 0;
 		for (var i = 0; i < this._frameData.length; i++) {
 			totalLength += this._frameData[i].data.length;
 		}
-		var finalBytes = new Uint8Array(totalLength);
+		const finalBytes = new Uint8Array(totalLength);
 		for (var i = 0; i < this._frameData.length; i++) {
 			finalBytes.set(this._frameData[i].data, this._position);
 			this._position += this._frameData[i].data.length;
@@ -332,7 +334,7 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
 		//this._decoderSession.close();
 		*/
 
-		var sound = new WaveAudio(new WaveAudioData(finalBytes.buffer));
+		const sound = new WaveAudio(new WaveAudioData(finalBytes.buffer));
 		this._sound = sound;
 	}
 }
@@ -345,15 +347,14 @@ export class MovieClipSoundStream {
 	private finalized: boolean;
 	public isPlaying: boolean;
 	private element;
-	private _stopped:boolean;
+	private _stopped: boolean;
 	private isMP3: boolean;
 	private soundStreamAdapter: WebAudioAdapter;
 
 	private decode: (block: Uint8Array) => DecodedSound;
 
-
 	public constructor(streamInfo: SoundStream) {
-		this._stopped=false;
+		this._stopped = false;
 		this.decode = streamInfo.decode.bind(streamInfo);
 		this.data = {
 			sampleRate: streamInfo.sampleRate,
@@ -401,8 +402,8 @@ export class MovieClipSoundStream {
 	}
 
 	public appendBlock(frameNum: number, streamBlock: Uint8Array) {
-		var decodedBlock = this.decode(streamBlock);
-		var streamPosition = this.position;
+		const decodedBlock = this.decode(streamBlock);
+		const streamPosition = this.position;
 		/*if(!this.seekIndex[frameNum-1]){
 		  this.seekIndex[frameNum-1]=streamPosition;
 		  var time = this.seekIndex[frameNum-1]  / this.data.channels / this.data.sampleRate;
@@ -412,7 +413,7 @@ export class MovieClipSoundStream {
 		  console.log("add soundblock", frameNum-1, this.seekIndex[frameNum-1], time)
 		}*/
 		this.seekIndex[frameNum] = (streamPosition + decodedBlock.seek);
-		var time = this.seekIndex[frameNum] / this.data.channels / this.data.sampleRate;
+		let time = this.seekIndex[frameNum] / this.data.channels / this.data.sampleRate;
 		if (this.isMP3) {
 			time *= this.data.channels;
 		}
@@ -421,33 +422,34 @@ export class MovieClipSoundStream {
 		this.soundStreamAdapter.queueData(decodedBlock);
 	}
 
-
-	public get stopped():boolean {
+	public get stopped(): boolean {
 		return this._stopped;
 	}
-	public set stopped(value:boolean) {
+
+	public set stopped(value: boolean) {
 		this._stopped = value;
 	}
 
 	public stop() {
 		this.soundStreamAdapter.stop();
 	}
+
 	public playFrame(frameNum: number): number {
 		if (this._stopped || isNaN(this.seekIndex[frameNum])) {
 			return 0;
 		}
 
 		this.isPlaying = true;
-		var PLAYBACK_ADJUSTMENT = 0.5;
+		const PLAYBACK_ADJUSTMENT = 0.5;
 
 		if (!this.finalized) {
 			this.finalized = true;
 			this.soundStreamAdapter.finish();
 		}
-		var soundStreamData = this.data;
+		const soundStreamData = this.data;
 
-		var time = this.seekIndex[frameNum] / soundStreamData.channels / soundStreamData.sampleRate;
-		var elementTime = this.soundStreamAdapter.currentTime;
+		let time = this.seekIndex[frameNum] / soundStreamData.channels / soundStreamData.sampleRate;
+		const elementTime = this.soundStreamAdapter.currentTime;
 		if (this.isMP3) {
 			time *= soundStreamData.channels;
 		}
@@ -456,12 +458,11 @@ export class MovieClipSoundStream {
 			this.soundStreamAdapter.playFrom(time);
 		}
 
-		var framestoSkip = 0;
+		let framestoSkip = 0;
 		if ((elementTime - time) < 0) {
 			framestoSkip = Math.ceil(((elementTime - time) * 1000) / (1000 / MovieClipSoundStream.frameRate));
 
-		}
-		else {
+		} else {
 			framestoSkip = Math.floor(((elementTime - time) * 1000) / (1000 / MovieClipSoundStream.frameRate));
 		}
 		//console.log("framestoSkip ", framestoSkip);
@@ -495,4 +496,3 @@ export class MovieClipSoundStream {
 	  }
 	  */
 }
-

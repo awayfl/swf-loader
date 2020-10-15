@@ -16,51 +16,48 @@ export interface IRedirectRule {
 
 export function matchRedirect(url: string, rules?: Array<IRedirectRule>): {url: string, supressErrors: boolean, supressLoad: boolean} | undefined {
 
-    let rule : {
-        url: string, supressErrors: boolean, supressLoad: boolean
-    } = undefined;
+	let rule: {
+		url: string, supressErrors: boolean, supressLoad: boolean
+	} = undefined;
 
-    const all = rules ? globalRedirectRules.concat(rules) : globalRedirectRules;
+	const all = rules ? globalRedirectRules.concat(rules) : globalRedirectRules;
 
-    all.forEach(({test, resolve, supressErrors = false, supressLoad = false})=>{
-        let passed: boolean | string = false;
+	all.forEach(({ test, resolve, supressErrors = false, supressLoad = false })=>{
+		let passed: boolean | string = false;
 
-        if(typeof test  === 'function') {
-            passed = test(url);
-        } 
-        else if (test instanceof RegExp) {
-            passed = test.test(url);
-        }
-        else if (typeof test === 'string') {
-            passed = test === url;
-        }
+		if (typeof test  === 'function') {
+			passed = test(url);
+		} else if (test instanceof RegExp) {
+			passed = test.test(url);
+		} else if (typeof test === 'string') {
+			passed = test === url;
+		}
 
-        if(passed) {					
-            if(rule) {
-                console.warn('[LOADER] Duplicate redirect rules, latest rule would be used!');
-            }
+		if (passed) {
+			if (rule) {
+				console.warn('[LOADER] Duplicate redirect rules, latest rule would be used!');
+			}
 
-            rule = {
-                url, supressErrors : supressErrors, supressLoad : supressLoad
-            }
+			rule = {
+				url, supressErrors : supressErrors, supressLoad : supressLoad
+			};
 
-            if(typeof resolve === 'function') {
-                rule.url = resolve(url);
-            } else if(resolve instanceof RegExp) {
-                rule.url = url.match(resolve)[0];
-            } else if (typeof resolve === 'string') {
-                rule.url = resolve;
-            } else if (typeof passed === 'string') {
-                rule.url = passed;
-            }
+			if (typeof resolve === 'function') {
+				rule.url = resolve(url);
+			} else if (resolve instanceof RegExp) {
+				rule.url = url.match(resolve)[0];
+			} else if (typeof resolve === 'string') {
+				rule.url = resolve;
+			} else if (typeof passed === 'string') {
+				rule.url = passed;
+			}
 
-            if(typeof rule.url === 'undefined'){
-                console.warn("[LOADER] Redirect url is null, would be used  original url!");
-                rule.url = url;
-            }
-        };
-    });
+			if (typeof rule.url === 'undefined') {
+				console.warn('[LOADER] Redirect url is null, would be used  original url!');
+				rule.url = url;
+			}
+		}
+	});
 
-
-    return rule;
+	return rule;
 }

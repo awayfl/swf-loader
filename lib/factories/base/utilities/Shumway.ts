@@ -3,12 +3,10 @@ export declare var Shumway: {
 	version: string;
 	build: string;
 }*/
-export var Shumway= {
-	version: "",
-	build: ""
-}
-
-
+export var Shumway = {
+	version: '',
+	build: ''
+};
 
 export const enum CharacterCodes {
 	_0 = 48,

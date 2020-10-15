@@ -1,6 +1,6 @@
 
-import {assert, release} from "./Debug";
-import {isNullOrUndefined, isObject, MapObject} from "../utilities";
+import { assert, release } from './Debug';
+import { isNullOrUndefined, isObject, MapObject } from '../utilities';
 
 export function boxValue(value) {
 	if (isNullOrUndefined(value) || isObject(value)) {
@@ -10,9 +10,9 @@ export function boxValue(value) {
 }
 
 export function toKeyValueArray(object: Object) {
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	var array = [];
-	for (var k in object) {
+	const hasOwnProperty = Object.prototype.hasOwnProperty;
+	const array = [];
+	for (const k in object) {
 		if (hasOwnProperty.call(object, k)) {
 			array.push([k, object[k]]);
 		}
@@ -21,7 +21,7 @@ export function toKeyValueArray(object: Object) {
 }
 
 export function isPrototypeWriteable(object: Object) {
-	return Object.getOwnPropertyDescriptor(object, "prototype").writable;
+	return Object.getOwnPropertyDescriptor(object, 'prototype').writable;
 }
 
 export function hasOwnProperty(object: Object, name: string): boolean {
@@ -38,7 +38,7 @@ export function propertyIsEnumerable(object: Object, name: string): boolean {
  */
 export function getPropertyDescriptor(object: Object, name: string): PropertyDescriptor {
 	do {
-		var propDesc = Object.getOwnPropertyDescriptor(object, name);
+		const propDesc = Object.getOwnPropertyDescriptor(object, name);
 		if (propDesc) {
 			return propDesc;
 		}
@@ -48,25 +48,25 @@ export function getPropertyDescriptor(object: Object, name: string): PropertyDes
 }
 
 export function hasOwnGetter(object: Object, name: string): boolean {
-	var d = Object.getOwnPropertyDescriptor(object, name);
+	const d = Object.getOwnPropertyDescriptor(object, name);
 	return !!(d && d.get);
 }
 
 export function getOwnGetter(object: Object, name: string): () => any {
-	var d = Object.getOwnPropertyDescriptor(object, name);
+	const d = Object.getOwnPropertyDescriptor(object, name);
 	return d ? d.get : null;
 }
 
 export function hasOwnSetter(object: Object, name: string): boolean {
-	var d = Object.getOwnPropertyDescriptor(object, name);
+	const d = Object.getOwnPropertyDescriptor(object, name);
 	return !!(d && !!d.set);
 }
 
-export function createMap<T>():MapObject<T> {
+export function createMap<T>(): MapObject<T> {
 	return Object.create(null);
 }
 
-export function createArrayMap<T>():MapObject<T> {
+export function createArrayMap<T>(): MapObject<T> {
 	return <MapObject<T>><any>[];
 }
 
@@ -80,13 +80,13 @@ export function defineReadOnlyProperty(object: Object, name: string, value: any)
 }
 
 export function copyProperties(object: Object, template: Object) {
-	for (var property in template) {
+	for (const property in template) {
 		object[property] = template[property];
 	}
 }
 
 export function copyOwnProperties(object: Object, template: Object) {
-	for (var property in template) {
+	for (const property in template) {
 		if (hasOwnProperty(template, property)) {
 			object[property] = template[property];
 		}
@@ -98,9 +98,9 @@ export function copyOwnPropertyDescriptors(object: Object,
 										   filter: (name: string) => boolean = null,
 										   overwrite = true,
 										   makeWritable = false) {
-	for (var property in template) {
+	for (const property in template) {
 		if (hasOwnProperty(template, property) && (!filter || filter(property))) {
-			var descriptor = Object.getOwnPropertyDescriptor(template, property);
+			const descriptor = Object.getOwnPropertyDescriptor(template, property);
 			if (!overwrite && hasOwnProperty(object, property)) {
 				continue;
 			}
@@ -111,7 +111,7 @@ export function copyOwnPropertyDescriptors(object: Object,
 				}
 				Object.defineProperty(object, property, descriptor);
 			} catch (e) {
-				assert("Can't define: " + property);
+				assert('Can\'t define: ' + property);
 			}
 		}
 	}
@@ -120,8 +120,8 @@ export function copyOwnPropertyDescriptors(object: Object,
 export function copyPropertiesByList(object: Object,
 									 template: Object,
 									 propertyList: string []) {
-	for (var i = 0; i < propertyList.length; i++) {
-		var property = propertyList[i];
+	for (let i = 0; i < propertyList.length; i++) {
+		const property = propertyList[i];
 		object[property] = template[property];
 	}
 }
@@ -141,8 +141,7 @@ export function defineNonEnumerableProperty(obj, name, value) {
 	});
 }
 
-
-export let ObjectUtilities={
+export const ObjectUtilities = {
 	boxValue:boxValue,
 	toKeyValueArray:toKeyValueArray,
 	isPrototypeWriteable:isPrototypeWriteable,

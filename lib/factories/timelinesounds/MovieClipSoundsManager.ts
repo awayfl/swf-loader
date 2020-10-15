@@ -1,6 +1,6 @@
 
-import { MovieClipSoundStream } from "./MovieClipSoundStream";
-import { MovieClip } from "@awayjs/scene";
+import { MovieClipSoundStream } from './MovieClipSoundStream';
+import { MovieClip } from '@awayjs/scene';
 import { WaveAudio } from '@awayjs/core';
 import { release } from '../base/utilities/Debug';
 
@@ -14,21 +14,23 @@ export class MovieClipSoundsManager {
 	public static addActiveSound(sound: WaveAudio) {
 		//console.log("start sound with id", sound.id)
 		if (!MovieClipSoundsManager.activeSounds[sound.id]) {
-			MovieClipSoundsManager.activeSounds[sound.id] = {}
+			MovieClipSoundsManager.activeSounds[sound.id] = {};
 		}
 		MovieClipSoundsManager.activeSounds[sound.id].active = true;
 		MovieClipSoundsManager.activeSounds[sound.id].sound = sound;
 	}
+
 	public static enterFrame() {
-		for (var key in MovieClipSoundsManager.activeSounds) {
+		for (const key in MovieClipSoundsManager.activeSounds) {
 			//console.log("set sound to inactive", key)
-			var sound = MovieClipSoundsManager.activeSounds[key];
+			const sound = MovieClipSoundsManager.activeSounds[key];
 			sound.active = false;
 		}
 	}
+
 	public static exitFrame() {
-		for (var key in MovieClipSoundsManager.activeSounds) {
-			var sound = MovieClipSoundsManager.activeSounds[key];
+		for (const key in MovieClipSoundsManager.activeSounds) {
+			const sound = MovieClipSoundsManager.activeSounds[key];
 			if (!sound.active) {
 				//console.log("stop inactive sound", key)
 				sound.sound.stop();
@@ -36,6 +38,7 @@ export class MovieClipSoundsManager {
 			}
 		}
 	}
+
 	constructor() {
 		this.lastFrameNum = -2;
 		this._soundStreams = [];
@@ -43,14 +46,13 @@ export class MovieClipSoundsManager {
 
 	}
 
-
 	public initSoundStream(streamInfo: any) {
 		this.soundStreamHead = streamInfo;
 	}
 
 	public addSoundStreamBlock(frameNum: number, streamBlock: Uint8Array) {
 		if (!this.soundStreamHead) {
-			release || console.log("can not add soundstreamblock if no soundstreamHead exists")
+			release || console.log('can not add soundstreamblock if no soundstreamHead exists');
 			return;
 		}
 		if (this._soundStreams.length == 0 || (frameNum - this.lastFrameNum) > 1) {
@@ -67,9 +69,10 @@ export class MovieClipSoundsManager {
 			return;
 		this._frameToSoundStream[frameNum].stopped = true;
 	}
+
 	public resetStreamStopped() {
 		for (let i = 0; i < this._soundStreams.length; i++) {
-			this._soundStreams[i].stopped=false;
+			this._soundStreams[i].stopped = false;
 		}
 	}
 

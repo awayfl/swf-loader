@@ -1,11 +1,9 @@
 
-
-import {assert, release} from "./Debug";
-
+import { assert, release } from './Debug';
 
 export function repeatString(c: string, n: number): string {
-	var s = "";
-	for (var i = 0; i < n; i++) {
+	let s = '';
+	for (let i = 0; i < n; i++) {
 		s += c;
 	}
 	return s;
@@ -13,14 +11,14 @@ export function repeatString(c: string, n: number): string {
 
 export function memorySizeToString(value: number) {
 	value |= 0;
-	var K = 1024;
-	var M = K * K;
+	const K = 1024;
+	const M = K * K;
 	if (value < K) {
-		return value + " B";
+		return value + ' B';
 	} else if (value < M) {
-		return (value / K).toFixed(2) + "KB";
+		return (value / K).toFixed(2) + 'KB';
 	} else {
-		return (value / M).toFixed(2) + "MB";
+		return (value / M).toFixed(2) + 'MB';
 	}
 }
 
@@ -28,38 +26,38 @@ export function memorySizeToString(value: number) {
  * Returns a reasonably sized description of the |value|, to be used for debugging purposes.
  */
 export function toSafeString(value) {
-	if (typeof value === "string") {
-		return "\"" + value + "\"";
+	if (typeof value === 'string') {
+		return '"' + value + '"';
 	}
-	if (typeof value === "number" || typeof value === "boolean") {
+	if (typeof value === 'number' || typeof value === 'boolean') {
 		return String(value);
 	}
 	if (value instanceof Array) {
-		return "[] " + value.length;
+		return '[] ' + value.length;
 	}
 	return typeof value;
 }
 
 export function toSafeArrayString(array) {
-	var str = [];
-	for (var i = 0; i < array.length; i++) {
+	const str = [];
+	for (let i = 0; i < array.length; i++) {
 		str.push(toSafeString(array[i]));
 	}
-	return str.join(", ");
+	return str.join(', ');
 }
 
 export function utf8decode(str: string): Uint8Array {
-	var bytes = new Uint8Array(str.length * 4);
-	var b = 0;
-	for (var i = 0, j = str.length; i < j; i++) {
-		var code = str.charCodeAt(i);
+	const bytes = new Uint8Array(str.length * 4);
+	let b = 0;
+	for (let i = 0, j = str.length; i < j; i++) {
+		let code = str.charCodeAt(i);
 		if (code <= 0x7f) {
 			bytes[b++] = code;
 			continue;
 		}
 
 		if (0xD800 <= code && code <= 0xDBFF) {
-			var codeLow = str.charCodeAt(i + 1);
+			const codeLow = str.charCodeAt(i + 1);
 			if (0xDC00 <= codeLow && codeLow <= 0xDFFF) {
 				// convert only when both high and low surrogates are present
 				code = ((code & 0x3FF) << 10) + (codeLow & 0x3FF) + 0x10000;
@@ -91,17 +89,17 @@ export function utf8decode(str: string): Uint8Array {
 }
 
 export function utf8encode(bytes: Uint8Array): string {
-	var j = 0, str = "";
+	let j = 0, str = '';
 	while (j < bytes.length) {
-		var b1 = bytes[j++] & 0xFF;
+		const b1 = bytes[j++] & 0xFF;
 		if (b1 <= 0x7F) {
 			str += String.fromCharCode(b1);
 		} else {
-			var currentPrefix = 0xC0;
-			var validBits = 5;
+			let currentPrefix = 0xC0;
+			let validBits = 5;
 			do {
-				var mask = (currentPrefix >> 1) | 0x80;
-				if((b1 & mask) === currentPrefix) break;
+				const mask = (currentPrefix >> 1) | 0x80;
+				if ((b1 & mask) === currentPrefix) break;
 				currentPrefix = (currentPrefix >> 1) | 0x80;
 				--validBits;
 			} while (validBits >= 0);
@@ -111,10 +109,10 @@ export function utf8encode(bytes: Uint8Array): string {
 				str += String.fromCharCode(b1);
 				continue;
 			}
-			var code = (b1 & ((1 << validBits) - 1));
-			var invalid = false;
+			let code = (b1 & ((1 << validBits) - 1));
+			let invalid = false;
 			for (var i = 5; i >= validBits; --i) {
-				var bi = bytes[j++];
+				const bi = bytes[j++];
 				if ((bi & 0xC0) != 0x80) {
 					// Invalid UTF8 character sequence
 					invalid = true;
@@ -124,7 +122,7 @@ export function utf8encode(bytes: Uint8Array): string {
 			}
 			if (invalid) {
 				// Copying invalid sequence as is
-				for (var k = j - (7 - i); k < j; ++k) {
+				for (let k = j - (7 - i); k < j; ++k) {
 					str += String.fromCharCode(bytes[k] & 255);
 				}
 				continue;
@@ -142,18 +140,18 @@ export function utf8encode(bytes: Uint8Array): string {
 
 // https://gist.github.com/958841
 export function base64EncodeBytes(bytes: Uint8Array) {
-	var base64 = '';
-	var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+	let base64 = '';
+	const encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-	var byteLength = bytes.byteLength;
-	var byteRemainder = byteLength % 3;
-	var mainLength = byteLength - byteRemainder;
+	const byteLength = bytes.byteLength;
+	const byteRemainder = byteLength % 3;
+	const mainLength = byteLength - byteRemainder;
 
-	var a, b, c, d;
-	var chunk;
+	let a, b, c, d;
+	let chunk;
 
 	// Main loop deals with bytes in chunks of 3
-	for (var i = 0; i < mainLength; i = i + 3) {
+	for (let i = 0; i < mainLength; i = i + 3) {
 		// Combine the three bytes into a single integer
 		chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
 
@@ -192,31 +190,31 @@ export function base64EncodeBytes(bytes: Uint8Array) {
 	return base64;
 }
 
-var base64DecodeMap = [ // starts at 0x2B
+const base64DecodeMap = [ // starts at 0x2B
 	62, 0, 0, 0, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
 	0, 0, 0, 0, 0, 0, 0, // 0x3A-0x40
 	0,  1,  2,  3,  4,  5,  6, 7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
 	19, 20, 21, 22, 23, 24, 25, 0, 0, 0, 0, 0, 0, // 0x5B-0x0x60
 	26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
 	44, 45, 46, 47, 48, 49, 50, 51];
-var base64DecodeMapOffset = 0x2B;
-var base64EOF = 0x3D;
+const base64DecodeMapOffset = 0x2B;
+const base64EOF = 0x3D;
 
 /**
  * Decodes the result of encoding with base64EncodeBytes, but not necessarily any other
  * base64-encoded data. Note that this also doesn't do any error checking.
  */
 export function decodeRestrictedBase64ToBytes(encoded: string): Uint8Array {
-	var ch: number;
-	var code: number;
-	var code2: number;
+	let ch: number;
+	let code: number;
+	let code2: number;
 
-	var len = encoded.length;
-	var padding = encoded.charAt(len - 2) === '=' ? 2 : encoded.charAt(len - 1) === '=' ? 1 : 0;
+	const len = encoded.length;
+	const padding = encoded.charAt(len - 2) === '=' ? 2 : encoded.charAt(len - 1) === '=' ? 1 : 0;
 	release || assert(encoded.length % 4 === 0);
-	var decoded = new Uint8Array((encoded.length >> 2) * 3 - padding);
+	const decoded = new Uint8Array((encoded.length >> 2) * 3 - padding);
 
-	for (var i = 0, j = 0; i < encoded.length;) {
+	for (let i = 0, j = 0; i < encoded.length;) {
 		ch = encoded.charCodeAt(i++);
 		code = base64DecodeMap[ch - base64DecodeMapOffset];
 		ch = encoded.charCodeAt(i++);
@@ -242,7 +240,7 @@ export function decodeRestrictedBase64ToBytes(encoded: string): Uint8Array {
 
 export function escapeString(str: string) {
 	if (str !== undefined) {
-		str = str.replace(/[^\w$]/gi,"$"); /* No dots, colons, dashes and /s */
+		str = str.replace(/[^\w$]/gi,'$'); /* No dots, colons, dashes and /s */
 		if (/^\d/.test(str)) { /* No digits at the beginning */
 			str = '$' + str;
 		}
@@ -254,9 +252,9 @@ export function escapeString(str: string) {
  * Workaround for max stack size limit.
  */
 export function fromCharCodeArray(buffer: Uint32Array): string {
-	var str = "", SLICE = 1024 * 16;
-	for (var i = 0; i < buffer.length; i += SLICE) {
-		var chunk = Math.min(buffer.length - i, SLICE);
+	let str = '', SLICE = 1024 * 16;
+	for (let i = 0; i < buffer.length; i += SLICE) {
+		const chunk = Math.min(buffer.length - i, SLICE);
 		str += String.fromCharCode.apply(null, buffer.subarray(i, i + chunk));
 	}
 	return str;
@@ -268,19 +266,19 @@ declare global {
 	}
 }
 
-var _encoding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$_';
+const _encoding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$_';
 export function variableLengthEncodeInt32(n) {
-	var e = _encoding;
-	var bitCount = (32 - Math.clz32(n));
+	const e = _encoding;
+	const bitCount = (32 - Math.clz32(n));
 	release || assert (bitCount <= 32, bitCount);
-	var l = Math.ceil(bitCount / 6);
+	const l = Math.ceil(bitCount / 6);
 	// Encode length followed by six bit chunks.
-	var s = e[l];
-	for (var i = l - 1; i >= 0; i--) {
-		var offset = (i * 6);
+	let s = e[l];
+	for (let i = l - 1; i >= 0; i--) {
+		const offset = (i * 6);
 		s += e[(n >> offset) & 0x3F];
 	}
-	release || assert (StringUtilities.variableLengthDecodeInt32(s) === n, n + " : " + s + " - " + l + " bits: " + bitCount);
+	release || assert (StringUtilities.variableLengthDecodeInt32(s) === n, n + ' : ' + s + ' - ' + l + ' bits: ' + bitCount);
 	return s;
 }
 
@@ -300,14 +298,14 @@ export function fromEncoding(c) {
 	} else if (c === 95) {
 		return 63;
 	}
-	release || assert (false, "Invalid Encoding");
+	release || assert (false, 'Invalid Encoding');
 }
 
 export function variableLengthDecodeInt32(s) {
-	var l = fromEncoding(s.charCodeAt(0));
-	var n = 0;
-	for (var i = 0; i < l; i++) {
-		var offset = ((l - i - 1) * 6);
+	const l = fromEncoding(s.charCodeAt(0));
+	let n = 0;
+	for (let i = 0; i < l; i++) {
+		const offset = ((l - i - 1) * 6);
 		n |= fromEncoding(s.charCodeAt(1 + i)) << offset;
 	}
 	return n;
@@ -317,23 +315,23 @@ export function trimMiddle(s: string, maxLength: number): string {
 	if (s.length <= maxLength) {
 		return s;
 	}
-	var leftHalf = maxLength >> 1;
-	var rightHalf = maxLength - leftHalf - 1;
-	return s.substr(0, leftHalf) + "\u2026" + s.substr(s.length - rightHalf, rightHalf);
+	const leftHalf = maxLength >> 1;
+	const rightHalf = maxLength - leftHalf - 1;
+	return s.substr(0, leftHalf) + '\u2026' + s.substr(s.length - rightHalf, rightHalf);
 }
 
 export function multiple(s: string, count: number): string {
-	var o = "";
-	for (var i = 0; i < count; i++) {
+	let o = '';
+	for (let i = 0; i < count; i++) {
 		o += s;
 	}
 	return o;
 }
 
 export function indexOfAny(s: string, chars: string [], position: number) {
-	var index = s.length;
-	for (var i = 0; i < chars.length; i++) {
-		var j = s.indexOf(chars[i], position);
+	let index = s.length;
+	for (let i = 0; i < chars.length; i++) {
+		const j = s.indexOf(chars[i], position);
 		if (j >= 0) {
 			index = Math.min(index, j);
 		}
@@ -341,9 +339,9 @@ export function indexOfAny(s: string, chars: string [], position: number) {
 	return index === s.length ? -1 : index;
 }
 
-var _concat3array = new Array(3);
-var _concat4array = new Array(4);
-var _concat9array = new Array(9);
+const _concat3array = new Array(3);
+const _concat4array = new Array(4);
+const _concat9array = new Array(9);
 
 /**
  * The concatN() functions concatenate multiple strings in a way that
@@ -370,7 +368,7 @@ export function concat4(s0: any, s1: any, s2: any, s3: any) {
 }
 
 export function concat9(s0: any, s1: any, s2: any, s3: any, s4: any,
-						s5: any, s6: any, s7: any, s8: any) {
+	s5: any, s6: any, s7: any, s8: any) {
 	_concat9array[0] = s0;
 	_concat9array[1] = s1;
 	_concat9array[2] = s2;
@@ -383,8 +381,7 @@ export function concat9(s0: any, s1: any, s2: any, s3: any, s4: any,
 	return _concat9array.join('');
 }
 
-
-export let StringUtilities={
+export const StringUtilities = {
 	repeatString:repeatString,
 	memorySizeToString:memorySizeToString,
 	toSafeString:toSafeString,

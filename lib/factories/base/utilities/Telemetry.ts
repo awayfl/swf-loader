@@ -28,6 +28,6 @@ export interface ITelemetryService {
 
 export var instance: ITelemetryService;
 
-export let Telemetry={
+export const Telemetry = {
 	instance:instance
 };

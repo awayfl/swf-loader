@@ -1,6 +1,5 @@
 
-
-import {notImplemented} from "./Debug";
+import { notImplemented } from './Debug';
 
 export interface IClipboardService {
 	setClipboard(data: string): void;

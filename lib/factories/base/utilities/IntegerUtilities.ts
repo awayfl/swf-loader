@@ -1,5 +1,5 @@
 
-var sharedBuffer = new ArrayBuffer(8);
+const sharedBuffer = new ArrayBuffer(8);
 export var i8 = new Int8Array(sharedBuffer);
 export var u8 = new Uint8Array(sharedBuffer);
 export var i32 = new Int32Array(sharedBuffer);
@@ -7,11 +7,10 @@ export var f32 = new Float32Array(sharedBuffer);
 export var f64 = new Float64Array(sharedBuffer);
 export var nativeLittleEndian = new Int8Array(new Int32Array([1]).buffer)[0] === 1;
 
-
 declare global {
 	interface Math {
 		clz32(value: number): number;
-		imul(value1:number, value2:number):number;
+		imul(value1: number, value2: number): number;
 	}
 }
 
@@ -87,14 +86,14 @@ export function trailingZeros(i: number): number {
 	return ones((i & -i) - 1);
 }
 export function getFlags(i: number, flags: string[]): string {
-	var str = "";
+	let str = '';
 	for (var i = 0; i < flags.length; i++) {
 		if (i & (1 << i)) {
-			str += flags[i] + " ";
+			str += flags[i] + ' ';
 		}
 	}
 	if (str.length === 0) {
-		return "";
+		return '';
 	}
 	return str.trim();
 }
@@ -108,24 +107,24 @@ export function roundToMultipleOfFour(x: number) {
 }
 
 export function nearestPowerOfTwo(x: number) {
-	x --;
+	x--;
 	x |= x >> 1;
 	x |= x >> 2;
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
-	x ++;
+	x++;
 	return x;
 }
 
 export function roundToMultipleOfPowerOfTwo(i: number, powerOfTwo: number) {
-	var x = (1 << powerOfTwo) - 1;
+	const x = (1 << powerOfTwo) - 1;
 	return (i + x) & ~x; // Round up to multiple of power of two.
 }
 
 export function toHEX(i: number) {
 	var i = (i < 0 ? 0xFFFFFFFF + i + 1 : i);
-	return "0x" + ("00000000" + i.toString(16)).substr(-8);
+	return '0x' + ('00000000' + i.toString(16)).substr(-8);
 }
 
 /**
@@ -133,10 +132,10 @@ export function toHEX(i: number) {
  */
 if (!Math.imul) {
 	Math.imul = function imul(a, b) {
-		var ah  = (a >>> 16) & 0xffff;
-		var al = a & 0xffff;
-		var bh  = (b >>> 16) & 0xffff;
-		var bl = b & 0xffff;
+		const ah  = (a >>> 16) & 0xffff;
+		const al = a & 0xffff;
+		const bh  = (b >>> 16) & 0xffff;
+		const bl = b & 0xffff;
 		// the shift by 0 fixes the sign on the high part
 		// the final |0 converts the unsigned value into a signed value
 		return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
@@ -157,7 +156,7 @@ if (!Math.clz32) {
 	};
 }
 
-export let IntegerUtilities={
+export const IntegerUtilities = {
 	i8:i8,
 	u8:u8,
 	i32:i32,

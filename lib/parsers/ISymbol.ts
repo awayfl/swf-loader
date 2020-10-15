@@ -1,21 +1,21 @@
 
-import { Bbox, Shape, ShapeTag} from "@awayjs/graphics";
-import { SWFFrame } from "./SWFFrame";
-import { UnparsedTag } from "@awayjs/graphics";
-import { TextTag, BinaryDataTag, VideoStreamTag, FontTag } from "../factories/base/SWFTags";
+import { Bbox, Shape, ShapeTag } from '@awayjs/graphics';
+import { SWFFrame } from './SWFFrame';
+import { UnparsedTag } from '@awayjs/graphics';
+import { TextTag, BinaryDataTag, VideoStreamTag, FontTag } from '../factories/base/SWFTags';
 
 export const enum SYMBOL_TYPE {
 	SHAPE = 'shape',
 	MORPH = 'morphshape',
-	FONT = "font",
-	SPRITE = "sprite",
-	TEXT = "text",
-	SOUND = "sound",
-	BUTTON = "button",
-	LABEL = "label",
-	IMAGE = "image",
-	BINARY = "binary",
-	VIDEO = "video"
+	FONT = 'font',
+	SPRITE = 'sprite',
+	TEXT = 'text',
+	SOUND = 'sound',
+	BUTTON = 'button',
+	LABEL = 'label',
+	IMAGE = 'image',
+	BINARY = 'binary',
+	VIDEO = 'video'
 }
 
 export interface ISymbol extends UnparsedTag {
@@ -43,8 +43,8 @@ export interface ITextSymbol extends ISymbol {
 
 export interface IButtonSymbol extends ISymbol {
 	states: any;
-    buttonActions: any;
-    buttonSounds: any;
+	buttonActions: any;
+	buttonSounds: any;
 }
 
 export interface ILabelSymbol extends ITextSymbol {
@@ -62,6 +62,6 @@ export interface IImageSymbol extends ISymbol {
 	lazyParser: () => IImageSymbol;
 }
 
-export interface IBinarySymbol extends BinaryDataTag, ISymbol {};
-export interface IVideoSymbol extends VideoStreamTag, ISymbol {};
-export interface IFontSymbol extends FontTag, ISymbol {};
+export interface IBinarySymbol extends BinaryDataTag, ISymbol {}
+export interface IVideoSymbol extends VideoStreamTag, ISymbol {}
+export interface IFontSymbol extends FontTag, ISymbol {}
