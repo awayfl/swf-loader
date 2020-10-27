@@ -1,8 +1,10 @@
 import {
 	Billboard,
-	Font,
+	DisplayObject,
 	IFilter,
+	IFrameScript,
 	ISceneGraphFactory,
+	ISymbolDecoder,
 	MorphSprite,
 	MovieClip,
 	Sprite,
@@ -72,7 +74,12 @@ const TF_ALIGNS: string[] = [
 	TextFormatAlign.JUSTIFY,
 ];
 
+<<<<<<< HEAD
 export class SymbolDecoder {
+=======
+export class SymbolDecoder implements ISymbolDecoder {
+
+>>>>>>> timeline_refactor
 	private _awaySymbols: NumberMap<IAsset> = {};
 	private _buttonIds: NumberMap<boolean> = {};
 	private _mcIds: NumberMap<boolean> = {};
@@ -92,7 +99,65 @@ export class SymbolDecoder {
 		return this._awaySymbols;
 	}
 
-	private _createShape(symbol: IShapeSymbol & { lazyParser: () => any }, target?: Shape, name?: string): IAsset {
+	/**
+	 * prepares framescript for use in AVM
+	 * this is actually only used for AVM1
+	 * @param source
+	 * @param frameIdx
+	 */
+	public prepareFrameScriptsForAVM1(source: IFrameScript[],
+		frameIdx: number,
+		objName: string,
+		objID: number): IFrameScript[] {
+		if (!this.parser.swfFile.useAVM1) {
+			return source;
+		}
+		return this.parser.factory.createFrameScripts(source, frameIdx, objName, objID);
+	}
+
+	/**
+	 * Get a instance for a given SymbolID and assign a sessionID to it.
+	 * This is used by timeline to create children
+	 *
+	 * @param symbolID
+	 * @param sessionID
+	 */
+	public createChildInstanceForTimeline(timeline: Timeline, symbolID: number, sessionID: number): IAsset {
+		const asset: IAsset = this.awaySymbols[symbolID];
+		let clone: DisplayObject;
+		if (asset.isAsset(Graphics)) {
+			clone = Sprite.getNewSprite(<Graphics> asset);
+			clone.mouseEnabled = false;
+		} else if (asset.isAsset(Sprite)) {
+			clone = Sprite.getNewSprite((<Sprite> asset).graphics);
+			clone.mouseEnabled = false;
+		} else if (asset.isAsset(MorphSprite)) {
+			clone = MorphSprite.getNewMorphSprite((<MorphSprite> asset).graphics);
+			clone.mouseEnabled = false;
+		} else if (asset.isAsset(BitmapImage2D)) {
+			// enable blending for symbols, because if you place image directly on stage
+			// it not enable blend mode
+			const m = new MethodMaterial(<BitmapImage2D>asset);
+			m.alphaBlending = (<BitmapImage2D>asset).transparent;
+			clone = Billboard.getNewBillboard(m);
+		} else {
+			clone = (<any> asset.adapter).clone(false).adaptee;
+		}
+		if (this.parser.swfFile.useAVM1) {
+			const placeObjectTag: any = timeline.placeObjectTagsForSessionIDs[sessionID];
+			if (placeObjectTag
+				&& ((<any>placeObjectTag).variableName
+				|| (placeObjectTag.events && placeObjectTag.events.length > 0))) {
+				(<any>clone.adapter).placeObjectTag = placeObjectTag;
+				(<any>clone.adapter).initEvents = placeObjectTag;
+			}
+		}
+		clone._sessionID = sessionID;
+		return clone;
+	}
+
+	private _createShape(symbol: IShapeSymbol & {lazyParser: () => any}, target?: Shape, name?: string): IAsset {
+
 		const shape = new Graphics();
 
 		/*
@@ -149,21 +214,18 @@ export class SymbolDecoder {
 
 		(<any>target).className = symbol.className;
 
-		const flashFont = (this.reqursive
-			? this.createAwaySymbol(symbol.tag.fontId)
-			: this._awaySymbols[symbol.tag.fontId]) as any;
+		const flashFont = (this.reqursive ?
+			this.createAwaySymbol(symbol.tag.fontId) : this._awaySymbols[symbol.tag.fontId]) as any;
 
 		if (flashFont) {
 			target.textFormat.font = flashFont.away;
-			target.textFormat.font_table = <TesselatedFontTable>(
-				flashFont.away.get_font_table(flashFont.fontStyleName, TesselatedFontTable.assetType)
-			);
+			target.textFormat.font_table = <TesselatedFontTable>
+				flashFont.away.get_font_table(flashFont.fontStyleName, TesselatedFontTable.assetType);
 		}
 
 		const tag = symbol.tag;
 		target.textFormat.size = tag.fontHeight / 20;
-		//awayText.textFormat.color = (symbol.tag.flags & TextFlags.HasColor)?ColorUtils.f32_RGBA_To_f32_ARGB(symbol.tag.color):0xffffff;
-		target.textColor = tag.flags & TextFlags.HasColor ? ColorUtils.f32_RGBA_To_f32_ARGB(tag.color) : 0xffffff;
+		target.textColor = (tag.flags & TextFlags.HasColor) ? ColorUtils.f32_RGBA_To_f32_ARGB(tag.color) : 0xffffff;
 		target.textFormat.leftMargin = tag.leftMargin / 20;
 		target.textFormat.rightMargin = tag.rightMargin / 20;
 		target.textFormat.letterSpacing = tag.letterSpacing / 20;
@@ -249,16 +311,14 @@ export class SymbolDecoder {
 		for (let r = 0; r < symbol.records.length; r++) {
 			const record: any = symbol.records[r];
 			if (record.fontId) {
-				font = this.reqursive
-					? (this.createAwaySymbol(record.fontId) as any)
-					: this._awaySymbols[record.fontId];
+				font = this.reqursive ?
+					(this.createAwaySymbol(record.fontId) as any) : this._awaySymbols[record.fontId];
 
 				if (font) {
 					//awayText.textFormat.font=font.away;
 					record.font = font;
-					record.font_table = <TesselatedFontTable>(
-						font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType)
-					);
+					record.font_table = <TesselatedFontTable>
+						font.away.get_font_table(font.fontStyleName, TesselatedFontTable.assetType);
 
 					if (!record.font_table) {
 						fontExist = true;
@@ -315,9 +375,9 @@ export class SymbolDecoder {
 			*/
 		}
 		if (target) {
-			(<any>target).className = this.parser.symbolClassesMap[symbol.id]
-				? this.parser.symbolClassesMap[symbol.id]
-				: symbol.className;
+
+			(<any>target).className = this.parser.symbolClassesMap[symbol.id] ?
+				this.parser.symbolClassesMap[symbol.id] : symbol.className;
 			target.name = (<any>target).className;
 
 			//assetsToFinalize[dictionary[i].id] = target;
@@ -341,9 +401,8 @@ export class SymbolDecoder {
 		const dummyVideo = new BitmapImage2D(symbol.width, symbol.height, false, 0x00ff00, false);
 		dummyVideo._symbol = symbol as any;
 
-		(<any>dummyVideo).className = this.parser.symbolClassesMap[symbol.id]
-			? this.parser.symbolClassesMap[symbol.id]
-			: symbol.className;
+		(<any>dummyVideo).className = this.parser.symbolClassesMap[symbol.id] ?
+			this.parser.symbolClassesMap[symbol.id] : symbol.className;
 		dummyVideo.name = (<any>dummyVideo).className;
 
 		return dummyVideo;
@@ -362,6 +421,7 @@ export class SymbolDecoder {
 		if (!symbol) {
 			throw new Error('Symbol can\'t be null');
 		}
+		//name = symbol.className;
 
 		// return existed away symbol by ID inside symbol
 		if (!target && this._awaySymbols[symbol.id]) {
@@ -374,12 +434,10 @@ export class SymbolDecoder {
 
 		//symbol.className && console.log(symbol.type, symbol.className);
 		switch (symbol.type) {
-			case SYMBOL_TYPE.MORPH: {
-				asset = this._createShape(
-					symbol as IShapeSymbol,
-					target as Shape,
-					name || 'AwayJS_morphshape_' + symbol.id.toString()
-				);
+			case SYMBOL_TYPE.MORPH:
+			{
+				asset = this._createShape(symbol as IShapeSymbol,
+					target as Shape, name || 'AwayJS_morphshape_' + symbol.id.toString());
 				break;
 			}
 			case SYMBOL_TYPE.SHAPE: {
@@ -433,14 +491,8 @@ export class SymbolDecoder {
 		return asset as T;
 	}
 
-	framesToTimeline(
-		awayMc: MovieClip,
-		symbol: any,
-		swfFrames: SWFFrame[],
-		states: any,
-		buttonActions: any,
-		buttonSound: any = null
-	): MovieClip {
+	framesToTimeline(awayMc: MovieClip, symbol: any, swfFrames: SWFFrame[],
+		states: any, buttonActions: any, buttonSound: any = null): MovieClip {
 		if (!states && !swfFrames) {
 			throw 'error when creating timeline - neither movieclip frames nor button-states present';
 		}
@@ -451,7 +503,7 @@ export class SymbolDecoder {
 
 		//console.log("swfFrames", swfFrames);
 		let isButton: boolean = false;
-		var key: string;
+		let key: string;
 		symbol.isButton = false;
 		if (states && !swfFrames) {
 			isButton = true;
@@ -469,8 +521,9 @@ export class SymbolDecoder {
 		awayMc = awayMc || this.factory.createMovieClip(null, symbol);
 		awayMc.symbolID = symbol.id;
 
+		let sessionIDCount: number = 0;
 		const awayTimeline: Timeline = awayMc.timeline;
-
+		awayMc.timeline.symbolDecoder = this;
 		const keyframe_durations: number[] = [];
 		const frameCmdInd: number[] = [];
 		const frameRecipe: number[] = [];
@@ -517,9 +570,7 @@ export class SymbolDecoder {
 		const propStreamStr: string[] = [];
 
 		let virtualScenegraph: any = {};
-		const freeChilds: any = {};
 		let keyFrameCount = 0;
-		var framesLen: number = 0;
 
 		const cmds_removed: any[] = [];
 		const cmds_add: any[] = [];
@@ -531,10 +582,8 @@ export class SymbolDecoder {
 
 		let instanceCNT: number = 0;
 		let child: any;
-		let name: string;
-		let freeChildsForID: any;
 		let i: number;
-		var framesLen: number = swfFrames.length;
+		const framesLen: number = swfFrames.length;
 		let command_recipe_flag: number = 0;
 		let audio_commands_cnt: number = 0;
 		let labelName: string;
@@ -586,24 +635,17 @@ export class SymbolDecoder {
 						console.log('\n\nerror: no away-asset for export\n\n', swfFrames[i].exports[key]);
 					} else {
 						if (awayAsset.isAsset) {
-							//  this is a awayjs asset. we just update its name.
-							//  all awayjs-assets will get registered on AssetLibrary by name at very end of parseSymbolsToAwayJS function
+							// this is a awayjs asset. we just update its name.
+							// all awayjs-assets will get registered on AssetLibrary
+							// by name at very end of parseSymbolsToAwayJS function
 							awayAsset.name = asset.className.toLowerCase();
-						} /*
-                        else if (awayAsset.away) {
-                            // this is a font. for now we do nothing (?)
-                        }*/ else {
-							// this is a binary asset. should already be handled in AXSecurityDomain.createInitializerFunction
+						} else {
+							// this is a binary asset.
+							// should already be handled in AXSecurityDomain.createInitializerFunction
 						}
 					}
-					noExportsDebug ||
-						console.log(
-							'			added export',
-							swfFrames[i].exports[key],
-							asset.className,
-							asset.symbolId,
-							awayAsset
-						);
+					noExportsDebug || console.log('			added export',
+						swfFrames[i].exports[key], asset.className, asset.symbolId, awayAsset);
 				}
 			}
 			// check if this is a empty frame
@@ -624,15 +666,6 @@ export class SymbolDecoder {
 					frameRecipe.push(command_recipe_flag);
 					for (key in virtualScenegraph) {
 						child = virtualScenegraph[key];
-						freeChildsForID = freeChilds[child.id];
-						if (!freeChildsForID) {
-							freeChildsForID = freeChilds[child.id] = {};
-						}
-						name = child.name; //+"#"+key;
-						if (!freeChildsForID[name]) {
-							freeChildsForID[name] = [];
-						}
-						freeChildsForID[name].push(child.sessionID);
 					}
 					virtualScenegraph = {};
 					keyFrameCount++;
@@ -649,15 +682,6 @@ export class SymbolDecoder {
 					command_recipe_flag |= 0x01;
 					for (key in virtualScenegraph) {
 						child = virtualScenegraph[key];
-						freeChildsForID = freeChilds[child.id];
-						if (!freeChildsForID) {
-							freeChildsForID = freeChilds[child.id] = {};
-						}
-						name = child.name; //+"#"+key;
-						if (!freeChildsForID[name]) {
-							freeChildsForID[name] = [];
-						}
-						freeChildsForID[name].push(child.sessionID);
 					}
 					virtualScenegraph = {};
 				}
@@ -680,7 +704,7 @@ export class SymbolDecoder {
 					}
 				}
 				if (!isEmpty && swfFrames[i].actionBlocks && swfFrames[i].actionBlocks.length > 0) {
-					awayTimeline.add_framescript(swfFrames[i].actionBlocks, i, awayMc);
+					awayTimeline.add_framescript(swfFrames[i].actionBlocks, i, awayMc, true);
 				}
 				if (buttonSound && buttonSound[keyFrameCount] && buttonSound[keyFrameCount].id != 0) {
 					awaySymbol = getSymbol(buttonSound[keyFrameCount].id);
@@ -689,21 +713,20 @@ export class SymbolDecoder {
 							cmd: SwfTagCode.CODE_START_SOUND,
 							id: buttonSound[keyFrameCount].id,
 							sound: awaySymbol,
-							props: buttonSound[keyFrameCount].info,
+							props: buttonSound[keyFrameCount].info
 						};
 						cmds_startSounds.push(audio_commands_cnt++);
 					}
 				}
 				keyFrameCount++;
 				if (!isEmpty && swfFrames[i].controlTags && swfFrames[i].controlTags.length > 0) {
-					noTimelineDebug || console.log('			Start parsing controltags', swfFrames[i].controlTags.length);
+					noTimelineDebug || console.log('			Start parsing controltags',
+						swfFrames[i].controlTags.length);
 					len = swfFrames[i].controlTags.length;
 					for (ct = 0; ct < len; ct++) {
 						unparsedTag = swfFrames[i].controlTags[ct];
-						tag =
-							unparsedTag.tagCode === undefined
-								? unparsedTag
-								: <any> this.parser.getParsedTag(unparsedTag);
+						tag = unparsedTag.tagCode === undefined ?
+							unparsedTag : <any> this.parser.getParsedTag(unparsedTag);
 
 						//console.log("parsed tag", tag);
 						switch (tag.code) {
@@ -725,8 +748,8 @@ export class SymbolDecoder {
 										sound: getSymbol(tag.soundId),
 										props: tag.soundInfo,
 									};
-									noTimelineDebug ||
-										console.log('startsound', tag.soundId, tag.soundInfo, awaySymbol, i + 1);
+									noTimelineDebug || console.log('startsound',
+										tag.soundId, tag.soundInfo, awaySymbol, i + 1);
 								}
 								// todo: volume / pan / other properties
 								cmds_startSounds.push(audio_commands_cnt++);
@@ -749,22 +772,16 @@ export class SymbolDecoder {
 							case SwfTagCode.CODE_REMOVE_OBJECT2:
 								child = virtualScenegraph[tag.depth];
 								if (!child) {
-									console.log('Error in timeline. remove cant find the obejct to remove');
+									console.log('Error in timeline. remove cant find the object to remove');
 								}
 
-								cmds_removed[cmds_removed.length] = { depth: tag.depth | 0 };
-								//awayTimeline.freePotentialChild(child.awayChild, child.sessionID);
+								if (this.parser.swfFile.useAVM1)
+									cmds_removed[cmds_removed.length] = { depth: tag.depth | 0 };
+								else
+									cmds_removed[cmds_removed.length] = { depth: child.sessionID | 0 };
+
 								virtualScenegraph[tag.depth] = null;
 								transformsAtDepth[tag.depth.toString()] = null;
-								freeChildsForID = freeChilds[child.id];
-								if (!freeChildsForID) {
-									freeChildsForID = freeChilds[child.id] = {};
-								}
-								name = child.name; //+"#"+tag.depth;
-								if (!freeChildsForID[name]) {
-									freeChildsForID[name] = [];
-								}
-								freeChildsForID[name].push(child.sessionID);
 
 								delete virtualScenegraph[tag.depth];
 								noTimelineDebug || console.log('				remove', 'depth', tag.depth);
@@ -793,11 +810,13 @@ export class SymbolDecoder {
 								// possible options:
 
 								// hasCharacter && !child
-								//		we need to put a child into the display list. might need to create sprite for graphics !
+								//		we need to put a child into the display list.
+								//		might need to create sprite for graphics !
 
 								// hasCharacter && child
 								//		need to update a child with a new graphic
-								//		if the existing child is not a graphic, we need to remove it and add a new sprite for it, so we can update the graphics there
+								//		if the existing child is not a graphic, we need to remove it
+								//		and add a new sprite for it, so we can update the graphics there
 
 								// !hasCharacter && child
 								//		need to update a child
@@ -814,13 +833,6 @@ export class SymbolDecoder {
 										break;
 									}
 
-									if (awaySymbol.isAsset(BitmapImage2D)) {
-										// enable blending for symbols, because if you place image directly on stage
-										// it not enable blend mode
-										const m = new MethodMaterial(<BitmapImage2D>awaySymbol);
-										m.alphaBlending = (<BitmapImage2D>awaySymbol).transparent;
-										awaySymbol = Billboard.getNewBillboard(m);
-									}
 									flashSymbol = this.parser.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if (awaySymbol.isAsset(Graphics)) {
@@ -830,97 +842,53 @@ export class SymbolDecoder {
 										}
 
 										// register a new instance for this object
-										graphicsSprite = this.factory.createSprite(
-											null,
+										graphicsSprite = this.factory.createSprite(null,
 											<Graphics>awaySymbol,
-											flashSymbol
-										);
+											flashSymbol);
 										graphicsSprite.mouseEnabled = false;
 
-										// if this a child is already existing, and it is a sprite, we will just use the swapGraphics command to exchange the graphics it holds
+										// if this a child is already existing, and it is a sprite,
+										// we will just use the swapGraphics command to exchange the graphics it holds
 										if (child && child.awayChild.isAsset(Sprite)) {
 											sessionID = child.sessionID;
-											// a child (sprite) already exists and the swapGraphicsId will be handled in the update command
+											// a child (sprite) already exists
+											// the swapGraphicsId will be handled in the update command
 										} else {
-											if (
-												placeObjectTag != null &&
-												((placeObjectTag.name && placeObjectTag.name != '') ||
-													this._mcIds[placeObjectTag.symbolId] ||
-													this._buttonIds[placeObjectTag.symbolId])
-											) {
+											if (placeObjectTag != null
+												&& ((placeObjectTag.name && placeObjectTag.name != '')
+												|| this._mcIds[placeObjectTag.symbolId]
+												|| this._buttonIds[placeObjectTag.symbolId])) {
+
 												if (!placeObjectTag.name || placeObjectTag.name == '')
-													placeObjectTag.name =
-														'instance' + placeObjectTag.symbolId + '_' + instanceCNT++;
+													placeObjectTag.name = 'instance' +
+														placeObjectTag.symbolId + '_' + instanceCNT++;
 											}
 											if (child) {
-												cmds_removed[cmds_removed.length] = { depth: tag.depth | 0 };
-												//awayTimeline.freePotentialChild(child.awayChild, child.sessionID);
-												freeChildsForID = freeChilds[child.id];
-												if (!freeChildsForID) {
-													freeChildsForID = freeChilds[child.id] = {};
-												}
-												name = child.name; //+"#"+tag.depth;
-												if (!freeChildsForID[name]) {
-													freeChildsForID[name] = [];
-												}
-												freeChildsForID[name].push(child.sessionID);
+
+												if (this.parser.swfFile.useAVM1)
+													cmds_removed[cmds_removed.length] = { depth: tag.depth | 0 };
+												else
+													cmds_removed[cmds_removed.length] = { depth: child.sessionID | 0 };
 
 												virtualScenegraph[tag.depth] = null;
 												transformsAtDepth[tag.depth.toString()] = null;
 												delete virtualScenegraph[tag.depth];
-												noTimelineDebug ||
-													console.log(
-														'				remove because we want to add a shape at this depth',
-														'depth',
-														tag.depth
-													);
+												noTimelineDebug	|| console.log(
+													'	remove because we want to add a shape at this depth',
+													'depth', tag.depth);
+
 											}
 
-											// check if we can reuse a free instance for this symbol:
-											if (freeChilds[placeObjectTag.symbolId]) {
-												name = placeObjectTag.name ? placeObjectTag.name : 'noname';
-												// first we check if a instance is available that had the same instance-name
-												if (
-													freeChilds[placeObjectTag.symbolId][name] &&
-													freeChilds[placeObjectTag.symbolId][name].length > 0
-												) {
-													sessionID = freeChilds[placeObjectTag.symbolId][name].shift();
-												} else {
-													// if not, we try to grab any other
-													for (key in freeChilds[placeObjectTag.symbolId]) {
-														if (freeChilds[placeObjectTag.symbolId][key].length > 0) {
-															sessionID = freeChilds[placeObjectTag.symbolId][
-																key
-															].shift();
-															break;
-														}
-													}
-												}
-											}
-											if (sessionID == -1) {
-												sessionID = awayTimeline.registerPotentialChild(graphicsSprite);
+											sessionID = sessionIDCount++;
+
+											if ((<any>placeObjectTag).name
+												|| (<any>placeObjectTag).variableName
+												|| (placeObjectTag.events && placeObjectTag.events.length > 0)) {
+												awayTimeline.placeObjectTagsForSessionIDs[sessionID] = placeObjectTag;
 											}
 
-											if (
-												(<any>placeObjectTag).name ||
-												(<any>placeObjectTag).variableName ||
-												(placeObjectTag.events && placeObjectTag.events.length > 0)
-											) {
-												awayTimeline.potentialPrototypesInitEventsMap[
-													sessionID + '#' + i
-												] = placeObjectTag;
-											}
-
-											noTimelineDebug ||
-												console.log(
-													'				add shape',
-													'session-id',
-													sessionID,
-													'depth',
-													tag.depth,
-													tag,
-													awaySymbol
-												);
+											noTimelineDebug || console.log('				add shape',
+												'session-id', sessionID, 'depth', tag.depth, tag, awaySymbol);
 											child = virtualScenegraph[tag.depth] = {
 												sessionID: sessionID,
 												id: placeObjectTag.symbolId,
@@ -937,51 +905,37 @@ export class SymbolDecoder {
 												id: placeObjectTag.symbolId,
 												name: placeObjectTag.name,
 											};
+											cmds_add[cmds_add.length] = {
+												sessionID: sessionID,
+												depth: tag.depth,
+												id: placeObjectTag.symbolId,
+												name: placeObjectTag.name };
+
 										}
 									} else {
 										if (!placeObjectTag.name || placeObjectTag.name == '')
-											placeObjectTag.name =
-												'instance' + placeObjectTag.symbolId + '_' + instanceCNT++;
+											placeObjectTag.name = 'instance'
+												+ placeObjectTag.symbolId + '_' + instanceCNT++;
 
-										// check if we can reuse a free instance for this symbol:
-										if (freeChilds[placeObjectTag.symbolId]) {
-											name = placeObjectTag.name ? placeObjectTag.name : 'noname';
-											// first we check if a instance is available that had the same instance-name
-											if (
-												freeChilds[placeObjectTag.symbolId][name] &&
-												freeChilds[placeObjectTag.symbolId][name].length > 0
-											) {
-												sessionID = freeChilds[placeObjectTag.symbolId][name].shift();
-											} else {
-												// if not, we try to grab any other
-												for (key in freeChilds[placeObjectTag.symbolId]) {
-													if (freeChilds[placeObjectTag.symbolId][key].length > 0) {
-														sessionID = freeChilds[placeObjectTag.symbolId][key].shift();
-														break;
-													}
-												}
-											}
-										}
-										if (sessionID == -1) {
-											sessionID = awayTimeline.registerPotentialChild(awaySymbol);
-										}
+										sessionID = sessionIDCount++;
 
-										if (
-											(<any>placeObjectTag).name ||
-											(<any>placeObjectTag).variableName ||
-											(placeObjectTag.events && placeObjectTag.events.length > 0)
-										) {
-											awayTimeline.potentialPrototypesInitEventsMap[
-												sessionID + '#' + i
-											] = placeObjectTag;
+										if ((<any>placeObjectTag).name
+											|| (<any>placeObjectTag).variableName
+											|| (placeObjectTag.events && placeObjectTag.events.length > 0)) {
+											awayTimeline.placeObjectTagsForSessionIDs[sessionID] = placeObjectTag;
 										}
 
 										doAdd = true;
-										if (
-											virtualScenegraph[tag.depth] &&
-											virtualScenegraph[tag.depth].id == placeObjectTag.symbolId
-										) {
+										if (virtualScenegraph[tag.depth]
+											&& virtualScenegraph[tag.depth].id == placeObjectTag.symbolId) {
 											doAdd = false;
+										} else if (virtualScenegraph[tag.depth]) {
+											// if depth is occupied remove existing child
+											if (this.parser.swfFile.useAVM1)
+												cmds_removed[cmds_removed.length] = { depth: tag.depth | 0 };
+											else
+												cmds_removed[cmds_removed.length] = {
+													depth: virtualScenegraph[tag.depth].sessionID | 0 };
 										}
 										child = virtualScenegraph[tag.depth] = {
 											sessionID: sessionID,
@@ -994,22 +948,13 @@ export class SymbolDecoder {
 											name: placeObjectTag.name ? placeObjectTag.name : 'noname',
 										};
 										if (doAdd) {
-											noTimelineDebug ||
-												console.log(
-													'				add',
-													'session-id',
-													sessionID,
-													'depth',
-													tag.depth,
-													tag,
-													awaySymbol
-												);
+											noTimelineDebug || console.log('				add', 'session-id',
+												sessionID, 'depth', tag.depth, tag, awaySymbol);
 											cmds_add[cmds_add.length] = {
 												sessionID: sessionID,
 												depth: tag.depth,
 												id: placeObjectTag.symbolId,
-												name: placeObjectTag.name,
-											};
+												name: placeObjectTag.name };
 										}
 									}
 								}
@@ -1021,26 +966,14 @@ export class SymbolDecoder {
 
 								if (child) {
 									cmds_update[cmds_update.length] = {
-										child: child,
-										placeObjectTag: placeObjectTag,
+										child: child, placeObjectTag: placeObjectTag,
 										swapGraphicsID: swapGraphicsID,
-										ratio: ratio,
-										depth: tag.depth,
-									};
-									noTimelineDebug ||
-										console.log(
-											'				update',
-											'session-id',
-											child.sessionID,
-											'hasCharacter',
-											hasCharacter,
-											'depth',
-											tag.depth,
-											'swapGraphicsID',
-											swapGraphicsID,
-											tag,
-											awaySymbol
-										);
+										ratio: ratio, depth: tag.depth };
+									noTimelineDebug || console.log('				update',
+										'session-id', child.sessionID, 'hasCharacter',
+										hasCharacter, 'depth', tag.depth, 'swapGraphicsID',
+										swapGraphicsID, tag, awaySymbol);
+
 								} else {
 									throw 'error in add command';
 								}
@@ -1055,54 +988,55 @@ export class SymbolDecoder {
 
 					// create remove commands:
 					let start_index = remChildStream.length;
-					var command_cnt = cmds_removed.length;
+					let command_cnt = cmds_removed.length;
 					if (command_cnt) {
 						start_index = remChildStream.length;
-						for (var cmd = 0; cmd < command_cnt; cmd++) {
+						for (let cmd = 0; cmd < command_cnt; cmd++) {
 							remChildStream.push(cmds_removed[cmd].depth);
 						}
 						command_recipe_flag |= 0x02;
 						cmdStreamLength.push(remChildStream.length - start_index);
 						cmdStremInd.push(start_index);
 						if (!noTimelineDebug) {
-							for (var iDebug: number = 0; iDebug < cmds_removed.length; iDebug++) {
+							for (let iDebug: number = 0; iDebug < cmds_removed.length; iDebug++) {
 								console.log('				removeCmd', cmds_removed[iDebug]);
 							}
 						}
 					}
 
 					// create add commands:
-					var command_cnt = cmds_add.length;
+					command_cnt = cmds_add.length;
 					if (command_cnt) {
 						start_index = addChildStream.length;
-						for (var cmd = 0; cmd < command_cnt; cmd++) {
+						for (let cmd = 0; cmd < command_cnt; cmd++) {
 							addChildStream.push(cmds_add[cmd].sessionID);
 							addChildStream.push(cmds_add[cmd].depth);
+							addChildStream.push(cmds_add[cmd].id);
 						}
 						command_recipe_flag |= 0x04;
 						cmdStreamLength.push(command_cnt);
-						cmdStremInd.push(start_index / 2);
+						cmdStremInd.push(start_index / 3);
 						if (!noTimelineDebug) {
-							for (var iDebug: number = 0; iDebug < cmds_add.length; iDebug++) {
+							for (let iDebug: number = 0; iDebug < cmds_add.length; iDebug++) {
 								console.log('				addCommands', cmds_add[iDebug]);
 							}
 						}
 					}
 
 					// create update commands:
-					var command_cnt: number = cmds_update.length;
+					command_cnt = cmds_update.length;
 
 					// virtualScenegraph is already updated.
 					// making sure all childs update their masking if needed:
 
-					for (var key in virtualScenegraph) {
+					for (key in virtualScenegraph) {
 						virtualScenegraph[key].oldMasks = virtualScenegraph[key].masks;
 						virtualScenegraph[key].masks = [];
 						virtualScenegraph[key].maskingChanged = false;
 					}
 					// for newly added objects, we translate the clipDepth to isMask
 					if (command_cnt) {
-						for (var cmd: number = 0; cmd < command_cnt; cmd++) {
+						for (let cmd: number = 0; cmd < command_cnt; cmd++) {
 							placeObjectTag = cmds_update[cmd].placeObjectTag;
 							child = cmds_update[cmd].child;
 							child.maskingChanged = true;
@@ -1115,7 +1049,7 @@ export class SymbolDecoder {
 					}
 					// now we are sure all scenegraphobjects know if they are a mask.
 					// we loop over all of them and apply the masking to the maskee
-					for (var key in virtualScenegraph) {
+					for (key in virtualScenegraph) {
 						if (virtualScenegraph[key].isMask) {
 							let depth = virtualScenegraph[key].clipDepth;
 							while (depth > virtualScenegraph[key].depth) {
@@ -1130,7 +1064,7 @@ export class SymbolDecoder {
 					let mLen = 0;
 					const childsWithMaskChanges = [];
 					// check for what objects the masking has been changed in this frame
-					for (var key in virtualScenegraph) {
+					for (key in virtualScenegraph) {
 						const myChild = virtualScenegraph[key];
 						myChild.masks.sort();
 						myChild.oldMasks.sort();
@@ -1154,7 +1088,7 @@ export class SymbolDecoder {
 					for (m = 0; m < mLen; m++) {
 						let hasCmd = false;
 						if (command_cnt) {
-							for (var cmd = 0; cmd < command_cnt; cmd++) {
+							for (let cmd = 0; cmd < command_cnt; cmd++) {
 								if (cmds_update[cmd].child == childsWithMaskChanges[m]) {
 									hasCmd = true;
 								}
@@ -1165,9 +1099,8 @@ export class SymbolDecoder {
 								child: childsWithMaskChanges[m],
 								placeObjectTag: null,
 								swapGraphicsID: null,
-								ratio: null,
-								depth: null,
-							};
+								ratio: null, depth: null };
+
 						}
 					}
 
@@ -1175,16 +1108,15 @@ export class SymbolDecoder {
 					if (command_cnt) {
 						// process updated props
 						if (!noTimelineDebug) {
-							for (var iDebug: number = 0; iDebug < cmds_update.length; iDebug++) {
+							for (let iDebug: number = 0; iDebug < cmds_update.length; iDebug++) {
 								console.log('				cmds_update', cmds_update[iDebug]);
 							}
 						}
 
 						start_index = updChildStream.length;
 						let updateCnt = 0;
-						var updateCmd;
-						for (var cmd = 0; cmd < command_cnt; cmd++) {
-							updateCmd = cmds_update[cmd];
+						for (let cmd = 0; cmd < command_cnt; cmd++) {
+							const updateCmd = cmds_update[cmd];
 							placeObjectTag = updateCmd.placeObjectTag;
 							child = updateCmd.child;
 
@@ -1198,13 +1130,11 @@ export class SymbolDecoder {
 								propStreamInt.push(updateCmd.swapGraphicsID);
 							}
 
-							const isButtonOrMc =
-								placeObjectTag &&
-								(this._buttonIds[placeObjectTag.symbolId] || this._mcIds[placeObjectTag.symbolId]);
-							if (
-								placeObjectTag &&
-								((placeObjectTag.name && placeObjectTag.name != '') || isButtonOrMc)
-							) {
+							const isButtonOrMc = placeObjectTag
+								&& (this._buttonIds[placeObjectTag.symbolId] || this._mcIds[placeObjectTag.symbolId]);
+							if (placeObjectTag
+								&& ((placeObjectTag.name && placeObjectTag.name != '')
+								|| isButtonOrMc)) {
 								num_updated_props++;
 								if (this._buttonIds[placeObjectTag.symbolId]) {
 									propStreamType.push(TimelineActionType.UPDATE_BUTTON_NAME);
@@ -1217,31 +1147,28 @@ export class SymbolDecoder {
 
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasMatrix) {
 								num_updated_props++;
-
-								propStreamType.push(TimelineActionType.UPDATE_MTX); //matrix type: 1=all, 11=no position, 12=no scale
+								//matrix type: 1=all, 11=no position, 12=no scale
+								propStreamType.push(TimelineActionType.UPDATE_MTX);
 								propStreamIndex.push(propStreamMatrixAll.length / 6);
 
 								// todo: we can save memory by checking if only scale or position was changed,
-								// but it means we would need to check against the matrix of the current child, not against identy matrix
+								// but it means we would need to check against the matrix
+								// of the current child, not against identy matrix
 
-								//  in swf there seem to a some transforms coming in with scale=0 when it should be scale=1
-								//  This is a flash-bug (?) todo with sharing graphics across multiple mc
-								//  i checked and if we set a object to scale=0 on purpose in Flash, we still get a scale>0 in swf,
-								//  so looks like we can fix this by making sure that scale=0 is converted to scale = 1
+								// there seem to a some transforms coming in with scale=0 when it should be scale=1
+								// This is a flash-bug (?) todo with sharing graphics across multiple mc
+								// if we set a object to scale=0 on purpose in Flash, we still get a scale>0 in swf,
+								// so looks like we can fix this by making sure that scale=0 is converted to scale = 1
 
-								if (
-									placeObjectTag.matrix.a == 0 &&
-									placeObjectTag.matrix.b == 0 &&
-									placeObjectTag.matrix.c == 0 &&
-									placeObjectTag.matrix.d != 0
-								) {
+								if (placeObjectTag.matrix.a == 0
+									&& placeObjectTag.matrix.b == 0
+									&& placeObjectTag.matrix.c == 0
+									&& placeObjectTag.matrix.d != 0) {
 									placeObjectTag.matrix.a = 1;
-								} else if (
-									placeObjectTag.matrix.d == 0 &&
-									placeObjectTag.matrix.b == 0 &&
-									placeObjectTag.matrix.c == 0 &&
-									placeObjectTag.matrix.a != 0
-								) {
+								} else if (placeObjectTag.matrix.d == 0
+									&& placeObjectTag.matrix.b == 0
+									&& placeObjectTag.matrix.c == 0
+									&& placeObjectTag.matrix.a != 0) {
 									placeObjectTag.matrix.d = 1;
 								}
 
@@ -1251,8 +1178,8 @@ export class SymbolDecoder {
 								const exTransform = transformsAtDepth[updateCmd.depth.toString()];
 								if (exTransform) {
 									num_updated_props++;
-
-									propStreamType.push(TimelineActionType.UPDATE_MTX); //matrix type: 1=all, 11=no position, 12=no scale
+									//matrix type: 1=all, 11=no position, 12=no scale
+									propStreamType.push(TimelineActionType.UPDATE_MTX);
 									propStreamIndex.push(propStreamMatrixAll.length / 6);
 
 									matrixToStream(propStreamMatrixAll, propStreamMatrixAll.length, exTransform);
@@ -1324,20 +1251,20 @@ export class SymbolDecoder {
 							cmdStremInd.push(start_index);
 						}
 					}
-					var command_cnt = cmds_startSounds.length;
-
+					command_cnt = cmds_startSounds.length;
 					if (command_cnt) {
 						command_recipe_flag |= 16;
 
 						start_index = addSoundsStream.length;
 						//console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol);
-						for (var cmd = 0; cmd < command_cnt; cmd++) {
+						for (let cmd = 0; cmd < command_cnt; cmd++) {
 							addSoundsStream.push(cmds_startSounds[cmd]);
 							//console.log("add", cmds_add[cmd].childID , cmds_add[cmd].depth);
 						}
 						cmdStreamLength.push(command_cnt);
 						cmdStremInd.push(start_index);
-						noTimelineDebug || console.log('				cmds_startSounds', cmds_startSounds.length, cmds_startSounds);
+						noTimelineDebug || console.log('				cmds_startSounds',
+							cmds_startSounds.length, cmds_startSounds);
 					}
 				} else {
 					if (isButton) {
@@ -1357,11 +1284,10 @@ export class SymbolDecoder {
 		if (framesLen == 4) {
 			let isButtonFrames: number = 0;
 			for (i = 0; i < framesLen; i++) {
-				if (
-					swfFrames[i].labelNames &&
-					swfFrames[i].labelNames.length > 0 &&
-					swfFrames[i].labelNames[0] == buttonFrameNames[i]
-				) {
+
+				if (swfFrames[i].labelNames
+					&& swfFrames[i].labelNames.length > 0
+					&& swfFrames[i].labelNames[0] == buttonFrameNames[i]) {
 					isButtonFrames++;
 				}
 			}
@@ -1404,7 +1330,8 @@ export class SymbolDecoder {
 			}
 			awayTimeline.extractHitArea(awayMc);
 		} else {
-			awayMc.mouseEnabled = false; //a movieclip that isn't a button automatically defaults to mouesEnabled = false
+			//a movieclip that isn't a button automatically defaults to mouesEnabled = false
+			awayMc.mouseEnabled = false;
 		}
 		return awayMc;
 	}
