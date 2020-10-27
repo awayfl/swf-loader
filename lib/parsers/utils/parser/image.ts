@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { assert, ImageType, Inflate } from '@awayjs/graphics';
+import { ImageType, Inflate } from '@awayjs/graphics';
 import { ImageTag }  from '../../../factories/base/SWFTags';
 
 /**
@@ -96,12 +96,12 @@ export function parsePngHeaders(image: any, bytes: Uint8Array): void {
  */
 function joinChunks(chunks: Uint8Array []): Uint8Array {
 	let length = 0;
-	for (var i = 0; i < chunks.length; i++) {
+	for (let i = 0; i < chunks.length; i++) {
 		length += chunks[i].length;
 	}
 	const bytes = new Uint8Array(length);
 	let offset = 0;
-	for (var i = 0; i < chunks.length; i++) {
+	for (let i = 0; i < chunks.length; i++) {
 		const chunk = chunks[i];
 		bytes.set(chunk, offset);
 		offset += chunk.length;

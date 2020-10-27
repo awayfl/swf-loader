@@ -57,6 +57,7 @@ export interface IImageSymbol extends ISymbol {
 		width: number;
 		height: number;
 		data: Uint8ClampedArray;
+		isPMA?: boolean;
 	},
 	needParse: boolean,
 	lazyParser: () => IImageSymbol;
