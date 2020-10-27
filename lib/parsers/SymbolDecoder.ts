@@ -13,9 +13,15 @@ import {
 	TextFormat,
 	TextFormatAlign,
 	Timeline,
-	TimelineActionType,
+	TimelineActionType
 } from '@awayjs/scene';
-import { PlaceObjectFlags, PlaceObjectTag, SoundInfoFlags, SwfTagCode, TextFlags } from '../factories/base/SWFTags';
+import {
+	PlaceObjectFlags,
+	PlaceObjectTag,
+	SoundInfoFlags,
+	SwfTagCode,
+	TextFlags
+} from '../factories/base/SWFTags';
 
 import {
 	IBinarySymbol,
@@ -28,7 +34,7 @@ import {
 	ITextSymbol,
 	IVideoSymbol,
 	IFontSymbol,
-	SYMBOL_TYPE,
+	SYMBOL_TYPE
 } from './ISymbol';
 
 import { MovieClipSoundsManager } from '../factories/timelinesounds/MovieClipSoundsManager';
@@ -44,6 +50,7 @@ const noTimelineDebug = true;
 const noExportsDebug = true;
 
 function matrixToStream(stream: number[] | Uint32Array, index: number, matrix: Matrix) {
+
 	stream[index++] = matrix.a;
 	stream[index++] = matrix.b;
 	stream[index++] = matrix.c;
@@ -55,6 +62,7 @@ function matrixToStream(stream: number[] | Uint32Array, index: number, matrix: M
 }
 
 function colorMatrixToStream(stream: number[] | Uint32Array, index: number, matrix: ColorTransform) {
+
 	stream[index++] = matrix.redMultiplier / 255;
 	stream[index++] = matrix.greenMultiplier / 255;
 	stream[index++] = matrix.blueMultiplier / 255;
@@ -71,22 +79,18 @@ const TF_ALIGNS: string[] = [
 	TextFormatAlign.LEFT,
 	TextFormatAlign.RIGHT,
 	TextFormatAlign.CENTER,
-	TextFormatAlign.JUSTIFY,
+	TextFormatAlign.JUSTIFY
 ];
 
-<<<<<<< HEAD
-export class SymbolDecoder {
-=======
 export class SymbolDecoder implements ISymbolDecoder {
 
->>>>>>> timeline_refactor
 	private _awaySymbols: NumberMap<IAsset> = {};
 	private _buttonIds: NumberMap<boolean> = {};
 	private _mcIds: NumberMap<boolean> = {};
 
 	/**
-	 * @description Force reqursive decoding of nested symbols, disable it when sure that symbol exist
-	 */
+     * @description Force reqursive decoding of nested symbols, disable it when sure that symbol exist
+     */
 	public reqursive: boolean = true;
 
 	constructor(public parser: SWFParser) {}
@@ -167,7 +171,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 		shape.queueShapeTag(symbol);
 
-		shape.name = name || 'AwayJS_shape_' + symbol.id.toString();
+		shape.name = name ||  'AwayJS_shape_' + symbol.id.toString();
 		(shape as any).className = symbol.className;
 
 		if (symbol.type === SYMBOL_TYPE.MORPH) {
@@ -188,12 +192,10 @@ export class SymbolDecoder implements ISymbolDecoder {
 		const awayMc = this.framesToTimeline(target, symbol, symbol.frames, null, null);
 
 		if (symbol.scalingGrid)
-			awayMc.scale9Grid = new Rectangle(
-				symbol.scalingGrid.xMin / 20,
+			awayMc.scale9Grid = new Rectangle(symbol.scalingGrid.xMin / 20,
 				symbol.scalingGrid.yMin / 20,
 				symbol.scalingGrid.xMax / 20,
-				symbol.scalingGrid.yMax / 20
-			);
+				symbol.scalingGrid.yMax / 20);
 
 		(<any>awayMc).className = symbol.className;
 		awayMc.name = name || 'AwayJS_mc_' + symbol.id.toString();
@@ -208,6 +210,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 	}
 
 	private _createText(symbol: ITextSymbol, target?: TextField, name?: string): IAsset {
+
 		target = target || this.factory.createTextField(symbol);
 		target._symbol = symbol;
 		target.textFormat = new TextFormat();
@@ -234,13 +237,13 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 		target.textOffsetX = symbol.fillBounds.xMin / 20;
 		target.textOffsetY = symbol.fillBounds.yMin / 20;
-		target.width = (symbol.fillBounds.xMax - symbol.fillBounds.xMin) / 20;
+		target.width = ((symbol.fillBounds.xMax - symbol.fillBounds.xMin) / 20);
 		target.height = (symbol.fillBounds.yMax - symbol.fillBounds.yMin) / 20;
 		target.border = !!(tag.flags & TextFlags.Border);
 		target.background = target.border;
 
-		target.multiline = tag.flags & TextFlags.Multiline ? true : false;
-		target.wordWrap = tag.flags & TextFlags.WordWrap ? true : false;
+		target.multiline = (tag.flags & TextFlags.Multiline) ? true : false;
+		target.wordWrap = (tag.flags & TextFlags.WordWrap) ? true : false;
 		target.selectable = tag.flags ? !(tag.flags & TextFlags.NoSelect) : false;
 
 		if (tag.maxLength && tag.maxLength > 0) {
@@ -254,10 +257,12 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 		if (tag.flags & TextFlags.Html) {
 			target.html = true;
-			if (tag.initialText && tag.initialText != '') target.htmlText = tag.initialText;
+			if (tag.initialText && tag.initialText != '')
+				target.htmlText = tag.initialText;
 		} else {
 			target.html = false;
-			if (tag.initialText && tag.initialText != '') target.text = tag.initialText;
+			if (tag.initialText && tag.initialText != '')
+				target.text = tag.initialText;
 		}
 		target.name = name || 'tf_' + symbol.id.toString();
 
@@ -265,7 +270,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 	}
 
 	private _createSound(symbol: ISymbol, target?: any, name?: string): IAsset {
-		const awaySound: WaveAudio = <WaveAudio> this.parser.awayUnresolvedSymbols[symbol.id];
+
+		const awaySound: WaveAudio = (<WaveAudio> this.parser.awayUnresolvedSymbols[symbol.id]);
 
 		if (awaySound) {
 			(<any>awaySound).className = this.parser.symbolClassesMap[symbol.id] || null;
@@ -288,18 +294,18 @@ export class SymbolDecoder implements ISymbolDecoder {
 		this._buttonIds[symbol.id] = true;
 		return target;
 		/*
-		assetsToFinalize[dictionary[i].id] = awayMc;
-		this._awaySymbols[dictionary[i].id] = awayMc;
-		*/
+        assetsToFinalize[dictionary[i].id] = awayMc;
+        this._awaySymbols[dictionary[i].id] = awayMc;
+        */
 
 		/*
-		var mySprite:SimpleButton=new SimpleButton();
-		console.log("Button:", symbol);
-		//var awayMc = this.framesToAwayTimeline(symbol.frames);
-		//mySprite._symbol=symbol;
-		this._pFinalizeAsset(mySprite, symbol.id);
-		this._awaySymbols[dictionary[i].id] = mySprite;
-		*/
+        var mySprite:SimpleButton=new SimpleButton();
+        console.log("Button:", symbol);
+        //var awayMc = this.framesToAwayTimeline(symbol.frames);
+        //mySprite._symbol=symbol;
+        this._pFinalizeAsset(mySprite, symbol.id);
+        this._awaySymbols[dictionary[i].id] = mySprite;
+        */
 	}
 
 	private _createLabel(symbol: ILabelSymbol, target?: TextField, name?: string): IAsset {
@@ -332,8 +338,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 		target.staticMatrix = symbol.matrix;
 		target.textOffsetX = symbol.fillBounds.xMin / 20;
 		target.textOffsetY = symbol.fillBounds.yMin / 20;
-		target.width = symbol.fillBounds.xMax / 20 - symbol.fillBounds.xMin / 20 - 1;
-		target.height = symbol.fillBounds.yMax / 20 - symbol.fillBounds.yMin / 20 - 1;
+		target.width = (symbol.fillBounds.xMax / 20 - symbol.fillBounds.xMin / 20) - 1;
+		target.height = (symbol.fillBounds.yMax / 20 - symbol.fillBounds.yMin / 20) - 1;
 
 		if (!fontExist) {
 			target.setLabelData(symbol);
@@ -341,10 +347,10 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 		target.name = name || 'AwayJS_label_' + symbol.id.toString();
 		/*
-		assetsToFinalize[dictionary[i].id] = target;
-		this._awaySymbols[dictionary[i].id] = target;
-		*/
-		target.selectable = symbol.tag.flags && !(symbol.tag.flags & TextFlags.NoSelect);
+        assetsToFinalize[dictionary[i].id] = target;
+        this._awaySymbols[dictionary[i].id] = target;
+    */
+		target.selectable = (symbol.tag.flags && !(symbol.tag.flags & TextFlags.NoSelect));
 
 		return target;
 	}
@@ -352,7 +358,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 	private _createImage(symbol: IImageSymbol, target?: BitmapImage2D, name?: string): IAsset {
 		const useLazy = true;
 
-		target = target || <BitmapImage2D> this.parser.awayUnresolvedSymbols[symbol.id];
+		target = target || (<BitmapImage2D> this.parser.awayUnresolvedSymbols[symbol.id]);
 
 		if (!target && symbol.definition) {
 			const def = symbol.definition;
@@ -366,11 +372,11 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 			/*
 			if (def.data.length != (4 * def.width * def.height)
-				&& def.data.length != (3 * def.width * def.height))
-			{
-				def.data = new Uint8ClampedArray(4 * def.width * def.height);
-				//symbol.definition.data.fill
-			}
+                && def.data.length != (3 * def.width * def.height))
+            {
+                def.data = new Uint8ClampedArray(4 * def.width * def.height);
+                //symbol.definition.data.fill
+            }
 			target.setPixels(new Rectangle(0, 0, def.width, def.height), def.data);
 			*/
 		}
@@ -387,13 +393,15 @@ export class SymbolDecoder implements ISymbolDecoder {
 	}
 
 	public _createBinary(symbol: IBinarySymbol, target?: any, name?: string): IAsset {
-		if ((<any> this.factory).createBinarySymbol) (<any> this.factory).createBinarySymbol(symbol);
+
+		if ((<any> this.factory).createBinarySymbol)
+			(<any> this.factory).createBinarySymbol(symbol);
 
 		/*
-		const bin = new ByteArray(bs.byteLength);
-		const asset = new GenericAsset<ByteArray>(bin, bs.className, ByteArray);
-		bin.setArrayBuffer(bs.data.buffer);
-		*/
+        const bin = new ByteArray(bs.byteLength);
+        const asset = new GenericAsset<ByteArray>(bin, bs.className, ByteArray);
+        bin.setArrayBuffer(bs.data.buffer);
+        */
 		return null;
 	}
 
@@ -440,48 +448,58 @@ export class SymbolDecoder implements ISymbolDecoder {
 					target as Shape, name || 'AwayJS_morphshape_' + symbol.id.toString());
 				break;
 			}
-			case SYMBOL_TYPE.SHAPE: {
+			case SYMBOL_TYPE.SHAPE:
+			{
 				asset = this._createShape(symbol as IShapeSymbol, target as Shape, name);
 				break;
 			}
-			case SYMBOL_TYPE.FONT: {
+			case SYMBOL_TYPE.FONT:
+			{
 				asset = this._createFont(symbol as IFontSymbol, target as any, name);
 				break;
 			}
-			case SYMBOL_TYPE.SPRITE: {
+			case SYMBOL_TYPE.SPRITE:
+			{
 				asset = this._createSprite(symbol as ISpriteSymbol, target as MovieClip, name);
 				break;
 			}
-			case SYMBOL_TYPE.TEXT: {
+			case SYMBOL_TYPE.TEXT:
+			{
 				asset = this._createText(symbol as ITextSymbol, target as TextField, name);
 				break;
 			}
-			case SYMBOL_TYPE.SOUND: {
+			case SYMBOL_TYPE.SOUND:
+			{
 				asset = this._createSound(symbol, target, name);
 				break;
 			}
-			case SYMBOL_TYPE.BUTTON: {
+			case SYMBOL_TYPE.BUTTON:
+			{
 				asset = this._createButton(symbol as IButtonSymbol, target, name);
 				break;
 			}
-			case SYMBOL_TYPE.LABEL: {
+			case SYMBOL_TYPE.LABEL:
+			{
 				asset = this._createLabel(symbol as ILabelSymbol, target as TextField, name);
 				break;
 			}
-			case SYMBOL_TYPE.IMAGE: {
+			case SYMBOL_TYPE.IMAGE:
+			{
 				asset = this._createImage(symbol as IImageSymbol, target as BitmapImage2D, name);
 				break;
 			}
-			case SYMBOL_TYPE.BINARY: {
+			case SYMBOL_TYPE.BINARY:
+			{
 				asset = this._createBinary(symbol as IBinarySymbol, target, name);
 				break;
 			}
-			case SYMBOL_TYPE.VIDEO: {
+			case SYMBOL_TYPE.VIDEO:
+			{
 				asset = this._createVideo(symbol as IVideoSymbol, target, name);
 				break;
 			}
 			default:
-				throw Error('Unknown symbol type:' + symbol.type);
+				throw Error ('Unknown symbol type:' + symbol.type);
 		}
 
 		this._awaySymbols[symbol.id] = asset;
@@ -489,17 +507,18 @@ export class SymbolDecoder implements ISymbolDecoder {
 		this.parser.registerAwayAsset(asset, symbol);
 
 		return asset as T;
+
 	}
 
 	framesToTimeline(awayMc: MovieClip, symbol: any, swfFrames: SWFFrame[],
 		states: any, buttonActions: any, buttonSound: any = null): MovieClip {
 		if (!states && !swfFrames) {
-			throw 'error when creating timeline - neither movieclip frames nor button-states present';
+			throw ('error when creating timeline - neither movieclip frames nor button-states present');
 		}
 
-		const getSymbol = this.reqursive
-			? (id: number) => this._awaySymbols[id] || this.createAwaySymbol(id)
-			: (id: number) => this._awaySymbols[id];
+		const getSymbol = this.reqursive ?
+			(id: number) => (this._awaySymbols[id] || this.createAwaySymbol(id)) :
+			(id: number) => this._awaySymbols[id];
 
 		//console.log("swfFrames", swfFrames);
 		let isButton: boolean = false;
@@ -532,21 +551,21 @@ export class SymbolDecoder implements ISymbolDecoder {
 		const addChildStream: number[] = [];
 		const addSoundsStream: number[] = [];
 		/**
-		 * @description Remove Child Stream
-		 */
+         * @description Remove Child Stream
+         */
 		const remChildStream: number[] = [];
 		/**
-		 * @description Update Child Stream
-		 */
+         * @description Update Child Stream
+         */
 		const updChildStream: number[] = [];
 		/**
-		 * @description Update Child Stream: Property Index
-		 */
+         * @description Update Child Stream: Property Index
+         */
 		const updСhildStreamPropsInd: number[] = [];
 
 		/**
-		 * @description Update Child Stream: Property Lenght
-		 */
+         * @description Update Child Stream: Property Lenght
+         */
 		const updChildStreamPropsLen: number[] = [];
 
 		const propStreamType: number[] = [];
@@ -555,15 +574,15 @@ export class SymbolDecoder implements ISymbolDecoder {
 		const propStreamFilters: IFilter[] = [];
 
 		/**
-		 * @description Matrix: Scale + Rotation props,
-		 * @type {Float32Array}
-		 */
+         * @description Matrix: Scale + Rotation props,
+         * @type {Float32Array}
+         */
 		const propStramMatrixSR: f32[] = [];
 
 		/**
-		 * @description Matrix: Position props,
-		 * @type {Float32Array}
-		 */
+         * @description Matrix: Position props,
+         * @type {Float32Array}
+         */
 		const propStreamMatrixPos: f32[] = [];
 		const propStreamMatrixAll: f32[] = [];
 		const propStreamCT: f32[] = [];
@@ -649,13 +668,12 @@ export class SymbolDecoder implements ISymbolDecoder {
 				}
 			}
 			// check if this is a empty frame
-			isEmpty =
-				(!swfFrames[i].controlTags || swfFrames[i].controlTags.length == 0) &&
-				(!swfFrames[i].labelNames || swfFrames[i].labelNames.length == 0) &&
-				(!swfFrames[i].actionBlocks || swfFrames[i].actionBlocks.length == 0);
+			isEmpty = ((!swfFrames[i].controlTags || swfFrames[i].controlTags.length == 0) &&
+                (!swfFrames[i].labelNames || swfFrames[i].labelNames.length == 0) &&
+                (!swfFrames[i].actionBlocks || swfFrames[i].actionBlocks.length == 0));
 
 			noTimelineDebug || console.log('	process frame:', i + 1, '/', isEmpty, swfFrames[i]);
-			if (keyframe_durations.length != 0 && isEmpty) {
+			if ((keyframe_durations.length != 0) && isEmpty) {
 				// frame is empty and it is not the first frame
 				// we just add to the duration of the last keyframe
 				if (isButton) {
@@ -666,6 +684,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 					frameRecipe.push(command_recipe_flag);
 					for (key in virtualScenegraph) {
 						child = virtualScenegraph[key];
+
 					}
 					virtualScenegraph = {};
 					keyFrameCount++;
@@ -682,12 +701,13 @@ export class SymbolDecoder implements ISymbolDecoder {
 					command_recipe_flag |= 0x01;
 					for (key in virtualScenegraph) {
 						child = virtualScenegraph[key];
+
 					}
 					virtualScenegraph = {};
 				}
 				frameCmdInd.push(cmdStremInd.length);
 				keyframe_durations[keyframe_durations.length] = 1;
-				if (!isEmpty && swfFrames[i].labelNames && swfFrames[i].labelNames.length > 0) {
+				if (!isEmpty && (swfFrames[i].labelNames && swfFrames[i].labelNames.length > 0)) {
 					fl_len = swfFrames[i].labelNames.length;
 					for (fl = 0; fl < fl_len; fl++) {
 						labelName = swfFrames[i].labelNames[fl];
@@ -699,7 +719,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 						if (!awayTimeline._labels[labelName])
 							awayTimeline._labels[labelName] = {
 								keyFrameIndex: keyFrameCount,
-								name: originalLabelName,
+								name: originalLabelName
 							};
 					}
 				}
@@ -733,12 +753,12 @@ export class SymbolDecoder implements ISymbolDecoder {
 							case SwfTagCode.CODE_START_SOUND:
 								//console.log("CODE_START_SOUND", tag)
 								awaySymbol = getSymbol(tag.soundId);
-								if (tag.soundInfo && tag.soundInfo.flags & SoundInfoFlags.Stop) {
+								if (tag.soundInfo && (tag.soundInfo.flags & SoundInfoFlags.Stop)) {
 									awayTimeline.audioPool[audio_commands_cnt] = {
 										cmd: SwfTagCode.CODE_STOP_SOUND,
 										id: tag.soundId,
 										sound: getSymbol(tag.soundId),
-										props: tag.soundInfo,
+										props: tag.soundInfo
 									};
 									noTimelineDebug || console.log('stopsound', tag.soundId, tag.soundInfo, i + 1);
 								} else {
@@ -746,7 +766,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 										cmd: SwfTagCode.CODE_START_SOUND,
 										id: tag.soundId,
 										sound: getSymbol(tag.soundId),
-										props: tag.soundInfo,
+										props: tag.soundInfo
 									};
 									noTimelineDebug || console.log('startsound',
 										tag.soundId, tag.soundInfo, awaySymbol, i + 1);
@@ -762,7 +782,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 									cmd: SwfTagCode.CODE_STOP_SOUND,
 									id: tag.soundId,
 									sound: getSymbol(tag.soundId),
-									props: tag.soundInfo,
+									props: tag.soundInfo
 								};
 								noTimelineDebug || console.log('stopsound', tag.soundId, tag.soundInfo, i + 1);
 								cmds_startSounds.push(audio_commands_cnt++);
@@ -836,6 +856,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 									flashSymbol = this.parser.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if (awaySymbol.isAsset(Graphics)) {
+
 										swapGraphicsID = placeObjectTag.symbolId;
 										if (!awayTimeline.graphicsPool[placeObjectTag.symbolId]) {
 											awayTimeline.graphicsPool[placeObjectTag.symbolId] = awaySymbol;
@@ -897,13 +918,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 												clipDepth: 0,
 												depth: 0,
 												awayChild: graphicsSprite,
-												name: placeObjectTag.name ? placeObjectTag.name : 'noname',
-											};
-											cmds_add[cmds_add.length] = {
-												sessionID: sessionID,
-												depth: tag.depth,
-												id: placeObjectTag.symbolId,
-												name: placeObjectTag.name,
+												name: placeObjectTag.name ? placeObjectTag.name : 'noname'
 											};
 											cmds_add[cmds_add.length] = {
 												sessionID: sessionID,
@@ -945,7 +960,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 											clipDepth: 0,
 											depth: 0,
 											awayChild: awaySymbol,
-											name: placeObjectTag.name ? placeObjectTag.name : 'noname',
+											name: placeObjectTag.name ? placeObjectTag.name : 'noname'
 										};
 										if (doAdd) {
 											noTimelineDebug || console.log('				add', 'session-id',
@@ -956,12 +971,15 @@ export class SymbolDecoder implements ISymbolDecoder {
 												id: placeObjectTag.symbolId,
 												name: placeObjectTag.name };
 										}
+
 									}
 								}
 
 								if (placeObjectTag.flags & PlaceObjectFlags.HasRatio) {
-									if (!awaySymbol) awaySymbol = getSymbol(child.id);
-									if (awaySymbol.isAsset(MorphSprite)) ratio = placeObjectTag.ratio;
+									if (!awaySymbol)
+										awaySymbol = getSymbol(child.id);
+									if (awaySymbol.isAsset(MorphSprite))
+										ratio = placeObjectTag.ratio;
 								}
 
 								if (child) {
@@ -975,7 +993,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 										swapGraphicsID, tag, awaySymbol);
 
 								} else {
-									throw 'error in add command';
+									throw ('error in add command');
 								}
 
 								break;
@@ -1002,6 +1020,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 								console.log('				removeCmd', cmds_removed[iDebug]);
 							}
 						}
+
 					}
 
 					// create add commands:
@@ -1021,6 +1040,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 								console.log('				addCommands', cmds_add[iDebug]);
 							}
 						}
+
 					}
 
 					// create update commands:
@@ -1086,6 +1106,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 					mLen = childsWithMaskChanges.length;
 					for (m = 0; m < mLen; m++) {
+
 						let hasCmd = false;
 						if (command_cnt) {
 							for (let cmd = 0; cmd < command_cnt; cmd++) {
@@ -1106,6 +1127,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 					command_cnt = cmds_update.length;
 					if (command_cnt) {
+
 						// process updated props
 						if (!noTimelineDebug) {
 							for (let iDebug: number = 0; iDebug < cmds_update.length; iDebug++) {
@@ -1123,7 +1145,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 							const childStartIdx: number = propStreamType.length;
 							let num_updated_props = 0;
 
-							if (updateCmd.swapGraphicsID != null && updateCmd.swapGraphicsID >= 0) {
+							if ((updateCmd.swapGraphicsID != null && updateCmd.swapGraphicsID >= 0)) {
+
 								num_updated_props++;
 								propStreamType.push(TimelineActionType.SWAP_GRAPHICS);
 								propStreamIndex.push(propStreamInt.length);
@@ -1146,6 +1169,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 							}
 
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasMatrix) {
+
 								num_updated_props++;
 								//matrix type: 1=all, 11=no position, 12=no scale
 								propStreamType.push(TimelineActionType.UPDATE_MTX);
@@ -1174,7 +1198,9 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 								matrixToStream(propStreamMatrixAll, propStreamMatrixAll.length, placeObjectTag.matrix);
 								transformsAtDepth[updateCmd.depth.toString()] = placeObjectTag.matrix;
+
 							} else if (updateCmd.depth != null) {
+
 								const exTransform = transformsAtDepth[updateCmd.depth.toString()];
 								if (exTransform) {
 									num_updated_props++;
@@ -1207,12 +1233,15 @@ export class SymbolDecoder implements ISymbolDecoder {
 								propStreamType.push(TimelineActionType.UPDATE_MASKS);
 								propStreamIndex.push(propStreamInt.length);
 								propStreamInt.push(child.masks.length);
-								for (const val of child.masks) propStreamInt.push(val);
+								for (const val of child.masks)
+									propStreamInt.push(val);
 							}
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasClipDepth) {
+
 								num_updated_props++;
 								propStreamType.push(TimelineActionType.ENABLE_MASKMODE);
 								propStreamIndex.push(0);
+
 							}
 
 							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasFilterList) {
@@ -1250,11 +1279,11 @@ export class SymbolDecoder implements ISymbolDecoder {
 							cmdStreamLength.push(command_cnt);
 							cmdStremInd.push(start_index);
 						}
+
 					}
 					command_cnt = cmds_startSounds.length;
 					if (command_cnt) {
 						command_recipe_flag |= 16;
-
 						start_index = addSoundsStream.length;
 						//console.log("startsound", tag.soundId, tag.soundInfo, awaySymbol);
 						for (let cmd = 0; cmd < command_cnt; cmd++) {
@@ -1266,8 +1295,10 @@ export class SymbolDecoder implements ISymbolDecoder {
 						noTimelineDebug || console.log('				cmds_startSounds',
 							cmds_startSounds.length, cmds_startSounds);
 					}
+
 				} else {
 					if (isButton) {
+
 						//	sessionID = awayTimeline.potentialPrototypes.length;
 						//	awayTimeline.registerPotentialChild(this.myTestSprite);
 					}
@@ -1278,6 +1309,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 				}
 				frameRecipe.push(command_recipe_flag);
 			}
+
 		}
 
 		const buttonFrameNames: string[] = ['_up', '_over', '_down', '_hit'];
@@ -1334,5 +1366,6 @@ export class SymbolDecoder implements ISymbolDecoder {
 			awayMc.mouseEnabled = false;
 		}
 		return awayMc;
+
 	}
 }
