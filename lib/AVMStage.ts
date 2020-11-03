@@ -679,5 +679,6 @@ export interface IGameConfig{
 	showFPS?: boolean;
 	forceJIT?: boolean;
 	files: IResourceFile[];
+	externalInterfaceID?: string;
 	[key: string]: any;
 }
