@@ -506,9 +506,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		if (this._isPaused) {
 			return;
 		}
+
 		if (!this._avmHandler) {
 			throw 'error - can not render when no avm-stage is available';
 		}
+
 		if (!this._scene || !this._scene.renderer) {
 			this._timer.stop();
 			return;

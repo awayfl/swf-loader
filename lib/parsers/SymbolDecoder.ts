@@ -65,10 +65,10 @@ function matrixToStream(stream: number[] | Uint32Array, index: number, matrix: M
 
 function colorMatrixToStream(stream: number[] | Uint32Array, index: number, matrix: ColorTransform) {
 
-	stream[index++] = matrix.redMultiplier / 255;
-	stream[index++] = matrix.greenMultiplier / 255;
-	stream[index++] = matrix.blueMultiplier / 255;
-	stream[index++] = matrix.alphaMultiplier / 255;
+	stream[index++] = matrix.redMultiplier / 256;
+	stream[index++] = matrix.greenMultiplier / 256;
+	stream[index++] = matrix.blueMultiplier / 256;
+	stream[index++] = matrix.alphaMultiplier / 256;
 	stream[index++] = matrix.redOffset;
 	stream[index++] = matrix.greenOffset;
 	stream[index++] = matrix.blueOffset;
