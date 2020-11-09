@@ -540,6 +540,7 @@ export interface SceneTag extends SwfTag {
 export interface Scene {
 	offset: number;
 	name: string;
+	labels: Label[];
 }
 
 export interface Label {

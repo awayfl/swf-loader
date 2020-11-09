@@ -796,25 +796,44 @@ function parseDefineScalingGridTag(stream: Stream, swfVersion: number,
 	return tag;
 }
 
+/*
+const sortScenes = function (a:Scene, b:Scene){
+	return a.offset-b.offset;
+}
+*/
+
 export function parseDefineSceneTag(stream: Stream, tagCode: number): SceneTag {
 	const tag: SceneTag = <any>{ code: tagCode };
 	const sceneCount = stream.readEncodedU32();
 	const scenes: Scene[] = tag.scenes = [];
-	var i = sceneCount;
+	let i = sceneCount;
 	while (i--) {
 		scenes.push({
 			offset: stream.readEncodedU32(),
-			name: stream.readString(-1)
+			name: stream.readString(-1),
+			labels:[]
 		});
 	}
+	// @todo: do we need to sort scenes, or are they coming in in order of offset ?
+	//scenes.sort(sortScenes);
+
 	const labelCount = stream.readEncodedU32();
 	const labels: Label[] = tag.labels = [];
-	var i = labelCount;
+	i = labelCount;
 	while (i--) {
-		labels.push({
+		const label: Label = {
 			frame: stream.readEncodedU32(),
 			name: stream.readString(-1)
-		});
+		};
+		labels.push(label);
+		let currentScene = scenes[0];
+		for (let s = 1; s <= scenes.length; s++) {
+			const scene = scenes[s];
+			if (scene.offset > label.frame)
+				break;
+			currentScene = scene;
+		}
+		currentScene.labels.push(label);
 	}
 	return tag;
 }
