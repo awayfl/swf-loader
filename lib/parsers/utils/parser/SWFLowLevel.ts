@@ -827,7 +827,7 @@ export function parseDefineSceneTag(stream: Stream, tagCode: number): SceneTag {
 		};
 		labels.push(label);
 		let currentScene = scenes[0];
-		for (let s = 1; s <= scenes.length; s++) {
+		for (let s = 1; s < scenes.length; s++) {
 			const scene = scenes[s];
 			if (scene.offset > label.frame)
 				break;
