@@ -369,8 +369,8 @@ export function defineFont(tag: FontTag, ns: string): any {
 	let maxy = -99999999;
 	while ((code = codes[i++]) !== undefined) {
 		const glyphPath: GraphicsPath = new GraphicsPath();
-		var records = glyphs[glyphIndex[code]];
 		const idx = glyphIndex[code];
+		var records = glyphs[idx];
 		segments = rawData[code];
 		var numberOfContours = 1;
 		var endPoint = 0;
@@ -543,12 +543,12 @@ export function defineFont(tag: FontTag, ns: string): any {
 			tag.advance.push((xMax - xMin) * resolution * 1.3);
 			glyphAdvance = xMax - xMin;
 		} else {
-			glyphAdvance = tag.advance[i - 1] / resolution;
+			glyphAdvance = tag.advance[idx] / resolution;
 		}
 		if (code == 32) {
 			//console.log("32 = ", code, (xMax - xMin));
 			//console.log("32 = ", tag.advance[i-1]);
-			whiteSpaceWidth = tag.advance[i - 1] / resolution;
+			whiteSpaceWidth = tag.advance[idx] / resolution;
 		}
 
 		tessFontTableAJS.setChar(code.toString(), glyphAdvance, null, null, false, idx, glyphPath);
