@@ -540,7 +540,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			return;
 		}
 
-		this._scene.render(true);
+		this._scene.render(false);
 
 		MovieClipSoundsManager.exitFrame();
 	}
