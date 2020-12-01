@@ -1,5 +1,6 @@
 import {
 	Billboard,
+	DefaultFontManager,
 	DisplayObject,
 	IFilter,
 	IFrameScript,
@@ -183,6 +184,10 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 	private _createFont(symbol: IFontSymbol, target?: any, name?: string): IAsset {
 		symbol.away.className = symbol.className;
+		if (symbol.className) {
+			// hack for dynamic fonts: preregister all font-assets under classname
+			DefaultFontManager.registerFontForClassName(symbol.away, symbol.className);
+		}
 		return symbol as any;
 	}
 
