@@ -2,6 +2,7 @@ import {
 	Billboard,
 	DefaultFontManager,
 	DisplayObject,
+	FrameScriptManager,
 	IFilter,
 	IFrameScript,
 	ISceneGraphFactory,
@@ -128,6 +129,10 @@ export class SymbolDecoder implements ISymbolDecoder {
 	 * @param sessionID
 	 */
 	public createChildInstanceForTimeline(timeline: Timeline, symbolID: number, sessionID: number): IAsset {
+
+		// if this was called we might have new constructors from timeline to process
+		FrameScriptManager.invalidAS3Constructors = true;
+
 		const asset: IAsset = this.awaySymbols[symbolID];
 		let clone: DisplayObject;
 		if (asset.isAsset(Graphics)) {
