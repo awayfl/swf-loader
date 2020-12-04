@@ -410,6 +410,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		switch (this._scaleMode) {
 			case StageScaleMode.NO_SCALE:
 				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
+				this._stageWidth = w;
+				this._stageHeight = h;
 				break;
 			case StageScaleMode.SHOW_ALL:
 				newHeight = h;
