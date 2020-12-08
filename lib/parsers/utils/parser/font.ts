@@ -544,11 +544,13 @@ export function defineFont(tag: FontTag, ns: string): any {
 			glyphAdvance = xMax - xMin;
 		} else {
 			glyphAdvance = tag.advance[idx] / resolution;
+			if (glyphAdvance < 0) glyphAdvance = Math.abs(glyphAdvance);
 		}
 		if (code == 32) {
 			//console.log("32 = ", code, (xMax - xMin));
 			//console.log("32 = ", tag.advance[i-1]);
 			whiteSpaceWidth = tag.advance[idx] / resolution;
+			if (whiteSpaceWidth < 0) whiteSpaceWidth = Math.abs(whiteSpaceWidth);
 		}
 
 		tessFontTableAJS.setChar(code.toString(), glyphAdvance, null, null, false, idx, glyphPath);
