@@ -120,8 +120,8 @@ export function defineFont(tag: FontTag, ns: string): any {
 		fontStyleName: FontStyleName.STANDART,
 	};
 	fontAJS.name = fontName;
-	
-	let fontStyleName: string = FontStyleName.STANDART;
+
+	const fontStyleName: string = FontStyleName.STANDART;
 
 	// stop grouping by fontstyle
 	/*if (font.bold && !font.italic) {

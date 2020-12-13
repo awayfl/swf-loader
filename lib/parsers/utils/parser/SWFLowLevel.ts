@@ -1043,7 +1043,7 @@ function parseFillStyle(stream: Stream, swfVersion: number, tagCode: number,
 				stream.readUb(4);
 			}
 			const count = stream.readUb(4);
-			let records: GradientRecord[] = gradient.records = [];
+			const records: GradientRecord[] = gradient.records = [];
 			let j = count;
 			while (j--) {
 				records.push(parseGradientRecord(stream, tagCode, isMorph));
