@@ -120,14 +120,17 @@ export function defineFont(tag: FontTag, ns: string): any {
 		fontStyleName: FontStyleName.STANDART,
 	};
 	fontAJS.name = fontName;
+	
 	let fontStyleName: string = FontStyleName.STANDART;
-	if (font.bold && !font.italic) {
+
+	// stop grouping by fontstyle
+	/*if (font.bold && !font.italic) {
 		fontStyleName = FontStyleName.BOLD;
 	} else if (!font.bold && font.italic) {
 		fontStyleName = FontStyleName.ITALIC;
 	} else if (font.bold && font.italic) {
 		fontStyleName = FontStyleName.BOLDITALIC;
-	}
+	}*/
 	font.fontStyleName = fontStyleName;
 	const tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
 		fontAJS.get_font_table(fontStyleName, TesselatedFontTable.assetType)
