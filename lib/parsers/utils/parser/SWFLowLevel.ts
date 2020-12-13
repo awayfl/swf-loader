@@ -879,11 +879,12 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 		tag.lineBoundsMorph = parseBbox(stream);
 	}
 
-	const canHaveStrokes = tagCode === SwfTagCode.CODE_DEFINE_SHAPE4 ||
-		tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
+	const canHaveStrokes = (
+		tagCode === SwfTagCode.CODE_DEFINE_SHAPE4
+			|| tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2);
 
 	if (canHaveStrokes) {
-		//const fillBounds = tag.fillBounds = parseBbox(stream);
+		tag.fillBounds = parseBbox(stream);
 		if (isMorph) {
 			tag.fillBoundsMorph = parseBbox(stream);
 		}
@@ -899,9 +900,14 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 	const sub = stream.substream(stream.pos, stream.end);
 
 	tag.lazyParser = function() {
-		this.needParse = false;
-		this.lazyParser = () => this;
-		return parseDefineShapeTagLazy(sub, this, swfVersion);
+		tag.needParse = false;
+		tag.lazyParser = () => tag;
+
+		const begin = performance.now();
+		parseDefineShapeTagLazy(sub, tag, swfVersion);
+		(<any>tag).parsingTime = performance.now() - begin;
+
+		return tag;
 	};
 
 	stream.pos = tagEnd;
@@ -912,18 +918,24 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 function parseShapeRecords(stream: Stream, swfVersion: number, tagCode: number,
 	isMorph: boolean, fillBits: number, lineBits: number,
 	hasStrokes: boolean): ShapeRecord[] {
-	const records: ShapeRecord[] = [];
+
+	const records: ShapeRecord[] = new Array(10);
+	let index = 0;
 	let bits: number;
+	let flags: number;
+
 	do {
 		const record: any = {};
 		const type = record.type = stream.readUb(1);
-		let flags = stream.readUb(5);
+
+		flags = stream.readUb(5);
 		if (!(type || flags)) {
 			break;
 		}
 		if (type) {
-			const bits = (flags & 0x0f) + 2;
+			bits = (flags & 0x0f) + 2;
 			flags = (flags & 0xf0) << 1;
+
 			if (flags & ShapeRecordFlags.IsStraight) {
 				const isGeneral = record.isGeneral = stream.readUb(1);
 				if (isGeneral) {
@@ -973,8 +985,15 @@ function parseShapeRecords(stream: Stream, swfVersion: number, tagCode: number,
 			}
 		}
 		record.flags = flags;
-		records.push(record);
-	} while (true);
+		records[index++] = record;
+
+	// eslint-disable-next-line no-constant-condition
+	} while (1);
+
+	if (records.length > index) {
+		records.length = index;
+	}
+
 	return records;
 }
 

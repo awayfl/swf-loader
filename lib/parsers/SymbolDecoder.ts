@@ -51,6 +51,115 @@ import { SWFParser } from './SWFParser';
 const noTimelineDebug = true;
 const noExportsDebug = true;
 
+type TLazyParsed = {
+	lazyParser: () => any,
+	needParse: boolean,
+	id: number,
+	lazyTaskDone?: (f: any) => void
+};
+
+const lazyCallbackProvider = (self['requestIdleCallback'] || self.requestAnimationFrame);
+// stop run next qued task if this is runs so slow;
+const MAX_TASK_TIME = 4;
+const MAX_TASK_COUNT = 8;
+
+const parserAsyncTask: TLazyParsed[] = [];
+let rafTaskId = -1;
+let processedTaskIndex = 0;
+let lastRafTime = 0;
+
+function taskLooper () {
+	rafTaskId = -1;
+
+	const time = performance.now();
+
+	let totalTime = 0;
+	let processedTask = 0;
+
+	let skipTask = false;
+
+	if (lastRafTime === 0) {
+		skipTask = true;
+
+		// skip task if raf is bussy
+	} else if (time - lastRafTime > 10) {
+		//skipTask = true;
+
+		//console.log('[Lazy task runner] Thread bussy:', time - lastRafTime);
+	}
+
+	lastRafTime = time;
+
+	while (processedTaskIndex < parserAsyncTask.length && !skipTask) {
+		totalTime += executeTask();
+
+		if (totalTime > MAX_TASK_TIME) {
+			//console.debug('[Lazy task runner] Stop task by running time:', totalTime);
+
+			break;
+		}
+
+		processedTask++;
+
+		if (processedTask >= MAX_TASK_COUNT) {
+			break;
+		}
+	}
+
+	if (processedTask > 0) {
+		//console.debug('[Lazy task runner] Processed tasks:', processedTask);
+	}
+
+	if (processedTaskIndex > 1) {
+		parserAsyncTask.splice(0, processedTaskIndex);
+		processedTaskIndex = 0;
+
+		if (parserAsyncTask.length === 0) {
+			return;
+		}
+	}
+
+	rafTaskId =  lazyCallbackProvider(taskLooper);
+}
+
+function executeTask(): number {
+	let task: TLazyParsed;
+
+	while (!task || (!task.lazyParser || !task.needParse)) {
+		task = parserAsyncTask[processedTaskIndex];
+		processedTaskIndex++;
+	}
+
+	if (!task) {
+		return 0;
+	}
+
+	const start = performance.now();
+
+	task.lazyParser();
+	task.needParse = false;
+
+	if (task.lazyTaskDone) {
+		task.lazyTaskDone(task);
+	}
+
+	return performance.now() - start;
+}
+
+function pushLazyTask (task: TLazyParsed) {
+	if (!task.lazyParser || !task.needParse) {
+		return;
+	}
+
+	parserAsyncTask.push(task);
+
+	if (rafTaskId >= 0) {
+		return;
+	}
+
+	rafTaskId = lazyCallbackProvider(taskLooper);
+}
+
 function matrixToStream(stream: number[] | Uint32Array, index: number, matrix: Matrix) {
 
 	stream[index++] = matrix.a;
@@ -65,10 +174,10 @@ function matrixToStream(stream: number[] | Uint32Array, index: number, matrix: M
 
 function colorMatrixToStream(stream: number[] | Uint32Array, index: number, matrix: ColorTransform) {
 
-	stream[index++] = matrix.redMultiplier / 255;
-	stream[index++] = matrix.greenMultiplier / 255;
-	stream[index++] = matrix.blueMultiplier / 255;
-	stream[index++] = matrix.alphaMultiplier / 255;
+	stream[index++] = matrix.redMultiplier / 256;
+	stream[index++] = matrix.greenMultiplier / 256;
+	stream[index++] = matrix.blueMultiplier / 256;
+	stream[index++] = matrix.alphaMultiplier / 256;
 	stream[index++] = matrix.redOffset;
 	stream[index++] = matrix.greenOffset;
 	stream[index++] = matrix.blueOffset;
@@ -166,7 +275,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		return clone;
 	}
 
-	private _createShape(symbol: IShapeSymbol & {lazyParser: () => any}, target?: Shape, name?: string): IAsset {
+	private _createShape(symbol: IShapeSymbol & TLazyParsed, target?: Shape, name?: string): IAsset {
 
 		const shape = new Graphics();
 
@@ -175,6 +284,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			symbol.lazyParser();
 		}*/
 
+		pushLazyTask(symbol);
 		shape.queueShapeTag(symbol);
 
 		shape.name = name ||  'AwayJS_shape_' + symbol.id.toString();
