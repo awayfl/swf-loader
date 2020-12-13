@@ -261,7 +261,7 @@ function parseFilter(stream: Stream): Filter {
 			var glow = <GlowFilter>filter;
 			var count: number;
 			if (type === FilterType.GRADIENTGLOW || type === FilterType.GRADIENTBEVEL) {
-       	count = stream.readUi8();
+				count = stream.readUi8();
 			} else {
 				count = type === FilterType.BEVEL ? 2 : 1;
 			}
@@ -481,13 +481,13 @@ export function parseDefineFontTag(stream: Stream, swfVersion: number,
 	const firstOffset = stream.readUi16();
 	const glyphCount = firstOffset / 2;
 	const restOffsets: number[] = [];
-	var i = glyphCount - 1;
+	let i = glyphCount - 1;
 	while (i--) {
 		restOffsets.push(stream.readUi16());
 	}
 	tag.offsets = [firstOffset].concat(restOffsets);
 	const glyphs: Glyph[] = tag.glyphs = [];
-	var i = glyphCount;
+	i = glyphCount;
 	while (i--) {
 		glyphs.push(parseGlyph(stream, swfVersion, tagCode));
 	}
@@ -542,9 +542,9 @@ function parseTextRecord(stream: Stream, swfVersion: number, tagCode: number, gl
 	if (flags & TextRecordFlags.HasFont) {
 		record.fontHeight = stream.readUi16();
 	}
-	let glyphCount = stream.readUi8();
+	const glyphCount = stream.readUi8();
 	if (swfVersion <= 6) {
-		glyphCount = glyphCount; // & 0x7f ???;
+		//glyphCount = glyphCount; // & 0x7f ???;
 	}
 	const entries: TextEntry[] = record.entries = [];
 	let i = glyphCount;
@@ -706,7 +706,7 @@ export function parseDefineFont2Tag(stream: Stream, swfVersion: number, tagCode:
 	}
 	const startpos = stream.pos;
 	const offsets: number[] = tag.offsets = [];
-	var i = glyphCount;
+	let i = glyphCount;
 	if (flags & FontFlags.WideOffset) {
 		while (i--) {
 			offsets.push(stream.readUi32());
@@ -719,7 +719,7 @@ export function parseDefineFont2Tag(stream: Stream, swfVersion: number, tagCode:
 		tag.mapOffset = stream.readUi16();
 	}
 	const glyphs: Glyph[] = tag.glyphs = [];
-	var i = glyphCount;
+	i = glyphCount;
 	while (i--) {
 		const dist = tag.offsets[glyphCount - i] + startpos - stream.pos;
 		// when just one byte difference between two offsets, just read that and insert an empty glyph.
@@ -731,7 +731,7 @@ export function parseDefineFont2Tag(stream: Stream, swfVersion: number, tagCode:
 		glyphs.push(parseGlyph(stream, swfVersion, tagCode));
 	}
 	const codes: number[] = tag.codes = [];
-	var i = glyphCount;
+	i = glyphCount;
 	while (i--) {
 		codes.push(wide ? stream.readUi16() : stream.readUi8());
 	}
@@ -740,18 +740,18 @@ export function parseDefineFont2Tag(stream: Stream, swfVersion: number, tagCode:
 		tag.descent = stream.readUi16();
 		tag.leading = stream.readSi16();
 		const advance: number[] = tag.advance = [];
-		var i = glyphCount;
+		i = glyphCount;
 		while (i--) {
 			advance.push(stream.readSi16());
 		}
 		const bbox: Bbox[] = tag.bbox = [];
-		var i = glyphCount;
+		i = glyphCount;
 		while (i--) {
 			bbox.push(parseBbox(stream));
 		}
 		const kerningCount = stream.readUi16();
 		const kernings: Kerning[] = tag.kerning = [];
-		var i = kerningCount;
+		i = kerningCount;
 		// DefineFont2 tags tend to have a wrong kerning count so we have to make sure here that there is enough unread
 		// data remaining before parsing the next kerning record. If not, we have to bail out earlier in the following
 		// loop to avoid reading out of bound.
@@ -872,7 +872,7 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 	tag.lineBounds = parseBbox(stream);
 
 	const isMorph = tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE ||
-      tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
+		tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
 
 	if (isMorph) {
 		flags |= ShapeFlags.IsMorph;
@@ -880,10 +880,10 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 	}
 
 	const canHaveStrokes = tagCode === SwfTagCode.CODE_DEFINE_SHAPE4 ||
-	  tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
+		tagCode === SwfTagCode.CODE_DEFINE_MORPH_SHAPE2;
 
 	if (canHaveStrokes) {
-		const fillBounds = tag.fillBounds = parseBbox(stream);
+		//const fillBounds = tag.fillBounds = parseBbox(stream);
 		if (isMorph) {
 			tag.fillBoundsMorph = parseBbox(stream);
 		}
@@ -899,9 +899,9 @@ function parseDefineShapeTag(stream: Stream, swfVersion: number, tagCode: number
 	const sub = stream.substream(stream.pos, stream.end);
 
 	tag.lazyParser = function() {
-	  this.needParse = false;
-	  this.lazyParser = () => this;
-	  return parseDefineShapeTagLazy(sub, this, swfVersion);
+		this.needParse = false;
+		this.lazyParser = () => this;
+		return parseDefineShapeTagLazy(sub, this, swfVersion);
 	};
 
 	stream.pos = tagEnd;
@@ -913,7 +913,7 @@ function parseShapeRecords(stream: Stream, swfVersion: number, tagCode: number,
 	isMorph: boolean, fillBits: number, lineBits: number,
 	hasStrokes: boolean): ShapeRecord[] {
 	const records: ShapeRecord[] = [];
-	var bits: number;
+	let bits: number;
 	do {
 		const record: any = {};
 		const type = record.type = stream.readUb(1);
@@ -922,7 +922,7 @@ function parseShapeRecords(stream: Stream, swfVersion: number, tagCode: number,
 			break;
 		}
 		if (type) {
-			var bits = (flags & 0x0f) + 2;
+			const bits = (flags & 0x0f) + 2;
 			flags = (flags & 0xf0) << 1;
 			if (flags & ShapeRecordFlags.IsStraight) {
 				const isGeneral = record.isGeneral = stream.readUb(1);
@@ -998,7 +998,7 @@ function parseFillStyle(stream: Stream, swfVersion: number, tagCode: number,
 	const type = style.type = stream.readUi8();
 	switch (type) {
 		case 0:
-			var solid = <SolidFill>style;
+			const solid = <SolidFill>style;
 			solid.color = tagCode > SwfTagCode.CODE_DEFINE_SHAPE2 || isMorph ?
 				parseRgba(stream) :
 				parseRgb(stream);
@@ -1009,7 +1009,7 @@ function parseFillStyle(stream: Stream, swfVersion: number, tagCode: number,
 		case 16:
 		case 18:
 		case 19:
-			var gradient = <GradientFill>style;
+			const gradient = <GradientFill>style;
 			gradient.matrix = parseMatrix(stream);
 			if (isMorph) {
 				gradient.matrixMorph = parseMatrix(stream);
@@ -1018,14 +1018,14 @@ function parseFillStyle(stream: Stream, swfVersion: number, tagCode: number,
 			if (tagCode === SwfTagCode.CODE_DEFINE_SHAPE4) {
 				gradient.spreadMode = stream.readUb(2);
 				gradient.interpolationMode = stream.readUb(2);
-		  //console.log("gradient.spreadMode", gradient.spreadMode);
-		  //console.log("gradient.interpolationMode", gradient.interpolationMode);
+			//console.log("gradient.spreadMode", gradient.spreadMode);
+			//console.log("gradient.interpolationMode", gradient.interpolationMode);
 			} else {
 				stream.readUb(4);
 			}
-			var count = stream.readUb(4);
-			var records: GradientRecord[] = gradient.records = [];
-			var j = count;
+			const count = stream.readUb(4);
+			let records: GradientRecord[] = gradient.records = [];
+			let j = count;
 			while (j--) {
 				records.push(parseGradientRecord(stream, tagCode, isMorph));
 			}
@@ -1040,7 +1040,7 @@ function parseFillStyle(stream: Stream, swfVersion: number, tagCode: number,
 		case 65:
 		case 66:
 		case 67:
-			var pattern = <BitmapFill>style;
+			const pattern = <BitmapFill>style;
 			pattern.bitmapId = stream.readUi16();
 			pattern.condition = type === 64 || type === 67;
 			pattern.matrix = parseMatrix(stream);
