@@ -125,7 +125,7 @@ function taskLooper () {
 function executeTask(): number {
 	let task: TLazyParsed;
 
-	while (!task || (!task.lazyParser || !task.needParse)) {
+	while (task && (!task.lazyParser || !task.needParse)) {
 		task = parserAsyncTask[processedTaskIndex];
 		processedTaskIndex++;
 	}
