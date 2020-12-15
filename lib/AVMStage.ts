@@ -11,23 +11,27 @@ import {
 	ColorUtils,
 	Loader,
 	WaveAudioParser,
+	EventDispatcher,
+	Vector3D,
 } from '@awayjs/core';
 import {
-	Scene,
-	Camera,
 	DisplayObjectContainer,
 	SceneGraphPartition,
 	MovieClip,
 	FrameScriptManager,
+	MouseManager,
 } from '@awayjs/scene';
+
+import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
+import { IPartitionEntity, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { DefaultRenderer, RendererType, RenderGroup } from '@awayjs/renderer';
+
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
 import { StageScaleMode } from './factories/as3webFlash/display/StageScaleMode';
 import { StageAlign } from './factories/as3webFlash/display/StageAlign';
-import { Stage, BitmapImage2D, Image2DParser } from '@awayjs/stage';
 import { AVMVERSION } from './factories/base/AVMVersion';
 import { AVMTestHandler } from './AVMTestHandler';
 import { SWFParser } from './parsers/SWFParser';
-import { BasicPartition } from '@awayjs/view';
 import { IAVMHandler } from './IAVMHandler';
 import { SWFFile } from './parsers/SWFFile';
 import { IAVMStage } from './IAVMStage';
@@ -39,7 +43,15 @@ export const enum StageDisplayState {
 	NORMAL = 'normal',
 }
 
-export class AVMStage extends DisplayObjectContainer implements IAVMStage {
+export class AVMStage extends EventDispatcher implements IAVMStage {
+
+	private _root:DisplayObjectContainer;
+	private _partition:SceneGraphPartition;
+	private _renderer:DefaultRenderer;
+	private _view: View;
+	private _pickGroup:PickGroup;
+	private _mousePicker: RaycastPicker;
+	private _mouseManager: MouseManager;
 	private _swfFile: SWFFile;
 	private _avmHandlers: StringMap<IAVMHandler>;
 	public avmTestHandler: AVMTestHandler;
@@ -61,7 +73,6 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	private _fpsTextField: HTMLDivElement;
 	private _currentFps: number;
 	private _projection: PerspectiveProjection;
-	private _scene: Scene;
 	private _rendererStage: Stage;
 	private _displayState: StageDisplayState;
 
@@ -79,16 +90,19 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 	private static _instance: AVMStage = null;
 	public static instance(): AVMStage {
-		if (!AVMStage._instance) throw 'AVMStage._instance should exists but does not';
+		if (!AVMStage._instance)
+			throw ('AVMStage._instance should exists but does not');
 		return AVMStage._instance;
 	}
 
 	public static forceINT: boolean = false;
 
 	constructor(gameConfig: IGameConfig) {
+
 		super();
 
-		if (AVMStage._instance) throw 'Only one AVMStage is allowed to be constructed';
+		if (AVMStage._instance)
+			throw ('Only one AVMStage is allowed to be constructed');
 
 		AVMStage._instance = this;
 
@@ -131,7 +145,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 
 		// init awayengine
 		this.initAwayEninge();
-		this._scene.renderer.view.backgroundColor = 0xffffff;
+		this._renderer.view.backgroundColor = 0xffffff;
 		//this._stage3Ds[this._stage3Ds.length]=new AwayStage(null, );
 		AudioManager.setVolume(1);
 
@@ -149,6 +163,26 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		}
 
 		document.addEventListener('fullscreenchange', this.onFullscreenChanged.bind(this));
+	}
+
+	public get root():DisplayObjectContainer
+	{
+		return this._root;
+	}	
+
+	public get view():View
+	{
+		return this._view;
+	}	
+
+	public get mousePicker():RaycastPicker
+	{
+		return this._mousePicker;
+	}
+
+	public get mouseManager():MouseManager
+	{
+		return this._mouseManager;
 	}
 
 	public get config(): IGameConfig {
@@ -193,29 +227,34 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	private initAwayEninge() {
-		//create the view
-		this._scene = new Scene(new BasicPartition(new DisplayObjectContainer()));
-		this._rendererStage = this.scene.view.stage;
+
+		//create the partition
+		this._root = new DisplayObjectContainer();
+		this._partition = new SceneGraphPartition(this._root, true);
+		this._root.partition = this._partition;
+
+		this._view = new View();
+		this._view.projection.transform.moveTo(0, 0, -1000);
+		this._pickGroup = PickGroup.getInstance(this._view);
+		this._mousePicker = this._pickGroup.getRaycastPicker(this._partition);
+		this._mousePicker.shapeFlag = true;
+		this._mouseManager = MouseManager.getInstance(this._view.stage);
+
+		this._renderer = RenderGroup.getInstance(this._view, RendererType.DEFAULT).getRenderer(this._partition);
+		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
-		this._scene.renderer.renderableSorter = null; //new RenderableSort2D();
-		this._scene.forceMouseMove = true;
-		this._scene.mousePicker.shapeFlag = true;
+		this._renderer.renderableSorter = null;//new RenderableSort2D();
 
-		this._projection = new PerspectiveProjection();
+		this._projection = <PerspectiveProjection> this._view.projection;
 		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
 		this._projection.originX = -1;
 		this._projection.originY = 1;
-		const camera: Camera = new Camera();
-		camera.projection = this._projection;
-		this._scene.camera = camera;
-		this._projection.fieldOfView = (Math.atan(window.innerHeight / 1000 / 2) * 360) / Math.PI;
-
-		this.partition = new SceneGraphPartition(this, true);
-		this._scene.root.addChild(this);
+		this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
 	}
 
 	public playSWF(buffer: any, url: string) {
+
 		this._gameConfig = {
 			files: [{ data: buffer, path: url, resourceType: ResourceType.GAME }],
 		};
@@ -224,12 +263,13 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public snapshot(callback: Function) {
+
 		const myBitmap: BitmapImage2D = new BitmapImage2D(this._stageWidth, this._stageHeight, true, 0xffffffff, false);
 
-		this._scene.renderer.queueSnapshot(myBitmap);
-		this._scene.renderer.view.target = myBitmap;
-		this._scene.render();
-		this._scene.renderer.view.target = null;
+		this._renderer.queueSnapshot(myBitmap);
+		this._renderer.view.target = myBitmap;
+		this._renderer.render();
+		this._renderer.view.target = null;
 		myBitmap.invalidate();
 
 		// flip vertical:
@@ -268,7 +308,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		imageData.data.set(myBitmap2.data);
 		context.putImageData(imageData, 0, 0);
 
-		if (callback) callback(htmlCanvas);
+		if (callback)
+			callback(htmlCanvas);
 	}
 
 	public loadNextResource(event: LoaderEvent = null) {
@@ -308,7 +349,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 					this._avmHandler.init(this, this._swfFile, (hasInit) => {
 						parser.factory = this._avmHandler.factory;
 						SWFParser.factory = this._avmHandler.factory;
-						if (hasInit) this.dispatchEvent(new AVMEvent(AVMEvent.AVM_COMPLETE, avmName));
+						if (hasInit)
+							this.dispatchEvent(new AVMEvent(AVMEvent.AVM_COMPLETE, avmName));
 					});
 				};
 			}
@@ -377,7 +419,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._timer = new RequestAnimationFrame(this.main_loop, this);
 		this._timer.start();
 
-		const rootMC: MovieClip = <MovieClip> this.getChildAt(0);
+		const rootMC: MovieClip = <MovieClip> this._root;
 		if (!rootMC) {
 			console.warn('warning: AVMPlayer.play called, but no scene is loaded');
 			return;
@@ -392,7 +434,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public updateFPS(): void {
-		this._fpsTextField.style.visibility = !this._currentFps || !this._frameRate ? 'hidden' : 'visible';
+		this._fpsTextField.style.visibility = (!this._currentFps || !this._frameRate) ? 'hidden' : 'visible';
 		this._fpsTextField.innerText = this._currentFps.toFixed(2) + '/' + this._frameRate + ' fps';
 		this._currentFps = 0;
 	}
@@ -406,6 +448,7 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	private resizeStageInternal() {
+
 		const x: number = typeof this._x === 'string'
 			? (parseFloat(this._x.replace('%', '')) / 100) * window.innerWidth
 			: this._x;
@@ -457,22 +500,23 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		// todo: correctly implement all alignModes;
 		switch (this._align) {
 			case StageAlign.TOP_LEFT:
-				this._scene.view.x = newX;
-				this._scene.view.y = newY;
+				this._view.x = newX;
+				this._view.y = newY;
 				break;
 			default:
-				this._scene.view.x = newX;
-				this._scene.view.y = newY;
+				this._view.x = newX;
+				this._view.y = newY;
 				console.log('Stage: only implemented StageAlign is TOP_LEFT');
 				break;
 		}
 
-		this._scene.view.x = newX;
-		this._scene.view.y = newY;
-		this._scene.view.width = newWidth;
-		this._scene.view.height = newHeight;
+		this._view.x = newX;
+		this._view.y = newY;
+		this._view.width = newWidth;
+		this._view.height = newHeight;
 
-		if (this._fpsTextField) this._fpsTextField.style.left = window.innerWidth * 0.5 - 50 + 'px';
+		if (this._fpsTextField)
+			this._fpsTextField.style.left = (window.innerWidth * 0.5 - 50 + 'px');
 
 		if (this._avmHandler) {
 			this._avmHandler.resizeStage();
@@ -508,18 +552,14 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		}
 
 		if (!this._avmHandler) {
-			throw 'error - can not render when no avm-stage is available';
-		}
-
-		if (!this._scene || !this._scene.renderer) {
-			this._timer.stop();
-			return;
+			throw ('error - can not render when no avm-stage is available');
 		}
 
 		const frameMarker: number = Math.floor(1000 / this._frameRate);
 		this._time += Math.min(dt, frameMarker);
 
 		if (this._time >= frameMarker) {
+
 			this._currentFps++;
 
 			this.showNextFrame(this._time);
@@ -528,13 +568,9 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public requestRender() {
-		if (!this._scene || !this._scene.renderer) {
-			this._timer.stop();
-			return;
-		}
 
 		FrameScriptManager.execute_queue();
-		this._scene.render(false);
+		this._renderer.render();
 	}
 
 	protected showNextFrame(dt: number) {
@@ -543,26 +579,20 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 			MovieClipSoundsManager.exitFrame();
 			return;
 		}
+
 		MovieClipSoundsManager.enterFrame();
-		if (this.avmTestHandler) {
+
+		if (this.avmTestHandler)
 			this.avmTestHandler.dispatchEvents();
-		}
-		this._scene.fireMouseEvents();
+
+		this._mouseManager.fireMouseEvents(this._mousePicker);
 
 		this._avmHandler.enterFrame(dt);
 
-		if (this.avmTestHandler) {
+		if (this.avmTestHandler)
 			this.avmTestHandler.nextFrame();
-		}
 
-		// actionscript might have disposed everything
-		// so lets check if that is the case and stop everything if its true
-		if (!this._scene || !this._scene.renderer) {
-			this._timer.stop();
-			return;
-		}
-
-		this._scene.render(false);
+		this._renderer.render();
 
 		MovieClipSoundsManager.exitFrame();
 	}
@@ -572,8 +602,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public set align(value: StageAlign) {
-		if (!this._alignAllowUpdate) return;
+		if (!this._alignAllowUpdate)
+			return;
+
 		this._align = value;
+
 		this.resizeCallback();
 	}
 
@@ -588,11 +621,11 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public get color(): number {
-		return this._scene.renderer.view.backgroundColor;
+		return this._renderer.view.backgroundColor;
 	}
 
 	public set color(value: number) {
-		this._scene.renderer.view.backgroundColor = value;
+		this._renderer.view.backgroundColor = value;
 	}
 
 	public get frameRate(): number {
@@ -603,12 +636,43 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 		this._frameRate = value;
 	}
 
-	public get mouseX(): number {
-		return this._scene.getLocalMouseX(this);
+	public getLocalMouseX(entity: IPartitionEntity): number {
+		return entity
+			.transform
+			.inverseConcatenatedMatrix3D
+			.transformVector(
+				this._renderer.view.unproject(
+					this._view.stage.screenX, this._view.stage.screenY, 1000))
+			.x;
 	}
 
-	public get mouseY(): number {
-		return this._scene.getLocalMouseY(this);
+	public getLocalMouseY(entity: IPartitionEntity): number {
+		return entity
+			.transform
+			.inverseConcatenatedMatrix3D
+			.transformVector(
+				this._renderer.view.unproject(
+					this._view.stage.screenX, this._view.stage.screenY, 1000))
+			.y;
+	}
+
+	public getLocalTouchPoints(entity: IPartitionEntity): Array<TouchPoint> {
+		let localPosition: Vector3D;
+		const localTouchPoints: Array<TouchPoint> = new Array<TouchPoint>();
+
+		const len: number = this._view.stage.touchPoints.length;
+		for (let i: number = 0; i < len; i++) {
+			localPosition = entity
+				.transform
+				.inverseConcatenatedMatrix3D
+				.transformVector(
+					this._renderer.view.unproject(
+						this._view.stage.touchPoints[i].x, this._view.stage.touchPoints[i].y, 1000));
+
+			localTouchPoints.push(new TouchPoint(localPosition.x, localPosition.y, this._view.stage.touchPoints[i].id));
+		}
+
+		return localTouchPoints;
 	}
 
 	public get scaleMode(): StageScaleMode {
@@ -616,13 +680,10 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public set scaleMode(value: StageScaleMode) {
-		if (!this._scaleModeAllowUpdate) return;
+		if (!this._scaleModeAllowUpdate)
+			return;
 		this._scaleMode = value;
 		this.resizeCallback();
-	}
-
-	public get scene(): Scene {
-		return this._scene;
 	}
 
 	public get showFrameRate(): boolean {
@@ -630,7 +691,8 @@ export class AVMStage extends DisplayObjectContainer implements IAVMStage {
 	}
 
 	public set showFrameRate(value: boolean) {
-		if (value == this._showFrameRate) return;
+		if (value == this._showFrameRate)
+			return;
 
 		this._showFrameRate = value;
 		if (value) {
