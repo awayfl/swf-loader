@@ -67,7 +67,11 @@ export class ExternalInterfaceService {
 	}
 
 	public static eval(expression: string): any {
-		return window.eval(expression);
+		try {
+			return window.eval(expression);
+		} catch (e) {
+			console.warn('[ExternalInterfaceService] Eval crashed:\n', expression, '\n' + e.message);
+		}
 	}
 
 	public static call(request: string): any {
