@@ -45,11 +45,11 @@ export const enum StageDisplayState {
 
 export class AVMStage extends EventDispatcher implements IAVMStage {
 
-	private _root:DisplayObjectContainer;
-	private _partition:SceneGraphPartition;
-	private _renderer:DefaultRenderer;
+	private _root: DisplayObjectContainer;
+	private _partition: SceneGraphPartition;
+	private _renderer: DefaultRenderer;
 	private _view: View;
-	private _pickGroup:PickGroup;
+	private _pickGroup: PickGroup;
 	private _mousePicker: RaycastPicker;
 	private _mouseManager: MouseManager;
 	private _swfFile: SWFFile;
@@ -165,23 +165,19 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		document.addEventListener('fullscreenchange', this.onFullscreenChanged.bind(this));
 	}
 
-	public get root():DisplayObjectContainer
-	{
+	public get root(): DisplayObjectContainer {
 		return this._root;
-	}	
+	}
 
-	public get view():View
-	{
+	public get view(): View {
 		return this._view;
-	}	
+	}
 
-	public get mousePicker():RaycastPicker
-	{
+	public get mousePicker(): RaycastPicker {
 		return this._mousePicker;
 	}
 
-	public get mouseManager():MouseManager
-	{
+	public get mouseManager(): MouseManager {
 		return this._mouseManager;
 	}
 
