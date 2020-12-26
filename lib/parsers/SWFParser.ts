@@ -1,22 +1,19 @@
 import {
 	WaveAudioParser,
-	Rectangle,
 	WaveAudio,
 	URLLoaderDataFormat,
 	IAsset,
 	ParserBase,
 	ResourceDependency,
-	ByteArray,  AssetBase
+	ByteArray
 } from '@awayjs/core';
 
 import { Image2DParser, BitmapImage2D } from '@awayjs/stage';
 
 import {
-	DefaultFontManager,
 	Sprite,
 	ISceneGraphFactory,
 	DefaultSceneGraphFactory,
-	MovieClip,
 	TextFormatAlign,
 	SceneImage2D
 } from '@awayjs/scene';
@@ -68,37 +65,14 @@ import {
 	getSwfTagCodeName
 } from '../factories/base/SWFTags';
 
-import { IBinarySymbol, IButtonSymbol, ISymbol, SYMBOL_TYPE,  } from './ISymbol';
+import { IButtonSymbol, ISymbol, SYMBOL_TYPE,  } from './ISymbol';
 import { SymbolDecoder } from './SymbolDecoder';
 
 import { CompressionMethod } from './CompressionMethod';
 import { release } from '../factories/base/utilities/Debug';
 import { Stat } from '../stat/Stat';
 
-class GenericAsset<T> extends AssetBase {
-	public static assetType = '[asset Generic]';
-	public readonly isGeneric = true;
-
-	constructor(public _symbol: T, name: string, public readonly dataClass: new () => T) {
-		super(name);
-	}
-
-	get assetType() {
-		return GenericAsset.assetType;
-	}
-
-	dispose() {
-		this._symbol = null;
-	}
-
-	clone(): GenericAsset<T> {
-		return new GenericAsset<T>(this._symbol, this.name, this.dataClass);
-	}
-}
-
 const noTimelineDebug = true;
-const noExportsDebug = true;
-const noSceneGraphDebug = true;
 
 const enum SWFParserProgressState {
 	STARTED,
@@ -279,8 +253,10 @@ export class SWFParser extends ParserBase {
 	 * @inheritDoc
 	 */
 	public _iResolveDependencyFailure(resourceDependency: ResourceDependency): void {
-		//not used - if a dependcy fails, the awaiting Texture or CubeTexture will never be finalized, and the default-bitmaps will be used.
-		// this means, that if one Bitmap of a CubeTexture fails, the CubeTexture will have the DefaultTexture applied for all six Bitmaps.
+		//not used - if a dependcy fails, the awaiting Texture or CubeTexture will never be finalized,
+		// and the default-bitmaps will be used.
+		// this means, that if one Bitmap of a CubeTexture fails,
+		// the CubeTexture will have the DefaultTexture applied for all six Bitmaps.
 		//console.log("_iResolveDependencyFailure", resourceDependency);
 		this.externalDependenciesCount--;
 		if (this.externalDependenciesCount == 0) {
@@ -400,14 +376,16 @@ export class SWFParser extends ParserBase {
 						case SYMBOL_TYPE.SOUND:
 							//console.log("init sound parsing", eagerlySymbol);
 							if (!eagerlySymbol.definition.packaged) {
-								console.warn('SWF-parser: Missed packaged data for sound-id:',eagerlySymbol.id.toString());
+								console.warn('SWF-parser: Missed packaged data for sound-id:',
+									eagerlySymbol.id.toString());
 								break;
 							}
 
 							this._pAddDependency(
 								eagerlySymbol.id.toString(), null,
 								new WaveAudioParser(),
-								new Blob([eagerlySymbol.definition.packaged.data], { type: eagerlySymbol.definition.packaged.mimeType }),
+								new Blob([eagerlySymbol.definition.packaged.data],
+									{ type: eagerlySymbol.definition.packaged.mimeType }),
 								false, true);
 
 							this.externalDependenciesCount++;
@@ -496,10 +474,9 @@ export class SWFParser extends ParserBase {
 			}
 
 			const symbol = this.getSymbol(entry.id) as ISymbol;
-			let asset: IAsset;
 
 			//try {
-			asset = this._symbolDecoder.createAwaySymbol(symbol, null, null);
+			const asset: IAsset = this._symbolDecoder.createAwaySymbol(symbol, null, null);
 			/*
 			} catch(e) {
 				console.warn("[SWF Symbol parser error]", e);
@@ -534,7 +511,6 @@ export class SWFParser extends ParserBase {
 		}
 
 		this._pFinalizeAsset(rootAsset, 'scene');
-		DefaultFontManager.applySharedFonts(this._iFileName);
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);
 
@@ -547,7 +523,12 @@ export class SWFParser extends ParserBase {
 		Stat.rec('parser').rec('symbols').rec('away').end();
 	}
 
-	public textFormatAlignMap: string[] = [TextFormatAlign.LEFT, TextFormatAlign.RIGHT, TextFormatAlign.CENTER, TextFormatAlign.JUSTIFY];
+	public textFormatAlignMap: string[] = [
+		TextFormatAlign.LEFT,
+		TextFormatAlign.RIGHT,
+		TextFormatAlign.CENTER,
+		TextFormatAlign.JUSTIFY
+	];
 
 	public _pStartParsing(frameLimit: number): void {
 		//console.log("SWFParser - _pStartParsing");
@@ -684,7 +665,8 @@ export class SWFParser extends ParserBase {
 		this._loadStarted = Date.now();
 		this._uncompressedLength = readSWFLength(initialBytes);
 		this._swfFile.bytesLoaded = initialBytes.length;
-		// In some malformed SWFs, the parsed length in the header doesn't exactly match the actual size of the file. For
+		// In some malformed SWFs, the parsed length in the header
+		// doesn't exactly match the actual size of the file. For
 		// uncompressed files it seems to be safer to make the buffer large enough from the beginning to fit the entire
 		// file than having to resize it later or risking an exception when reading out of bounds.
 		this.swfData = new Uint8Array(this._swfFile.compression === CompressionMethod.None ?
@@ -749,7 +731,8 @@ export class SWFParser extends ParserBase {
 	}
 
 	private processDecompressedData(data: Uint8Array) {
-		// Make sure we don't cause an exception here when trying to set out-of-bound data by clamping the number of bytes
+		// Make sure we don't cause an exception here
+		// when trying to set out-of-bound data by clamping the number of bytes
 		// to write to the remaining space in our buffer. If this is the case, we probably got a wrong file length from
 		// the SWF header. The Flash Player ignores data that goes over that given length, so should we.
 		Stat.rec('parser').rec('unzip').end();
@@ -826,11 +809,11 @@ export class SWFParser extends ParserBase {
 	}
 
 	private Utf8ArrayToStr(array) {
-		let out, i, len, c;
+		let out, i, c;
 		let char2, char3;
 
 		out = '';
-		len = array.length;
+		const len = array.length;
 		i = 0;
 		while (i < len) {
 			c = array[i++];
@@ -867,7 +850,8 @@ export class SWFParser extends ParserBase {
 		const tagCode = tag.tagCode;
 		const tagLength = tag.byteLength;
 
-		//console.info("Scanning tag " + getSwfTagCodeName(tagCode) + " (start: " + byteOffset +  ", end: " + (byteOffset + tagLength) + ")");
+		//console.info("Scanning tag " + getSwfTagCodeName(tagCode) +
+		//"(start: " + byteOffset +  ", end: " + (byteOffset + tagLength) + ")");
 
 		if (tagCode === SwfTagCode.CODE_DEFINE_SPRITE) {
 			// According to Chapter 13 of the SWF format spec, no nested definition tags are
@@ -889,13 +873,13 @@ export class SWFParser extends ParserBase {
 		if (ImageDefinitionTags[tagCode]) {
 			// Images are decoded asynchronously, so we have to deal with them ahead of time to
 			// ensure they're ready when used.
-			var unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
+			const unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
 			this.decodeEmbeddedImage(unparsed);
 			return;
 		}
 		if (tagCode === SwfTagCode.CODE_DEFINE_SOUND) {
 
-			var unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
+			const unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
 			const definition = this.getParsedTag(unparsed);
 			const symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, SYMBOL_TYPE.SOUND, definition);
 			/*if (!release && traceLevel.value > 0) {
@@ -908,7 +892,7 @@ export class SWFParser extends ParserBase {
 			return;
 		}
 		if (FontDefinitionTags[tagCode]) {
-			var unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
+			const unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
 			this.registerEmbeddedFont(unparsed);
 			return;
 		}
@@ -954,7 +938,7 @@ export class SWFParser extends ParserBase {
 			case SwfTagCode.CODE_DO_ABC:
 			case SwfTagCode.CODE_DO_ABC_DEFINE:
 				if (!this._swfFile.useAVM1) {
-					var tagEnd = byteOffset + tagLength;
+					const tagEnd = byteOffset + tagLength;
 					const abcBlock = new ABCBlock();
 					if (tagCode === SwfTagCode.CODE_DO_ABC) {
 						abcBlock.flags = stream.readUi32();
@@ -976,7 +960,7 @@ export class SWFParser extends ParserBase {
 				var symbolCount = stream.readUi16();
 				// TODO: check if symbols can be reassociated after instances have been created.
 				while (symbolCount--) {
-					var symbolId = stream.readUi16();
+					const symbolId = stream.readUi16();
 					const symbolClassName = stream.readString(-1);
 					/* if (!release && traceLevel.value > 0) {
 					   console.log('Registering symbol class ' + symbolClassName + ' to symbol ' + symbolId);
@@ -1032,7 +1016,8 @@ export class SWFParser extends ParserBase {
 				console.log(this._currentSoundStreamBlock.byteLength);
 				console.log(this._currentSoundStreamBlock.byteOffset);
 				console.log(this._currentSoundStreamBlock.buffer.byteLength);
-				var int16array=new Uint16Array(this._currentSoundStreamBlock.buffer, this._currentSoundStreamBlock.byteOffset, this._currentSoundStreamBlock.length);
+				var int16array=new Uint16Array(this._currentSoundStreamBlock.buffer,
+					this._currentSoundStreamBlock.byteOffset, this._currentSoundStreamBlock.length);
 				console.log(int16array.buffer);
 				console.log(int16array.length);
 				console.log(int16array.byteLength);
@@ -1054,7 +1039,7 @@ export class SWFParser extends ParserBase {
 				var exportsCount = stream.readUi16();
 				var exports = this._currentExports || (this._currentExports = []);
 				while (exportsCount--) {
-					var symbolId = stream.readUi16();
+					const symbolId = stream.readUi16();
 					const className = stream.readString(-1);
 					if (stream.pos > tagEnd) {
 						stream.pos = tagEnd;
@@ -1080,8 +1065,8 @@ export class SWFParser extends ParserBase {
 
 				break;
 			case SwfTagCode.CODE_DEFINE_SCALING_GRID:
-				const scaleGridtag = this.getParsedTag(tag);
-				const unparsedSymbol = this.dictionary[scaleGridtag.symbolId];
+				var scaleGridtag = this.getParsedTag(tag);
+				var unparsedSymbol = this.dictionary[scaleGridtag.symbolId];
 				(<any>unparsedSymbol).scalingGrid = scaleGridtag.splitter;
 				//console.log("scaleGridtag", scaleGridtag, symbol);
 				break;
@@ -1102,6 +1087,8 @@ export class SWFParser extends ParserBase {
 			case SwfTagCode.CODE_DEFINE_FONT_ALIGN_ZONES:
 			case SwfTagCode.CODE_SCRIPT_LIMITS:
 			case SwfTagCode.CODE_SET_TAB_INDEX:
+				this.jumpToNextTag(tagLength);
+				break;
 			// These tags are used by the player, but not relevant to us.
 			case SwfTagCode.CODE_ENABLE_DEBUGGER:
 			case SwfTagCode.CODE_ENABLE_DEBUGGER2:
@@ -1112,6 +1099,8 @@ export class SWFParser extends ParserBase {
 			case SwfTagCode.CODE_PROTECT:
 			case SwfTagCode.CODE_PATHS_ARE_POSTSCRIPT:
 			case SwfTagCode.CODE_TELEMETRY:
+				this.jumpToNextTag(tagLength);
+				break;
 			// These are obsolete Generator-related tags.
 			case SwfTagCode.CODE_GEN_TAG_OBJECTS:
 			case SwfTagCode.CODE_GEN_COMMAND:
@@ -1205,7 +1194,7 @@ export class SWFParser extends ParserBase {
 						if (!actionBlocks) {
 							actionBlocks = [];
 						}
-						var actionsData = data.subarray(stream.pos, stream.pos + tagLength);
+						const actionsData = data.subarray(stream.pos, stream.pos + tagLength);
 						actionBlocks.push({ actionsData: actionsData, precedence: stream.pos });
 					}
 					break;
@@ -1216,7 +1205,7 @@ export class SWFParser extends ParserBase {
 						}
 						const spriteId = dataView.getUint16(stream.pos, true);
 						stream.pos += 2;
-						var actionsData = data.subarray(stream.pos, stream.pos + tagLength);
+						const actionsData = data.subarray(stream.pos, stream.pos + tagLength);
 						initActionBlocks.push({ spriteId: spriteId, actionsData: actionsData });
 					}
 					break;
@@ -1285,8 +1274,9 @@ export class SWFParser extends ParserBase {
 	}
 
 	private emitTagSlopWarning(tag: UnparsedTag, tagEnd: number) {
-		const consumedBytes = this._dataStream.pos - tag.byteOffset;
-		//console.log('Scanning ' + getSwfTagCodeName(tag.tagCode) + ' at offset ' + tag.byteOffset +' consumed ' + consumedBytes + ' of ' + tag.byteLength + ' bytes. (' +(tag.byteLength - consumedBytes) + ' left)');
+		//const consumedBytes = this._dataStream.pos - tag.byteOffset;
+		//console.log('Scanning ' + getSwfTagCodeName(tag.tagCode) + ' at offset ' + tag.byteOffset +' consumed '
+		//+ consumedBytes + ' of ' + tag.byteLength + ' bytes. (' +(tag.byteLength - consumedBytes) + ' left)');
 		this._dataStream.pos = tagEnd;
 	}
 
@@ -1336,7 +1326,8 @@ export class SWFParser extends ParserBase {
 			this.jumpToNextTag(tagLength);
 			return;
 		}
-		this._swfFile.sceneAndFrameLabelData = this._swfFile.sceneAndFrameLabelData = parseDefineSceneTag(this._dataStream, SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA);
+		this._swfFile.sceneAndFrameLabelData = this._swfFile.sceneAndFrameLabelData
+			= parseDefineSceneTag(this._dataStream, SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA);
 	}
 
 	private addControlTag(tagCode: number, byteOffset: number, tagLength: number) {
