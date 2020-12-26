@@ -121,7 +121,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 	};
 	fontAJS.name = fontName;
 
-	let fontStyleName: string = FontStyleName.STANDART;
+	let fontStyleName = FontStyleName.STANDART;
 	if (font.bold && !font.italic) {
 		fontStyleName = FontStyleName.BOLD;
 	} else if (!font.bold && font.italic) {
@@ -131,8 +131,9 @@ export function defineFont(tag: FontTag, ns: string): any {
 	}
 
 	font.fontStyleName = fontStyleName;
+	//console.log("define font", fontName, " - ", fontStyleName);
 	const tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
-		fontAJS.get_font_table(fontStyleName, TesselatedFontTable.assetType)
+		fontAJS.create_font_table(fontStyleName, TesselatedFontTable.assetType)
 	);
 	//var tessFontTableAJS:TesselatedFontTable=new TesselatedFontTable();
 	//fontAJS.font_styles.push(tessFontTableAJS);
