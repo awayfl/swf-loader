@@ -20,6 +20,7 @@ import {
 	MovieClip,
 	FrameScriptManager,
 	MouseManager,
+	DefaultFontManager,
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
@@ -313,7 +314,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		if (this._curFile) {
 			const parser = new SWFParser();
 			parser._iFileName = this._curFile.path;
-			if (this._curFile.resourceType == ResourceType.GAME) {
+			if (this._curFile.resourceType != ResourceType.GAME) {
+				DefaultFontManager.deviceFontsLoading = true;
+			} else {
+				DefaultFontManager.deviceFontsLoading = false;
 				if (this._swfFile) {
 					throw 'Only playing of 1 SWF file is supported at the moment';
 				}
