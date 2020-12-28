@@ -398,6 +398,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	private _onLoaderCompleteDelegate: (event: LoaderEvent) => void;
 	public onLoaderComplete(event: LoaderEvent) {
+		if (this._root)
+			this._root.dispatchEvent(event);
 		AssetLibrary.removeEventListener(AssetEvent.ASSET_COMPLETE, this._onAssetCompleteDelegate);
 		AssetLibrary.removeEventListener(LoaderEvent.LOADER_COMPLETE, this._onLoaderCompleteDelegate);
 		AssetLibrary.removeEventListener(URLLoaderEvent.LOAD_ERROR, this._onLoadErrorDelegate);
