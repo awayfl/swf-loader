@@ -76,6 +76,7 @@ const noTimelineDebug = true;
 
 const enum SWFParserProgressState {
 	STARTED,
+	DECODING,
 	SCANNED,
 	WAIT_FOR_DEPENDENCY,
 	WAIT_FOR_FACTORY,
@@ -166,6 +167,9 @@ export class SWFParser extends ParserBase {
 
 	public soundExports: any = {};
 
+	public static ID = 0;
+	id = 0;
+
 	/**
 	 * Creates a new AWD3Parserutils object.
 	 * @param uri The url or id of the data or file to be parsed.
@@ -173,6 +177,8 @@ export class SWFParser extends ParserBase {
 	 */
 	constructor(factory: ISceneGraphFactory = null) {
 		super(URLLoaderDataFormat.ARRAY_BUFFER);
+
+		this.id = SWFParser.ID++;
 
 		this._swfFile = new SWFFile();
 		this._factory = factory;
@@ -245,6 +251,7 @@ export class SWFParser extends ParserBase {
 		if (this.externalDependenciesCount == 0) {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
+			console.log('Finish parser:', this.id);
 		}
 
 	}
@@ -287,7 +294,7 @@ export class SWFParser extends ParserBase {
 	 */
 	public _pProceedParsing(): boolean {
 		//console.log("SWFParser - _pProceedParsing");
-		if (this._progressState == SWFParserProgressState.STARTED) {
+		if (this._progressState === SWFParserProgressState.STARTED) {
 
 			const byteData: ByteArray = this._pGetByteData();
 			const int8Array: Uint8Array = new Uint8Array(byteData.arraybytes);
@@ -307,9 +314,16 @@ export class SWFParser extends ParserBase {
 			// get the bytedata
 			// preparse all data. after this step we can deal with tag-objects rather than bytedata
 
+			this._progressState = SWFParserProgressState.DECODING;
+			this._swfFile.url = this._iFileName;
+
 			this.initSWFLoading(int8Array, int8Array.length);
 
-			this._swfFile.url = this._iFileName;
+		} else if (this._progressState === SWFParserProgressState.SCANNED) {
+
+			console.log('Begin parse', this.id);
+
+			this._progressState = SWFParserProgressState.WAIT_FOR_FACTORY;
 
 			if (this._factory) {
 				this.parseSymbols();
@@ -317,26 +331,25 @@ export class SWFParser extends ParserBase {
 				if (!this.onFactoryRequest)
 					throw ('Error in SWFParser. no factory and noFactoryRequest method exists.');
 
-				this._progressState = SWFParserProgressState.WAIT_FOR_FACTORY;
 				this.onFactoryRequest(this._swfFile);
 				if (this._factory) {
 					this.parseSymbols();
 				}
 			}
 
-		} else if (this._progressState == SWFParserProgressState.FACTORY_AVAILABLE) {
+		} else if (this._progressState === SWFParserProgressState.FACTORY_AVAILABLE) {
 			if (!this.onFactoryRequest)
 				throw ('Error in SWFParser. no factory and noFactoryRequest method exists.');
 			if (this._factory) {
 				this.parseSymbols();
 			}
+
+			Stat.rec('parser').end();
 		}
 
-		if (this._progressState != SWFParserProgressState.FINISHED) {
+		if (this._progressState !== SWFParserProgressState.FINISHED) {
 			return ParserBase.MORE_TO_PARSE;
 		}
-
-		Stat.rec('parser').end();
 
 		return ParserBase.PARSING_DONE;
 	}
@@ -409,6 +422,7 @@ export class SWFParser extends ParserBase {
 		} else {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
+			console.log('Finish parser:', this.id);
 
 			Stat.rec('parser').rec('symbols').end();
 		}
@@ -591,11 +605,15 @@ export class SWFParser extends ParserBase {
 	}
 
 	finishLoading() {
-		if (this._swfFile.compression !== CompressionMethod.None) {
+		if (this._decompressor) {
 			this._decompressor.close();
 			this._decompressor = null;
-			this.scanLoadedData();
 		}
+
+		console.log('Finish loading', this.id);
+
+		this._progressState = SWFParserProgressState.SCANNED;
+		this.scanLoadedData();
 	}
 
 	getSymbol(id: number): ISymbol | EagerlyParsedDictionaryEntry {
@@ -648,65 +666,65 @@ export class SWFParser extends ParserBase {
 	}
 
 	private readHeaderAndInitialize(initialBytes: Uint8Array) {
-		////SWF.enterTimeline('Initialize SWFFile');
-		const isDeflateCompressed = initialBytes[0] === 67;
-		const isLzmaCompressed = initialBytes[0] === 90;
-		if (isDeflateCompressed) {
-			this._swfFile.compression = CompressionMethod.Deflate;
-		} else if (isLzmaCompressed) {
-			this._swfFile.compression = CompressionMethod.LZMA;
-		}
-		this._swfFile.swfVersion = initialBytes[3];
-		this._swfFile.mapSWFVersionToFPVersion();
+		const swf = this._swfFile;
 
-		if (this._swfFile.swfVersion != 6) {
-			//console.log("WARNING: SWF VERSION IS NOT 6", this._swfFile.swfVersion)
-		}
+		swf.swfVersion = initialBytes[3];
+		swf.mapSWFVersionToFPVersion();
+
 		this._loadStarted = Date.now();
 		this._uncompressedLength = readSWFLength(initialBytes);
-		this._swfFile.bytesLoaded = initialBytes.length;
+
+		if (initialBytes[0] === 67) {
+			this._decompressor = Inflate.create(true, this._uncompressedLength, true);
+
+			swf.compression = CompressionMethod.Deflate;
+		} else if (initialBytes[0] === 90) {
+			this._decompressor = new LzmaDecoder(true);
+
+			swf.compression = CompressionMethod.LZMA;
+		}
+
+		swf.bytesLoaded = initialBytes.length;
+
 		// In some malformed SWFs, the parsed length in the header
 		// doesn't exactly match the actual size of the file. For
 		// uncompressed files it seems to be safer to make the buffer large enough from the beginning to fit the entire
 		// file than having to resize it later or risking an exception when reading out of bounds.
-		this.swfData = new Uint8Array(this._swfFile.compression === CompressionMethod.None ?
-			this._swfFile.bytesTotal : this._uncompressedLength);
+		this.swfData = new Uint8Array(
+			swf.compression === CompressionMethod.None
+				? swf.bytesTotal
+				: this._uncompressedLength);
+
 		this._dataStream = new Stream(this.swfData.buffer);
 		this._dataStream.pos = 8;
 		this._dataView = this._dataStream.view;
-		if (isDeflateCompressed) {
-			//console.log("readHeaderAndInitialize isDeflateCompressed");
+
+		if (this._decompressor) {
 			this.swfData.set(initialBytes.subarray(0, 8));
+
 			this._uncompressedLoadedLength = 8;
-			this._decompressor = Inflate.create(true);
 			// Parts of the header are compressed. Get those out of the way before starting tag parsing.
 			this._decompressor.onData = this.processFirstBatchOfDecompressedData.bind(this);
 			this._decompressor.onError = function (error) {
 				// TODO: Let the loader handle this error.
-				throw new Error(error);
-			};
-			this._decompressor.push(initialBytes.subarray(8));
-		} else if (isLzmaCompressed) {
-			//console.log("readHeaderAndInitialize isLzmaCompressed");
-			this.swfData.set(initialBytes.subarray(0, 8));
-			this._uncompressedLoadedLength = 8;
-			this._decompressor = new LzmaDecoder(true);
-			this._decompressor.onData = this.processFirstBatchOfDecompressedData.bind(this);
-			this._decompressor.onError = function (error) {
-				// TODO: Let the loader handle this error.
-				//console.log('Invalid LZMA stream: ' + error);
-			};
-			this._decompressor.push(initialBytes);
+				throw new Error(error + ' from:' + this.id);
+			}.bind(this);
+
+			const subb = initialBytes.subarray(8);
+			console.log('Push bytes to:', subb.length, this.id);
+
+			this._decompressor.push(subb);
+
 		} else {
 			//console.log("readHeaderAndInitialize isUncompressed");
 			this.swfData.set(initialBytes);
 			this._uncompressedLoadedLength = initialBytes.length;
 			this._decompressor = null;
+
 			this.parseHeaderContents();
+			this.finishLoading();
 		}
-		////SWF.leaveTimeline();
-		this._lastScanPosition = this._dataStream.pos;
-		this.scanLoadedData();
+
 	}
 
 	private parseHeaderContents() {
@@ -714,6 +732,8 @@ export class SWFParser extends ParserBase {
 		this._swfFile.bounds = this._swfFile.bounds = obj.bounds;
 		this._swfFile.frameRate = this._swfFile.frameRate = obj.frameRate;
 		this._swfFile.frameCount = this._swfFile.frameCount = obj.frameCount;
+		this._lastScanPosition = this._dataStream.pos;
+
 		//var str = String.fromCharCode.apply(null, data);
 		//console.log(obj);
 		//console.log("parseHeaderContents this._swfFile.bounds", this._swfFile.bounds);
@@ -726,8 +746,11 @@ export class SWFParser extends ParserBase {
 		Stat.rec('parser').rec('unzip').begin();
 
 		this.processDecompressedData(data);
-		this.parseHeaderContents();
-		this._decompressor.onData = this.processDecompressedData.bind(this);
+
+		// may be finished
+		if (this._decompressor) {
+			this._decompressor.onData = this.processDecompressedData.bind(this);
+		}
 	}
 
 	private processDecompressedData(data: Uint8Array) {
@@ -740,6 +763,17 @@ export class SWFParser extends ParserBase {
 		const length = Math.min(data.length, this._uncompressedLength - this._uncompressedLoadedLength);
 		memCopy(this.swfData, data, this._uncompressedLoadedLength, 0, length);
 		this._uncompressedLoadedLength += length;
+
+		//console.log("Processed data size:", this._uncompressedLoadedLength, this._uncompressedLength);
+
+		if (this._uncompressedLoadedLength === this._uncompressedLength) {
+			if (this._decompressor)
+				this._decompressor.onData = null;
+
+			this.parseHeaderContents();
+			this.finishLoading();
+		}
+
 	}
 
 	private scanLoadedData() {
