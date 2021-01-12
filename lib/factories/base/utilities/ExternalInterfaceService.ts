@@ -67,6 +67,7 @@ export class ExternalInterfaceService {
 	}
 
 	public static eval(expression: string): any {
+		ExternalInterfaceService.ensureInit();
 		try {
 			return window.eval(expression);
 		} catch (e) {
