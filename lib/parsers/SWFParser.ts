@@ -251,7 +251,6 @@ export class SWFParser extends ParserBase {
 		if (this.externalDependenciesCount == 0) {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
-			console.log('Finish parser:', this.id);
 		}
 
 	}
@@ -297,11 +296,14 @@ export class SWFParser extends ParserBase {
 		if (this._progressState === SWFParserProgressState.STARTED) {
 
 			const byteData: ByteArray = this._pGetByteData();
-			const int8Array: Uint8Array = new Uint8Array(byteData.arraybytes);
+
+			// fucking ByteArray can be greater that real buffer with leading 0
+			// this is throw error in parser
+			const int8Array: Uint8Array = new Uint8Array(byteData.arraybytes, 0, byteData.length);
 
 			if (!SWFParser.supportsData(int8Array)) {
 
-				const head = int8Array.slice(0, 3).reverse().reduce((acc, e) => acc += String.fromCharCode(e), '');
+				const head = int8Array.slice(0, 3).reduce((acc, e) => acc += String.fromCharCode(e), '');
 
 				console.error('[SWF Parser] unknow file type:', head);
 
@@ -321,7 +323,7 @@ export class SWFParser extends ParserBase {
 
 		} else if (this._progressState === SWFParserProgressState.SCANNED) {
 
-			console.log('Begin parse', this.id);
+			//console.log('Begin parse', this.id);
 
 			this._progressState = SWFParserProgressState.WAIT_FOR_FACTORY;
 
@@ -422,7 +424,6 @@ export class SWFParser extends ParserBase {
 		} else {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
-			console.log('Finish parser:', this.id);
 
 			Stat.rec('parser').rec('symbols').end();
 		}
@@ -610,8 +611,6 @@ export class SWFParser extends ParserBase {
 			this._decompressor = null;
 		}
 
-		console.log('Finish loading', this.id);
-
 		this._progressState = SWFParserProgressState.SCANNED;
 		this.scanLoadedData();
 	}
@@ -705,13 +704,12 @@ export class SWFParser extends ParserBase {
 			this._uncompressedLoadedLength = 8;
 			// Parts of the header are compressed. Get those out of the way before starting tag parsing.
 			this._decompressor.onData = this.processFirstBatchOfDecompressedData.bind(this);
-			this._decompressor.onError = function (error) {
+			this._decompressor.onError = function (error: any) {
 				// TODO: Let the loader handle this error.
 				throw new Error(error + ' from:' + this.id);
 			}.bind(this);
 
 			const subb = initialBytes.subarray(8);
-			console.log('Push bytes to:', subb.length, this.id);
 
 			this._decompressor.push(subb);
 
@@ -763,8 +761,6 @@ export class SWFParser extends ParserBase {
 		const length = Math.min(data.length, this._uncompressedLength - this._uncompressedLoadedLength);
 		memCopy(this.swfData, data, this._uncompressedLoadedLength, 0, length);
 		this._uncompressedLoadedLength += length;
-
-		//console.log("Processed data size:", this._uncompressedLoadedLength, this._uncompressedLength);
 
 		if (this._uncompressedLoadedLength === this._uncompressedLength) {
 			if (this._decompressor)
