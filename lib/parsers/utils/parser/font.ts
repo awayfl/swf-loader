@@ -106,10 +106,8 @@ export function defineFont(tag: FontTag, ns: string): any {
 
 	if (fontName == 'Helvetica') fontName = 'arial';
 
-
 	const glyphs = tag.glyphs;
 	const glyphCount = glyphs ? glyphs.length : 0;
-
 
 	const font = {
 		type: 'font',
