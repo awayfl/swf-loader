@@ -15,7 +15,7 @@
  */
 
 import { FontTag, FontFlags, SwfTagCode } from '../../../factories/base/SWFTags';
-import { Font, TesselatedFontTable, DefaultFontManager, FontStyleName } from '@awayjs/scene';
+import { Font, TesselatedFontTable, DefaultFontManager, DeviceFontManager, FontStyleName } from '@awayjs/scene';
 import { GraphicsPath, ShapeRecordFlags } from '@awayjs/graphics';
 import { AttributesBuffer } from '@awayjs/stage';
 
@@ -105,7 +105,12 @@ export function defineFont(tag: FontTag, ns: string): any {
 	let fontName = tag.name || uniqueName;
 
 	if (fontName == 'Helvetica') fontName = 'arial';
-	const fontAJS: Font = DefaultFontManager.defineFont(fontName, ns);
+
+
+	const glyphs = tag.glyphs;
+	const glyphCount = glyphs ? glyphs.length : 0;
+
+
 	const font = {
 		type: 'font',
 		id: tag.id,
@@ -116,11 +121,9 @@ export function defineFont(tag: FontTag, ns: string): any {
 		metrics: null,
 		data: tag.data,
 		originalSize: false,
-		away: fontAJS,
+		away: null,
 		fontStyleName: FontStyleName.STANDART,
 	};
-	fontAJS.name = fontName;
-
 	let fontStyleName = FontStyleName.STANDART;
 	if (font.bold && !font.italic) {
 		fontStyleName = FontStyleName.BOLD;
@@ -129,8 +132,15 @@ export function defineFont(tag: FontTag, ns: string): any {
 	} else if (font.bold && font.italic) {
 		fontStyleName = FontStyleName.BOLDITALIC;
 	}
-
 	font.fontStyleName = fontStyleName;
+
+	if (!glyphCount) {
+		font.away = DeviceFontManager.getDeviceFont(fontName);
+		return font;
+	}
+	const fontAJS: Font = DefaultFontManager.defineFont(fontName, ns);
+	font.away = fontAJS;
+	fontAJS.name = fontName;
 	//console.log("define font", fontName, " - ", fontStyleName);
 	const tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
 		fontAJS.create_font_table(fontStyleName, TesselatedFontTable.assetType)
@@ -139,13 +149,6 @@ export function defineFont(tag: FontTag, ns: string): any {
 	//fontAJS.font_styles.push(tessFontTableAJS);
 
 	//console.log("parsed font = ", fontName, fontStyleName);
-
-	const glyphs = tag.glyphs;
-	const glyphCount = glyphs ? glyphs.length : 0;
-
-	if (!glyphCount) {
-		return font;
-	}
 
 	const tables = {};
 	const codes = [];
