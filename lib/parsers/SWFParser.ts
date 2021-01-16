@@ -525,6 +525,9 @@ export class SWFParser extends ParserBase {
 			this._pFinalizeAsset(assetsToFinalize[key]);
 		}
 
+		if (this._swfFile.sceneAndFrameLabelData) {
+			rootAsset.scenes = this._swfFile.sceneAndFrameLabelData.scenes;
+		}
 		this._pFinalizeAsset(rootAsset, 'scene');
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);

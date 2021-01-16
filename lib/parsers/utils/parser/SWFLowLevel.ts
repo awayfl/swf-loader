@@ -811,9 +811,15 @@ export function parseDefineSceneTag(stream: Stream, tagCode: number): SceneTag {
 		scenes.push({
 			offset: stream.readEncodedU32(),
 			name: stream.readString(-1),
-			labels:[]
+			labels:[],
+			numFrames:-1,
 		});
+		if (scenes.length > 1) {
+			scenes[scenes.length - 2].numFrames =
+				scenes[scenes.length - 1].offset - scenes[scenes.length - 2].offset;
+		}
 	}
+
 	// @todo: do we need to sort scenes, or are they coming in in order of offset ?
 	//scenes.sort(sortScenes);
 

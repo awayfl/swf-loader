@@ -541,6 +541,7 @@ export interface Scene {
 	offset: number;
 	name: string;
 	labels: Label[];
+	numFrames: number;
 }
 
 export interface Label {
