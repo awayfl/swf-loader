@@ -17,6 +17,8 @@ export {
 export { SWFABCExtractor } from "./lib/parsers/SWFABCExtractor";
 export { SWFParser } from "./lib/parsers/SWFParser";
 
+export { OpenTypeParser } from "./lib/parsers/utils/parser/OpenTypeParser";
+
 export {
   Debug,
   release,

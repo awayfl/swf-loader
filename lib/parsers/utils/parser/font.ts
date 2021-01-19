@@ -18,6 +18,7 @@ import { FontTag, FontFlags, SwfTagCode } from '../../../factories/base/SWFTags'
 import { Font, TesselatedFontTable, DefaultFontManager, DeviceFontManager, FontStyleName } from '@awayjs/scene';
 import { GraphicsPath, ShapeRecordFlags } from '@awayjs/graphics';
 import { AttributesBuffer } from '@awayjs/stage';
+import { OpenTypeParser } from './OpenTypeParser';
 
 const pow = Math.pow;
 const min = Math.min;
@@ -106,6 +107,11 @@ export function defineFont(tag: FontTag, ns: string): any {
 
 	if (fontName == 'Helvetica') fontName = 'arial';
 
+	let openTypeFont;
+	if (tag.code == SwfTagCode.CODE_DEFINE_FONT4) {
+		openTypeFont = OpenTypeParser.parseData(tag);
+	}
+
 	const glyphs = tag.glyphs;
 	const glyphCount = glyphs ? glyphs.length : 0;
 
@@ -132,17 +138,27 @@ export function defineFont(tag: FontTag, ns: string): any {
 	}
 	font.fontStyleName = fontStyleName;
 
-	if (!glyphCount) {
+	if (!glyphCount && !openTypeFont) {
 		font.away = DeviceFontManager.getDeviceFont(fontName);
 		return font;
 	}
-	const fontAJS: Font = DefaultFontManager.defineFont(fontName, ns);
+	let fontAJS: Font;
+	if (openTypeFont)
+		fontAJS = DefaultFontManager.defineFont_CFF(fontName, ns);
+	else
+		fontAJS = DefaultFontManager.defineFont(fontName, ns);
+
 	font.away = fontAJS;
 	fontAJS.name = fontName;
 	//console.log("define font", fontName, " - ", fontStyleName);
 	const tessFontTableAJS: TesselatedFontTable = <TesselatedFontTable>(
 		fontAJS.create_font_table(fontStyleName, TesselatedFontTable.assetType)
 	);
+	if (openTypeFont) {
+		tessFontTableAJS.changeOpenTypeFont(openTypeFont);
+		return font;
+
+	}
 	//var tessFontTableAJS:TesselatedFontTable=new TesselatedFontTable();
 	//fontAJS.font_styles.push(tessFontTableAJS);
 

@@ -782,7 +782,7 @@ export function parseDefineFont4Tag(stream: Stream, swfVersion: number, tagCode:
 	const flags = tag.flags = stream.readUi8();
 	tag.name = stream.readString(-1);
 	if (flags & FontFlags.WideOrHasFontData) {
-		tag.data = stream.bytes.subarray(stream.pos, tagEnd);
+		tag.data = stream.bytes.slice(stream.pos, tagEnd);
 		stream.pos = tagEnd;
 	}
 	return tag;
