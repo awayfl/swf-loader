@@ -58,6 +58,8 @@ type TLazyParsed = {
 	lazyTaskDone?: (f: any) => void
 };
 
+const buttonStateNames = ['up', 'over', 'down', 'hitTest'];
+
 const lazyCallbackProvider = (self['requestIdleCallback'] || self.requestAnimationFrame);
 // stop run next qued task if this is runs so slow;
 const MAX_TASK_TIME = 4;
@@ -648,10 +650,14 @@ export class SymbolDecoder implements ISymbolDecoder {
 			isButton = true;
 			symbol.isButton = true;
 			swfFrames = [];
-			for (key in states) {
+			for (let i = 0; i < 4; i++) {
 				const newSWFFrame: SWFFrame = new SWFFrame();
-				newSWFFrame.controlTags = states[key];
-				newSWFFrame.buttonStateName = key;
+				const stateName = buttonStateNames[i];
+				newSWFFrame.controlTags = states[stateName];
+				if (!newSWFFrame.controlTags) {
+					console.warn('[SymbolDecoder - parsing Button: no state provided for ', stateName);
+				}
+				newSWFFrame.buttonStateName = stateName;
 				swfFrames[swfFrames.length] = newSWFFrame;
 				//console.log("buttonSound ", buttonSound);
 			}
