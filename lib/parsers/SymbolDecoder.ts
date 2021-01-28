@@ -681,7 +681,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		/**
          * @description Update Child Stream: Property Index
          */
-		const updСhildStreamPropsInd: number[] = [];
+		const updChildStreamPropsInd: number[] = [];
 
 		/**
          * @description Update Child Stream: Property Lenght
@@ -742,7 +742,12 @@ export class SymbolDecoder implements ISymbolDecoder {
 		let graphicsSprite: Sprite;
 		let doAdd = true;
 		let tag: any;
+
 		MovieClip.movieClipSoundsManagerClass = MovieClipSoundsManager;
+
+		// there only 1 command for graphics if it use a bitmapFill
+		// try to optimise it to simple rectangle shape
+		let tryOptimiseGraphics = framesLen === 1;
 
 		for (i = 0; i < framesLen; i++) {
 			noTimelineDebug || console.log('	process frame:', i + 1, '/', framesLen);
@@ -868,7 +873,12 @@ export class SymbolDecoder implements ISymbolDecoder {
 						tag = unparsedTag.tagCode === undefined ?
 							unparsedTag : <any> this.parser.getParsedTag(unparsedTag);
 
-						//console.log("parsed tag", tag);
+						tryOptimiseGraphics = tryOptimiseGraphics && (
+							tag.code === SwfTagCode.CODE_PLACE_OBJECT ||
+							tag.code === SwfTagCode.CODE_PLACE_OBJECT2 ||
+							tag.code === SwfTagCode.CODE_PLACE_OBJECT3
+						);
+
 						switch (tag.code) {
 							case SwfTagCode.CODE_START_SOUND:
 								//console.log("CODE_START_SOUND", tag)
@@ -976,6 +986,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 									flashSymbol = this.parser.dictionary[placeObjectTag.symbolId];
 									//addedIds[addedIds.length]=placeObjectTag.symbolId;
 									if (awaySymbol.isAsset(Graphics)) {
+
+										(<Graphics>awaySymbol).tryOptimiseSigleImage = tryOptimiseGraphics;
 
 										swapGraphicsID = placeObjectTag.symbolId;
 										if (!awayTimeline.graphicsPool[placeObjectTag.symbolId]) {
@@ -1390,7 +1402,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 							if (num_updated_props > 0) {
 								updateCnt++;
 								updChildStream.push(child.sessionID);
-								updСhildStreamPropsInd.push(childStartIdx);
+								updChildStreamPropsInd.push(childStartIdx);
 								updChildStreamPropsLen.push(num_updated_props);
 							}
 						}
@@ -1458,7 +1470,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		awayTimeline.add_sounds_stream = new Uint32Array(addSoundsStream);
 		awayTimeline.remove_child_stream = new Uint32Array(remChildStream);
 		awayTimeline.update_child_stream = new Uint32Array(updChildStream);
-		awayTimeline.update_child_props_indices_stream = new Uint32Array(updСhildStreamPropsInd);
+		awayTimeline.update_child_props_indices_stream = new Uint32Array(updChildStreamPropsInd);
 		awayTimeline.update_child_props_length_stream = new Uint32Array(updChildStreamPropsLen);
 		awayTimeline.property_type_stream = new Uint32Array(propStreamType);
 		awayTimeline.property_index_stream = new Uint32Array(propStreamIndex);
