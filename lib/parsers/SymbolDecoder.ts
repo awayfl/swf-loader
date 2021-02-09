@@ -47,6 +47,7 @@ import { SWFFrame } from './SWFFrame';
 import { ColorUtils, IAsset, Rectangle, WaveAudio } from '@awayjs/core';
 import { Matrix, ColorTransform } from '../factories/base/SWFTags';
 import { SWFParser } from './SWFParser';
+import { BasicPartition } from '@awayjs/view';
 
 const noTimelineDebug = true;
 const noExportsDebug = true;
@@ -273,6 +274,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 				(<any>clone.adapter).initEvents = placeObjectTag;
 			}
 		}
+		clone.partitionClass = BasicPartition;
 		clone._sessionID = sessionID;
 		return clone;
 	}

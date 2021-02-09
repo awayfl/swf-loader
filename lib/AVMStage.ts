@@ -16,7 +16,6 @@ import {
 } from '@awayjs/core';
 import {
 	DisplayObjectContainer,
-	SceneGraphPartition,
 	MovieClip,
 	FrameScriptManager,
 	MouseManager,
@@ -24,7 +23,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { IPartitionEntity, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { BasicPartition, ContainerNode, IPartitionEntity, NodePool, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RendererType, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -47,8 +46,9 @@ export const enum StageDisplayState {
 export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	private _root: DisplayObjectContainer;
-	private _partition: SceneGraphPartition;
+	private _partition: BasicPartition;
 	private _renderer: DefaultRenderer;
+	private _pool: NodePool;
 	private _view: View;
 	private _pickGroup: PickGroup;
 	private _mousePicker: RaycastPicker;
@@ -170,8 +170,17 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._root;
 	}
 
+	public get pool(): NodePool {
+		return this._pool;
+	}
+
 	public get view(): View {
 		return this._view;
+	}
+
+	public get pickGroup():PickGroup
+	{
+		return this._pickGroup;
 	}
 
 	public get mousePicker(): RaycastPicker {
@@ -227,8 +236,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		//create the partition
 		this._root = new DisplayObjectContainer();
-		this._partition = new SceneGraphPartition(this._root, true);
-		this._root.partition = this._partition;
+		this._partition = NodePool.getRootNode(this._root, BasicPartition).partition;
+		this._pool = this._partition.rootNode.pool;
 
 		this._view = new View();
 		this._view.projection.transform.moveTo(0, 0, -1000);
@@ -638,35 +647,32 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._frameRate = value;
 	}
 
-	public getLocalMouseX(entity: IPartitionEntity): number {
-		return entity
-			.transform
-			.inverseConcatenatedMatrix3D
+	public getLocalMouseX(node: ContainerNode): number {
+		return node
+			.getInverseMatrix3D()
 			.transformVector(
 				this._renderer.view.unproject(
 					this._view.stage.screenX, this._view.stage.screenY, 1000))
 			.x;
 	}
 
-	public getLocalMouseY(entity: IPartitionEntity): number {
-		return entity
-			.transform
-			.inverseConcatenatedMatrix3D
+	public getLocalMouseY(node: ContainerNode): number {
+		return node
+			.getInverseMatrix3D()
 			.transformVector(
 				this._renderer.view.unproject(
 					this._view.stage.screenX, this._view.stage.screenY, 1000))
 			.y;
 	}
 
-	public getLocalTouchPoints(entity: IPartitionEntity): Array<TouchPoint> {
+	public getLocalTouchPoints(node: ContainerNode): Array<TouchPoint> {
 		let localPosition: Vector3D;
 		const localTouchPoints: Array<TouchPoint> = new Array<TouchPoint>();
 
 		const len: number = this._view.stage.touchPoints.length;
 		for (let i: number = 0; i < len; i++) {
-			localPosition = entity
-				.transform
-				.inverseConcatenatedMatrix3D
+			localPosition = node
+				.getInverseMatrix3D()
 				.transformVector(
 					this._renderer.view.unproject(
 						this._view.stage.touchPoints[i].x, this._view.stage.touchPoints[i].y, 1000));
