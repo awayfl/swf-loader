@@ -46,6 +46,7 @@ export const enum StageDisplayState {
 export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	private _root: DisplayObjectContainer;
+	private _rootNode: ContainerNode;
 	private _partition: BasicPartition;
 	private _renderer: DefaultRenderer;
 	private _pool: NodePool;
@@ -170,6 +171,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._root;
 	}
 
+	public get rootNode(): ContainerNode {
+		return this._rootNode;
+	}
+
 	public get pool(): NodePool {
 		return this._pool;
 	}
@@ -236,7 +241,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		//create the partition
 		this._root = new DisplayObjectContainer();
-		this._partition = NodePool.getRootNode(this._root, BasicPartition).partition;
+		this._rootNode = NodePool.getRootNode(this._root, BasicPartition);
+		this._partition = this._rootNode.partition;
 		this._pool = this._partition.rootNode.pool;
 
 		this._view = new View();
@@ -430,7 +436,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._timer = new RequestAnimationFrame(this.main_loop, this);
 		this._timer.start();
 
-		const rootMC: MovieClip = <MovieClip> this._root;
+		const rootMC: MovieClip = <MovieClip> this._root.getChildAt(0);
 		if (!rootMC) {
 			console.warn('warning: AVMPlayer.play called, but no scene is loaded');
 			return;
