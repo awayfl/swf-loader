@@ -23,7 +23,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { BasicPartition, ContainerNode, IPartitionEntity, NodePool, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { BasicPartition, ContainerNode, NodePool, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RendererType, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -183,8 +183,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._view;
 	}
 
-	public get pickGroup():PickGroup
-	{
+	public get pickGroup(): PickGroup {
 		return this._pickGroup;
 	}
 
