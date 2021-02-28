@@ -315,11 +315,18 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 		const awayMc = this.framesToTimeline(target, symbol, symbol.frames, null, null);
 
-		if (symbol.scalingGrid)
-			awayMc.scale9Grid = new Rectangle(symbol.scalingGrid.xMin / 20,
-				symbol.scalingGrid.yMin / 20,
-				symbol.scalingGrid.xMax / 20,
-				symbol.scalingGrid.yMax / 20);
+		if (symbol.scalingGrid) {
+			const {
+				xMin, xMax, yMin, yMax
+			} = symbol.scalingGrid;
+
+			awayMc.scale9Grid = new Rectangle(
+				xMin / 20,
+				yMin / 20,
+				(xMax - xMin) / 20,
+				(yMax - yMin) / 20
+			);
+		}
 
 		(<any>awayMc).className = symbol.className;
 		awayMc.name = name || 'AwayJS_mc_' + symbol.id.toString();
