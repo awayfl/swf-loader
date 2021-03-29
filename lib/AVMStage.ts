@@ -24,7 +24,7 @@ import {
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
 import { BasicPartition, ContainerNode, NodePool, PickGroup, RaycastPicker, View } from '@awayjs/view';
-import { DefaultRenderer, RendererType, RenderGroup } from '@awayjs/renderer';
+import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
 import { StageScaleMode } from './factories/as3webFlash/display/StageScaleMode';
@@ -251,7 +251,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._mousePicker.shapeFlag = true;
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
-		this._renderer = RenderGroup.getInstance(this._view, RendererType.DEFAULT).getRenderer(this._partition);
+		this._renderer = RenderGroup.getInstance(this._view, DefaultRenderer).getRenderer(this._partition);
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;

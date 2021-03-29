@@ -1,27 +1,14 @@
 import {
-	WaveAudioParser,
-	Rectangle,
-	WaveAudio,
 	URLLoaderDataFormat,
 	IAsset,
 	ParserBase,
-	ResourceDependency,
 	ByteArray,  AssetBase
 } from '@awayjs/core';
 
-import { Image2DParser, BitmapImage2D } from '@awayjs/stage';
-
 import {
-	DefaultFontManager,
-	Sprite,
 	ISceneGraphFactory,
-	DefaultSceneGraphFactory,
-	MovieClip,
-	TextFormatAlign,
-	SceneImage2D
 } from '@awayjs/scene';
 
-import { MethodMaterial, ImageTexture2D } from '@awayjs/materials';
 import {
 	assert,
 	IDataDecoder,
@@ -41,9 +28,7 @@ import { Inflate, LzmaDecoder } from '@awayjs/graphics';
 
 import {
 	parseHeader,
-	parseRgb,
 	parseSoundStreamHeadTag,
-	parseDefineSceneTag,
 	parseSoundInfo,
 	tagHandlers
 } from '../parsers/utils/parser/SWFLowLevel';
@@ -57,7 +42,6 @@ import { defineBitmap } from '../parsers/utils/parser/bitmap';
 import { defineImage } from '../parsers/utils/parser/image';
 import { defineLabel } from '../parsers/utils/parser/label';
 import { SWFFrame } from './SWFFrame';
-import { SWFFile } from './SWFFile';
 
 import {
 	SwfTagCode,
@@ -68,11 +52,10 @@ import {
 	getSwfTagCodeName
 } from '../factories/base/SWFTags';
 
-import { IBinarySymbol, IButtonSymbol, ISymbol, SYMBOL_TYPE,  } from './ISymbol';
+import { SYMBOL_TYPE } from './ISymbol';
 import { SymbolDecoder } from './SymbolDecoder';
 
 import { CompressionMethod } from './CompressionMethod';
-import { release } from '../factories/base/utilities/Debug';
 import { Stat } from '../stat/Stat';
 
 class GenericAsset<T> extends AssetBase {

@@ -18,7 +18,8 @@ import {
 	SceneImage2D
 } from '@awayjs/scene';
 
-import { MethodMaterial, ImageTexture2D } from '@awayjs/materials';
+import { ImageTexture2D } from '@awayjs/renderer';
+import { MethodMaterial } from '@awayjs/materials';
 import {
 	assert,
 	IDataDecoder,
