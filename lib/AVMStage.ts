@@ -90,7 +90,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	public static runtimeStartTime: number = 0;
 
-	private static _instance: AVMStage = null;
+	protected static _instance: AVMStage = null;
 	public static instance(): AVMStage {
 		if (!AVMStage._instance)
 			throw ('AVMStage._instance should exists but does not');
@@ -389,7 +389,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	public load() {
-		this.loadNextResource();
+		this.loadNextResource(new LoaderEvent(LoaderEvent.LOADER_COMPLETE));
 	}
 
 	private _onLoaderStartDelegate: (event: LoaderEvent) => void;
