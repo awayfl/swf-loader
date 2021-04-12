@@ -1,6 +1,5 @@
 
 import { MovieClipSoundStream } from './MovieClipSoundStream';
-import { MovieClip } from '@awayjs/scene';
 import { WaveAudio } from '@awayjs/core';
 import { release } from '../base/utilities/Debug';
 
