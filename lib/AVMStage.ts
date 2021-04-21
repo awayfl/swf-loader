@@ -167,6 +167,13 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		document.addEventListener('fullscreenchange', this.onFullscreenChanged.bind(this));
 	}
 
+	public dispose() {
+		console.log('dispose');
+		this._timer.stop();
+		this._timer = null;
+		this._avmHandler.dispose();
+	}
+
 	public get root(): DisplayObjectContainer {
 		return this._root;
 	}

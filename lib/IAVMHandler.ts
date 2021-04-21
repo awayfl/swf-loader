@@ -8,6 +8,7 @@ export interface IAVMHandler{
 	init(avmStage: IAVMStage, swfFile: SWFFile, callback: (hasInit: boolean) => void): void;
 	factory: ISceneGraphFactory;
 	addAsset(asset: IAsset, addScene: boolean);
+	dispose();
 	resizeStage();
 	enterFrame(dt: number);
 }
