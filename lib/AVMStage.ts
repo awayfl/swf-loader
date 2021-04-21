@@ -103,8 +103,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		super();
 
-		if (AVMStage._instance)
-			throw ('Only one AVMStage is allowed to be constructed');
+		//if (AVMStage._instance)
+		//	throw ('Only one AVMStage is allowed to be constructed');
 
 		AVMStage._instance = this;
 
