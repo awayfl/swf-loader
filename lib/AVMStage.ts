@@ -731,7 +731,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			this._fpsTextField.style.visibility = 'hidden';
 			this._fpsTextField.innerHTML = '';
 			document.body.appendChild(this._fpsTextField);
-			this._showFrameRateIntervalID = setInterval(() => this.updateFPS(), 1000);
+			this._showFrameRateIntervalID = window.setInterval(() => this.updateFPS(), 1000);
 		} else {
 			if (this._showFrameRateIntervalID) {
 				clearInterval(this._showFrameRateIntervalID);
