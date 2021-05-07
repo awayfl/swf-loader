@@ -1,5 +1,4 @@
 import {
-	WaveAudioParser,
 	WaveAudio,
 	URLLoaderDataFormat,
 	IAsset,
@@ -34,6 +33,8 @@ import {
 	memCopy
 } from '@awayjs/graphics';
 
+import { FlashWaveAudioParser } from './FlashWaveAudioParser';
+
 import { Stream } from '../parsers/utils/stream';
 import { Inflate, LzmaDecoder } from '@awayjs/graphics';
 
@@ -66,7 +67,7 @@ import {
 	getSwfTagCodeName
 } from '../factories/base/SWFTags';
 
-import { IButtonSymbol, ISymbol, SYMBOL_TYPE,  } from './ISymbol';
+import { IButtonSymbol, ISoundSymbol, ISymbol, SYMBOL_TYPE,  } from './ISymbol';
 import { SymbolDecoder } from './SymbolDecoder';
 
 import { CompressionMethod } from './CompressionMethod';
@@ -389,23 +390,23 @@ export class SWFParser extends ParserBase {
 								false, true);
 							this.externalDependenciesCount++;
 							break;
-						case SYMBOL_TYPE.SOUND:
-							//console.log("init sound parsing", eagerlySymbol);
-							if (!eagerlySymbol.definition.packaged) {
-								console.warn('SWF-parser: Missed packaged data for sound-id:',
-									eagerlySymbol.id.toString());
+						case SYMBOL_TYPE.SOUND: {
+							const symbol: ISoundSymbol = eagerlySymbol;
+
+							if (!symbol.definition.packaged) {
+								console.warn('SWF-parser: Missed packaged data for sound-id:', symbol.id.toString());
 								break;
 							}
 
-							this._pAddDependency(
-								eagerlySymbol.id.toString(), null,
-								new WaveAudioParser(),
-								new Blob([eagerlySymbol.definition.packaged.data],
-									{ type: eagerlySymbol.definition.packaged.mimeType }),
-								false, true);
+							this._pAddDependency (
+								symbol.id.toString(), null,
+								new FlashWaveAudioParser(),
+								symbol, false, true
+							);
 
 							this.externalDependenciesCount++;
 							break;
+						}
 						case SYMBOL_TYPE.FONT:
 							//console.log("encountered eagerly parsed font: ", eagerlySymbol);
 							break;

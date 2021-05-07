@@ -63,6 +63,20 @@ export interface IImageSymbol extends ISymbol {
 	lazyParser: () => IImageSymbol;
 }
 
+export interface ISoundSymbol extends ISymbol {
+	definition: {
+		packaged?: {
+			data: Uint8Array;
+			mimeType: string;
+			seek: number;
+		};
+		pcm: any;
+		sampleRate: number;
+		samplesCount: number;
+		channels: number;
+	}
+}
+
 export interface IBinarySymbol extends BinaryDataTag, ISymbol {}
 export interface IVideoSymbol extends VideoStreamTag, ISymbol {}
 export interface IFontSymbol extends FontTag, ISymbol {}

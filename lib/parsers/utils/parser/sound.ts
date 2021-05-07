@@ -72,49 +72,57 @@ export function defineSound(tag: SoundTag) {
 	const channels = tag.soundType == SOUND_TYPE_STEREO ? 2 : 1;
 	const samplesCount = tag.samplesCount;
 	const sampleRate = SOUND_RATES[tag.soundRate];
-
 	const data = tag.soundData;
-	let pcm, packaged;
+
+	let pcm: any, packaged: any;
+
 	switch (tag.soundFormat) {
-		case SOUND_FORMAT_PCM_BE:
+		case SOUND_FORMAT_PCM_BE: {
 			pcm = new Float32Array(samplesCount * channels);
 			if (tag.soundSize == SOUND_SIZE_16_BIT) {
-				for (var i = 0, j = 0; i < pcm.length; i++, j += 2)
+				for (let i = 0, j = 0; i < pcm.length; i++, j += 2)
 					pcm[i] = ((data[j] << 24) | (data[j + 1] << 16)) / 2147483648;
 				packaged = packageWave(data, sampleRate, channels, 16, true);
 			} else {
-				for (var i = 0; i < pcm.length; i++)
+				for (let i = 0; i < pcm.length; i++)
 					pcm[i] = (data[i] - 128) / 128;
 				packaged = packageWave(data, sampleRate, channels, 8, false);
 			}
 			break;
-		case SOUND_FORMAT_PCM_LE:
+		}
+		case SOUND_FORMAT_PCM_LE: {
 			pcm = new Float32Array(samplesCount * channels);
 			if (tag.soundSize == SOUND_SIZE_16_BIT) {
-				for (var i = 0, j = 0; i < pcm.length; i++, j += 2)
+				for (let i = 0, j = 0; i < pcm.length; i++, j += 2)
 					pcm[i] = ((data[j + 1] << 24) | (data[j] << 16)) / 2147483648;
 				packaged = packageWave(data, sampleRate, channels, 16, false);
 			} else {
-				for (var i = 0; i < pcm.length; i++)
+				for (let i = 0; i < pcm.length; i++)
 					pcm[i] = (data[i] - 128) / 128;
 				packaged = packageWave(data, sampleRate, channels, 8, false);
 			}
 			break;
+		}
 		case SOUND_FORMAT_MP3:
 			packaged = {
+				seek: data[0] | (data[1] << 8),
 				data: new Uint8Array(data.subarray(2)),
 				mimeType: 'audio/mpeg'
 			};
 			break;
-		case SOUND_FORMAT_ADPCM:
-			var pcm16 = new Int16Array(samplesCount * channels);
+		case SOUND_FORMAT_ADPCM: {
+			const pcm16 = new Int16Array(samplesCount * channels);
 			decodeACPCMSoundData(data, pcm16, channels);
 			pcm = new Float32Array(samplesCount * channels);
-			for (var i = 0; i < pcm.length; i++)
+
+			for (let i = 0; i < pcm.length; i++) {
 				pcm[i] = pcm16[i] / 32768;
+			}
+
 			packaged = packageWave(new Uint8Array(pcm16.buffer), sampleRate, channels,
 				16, !(new Uint8Array(new Uint16Array([1]).buffer))[0]);
 			break;
+		}
 		default:
 			release || console.log('Unsupported audio format: ' + tag.soundFormat);
 	}
@@ -123,6 +131,7 @@ export function defineSound(tag: SoundTag) {
 		type: 'sound',
 		id: tag.id,
 		sampleRate: sampleRate,
+		samplesCount: samplesCount,
 		channels: channels,
 		pcm: pcm,
 		packaged: null

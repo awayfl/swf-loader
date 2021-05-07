@@ -33,6 +33,7 @@ import {
 	IShapeSymbol,
 	ISpriteSymbol,
 	ISymbol,
+	ISoundSymbol,
 	ITextSymbol,
 	IVideoSymbol,
 	IFontSymbol,
@@ -288,7 +289,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			symbol.lazyParser();
 		}*/
 
-		pushLazyTask(symbol);
+		//pushLazyTask(symbol);
 		shape.queueShapeTag(symbol);
 
 		shape.name = name ||  'AwayJS_shape_' + symbol.id.toString();
@@ -400,14 +401,13 @@ export class SymbolDecoder implements ISymbolDecoder {
 		return target;
 	}
 
-	private _createSound(symbol: ISymbol, target?: any, name?: string): IAsset {
+	private _createSound(symbol: ISoundSymbol, target?: any, name?: string): IAsset {
 
 		const awaySound: WaveAudio = (<WaveAudio> this.parser.awayUnresolvedSymbols[symbol.id]);
 
 		if (awaySound) {
 			(<any>awaySound).className = this.parser.symbolClassesMap[symbol.id] || null;
 			awaySound.name = (<any>awaySound).className;
-			//awaySound.play(0,false);
 		} else {
 			console.warn('SWF-parser: no sound loaded for sound-id:', symbol.id);
 		}
@@ -601,7 +601,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			}
 			case SYMBOL_TYPE.SOUND:
 			{
-				asset = this._createSound(symbol, target, name);
+				asset = this._createSound(symbol as ISoundSymbol, target, name);
 				break;
 			}
 			case SYMBOL_TYPE.BUTTON:
