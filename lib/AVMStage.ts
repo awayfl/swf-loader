@@ -43,6 +43,13 @@ export const enum StageDisplayState {
 	NORMAL = 'normal',
 }
 
+function parseRelative(value: string | number, from: number): number {
+	// not require replace %, parsefloat MUST (by spec) ignore it
+	if (typeof value === 'string' && value.includes('%')) {
+		return from * parseFloat(value) / 100;
+	}
+	return +value;
+}
 export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	private _root: DisplayObjectContainer;
@@ -65,6 +72,9 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _scaleMode: StageScaleMode;
 	private _alignAllowUpdate: boolean;
 	private _scaleModeAllowUpdate: boolean;
+
+	private _baseStageWidth: number;
+	private _baseStageHeight: number;
 	private _stageWidth: number;
 	private _stageHeight: number;
 
@@ -115,8 +125,9 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		this._avmHandlers = {};
 
-		this._stageWidth = 550;
-		this._stageHeight = 400;
+		this._baseStageWidth = this._stageWidth = 550;
+		this._baseStageHeight = this._stageHeight = 400;
+
 		this._scaleMode = StageScaleMode.SHOW_ALL;
 		this._align = StageAlign.TOP_LEFT;
 		this._scaleModeAllowUpdate = true;
@@ -348,8 +359,12 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 					// todo: these values should already been modded in the parser:
 					this.color = ColorUtils.f32_RGBA_To_f32_ARGB(swfFile.backgroundColor);
-					this.stageWidth = this._swfFile.bounds.width / 20;
-					this.stageHeight = this._swfFile.bounds.height / 20;
+
+					this._stageWidth = this._swfFile.bounds.width / 20;
+					this._stageHeight = this._swfFile.bounds.height / 20;
+					this._baseStageHeight = this._stageHeight;
+					this._baseStageWidth = this._stageWidth;
+					this.resizeCallback();
 
 					const avmName: AVMVERSION = this._swfFile.useAVM1 ? AVMVERSION.AVM1 : AVMVERSION.AVM2;
 
@@ -471,47 +486,65 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	private resizeStageInternal() {
+		const x = parseRelative(this._x, window.innerWidth);
+		const y = parseRelative(this._y, window.innerHeight);
+		const w = parseRelative(this._w, window.innerWidth);
+		const h = parseRelative(this._h, window.innerHeight);
 
-		const x: number = typeof this._x === 'string'
-			? (parseFloat(this._x.replace('%', '')) / 100) * window.innerWidth
-			: this._x;
-
-		const y: number = typeof this._y === 'string'
-			? (parseFloat(this._y.replace('%', '')) / 100) * window.innerHeight
-			: this._y;
-
-		const w: number = typeof this._w === 'string'
-			? (parseFloat(this._w.replace('%', '')) / 100) * window.innerWidth
-			: this._w;
-
-		const h: number = typeof this._h === 'string'
-			? (parseFloat(this._h.replace('%', '')) / 100) * window.innerHeight
-			: this._h;
+		// we should supress pixel ratio scaling for stage when there are scale limit
+		const supressPixelRatio = !!this._gameConfig.maxStageScale;
+		const maxScale = (+this._gameConfig.maxStageScale || 10);
+		const maxWidth = maxScale * this._baseStageWidth;
+		const maxHeight = maxScale * this._baseStageHeight;
+		const aspect = this._baseStageWidth / this._baseStageHeight;
+		const container = this._rendererStage.container;
+		const dpi = supressPixelRatio ? self.devicePixelRatio : 1;
 
 		let newX = x;
 		let newY = y;
-		let newWidth = w;
-		let newHeight = h;
+		let scaledWidth = w;
+		let scaledHeight = h;
+
+		// this is CSS bassed width/heigth, used for apply canvas style
+		// real canvas size can be greater or less render dimension
+		let targetWidth = w;
+		let targetHeight = h;
 
 		// todo: correctly implement all StageScaleModes;
 		switch (this._scaleMode) {
-			case StageScaleMode.NO_SCALE:
+			case StageScaleMode.NO_SCALE: {
 				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
 				this._stageWidth = w;
 				this._stageHeight = h;
 				break;
-			case StageScaleMode.SHOW_ALL:
-				newHeight = h;
-				newWidth = (this._stageWidth / this._stageHeight) * newHeight;
-				if (newWidth > w) {
-					newWidth = w;
-					newHeight = newWidth * (this._stageHeight / this._stageWidth);
+			}
+			case StageScaleMode.SHOW_ALL: {
+				targetHeight = h;
+				targetWidth = aspect * h;
+
+				scaledHeight = Math.min(maxHeight, targetHeight * dpi);
+				scaledWidth = aspect * scaledHeight;
+
+				if (targetWidth > w || scaledWidth > maxWidth) {
+					targetWidth = w ;
+					targetHeight = w / aspect;
+
+					scaledWidth = Math.min(maxWidth, targetWidth * dpi);
+					scaledHeight = scaledWidth / aspect;
 				}
-				newX += (w - newWidth) / 2;
-				newY += (h - newHeight) / 2;
+
+				newX += (w - targetWidth) / 2;
+				newY += (h - targetHeight) / 2;
+
+				if (supressPixelRatio) {
+					// limit pixel ratio to 1 and supress auto scale
+					// now stage will ignore pixel ratio and will equal `scaledWidth`
+					this._rendererStage.pixelRatio = 1;
+				}
+
 				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
 				break;
-
+			}
 			case StageScaleMode.EXACT_FIT:
 			case StageScaleMode.NO_BORDER:
 				this._projection.fieldOfView = (Math.atan(h / 1000 / 2) * 360) / Math.PI;
@@ -520,6 +553,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 				console.log('Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL');
 				break;
 		}
+
 		// todo: correctly implement all alignModes;
 		switch (this._align) {
 			case StageAlign.TOP_LEFT:
@@ -533,10 +567,13 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 				break;
 		}
 
-		this._view.x = newX;
-		this._view.y = newY;
-		this._view.width = newWidth;
-		this._view.height = newHeight;
+		this._view.width = scaledWidth;
+		this._view.height = scaledHeight;
+
+		// override canvas dimension, we can scale down it
+		// this is REQUIRED because stage set dimension relative scale
+		container.style.width = targetWidth + 'px';
+		container.style.height = targetHeight + 'px';
 
 		if (this._fpsTextField)
 			this._fpsTextField.style.left = (window.innerWidth * 0.5 - 50 + 'px');
@@ -781,5 +818,9 @@ export interface IGameConfig {
 	forceJIT?: boolean;
 	files: IResourceFile[];
 	externalInterfaceID?: string;
+	/**
+	 * Maximal scale ratio for stage
+	 */
+	maxStageScale?: number;
 	[key: string]: any;
 }
