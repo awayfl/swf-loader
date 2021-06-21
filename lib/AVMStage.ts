@@ -93,6 +93,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _w: any;
 	private _h: any;
 
+	private _volume: number = 1;
 	private _isPaused: boolean;
 
 	protected _gameConfig: IGameConfig = null;
@@ -248,7 +249,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._displayState;
 	}
 
-	private onFullscreenChanged(e) {
+	private onFullscreenChanged(_e) {
 		if (!document.fullscreenElement) {
 			this._displayState = StageDisplayState.NORMAL;
 		}
@@ -287,7 +288,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._gameConfig = {
 			files: [{ data: buffer, path: url, resourceType: ResourceType.GAME }],
 		};
-		this.addEventListener(LoaderEvent.LOADER_COMPLETE, (e) => this.play());
+		this.addEventListener(LoaderEvent.LOADER_COMPLETE, (_e) => this.play());
 		this.loadNextResource();
 	}
 
@@ -311,12 +312,11 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			0xff00ffff,
 			false
 		);
-		let x = 0;
-		let y = 0;
+
 		let idx = 0;
 		let color = 0;
-		for (y = 0; y < this._stageHeight; y++) {
-			for (x = 0; x < this._stageWidth; x++) {
+		for (let y = 0; y < this._stageHeight; y++) {
+			for (let x = 0; x < this._stageWidth; x++) {
 				idx = ((this._stageHeight - 1 - y) * this._stageWidth + x) * 4;
 				color = ColorUtils.ARGBtoFloat32(oldData[idx + 3], oldData[idx], oldData[idx + 1], oldData[idx + 2]);
 				myBitmap2.setPixel32(x, y, color);
@@ -584,17 +584,20 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	private _resizeCallbackDelegate: (event: any) => void;
-	private resizeCallback(event: any = null): void {
+	private resizeCallback(_event: any = null): void {
 		this.resizeStageInternal();
 	}
 
 	public pause() {
-		AudioManager.setVolume(0);
+		// store default volume, because can be changed via game
+		this._volume = AudioManager.getVolume();
 		this._isPaused = true;
+
+		AudioManager.setVolume(0);
 	}
 
 	public unPause() {
-		AudioManager.setVolume(1);
+		AudioManager.setVolume(this._volume);
 		this._isPaused = false;
 	}
 
@@ -675,7 +678,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._align;
 	}
 
-	public set accessibilityImplementation(value: any) {
+	public set accessibilityImplementation(_value: any) {
 		//todo: any is AccessibilityImplementation
 		console.log('AVMStage:  accessibilityImplementation not implemented');
 	}
