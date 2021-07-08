@@ -36,6 +36,7 @@ import { IAVMHandler } from './IAVMHandler';
 import { SWFFile } from './parsers/SWFFile';
 import { IAVMStage } from './IAVMStage';
 import { AVMEvent } from './AVMEvent';
+import { globalRedirectRules } from './redirectResolver';
 
 export const enum StageDisplayState {
 	FULL_SCREEN = 'fullScreen',
@@ -144,8 +145,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		if (gameConfig.forceINT) {
 			AVMStage.forceINT = gameConfig.forceINT;
 		}
+
+		this.showFrameRate = gameConfig.showFPS;
+
 		this._frameRate = 30;
-		this._showFrameRate = false;
 		this._showFrameRateIntervalID = -1;
 
 		this._x = gameConfig.x ? gameConfig.x : 0;
@@ -411,6 +414,12 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	public load() {
+		if (!this._gameConfig.files || !this._gameConfig.files.length) {
+			throw ("AVMStage: gameConfig.files must have positive length");
+		}
+
+		globalRedirectRules.push.apply(globalRedirectRules, this._gameConfig.redirects);
+
 		this.loadNextResource(new LoaderEvent(LoaderEvent.LOADER_COMPLETE));
 	}
 
