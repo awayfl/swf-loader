@@ -415,7 +415,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	public load() {
 		if (!this._gameConfig.files || !this._gameConfig.files.length) {
-			throw ("AVMStage: gameConfig.files must have positive length");
+			throw ('AVMStage: gameConfig.files must have positive length');
 		}
 
 		globalRedirectRules.push.apply(globalRedirectRules, this._gameConfig.redirects);
