@@ -46,7 +46,7 @@ export function toSafeArrayString(array) {
 	return str.join(', ');
 }
 
-export function utf8decode(str: string): Uint8Array {
+function utf8decode_impl(str: string): Uint8Array {
 	const bytes = new Uint8Array(str.length * 4);
 	let b = 0;
 	for (let i = 0, j = str.length; i < j; i++) {
@@ -85,10 +85,10 @@ export function utf8decode(str: string): Uint8Array {
 			bytes[b++] = 0x80 | (code & 0x3F);
 		}
 	}
-	return bytes.subarray(0, b);
+	return bytes.slice(0, b);
 }
 
-export function utf8encode(bytes: Uint8Array): string {
+function utf8encode_impl(bytes: Uint8Array): string {
 	let j = 0, str = '';
 	while (j < bytes.length) {
 		const b1 = bytes[j++] & 0xFF;
@@ -138,56 +138,51 @@ export function utf8encode(bytes: Uint8Array): string {
 	return str;
 }
 
-// https://gist.github.com/958841
+const textEncoder = self.TextEncoder ? new self.TextEncoder() : null;
+const textDecoder = self.TextDecoder ? new self.TextDecoder() : null;
+
+let useNativeUT8: boolean = true;
+
+export function setNativeUTF8Decoding(value: boolean) {
+	useNativeUT8 = value;
+}
+
+export function getNativeUTF8Decoding() {
+	return useNativeUT8;
+}
+
+/**
+ * Encoder utf to byte array
+ * @param str string
+ */
+export function utf8decode(str: string): Uint8Array {
+	if (!textEncoder || !useNativeUT8)
+		return utf8decode_impl(str);
+
+	try {
+		return textEncoder.encode(str);
+	} catch (e) {
+		return utf8decode_impl(str);
+	}
+}
+
+/**
+ * Decode utf string from byte array
+ * @param buffer
+ */
+export function utf8encode(buffer: Uint8Array): string {
+	if (!textDecoder || !useNativeUT8)
+		return utf8encode_impl(buffer);
+
+	try {
+		return textDecoder.decode(buffer);
+	} catch (e) {
+		return utf8encode_impl(buffer);
+	}
+}
+
 export function base64EncodeBytes(bytes: Uint8Array) {
-	let base64 = '';
-	const encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-	const byteLength = bytes.byteLength;
-	const byteRemainder = byteLength % 3;
-	const mainLength = byteLength - byteRemainder;
-
-	let a, b, c, d;
-	let chunk;
-
-	// Main loop deals with bytes in chunks of 3
-	for (let i = 0; i < mainLength; i = i + 3) {
-		// Combine the three bytes into a single integer
-		chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
-
-		// Use bitmasks to extract 6-bit segments from the triplet
-		a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
-		b = (chunk & 258048) >> 12; // 258048 = (2^6 - 1) << 12
-		c = (chunk & 4032) >> 6; // 4032 = (2^6 - 1) << 6
-		d = chunk & 63; // 63 = 2^6 - 1
-
-		// Convert the raw binary segments to the appropriate ASCII encoding
-		base64 += concat4(encodings[a], encodings[b], encodings[c],
-			encodings[d]);
-	}
-
-	// Deal with the remaining bytes and padding
-	if (byteRemainder == 1) {
-		chunk = bytes[mainLength];
-
-		a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
-
-		// Set the 4 least significant bits to zero
-		b = (chunk & 3) << 4; // 3 = 2^2 - 1
-
-		base64 += concat3(encodings[a], encodings[b], '==');
-	} else if (byteRemainder == 2) {
-		chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
-
-		a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
-		b = (chunk & 1008) >> 4; // 1008 = (2^6 - 1) << 4
-
-		// Set the 2 least significant bits to zero
-		c = (chunk & 15) << 2; // 15 = 2^4 - 1
-
-		base64 += concat4(encodings[a], encodings[b], encodings[c], '=');
-	}
-	return base64;
+	return self.btoa(fromCharCodeArray(bytes));
 }
 
 const base64DecodeMap = [ // starts at 0x2B
@@ -205,37 +200,15 @@ const base64EOF = 0x3D;
  * base64-encoded data. Note that this also doesn't do any error checking.
  */
 export function decodeRestrictedBase64ToBytes(encoded: string): Uint8Array {
-	let ch: number;
-	let code: number;
-	let code2: number;
+	const byteStr = window.atob(encoded);
+	const len = byteStr.length;
+	const bytes = new Uint8Array(len);
 
-	const len = encoded.length;
-	const padding = encoded.charAt(len - 2) === '=' ? 2 : encoded.charAt(len - 1) === '=' ? 1 : 0;
-	release || assert(encoded.length % 4 === 0);
-	const decoded = new Uint8Array((encoded.length >> 2) * 3 - padding);
-
-	for (let i = 0, j = 0; i < encoded.length;) {
-		ch = encoded.charCodeAt(i++);
-		code = base64DecodeMap[ch - base64DecodeMapOffset];
-		ch = encoded.charCodeAt(i++);
-		code2 = base64DecodeMap[ch - base64DecodeMapOffset];
-		decoded[j++] = (code << 2) | ((code2 & 0x30) >> 4);
-
-		ch = encoded.charCodeAt(i++);
-		if (ch == base64EOF) {
-			return decoded;
-		}
-		code = base64DecodeMap[ch - base64DecodeMapOffset];
-		decoded[j++] = ((code2 & 0x0f) << 4) | ((code & 0x3c) >> 2);
-
-		ch = encoded.charCodeAt(i++);
-		if (ch == base64EOF) {
-			return decoded;
-		}
-		code2 = base64DecodeMap[ch - base64DecodeMapOffset];
-		decoded[j++] = ((code & 0x03) << 6) | code2;
+	for (let i = 0; i < len; i++) {
+		bytes[i] = byteStr.charCodeAt(i);
 	}
-	return decoded;
+
+	return bytes;
 }
 
 export function escapeString(str: string) {
@@ -251,8 +224,8 @@ export function escapeString(str: string) {
 /**
  * Workaround for max stack size limit.
  */
-export function fromCharCodeArray(buffer: Uint32Array): string {
-	let str = '', SLICE = 1024 * 16;
+export function fromCharCodeArray(buffer: Uint8Array | Uint32Array): string {
+	let str = '', SLICE = 1024 * 5;
 	for (let i = 0; i < buffer.length; i += SLICE) {
 		const chunk = Math.min(buffer.length - i, SLICE);
 		str += String.fromCharCode.apply(null, buffer.subarray(i, i + chunk));
