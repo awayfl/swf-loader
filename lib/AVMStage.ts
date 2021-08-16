@@ -89,6 +89,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _rendererStage: Stage;
 	private _displayState: StageDisplayState;
 
+	private _trapResize = false;
+
 	private _x: any;
 	private _y: any;
 	private _w: any;
@@ -494,7 +496,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this.resizeStageInternal();
 	}
 
-	private resizeStageInternal() {
+	private resizeStageInternal(noEmitResize = false) {
 		const x = parseRelative(this._x, window.innerWidth);
 		const y = parseRelative(this._y, window.innerHeight);
 		const w = parseRelative(this._w, window.innerWidth);
@@ -587,8 +589,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		if (this._fpsTextField)
 			this._fpsTextField.style.left = (window.innerWidth * 0.5 - 50 + 'px');
 
-		if (this._avmHandler) {
-			this._avmHandler.resizeStage();
+		// we should not a emit resize event onto stage when property changed inside AVM
+		if (this._avmHandler && !noEmitResize) {
+			// we should emit resize in loop instead of immediate, prevent stack overflow
+			this._trapResize = true;
 		}
 	}
 
@@ -621,6 +625,11 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	protected main_loop(dt: number) {
 		if (this._isPaused) {
 			return;
+		}
+
+		if (this._trapResize) {
+			this._avmHandler && this._avmHandler.resizeStage();
+			this._trapResize = false;
 		}
 
 		if (!this._avmHandler) {
@@ -679,7 +688,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		this._align = value;
 
-		this.resizeCallback();
+		this.resizeStageInternal(true);
 	}
 
 	public get accessibilityImplementation(): any {
@@ -752,7 +761,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		if (!this._scaleModeAllowUpdate)
 			return;
 		this._scaleMode = value;
-		this.resizeCallback();
+		this.resizeStageInternal(true);
 	}
 
 	public get showFrameRate(): boolean {
