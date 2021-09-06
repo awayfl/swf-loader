@@ -31,21 +31,36 @@ export function defineButton(tag: ButtonTag, dictionary: any): any {
 		// TODO: What should happen if the symbol gets defined later in the file?
 		if (characterItem) {
 			const cmd = {
-		  symbolId: characterItem.id,
-		  code: SwfTagCode.CODE_PLACE_OBJECT,
-		  depth: character.depth,
-		  flags: 0,
-		  matrix:null,
-		  cxform:null
+				symbolId: characterItem.id,
+				code: SwfTagCode.CODE_PLACE_OBJECT,
+				depth: character.depth,
+				flags: 0,
+				matrix:null,
+				cxform:null,
+				blendMode: null,
+				filters: null
 			};
+
+			if (character.filters) {
+				cmd.flags |= PlaceObjectFlags.HasFilterList;
+				cmd.filters = character.filters;
+			}
+
+			if (character.blendMode) {
+				cmd.flags |= PlaceObjectFlags.HasBlendMode;
+				cmd.blendMode = character.blendMode;
+			}
+
 			if (character.matrix) {
-		  cmd.flags |= PlaceObjectFlags.HasMatrix;
-		  cmd.matrix = character.matrix;
-	  }
+				cmd.flags |= PlaceObjectFlags.HasMatrix;
+				cmd.matrix = character.matrix;
+			}
+
 			if (character.cxform) {
 				cmd.flags |= PlaceObjectFlags.HasColorTransform;
 				cmd.cxform = character.cxform;
 			}
+
 			if (character.flags & ButtonCharacterFlags.StateUp)
 				states.up.push(cmd);
 			if (character.flags & ButtonCharacterFlags.StateOver)
