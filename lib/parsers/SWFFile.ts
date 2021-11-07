@@ -4,6 +4,7 @@ import { EagerlyParsedDictionaryEntry } from './EagerlyParsedDictionaryEntry';
 import { Bounds, DictionaryEntry, ABCBlock } from '@awayjs/graphics';
 
 export class SWFFile {
+	public hash: string = '';
 	public compression: number;//CompressionMethod;
 	public swfVersion: number;
 	public fpVersion: string;

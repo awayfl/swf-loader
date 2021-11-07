@@ -170,13 +170,8 @@ export class SWFParser extends ParserBase {
 	public soundExports: any = {};
 
 	public static ID = 0;
-	id = 0;
+	public id = 0;
 
-	/**
-	 * Creates a new AWD3Parserutils object.
-	 * @param uri The url or id of the data or file to be parsed.
-	 * @param extra The holder for extra contextual data that the parser might need.
-	 */
 	constructor(factory: ISceneGraphFactory = null) {
 		super(URLLoaderDataFormat.ARRAY_BUFFER);
 
@@ -307,7 +302,7 @@ export class SWFParser extends ParserBase {
 
 				const head = int8Array.slice(0, 3).reduce((acc, e) => acc += String.fromCharCode(e), '');
 
-				console.error('[SWF Parser] unknow file type:', head);
+				console.error('[SWF Parser] unknown file type:', head);
 
 				this.parsingFailure = true;
 				return false;
@@ -610,14 +605,24 @@ export class SWFParser extends ParserBase {
 		this.readHeaderAndInitialize(initialBytes);
 	}
 
+	computeHash(arrayBuffer: ArrayBuffer) {
+		return crypto.subtle.digest('SHA-1', arrayBuffer).then(hashBuffer => {
+			const hashArray = Array.from(new Uint8Array(hashBuffer));
+			return 'SHA-1:' + hashArray.map(b => b.toString(16)).join('');
+		});
+	}
+
 	finishLoading() {
 		if (this._decompressor) {
 			this._decompressor.close();
 			this._decompressor = null;
 		}
 
-		this._progressState = SWFParserProgressState.SCANNED;
-		this.scanLoadedData();
+		this.computeHash(this.swfData).then(hash => {
+			this.swfFile.hash = hash;
+			this._progressState = SWFParserProgressState.SCANNED;
+			this.scanLoadedData();
+		});
 	}
 
 	getSymbol(id: number): ISymbol | EagerlyParsedDictionaryEntry {
