@@ -73,6 +73,7 @@ import { SymbolDecoder } from './SymbolDecoder';
 import { CompressionMethod } from './CompressionMethod';
 import { release } from '../factories/base/utilities/Debug';
 import { Stat } from '../stat/Stat';
+import { HashUtilities } from '../factories/base/utilities/HashUtilities';
 
 const noTimelineDebug = true;
 
@@ -605,8 +606,17 @@ export class SWFParser extends ParserBase {
 		this.readHeaderAndInitialize(initialBytes);
 	}
 
-	computeHash(arrayBuffer: ArrayBuffer) {
-		return crypto.subtle.digest('SHA-1', arrayBuffer).then(hashBuffer => {
+	computeHash(data: Uint8Array) {
+		if (!crypto || !crypto.subtle) {
+			console.warn('[SWF Loader] crypto.subtle unavailable, use MD5');
+
+			const md5hash = HashUtilities.hashBytesTo128BitsMD5(data, 0, data.length);
+			const hashArray = Array.from(new Uint8Array(md5hash.buffer));
+
+			return Promise.resolve('MD5:' + hashArray.map(b => b.toString(16)).join(''));
+		}
+
+		return crypto.subtle.digest('SHA-1', data).then(hashBuffer => {
 			const hashArray = Array.from(new Uint8Array(hashBuffer));
 			return 'SHA-1:' + hashArray.map(b => b.toString(16)).join('');
 		});

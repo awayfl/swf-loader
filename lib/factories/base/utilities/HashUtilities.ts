@@ -19,6 +19,10 @@ const _md5K = new Int32Array([
 	-145523070, -1120210379, 718787259, -343485551]);
 
 export function hashBytesTo32BitsMD5(data: Uint8Array, offset: number, length: number): number {
+	return hashBytesTo128BitsMD5(data, offset, length)[0];
+}
+
+export function hashBytesTo128BitsMD5(data: Uint8Array, offset: number, length: number): Uint32Array {
 	const r = _md5R;
 	const k = _md5K;
 	let h0 = 1732584193, h1 = -271733879, h2 = -1732584194, h3 = 271733878;
@@ -76,16 +80,18 @@ export function hashBytesTo32BitsMD5(data: Uint8Array, offset: number, length: n
 		h2 = (h2 + c) | 0;
 		h3 = (h3 + d) | 0;
 	}
-	return h0;
+
+	return new Uint32Array([h0, h1, h2, h3]);
 }
 
 export function mixHash(a: number, b: number) {
 	return (((31 * a) | 0) + b) | 0;
 }
 
-export var HashUtilities = {
-	_md5R:_md5R,
-	_md5K:_md5K,
-	hashBytesTo32BitsMD5:hashBytesTo32BitsMD5,
-	mixHash:mixHash
+export const HashUtilities = {
+	_md5R,
+	_md5K,
+	hashBytesTo32BitsMD5,
+	hashBytesTo128BitsMD5,
+	mixHash
 };
