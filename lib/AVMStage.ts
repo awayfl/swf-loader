@@ -267,7 +267,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._rootNode = this._view.getNode(this._root);
 		this._partition = this._rootNode.partition;
 
-		
 		this._view.projection.transform.moveTo(0, 0, -1000);
 		this._pickGroup = PickGroup.getInstance(this._view);
 		this._mousePicker = this._pickGroup.getRaycastPicker(this._partition);
