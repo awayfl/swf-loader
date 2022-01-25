@@ -23,7 +23,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { BasicPartition, ContainerNode, NodePool, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { BasicPartition, ContainerNode, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -57,7 +57,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _rootNode: ContainerNode;
 	private _partition: BasicPartition;
 	private _renderer: DefaultRenderer;
-	private _pool: NodePool;
 	private _view: View;
 	private _pickGroup: PickGroup;
 	private _mousePicker: RaycastPicker;
@@ -199,8 +198,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._rootNode;
 	}
 
-	public get pool(): NodePool {
-		return this._pool;
+	public get pool(): View {
+		return this._view;
 	}
 
 	public get view(): View {
@@ -263,19 +262,19 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private initAwayEninge() {
 
 		//create the partition
-		this._root = new DisplayObjectContainer();
-		this._rootNode = NodePool.getRootNode(this._root, BasicPartition);
-		this._partition = this._rootNode.partition;
-		this._pool = this._partition.rootNode.pool;
-
 		this._view = new View();
+		this._root = new DisplayObjectContainer();
+		this._rootNode = this._view.getNode(this._root);
+		this._partition = this._rootNode.partition;
+
+		
 		this._view.projection.transform.moveTo(0, 0, -1000);
 		this._pickGroup = PickGroup.getInstance(this._view);
 		this._mousePicker = this._pickGroup.getRaycastPicker(this._partition);
 		this._mousePicker.shapeFlag = true;
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
-		this._renderer = RenderGroup.getInstance(this._view, DefaultRenderer).getRenderer(this._partition);
+		this._renderer = <DefaultRenderer> RenderGroup.getInstance(DefaultRenderer).getRenderer(this._partition);
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
