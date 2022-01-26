@@ -1,4 +1,3 @@
-import { registerCSSFont } from '../factories/base/utilities';
 
 const enum RECORD_STATE {
 	NONE, BEGIN, END, DROP

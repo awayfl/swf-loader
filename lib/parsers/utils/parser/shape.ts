@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { Graphics } from '@awayjs/graphics';
-import { MorphSprite } from '@awayjs/scene';
 import { ShapeTag } from '@awayjs/graphics';
 
 import { SWFParser } from '../../SWFParser';
