@@ -23,7 +23,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { BasicPartition, ContainerNode, NodePool, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { BasicPartition, ContainerNode, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -57,7 +57,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _rootNode: ContainerNode;
 	private _partition: BasicPartition;
 	private _renderer: DefaultRenderer;
-	private _pool: NodePool;
 	private _view: View;
 	private _pickGroup: PickGroup;
 	private _mousePicker: RaycastPicker;
@@ -199,10 +198,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._rootNode;
 	}
 
-	public get pool(): NodePool {
-		return this._pool;
-	}
-
 	public get view(): View {
 		return this._view;
 	}
@@ -262,30 +257,33 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	private initAwayEninge() {
 
-		//create the partition
-		this._root = new DisplayObjectContainer();
-		this._rootNode = NodePool.getRootNode(this._root, BasicPartition);
-		this._partition = this._rootNode.partition;
-		this._pool = this._partition.rootNode.pool;
+		//create the projection
+		this._projection = new PerspectiveProjection();
+		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
+		this._projection.originX = -1;
+		this._projection.originY = 1;
+		this._projection.transform.moveTo(0, 0, -1000);
+		this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
 
-		this._view = new View();
-		this._view.projection.transform.moveTo(0, 0, -1000);
-		this._pickGroup = PickGroup.getInstance(this._view);
+		//create the partition
+		this._view = new View(this._projection);
+		this._root = new DisplayObjectContainer();
+		this._rootNode = this._root.getAbstraction<ContainerNode>(this._view);
+		this._partition = this._rootNode.partition;
+
+		//create the pickers
+		this._pickGroup = PickGroup.getInstance();
 		this._mousePicker = this._pickGroup.getRaycastPicker(this._partition);
 		this._mousePicker.shapeFlag = true;
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
-		this._renderer = RenderGroup.getInstance(this._view, DefaultRenderer).getRenderer(this._partition);
+		//create the renderer
+		this._renderer = this._partition.getAbstraction<DefaultRenderer>(RenderGroup.getInstance(DefaultRenderer));
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
 		this._renderer.renderableSorter = null;//new RenderableSort2D();
 
-		this._projection = <PerspectiveProjection> this._view.projection;
-		this._projection.coordinateSystem = CoordinateSystem.RIGHT_HANDED;
-		this._projection.originX = -1;
-		this._projection.originY = 1;
-		this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
 	}
 
 	public playSWF(buffer: any, url: string) {

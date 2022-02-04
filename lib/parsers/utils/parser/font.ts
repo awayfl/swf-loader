@@ -17,7 +17,6 @@
 import { FontTag, FontFlags, SwfTagCode } from '../../../factories/base/SWFTags';
 import { Font, TesselatedFontTable, DefaultFontManager, DeviceFontManager, FontStyleName } from '@awayjs/scene';
 import { GraphicsPath, ShapeRecordFlags } from '@awayjs/graphics';
-import { AttributesBuffer } from '@awayjs/stage';
 import { OpenTypeParser } from './OpenTypeParser';
 
 const pow = Math.pow;
