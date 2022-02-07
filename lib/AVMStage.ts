@@ -1,3 +1,5 @@
+// @ts-ignore
+import assembly from "@awayjs/assembly";
 import {
 	AssetEvent,
 	LoaderEvent,
@@ -388,8 +390,9 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					this._avmHandler.init(this, this._swfFile, (hasInit) => {
 						parser.factory = this._avmHandler.factory;
 						SWFParser.factory = this._avmHandler.factory;
-						if (hasInit)
+						if (hasInit) {
 							this.dispatchEvent(new AVMEvent(AVMEvent.AVM_COMPLETE, avmName));
+						}
 					});
 				};
 			}
