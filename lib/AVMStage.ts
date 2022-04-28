@@ -149,8 +149,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			AVMStage.forceINT = gameConfig.forceINT;
 		}
 
-		this.showFrameRate = gameConfig.showFPS;
-
 		this._frameRate = 30;
 		this._showFrameRateIntervalID = -1;
 
@@ -181,6 +179,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		if (this._gameConfig.testConfig) {
 			this.avmTestHandler = new AVMTestHandler(this._gameConfig.testConfig, this);
 		}
+
+		this.showFrameRate = this._gameConfig.showFPS;
 
 		document.addEventListener('fullscreenchange', this.onFullscreenChanged.bind(this));
 	}
@@ -792,7 +792,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			document.body.appendChild(this._fpsTextField);
 			this._showFrameRateIntervalID = window.setInterval(() => this.updateFPS(), 1000);
 		} else {
-			if (this._showFrameRateIntervalID) {
+			if (this._showFrameRateIntervalID != -1) {
 				clearInterval(this._showFrameRateIntervalID);
 				this._showFrameRateIntervalID = -1;
 				document.body.removeChild(this._fpsTextField);

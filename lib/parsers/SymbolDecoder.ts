@@ -292,7 +292,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		//pushLazyTask(symbol);
 		shape.queueShapeTag(symbol);
 
-		shape.name = name ||  'AwayJS_shape_' + symbol.id.toString();
+		shape.name = name ||  'instance_shape_' + symbol.id.toString();
 		(shape as any).className = symbol.className;
 
 		if (symbol.type === SYMBOL_TYPE.MORPH) {
@@ -330,7 +330,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		}
 
 		(<any>awayMc).className = symbol.className;
-		awayMc.name = name || 'AwayJS_mc_' + symbol.id.toString();
+		awayMc.name = name || 'instance_mc_' + symbol.id.toString();
 
 		if (awayMc.buttonMode) {
 			this._buttonIds[symbol.id] = true;
@@ -419,7 +419,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		noTimelineDebug || console.log('start parsing button: ', symbol);
 		target = this.framesToTimeline(target, symbol, null, symbol.states, symbol.buttonActions, symbol.buttonSounds);
 		//awayMc._symbol=symbol;
-		target.name = name || 'AwayJS_button_' + symbol.id.toString();
+		target.name = name || 'instance_button_' + symbol.id.toString();
 		(<any>target).className = symbol.className;
 
 		this._buttonIds[symbol.id] = true;
@@ -476,7 +476,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			target.setLabelData(symbol);
 		}
 
-		target.name = name || 'AwayJS_label_' + symbol.id.toString();
+		target.name = name || 'instance_label_' + symbol.id.toString();
 		/*
         assetsToFinalize[dictionary[i].id] = target;
         this._awaySymbols[dictionary[i].id] = target;
@@ -576,7 +576,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			case SYMBOL_TYPE.MORPH:
 			{
 				asset = this._createShape(symbol as IShapeSymbol,
-					target as Shape, name || 'AwayJS_morphshape_' + symbol.id.toString());
+					target as Shape, name || 'instance_morphshape_' + symbol.id.toString());
 				break;
 			}
 			case SYMBOL_TYPE.SHAPE:
