@@ -268,6 +268,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		//create the partition
 		this._view = new View(this._projection);
 		this._root = new DisplayObjectContainer();
+		this._root.partitionClass = BasicPartition;
 		this._rootNode = this._root.getAbstraction<ContainerNode>(this._view);
 		this._partition = this._rootNode.partition;
 
