@@ -263,6 +263,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			const m = new MethodMaterial(<BitmapImage2D>asset);
 			m.alphaBlending = (<BitmapImage2D>asset).transparent;
 			clone = Billboard.getNewBillboard(m);
+			clone.mouseEnabled = false;
 		} else {
 			clone = (<any> asset.adapter).clone(false).adaptee;
 		}
