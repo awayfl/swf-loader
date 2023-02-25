@@ -1,12 +1,7 @@
 import {
-	Billboard,
 	DefaultFontManager,
-	DisplayObject,
-	FrameScriptManager,
 	IFilter,
-	IFrameScript,
 	ISceneGraphFactory,
-	ISymbolDecoder,
 	MorphSprite,
 	MovieClip,
 	Sprite,
@@ -197,9 +192,8 @@ const TF_ALIGNS: string[] = [
 	TextFormatAlign.JUSTIFY
 ];
 
-export class SymbolDecoder implements ISymbolDecoder {
+export class SymbolDecoder {
 
-	private _awaySymbols: NumberMap<IAsset> = {};
 	private _buttonIds: NumberMap<boolean> = {};
 	private _mcIds: NumberMap<boolean> = {};
 
@@ -208,77 +202,10 @@ export class SymbolDecoder implements ISymbolDecoder {
      */
 	public reqursive: boolean = true;
 
-	constructor(public parser: SWFParser) {}
+	constructor(readonly parser: SWFParser) {}
 
 	get factory(): ISceneGraphFactory {
 		return this.parser.factory;
-	}
-
-	get awaySymbols() {
-		return this._awaySymbols;
-	}
-
-	/**
-	 * prepares framescript for use in AVM
-	 * this is actually only used for AVM1
-	 * @param source
-	 * @param frameIdx
-	 */
-	public prepareFrameScriptsForAVM1(source: IFrameScript[],
-		frameIdx: number,
-		objName: string,
-		objID: number): IFrameScript[] {
-		if (!this.parser.swfFile.useAVM1) {
-			return source;
-		}
-		return this.parser.factory.createFrameScripts(source, frameIdx, objName, objID);
-	}
-
-	/**
-	 * Get a instance for a given SymbolID and assign a sessionID to it.
-	 * This is used by timeline to create children
-	 *
-	 * @param symbolID
-	 * @param sessionID
-	 */
-	public createChildInstanceForTimeline(timeline: Timeline, symbolID: number, sessionID: number): IAsset {
-
-		// if this was called we might have new constructors from timeline to process
-		FrameScriptManager.invalidAS3Constructors = true;
-
-		const asset: IAsset = this.awaySymbols[symbolID];
-		let clone: DisplayObject;
-		if (asset.isAsset(Graphics)) {
-			clone = Sprite.getNewSprite(<Graphics> asset);
-			clone.mouseEnabled = false;
-		} else if (asset.isAsset(Sprite)) {
-			clone = Sprite.getNewSprite((<Sprite> asset).graphics);
-			clone.mouseEnabled = false;
-		} else if (asset.isAsset(MorphSprite)) {
-			clone = MorphSprite.getNewMorphSprite((<MorphSprite> asset).graphics);
-			clone.mouseEnabled = false;
-		} else if (asset.isAsset(BitmapImage2D)) {
-			// enable blending for symbols, because if you place image directly on stage
-			// it not enable blend mode
-			const m = new MethodMaterial(<BitmapImage2D>asset);
-			m.alphaBlending = (<BitmapImage2D>asset).transparent;
-			clone = Billboard.getNewBillboard(m);
-			clone.mouseEnabled = false;
-		} else {
-			clone = (<any> asset.adapter).clone(false).adaptee;
-		}
-		if (this.parser.swfFile.useAVM1) {
-			const placeObjectTag: any = timeline.placeObjectTagsForSessionIDs[sessionID];
-			if (placeObjectTag
-				&& ((<any>placeObjectTag).variableName
-				|| (placeObjectTag.events && placeObjectTag.events.length > 0))) {
-				(<any>clone.adapter).placeObjectTag = placeObjectTag;
-				(<any>clone.adapter).initEvents = placeObjectTag;
-			}
-		}
-		clone.partitionClass = BasicPartition;
-		clone._sessionID = sessionID;
-		return clone;
 	}
 
 	private _createShape(symbol: IShapeSymbol & TLazyParsed, target?: Shape, name?: string): IAsset {
@@ -351,7 +278,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		(<any>target).className = symbol.className;
 
 		const flashFont = (this.reqursive ?
-			this.createAwaySymbol(symbol.tag.fontId) : this._awaySymbols[symbol.tag.fontId]) as any;
+			this.createAwaySymbol(symbol.tag.fontId) : this.factory.awaySymbols[symbol.tag.fontId]) as any;
 
 		if (flashFont) {
 			target.textFormat.font = flashFont.away;
@@ -427,7 +354,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		return target;
 		/*
         assetsToFinalize[dictionary[i].id] = awayMc;
-        this._awaySymbols[dictionary[i].id] = awayMc;
+        this.factory.awaySymbols[dictionary[i].id] = awayMc;
         */
 
 		/*
@@ -436,7 +363,7 @@ export class SymbolDecoder implements ISymbolDecoder {
         //var awayMc = this.framesToAwayTimeline(symbol.frames);
         //mySprite._symbol=symbol;
         this._pFinalizeAsset(mySprite, symbol.id);
-        this._awaySymbols[dictionary[i].id] = mySprite;
+        this.factory.awaySymbols[dictionary[i].id] = mySprite;
         */
 	}
 
@@ -450,7 +377,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 			const record: any = symbol.records[r];
 			if (record.fontId) {
 				font = this.reqursive ?
-					(this.createAwaySymbol(record.fontId) as any) : this._awaySymbols[record.fontId];
+					(this.createAwaySymbol(record.fontId) as any) : this.factory.awaySymbols[record.fontId];
 
 				if (font) {
 					//awayText.textFormat.font=font.away;
@@ -480,7 +407,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 		target.name = name || 'instance_label_' + symbol.id.toString();
 		/*
         assetsToFinalize[dictionary[i].id] = target;
-        this._awaySymbols[dictionary[i].id] = target;
+        this.factory.awaySymbols[dictionary[i].id] = target;
     */
 		target.selectable = (symbol.tag.flags && !(symbol.tag.flags & TextFlags.NoSelect));
 
@@ -551,8 +478,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 	public createAwaySymbol<T extends IAsset = IAsset>(symbol: ISymbol | number, target?: IAsset, name?: string): T {
 		if (typeof symbol === 'number') {
 			// Return existed away symbol by ID, skip getSymbol
-			if (!target && this._awaySymbols[symbol]) {
-				return this._awaySymbols[symbol] as T;
+			if (!target && this.factory.awaySymbols[symbol]) {
+				return this.factory.awaySymbols[symbol] as T;
 			}
 
 			symbol = this.parser.getSymbol(symbol) as ISymbol;
@@ -564,8 +491,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 		//name = symbol.className;
 
 		// return existed away symbol by ID inside symbol
-		if (!target && this._awaySymbols[symbol.id]) {
-			return this._awaySymbols[symbol.id] as T;
+		if (!target && this.factory.awaySymbols[symbol.id]) {
+			return this.factory.awaySymbols[symbol.id] as T;
 		}
 
 		let asset: IAsset;
@@ -634,7 +561,7 @@ export class SymbolDecoder implements ISymbolDecoder {
 				throw Error ('Unknown symbol type:' + symbol.type);
 		}
 
-		this._awaySymbols[symbol.id] = asset;
+		this.factory.awaySymbols[symbol.id] = asset;
 
 		this.parser.registerAwayAsset(asset, symbol);
 
@@ -649,8 +576,8 @@ export class SymbolDecoder implements ISymbolDecoder {
 		}
 
 		const getSymbol = this.reqursive ?
-			(id: number) => (this._awaySymbols[id] || this.createAwaySymbol(id)) :
-			(id: number) => this._awaySymbols[id];
+			(id: number) => (this.factory.awaySymbols[id] || this.createAwaySymbol(id)) :
+			(id: number) => this.factory.awaySymbols[id];
 
 		//console.log("swfFrames", swfFrames);
 		let isButton: boolean = false;
@@ -678,7 +605,6 @@ export class SymbolDecoder implements ISymbolDecoder {
 
 		let sessionIDCount: number = 0;
 		const awayTimeline: Timeline = awayMc.timeline;
-		awayMc.timeline.symbolDecoder = this;
 		const keyframe_durations: number[] = [];
 		const frameCmdInd: number[] = [];
 		const frameRecipe: number[] = [];

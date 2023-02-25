@@ -20,6 +20,7 @@ import {
 	FrameScriptManager,
 	MouseManager,
 	DefaultFontManager,
+	ISceneGraphFactory,
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
@@ -111,6 +112,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	public static forceINT: boolean = false;
+
+	public get factory():ISceneGraphFactory {
+		return this._avmHandler.factory;
+	}
 
 	constructor(gameConfig: IGameConfig) {
 

@@ -137,10 +137,6 @@ export class SWFParser extends ParserBase {
 		return this._awayUnresolvedSymbols;
 	}
 
-	public get awaySymbols() {
-		return this._symbolDecoder.awaySymbols;
-	}
-
 	private _factory: ISceneGraphFactory;
 	private _symbolDecoder: SymbolDecoder;
 	private _progressState: SWFParserProgressState;
@@ -361,7 +357,6 @@ export class SWFParser extends ParserBase {
 		(<any> this._factory).url = this._iFileName;
 		this._pContent = this._factory.createDisplayObjectContainer();
 		this._awayUnresolvedSymbols = {};
-		this._mapMatsForBitmaps = {};
 
 		if (this.abcBlocks.length && (<any> this._factory).executeABCBytes) {
 			(<any> this._factory).executeABCBytes(this.abcBlocks);
@@ -427,28 +422,7 @@ export class SWFParser extends ParserBase {
 		}
 	}
 
-	public getMaterial(bitmapIndex: number): MethodMaterial {
-		let material: MethodMaterial = this._mapMatsForBitmaps[bitmapIndex];
-		if (!material) {
-			material = new MethodMaterial();
-			let myImage = this.awaySymbols[bitmapIndex];
-			if (!myImage || (!myImage.isAsset(BitmapImage2D) && !myImage.isAsset(SceneImage2D))) {
-				release || console.log('error: can not find image for bitmapfill', myImage);
-				myImage = new BitmapImage2D(512, 512, true, 0xff0000ff, true);
-			}
-			material.ambientMethod.texture = new ImageTexture2D(myImage as any);
-
-			material.alphaBlending = true;
-			material.useColorTransform = true;
-			material.bothSides = true;
-			this._mapMatsForBitmaps[bitmapIndex] = material;
-		}
-
-		return material;
-	}
-
 	private myTestSprite: Sprite;
-	private _mapMatsForBitmaps: any;
 	private _lockFinalize = false;
 
 	public registerAwayAsset(asset: IAsset, symbol: ISymbol) {
@@ -1535,7 +1509,7 @@ function defineSymbol(swfTag, symbols, parser) {
 				rec = d.rec('font');
 				rec.begin();
 			}
-			ret = defineFont(swfTag, (<SWFParser>parser)._iFileName);
+			ret = defineFont(swfTag, parser._iFileName);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_MORPH_SHAPE:
@@ -1550,7 +1524,7 @@ function defineSymbol(swfTag, symbols, parser) {
 				rec.begin();
 			}
 
-			ret = defineShape(swfTag, parser);
+			ret = defineShape(swfTag, parser.factory);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_SOUND:

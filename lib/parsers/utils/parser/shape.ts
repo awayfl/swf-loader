@@ -19,6 +19,7 @@ import { ShapeTag } from '@awayjs/graphics';
 import { SWFParser } from '../../SWFParser';
 import { ShapeFlags } from '../../../factories/base/SWFTags';
 import { SYMBOL_TYPE } from '../../ISymbol';
+import { ISceneGraphFactory } from '@awayjs/scene';
 
 /*
  * Applies the current segment1 to the paths of all styles specified in the last
@@ -64,12 +65,12 @@ function applySegmentToStyles(segment1: PathSegment, styles,
 }
 */
 
-export function defineShape(tag: ShapeTag, parser: SWFParser): any {
+export function defineShape(tag: ShapeTag, factory: ISceneGraphFactory): any {
 	//console.log(fillPaths, linePaths);
 
 	const isMorph = tag.flags & ShapeFlags.IsMorph;
 
-	tag.parser = parser;
+	tag.factory = factory;
 	(tag as any).type = isMorph ? SYMBOL_TYPE.MORPH : SYMBOL_TYPE.SHAPE;
 
 	return tag;
