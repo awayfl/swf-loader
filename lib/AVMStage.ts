@@ -113,7 +113,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	public static forceINT: boolean = false;
 
-	public get factory():ISceneGraphFactory {
+	public get factory(): ISceneGraphFactory {
 		return this._avmHandler.factory;
 	}
 
