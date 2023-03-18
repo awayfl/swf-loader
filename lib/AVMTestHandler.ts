@@ -113,9 +113,6 @@ export class AVMTestHandler implements IInputRecorder {
 				const jsonEvent = this.config.events[this.frameIdx][i];
 				jsonEvent.preventDefault = () => { };
 				switch (jsonEvent.type) {
-					case 'click':
-						MouseManager.getInstance(null).onClick(jsonEvent);
-						break;
 					case 'dblclick':
 						MouseManager.getInstance(null).onDoubleClick(jsonEvent);
 						break;
@@ -140,9 +137,6 @@ export class AVMTestHandler implements IInputRecorder {
 						break;
 					case 'touchend':
 						MouseManager.getInstance(null).onMouseUp(jsonEvent);
-						break;
-					case 'touchend':
-						MouseManager.getInstance(null).onClick(jsonEvent);
 						break;
 					case 'mousewheel':
 						MouseManager.getInstance(null).onMouseWheel(jsonEvent);
