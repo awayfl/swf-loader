@@ -72,7 +72,7 @@ export {
 
 export { StringUtilities } from "./lib/factories/base/utilities/StringUtilities";
 export {
-  NumberUtilities,
+  clamp,
   roundHalfEven,
 } from "./lib/factories/base/utilities/NumberUtilities";
 export {

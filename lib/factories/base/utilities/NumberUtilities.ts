@@ -39,11 +39,3 @@ export function altTieBreakRound(value: number, even: boolean): number {
 export function epsilonEquals(value: number, other: number): boolean {
 	return Math.abs(value - other) < 0.0000001;
 }
-
-export const NumberUtilities = {
-	pow2:pow2,
-	clamp:clamp,
-	roundHalfEven:roundHalfEven,
-	altTieBreakRound:altTieBreakRound,
-	epsilonEquals:epsilonEquals
-};
