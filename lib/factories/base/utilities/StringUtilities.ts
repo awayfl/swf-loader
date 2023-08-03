@@ -233,12 +233,6 @@ export function fromCharCodeArray(buffer: Uint8Array | Uint32Array): string {
 	return str;
 }
 
-declare global {
-	interface Math {
-		clz32(value: number): number;
-	}
-}
-
 const _encoding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$_';
 export function variableLengthEncodeInt32(n) {
 	const e = _encoding;
