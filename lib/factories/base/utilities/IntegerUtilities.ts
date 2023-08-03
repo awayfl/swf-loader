@@ -7,7 +7,6 @@ export var f32 = new Float32Array(sharedBuffer);
 export var f64 = new Float64Array(sharedBuffer);
 export var nativeLittleEndian = new Int8Array(new Int32Array([1]).buffer)[0] === 1;
 
-
 /**
  * Convert a float into 32 bits.
  */

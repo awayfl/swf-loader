@@ -84,10 +84,10 @@ export function copyOwnPropertyDescriptors(object: Object,
 										   filter: (name: string) => boolean = null,
 										   overwrite = true,
 										   makeWritable = false) {
-	
+
 	const names = Object.getOwnPropertyNames(template);
 	for (const property of names) {
-		if (property != "constructor" &&  hasOwnProperty(template, property) && (!filter || filter(property))) {
+		if (property != 'constructor' &&  hasOwnProperty(template, property) && (!filter || filter(property))) {
 			const descriptor = Object.getOwnPropertyDescriptor(template, property);
 			if (!overwrite && hasOwnProperty(object, property)) {
 				continue;
