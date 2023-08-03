@@ -78,11 +78,11 @@ export {
 export {
   defineNonEnumerableProperty,
   getPropertyDescriptor,
-  ObjectUtilities,
   hasOwnProperty,
   copyOwnPropertyDescriptors,
   copyPropertiesByList,
   hasOwnGetter,
+  createMap,
   defineReadOnlyProperty,
   toKeyValueArray,
 } from "./lib/factories/base/utilities/ObjectUtilities";

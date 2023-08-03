@@ -128,22 +128,3 @@ export function defineNonEnumerableProperty(obj, name, value) {
 		enumerable: false
 	});
 }
-
-export const ObjectUtilities = {
-	boxValue:boxValue,
-	toKeyValueArray:toKeyValueArray,
-	isPrototypeWriteable:isPrototypeWriteable,
-	hasOwnProperty:hasOwnProperty,
-	propertyIsEnumerable:propertyIsEnumerable,
-	getPropertyDescriptor:getPropertyDescriptor,
-	hasOwnGetter:hasOwnGetter,
-	getOwnGetter:getOwnGetter,
-	hasOwnSetter:hasOwnSetter,
-	createArrayMap:createArrayMap,
-	createMap:createMap,
-	defineReadOnlyProperty:defineReadOnlyProperty,
-	copyOwnPropertyDescriptors:copyOwnPropertyDescriptors,
-	copyPropertiesByList:copyPropertiesByList,
-	defineNonEnumerableGetter:defineNonEnumerableGetter,
-	defineNonEnumerableProperty:defineNonEnumerableProperty
-};
