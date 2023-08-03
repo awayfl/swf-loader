@@ -79,27 +79,15 @@ export function defineReadOnlyProperty(object: Object, name: string, value: any)
 	});
 }
 
-export function copyProperties(object: Object, template: Object) {
-	for (const property in template) {
-		object[property] = template[property];
-	}
-}
-
-export function copyOwnProperties(object: Object, template: Object) {
-	for (const property in template) {
-		if (hasOwnProperty(template, property)) {
-			object[property] = template[property];
-		}
-	}
-}
-
 export function copyOwnPropertyDescriptors(object: Object,
 										   template: Object,
 										   filter: (name: string) => boolean = null,
 										   overwrite = true,
 										   makeWritable = false) {
-	for (const property in template) {
-		if (hasOwnProperty(template, property) && (!filter || filter(property))) {
+	
+	const names = Object.getOwnPropertyNames(template);
+	for (const property of names) {
+		if (property != "constructor" &&  hasOwnProperty(template, property) && (!filter || filter(property))) {
 			const descriptor = Object.getOwnPropertyDescriptor(template, property);
 			if (!overwrite && hasOwnProperty(object, property)) {
 				continue;
@@ -154,8 +142,6 @@ export const ObjectUtilities = {
 	createArrayMap:createArrayMap,
 	createMap:createMap,
 	defineReadOnlyProperty:defineReadOnlyProperty,
-	copyProperties:copyProperties,
-	copyOwnProperties:copyOwnProperties,
 	copyOwnPropertyDescriptors:copyOwnPropertyDescriptors,
 	copyPropertiesByList:copyPropertiesByList,
 	defineNonEnumerableGetter:defineNonEnumerableGetter,
