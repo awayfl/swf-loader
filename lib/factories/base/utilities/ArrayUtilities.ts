@@ -2,23 +2,6 @@
 import { nearestPowerOfTwo } from './IntegerUtilities';
 import { assert, release } from './Debug';
 
-export class ArrayUtilities {
-	public static popManyInto=popManyInto;
-	public static popMany=popMany;
-	public static popManyIntoVoid=popManyIntoVoid;
-	public static pushMany=pushMany;
-	public static top=top;
-	public static last=last;
-	public static peek=peek;
-	public static indexOf=indexOf;
-	public static equals=equals;
-	public static pushUnique=pushUnique;
-	public static unique=unique;
-	public static copyFrom=copyFrom;
-	public static ensureTypedArrayCapacity=ensureTypedArrayCapacity;
-	public static memCopy=memCopy;
-}
-
 /**
  * Pops elements from a source array into a destination array. This avoids
  * allocations and should be faster. The elements in the destination array
