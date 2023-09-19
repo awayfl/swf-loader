@@ -724,7 +724,7 @@ export class SymbolDecoder {
 							// this is a awayjs asset. we just update its name.
 							// all awayjs-assets will get registered on AssetLibrary
 							// by name at very end of parseSymbolsToAwayJS function
-							awayAsset.name = asset.className//;.toLowerCase(); //testing whether lowercase is needed here
+							awayAsset.name = asset.className;//;.toLowerCase(); //testing whether lowercase is needed here
 						} else {
 							// this is a binary asset.
 							// should already be handled in AXSecurityDomain.createInitializerFunction
