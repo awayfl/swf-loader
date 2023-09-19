@@ -1,6 +1,6 @@
 {
   "name": "@awayfl/swf-loader",
-  "version": "0.4.118",
+  "version": "0.4.119",
   "description": "Viewer for playing swf files",
   "main": "bundle/awayfl-swf-loader.umd.js",
   "module": "dist/index.js",
