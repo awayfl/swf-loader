@@ -154,7 +154,6 @@ class WebAudioMP3Adapter extends WebAudioAdapter {
 }
 
 export class MovieClipSoundStream {
-	public static frameRate: number = 25;
 	private data: ISampeFrameInfo;
 	private seekIndex: Array<number>;
 	private position: number;
@@ -225,8 +224,6 @@ export class MovieClipSoundStream {
 
 		let time = this.seekIndex[frameNum] / soundStreamData.channels / soundStreamData.sampleRate;
 
-		const elementTime = this.soundStreamAdapter.currentTime;
-
 		if (this.isMP3) {
 			time *= soundStreamData.channels;
 		}
@@ -237,7 +234,9 @@ export class MovieClipSoundStream {
 			this.soundStreamAdapter.playFrom(time);
 		}
 
-		let framestoSkip = ((elementTime - time) * 1000) / (1000 / MovieClipSoundStream.frameRate);
+		const elementTime = this.soundStreamAdapter.currentTime;
+
+		let framestoSkip = (elementTime - time) * MovieClipSoundsManager.frameRate;
 
 		if ((elementTime - time) < 0) {
 			framestoSkip = Math.ceil(framestoSkip);

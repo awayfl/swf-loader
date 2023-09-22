@@ -8,6 +8,9 @@ export class MovieClipSoundsManager {
 	private soundStreamHead: any;
 	private _soundStreams: MovieClipSoundStream[];
 	private _frameToSoundStream: NumberMap<MovieClipSoundStream>;
+
+	public static frameRate: number = 24;
+
 	private static activeSounds = {};
 
 	public static addActiveSound(sound: WaveAudio) {

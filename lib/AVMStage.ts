@@ -719,6 +719,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	public set frameRate(value: number) {
 		this._frameRate = value;
+		MovieClipSoundsManager.frameRate = value;
 	}
 
 	public getLocalMouseX(node: ContainerNode): number {
