@@ -562,7 +562,31 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			}
 			case StageScaleMode.EXACT_FIT:
 			case StageScaleMode.NO_BORDER:
-				this._projection.fieldOfView = (Math.atan(h / 1000 / 2) * 360) / Math.PI;
+
+				targetHeight = w / aspect;
+				targetWidth = w;
+
+				scaledWidth = Math.min(maxWidth, targetWidth * dpi);
+				scaledHeight = scaledWidth / aspect;
+
+				if (targetHeight < h || scaledHeight > maxHeight) {
+					targetWidth = h * aspect;
+					targetHeight = h;
+
+					scaledHeight = Math.min(maxHeight, targetHeight * dpi);
+					scaledWidth = scaledHeight * aspect;
+				}
+
+				newX += (w - targetWidth) / 2;
+				newY += (h - targetHeight) / 2;
+
+				if (supressPixelRatio) {
+					// limit pixel ratio to 1 and supress auto scale
+					// now stage will ignore pixel ratio and will equal `scaledWidth`
+					this._rendererStage.pixelRatio = 1;
+				}
+
+				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
 				break;
 			default:
 				console.log('Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL');
