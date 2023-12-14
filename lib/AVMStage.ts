@@ -13,6 +13,7 @@ import {
 	WaveAudioParser,
 	EventDispatcher,
 	Vector3D,
+	Point,
 } from '@awayjs/core';
 import {
 	DisplayObjectContainer,
@@ -24,7 +25,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { BasicPartition, ContainerNode, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { BasicPartition, ContainerNode, IPartitionContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -780,6 +781,15 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		}
 
 		return localTouchPoints;
+	}
+
+	public unprojectPoint(point: Point, targetCoordinateSpace: IPartitionContainer): Point {
+
+		const localPosition = this._view.getNode(targetCoordinateSpace)
+			.getInverseMatrix3D()
+			.transformVector(this._view.unproject(point.x, point.y, 1000));
+
+		return new Point(localPosition.x, localPosition.y);
 	}
 
 	public get scaleMode(): StageScaleMode {
