@@ -158,7 +158,7 @@ export class SWFParser extends ParserBase {
 		SWFParser.factory = value;
 		this._progressState = SWFParserProgressState.FACTORY_AVAILABLE;
 
-		if(this.hasTime())
+		if (this.hasTime())
 			this.proceedParsing();
 	}
 
@@ -601,7 +601,7 @@ export class SWFParser extends ParserBase {
 			this.swfFile.hash = hash;
 			this._progressState = SWFParserProgressState.SCANNED;
 			this._scanLoadedData();
-			
+
 			if (this.hasTime())
 				this.proceedParsing();
 		});
@@ -699,17 +699,17 @@ export class SWFParser extends ParserBase {
 			this._decompressor.onData = (data: Uint8Array) => {
 
 				Stat.rec('parser').rec('unzip').begin();
-		
+
 				this._processDecompressedData(data);
-		
+
 				// may be finished
 				this._decompressor.onData = this._processDecompressedData.bind(this);
-			}
+			};
 
 			this._decompressor.onError = (error: any) => {
 				// TODO: Let the loader handle this error.
 				throw new Error(error + ' from:' + this.id);
-			}
+			};
 
 			const subb = initialBytes.subarray(8);
 
