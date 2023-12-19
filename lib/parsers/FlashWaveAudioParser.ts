@@ -2,7 +2,7 @@ import { ParserBase, WaveAudio, WaveAudioData, WaveAudioParser } from '@awayjs/c
 import { ISoundSymbol } from './../parsers/ISymbol';
 
 export class FlashWaveAudioParser extends WaveAudioParser {
-	public _pProceedParsing(): boolean {
+	protected proceedParsing(): void {
 		const data: ISoundSymbol = this.data;
 		const define = data.definition!;
 
@@ -12,9 +12,9 @@ export class FlashWaveAudioParser extends WaveAudioParser {
 			startOffset: define.packaged.seek,
 		};
 		//@ts-ignore
-		this._pContent = new WaveAudio(new WaveAudioData(define.packaged.data.buffer, meta));
-		this._pFinalizeAsset(this._pContent, this._iFileName);
+		this._content = new WaveAudio(new WaveAudioData(define.packaged.data.buffer, meta));
+		this.finalizeAsset(this._content, this.fileName);
 
-		return ParserBase.PARSING_DONE;
+		this.finishParsing();
 	}
 }

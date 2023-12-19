@@ -362,7 +362,7 @@ export class SymbolDecoder {
         console.log("Button:", symbol);
         //var awayMc = this.framesToAwayTimeline(symbol.frames);
         //mySprite._symbol=symbol;
-        this._pFinalizeAsset(mySprite, symbol.id);
+        this.finalizeAsset(mySprite, symbol.id);
         this.factory.awaySymbols[dictionary[i].id] = mySprite;
         */
 	}

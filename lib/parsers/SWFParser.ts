@@ -79,10 +79,10 @@ const noTimelineDebug = true;
 
 const enum SWFParserProgressState {
 	STARTED,
-	DECODING,
+	SCANNING,
 	SCANNED,
-	WAIT_FOR_DEPENDENCY,
-	WAIT_FOR_FACTORY,
+	WAITING_FOR_FACTORY,
+	WAITING_FOR_DEPENDENCY,
 	FACTORY_AVAILABLE,
 	FINISHED
 }
@@ -157,6 +157,9 @@ export class SWFParser extends ParserBase {
 		this._factory = value;
 		SWFParser.factory = value;
 		this._progressState = SWFParserProgressState.FACTORY_AVAILABLE;
+
+		if(this.hasTime())
+			this.proceedParsing();
 	}
 
 	// will be overwritten by AVMhandlers to return Factory to SWFParser after it has been init
@@ -203,8 +206,8 @@ export class SWFParser extends ParserBase {
 	/**
 	 * @inheritDoc
 	 */
-	public _iResolveDependency(resourceDependency: ResourceDependency): void {
-		//console.log("_iResolveDependency", resourceDependency);
+	public resolveDependency(resourceDependency: ResourceDependency): void {
+		//console.log("resolveDependency", resourceDependency);
 		// this will be called when Dependency has finished loading.
 		// the ressource dependecniy has a id that point to the awd_block waiting for it.
 		//console.log("SWFParser resolve dependencies";
@@ -245,6 +248,7 @@ export class SWFParser extends ParserBase {
 		if (this.externalDependenciesCount == 0) {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
+			this.finishParsing();
 		}
 
 	}
@@ -252,16 +256,17 @@ export class SWFParser extends ParserBase {
 	/**
 	 * @inheritDoc
 	 */
-	public _iResolveDependencyFailure(resourceDependency: ResourceDependency): void {
+	public resolveDependencyFailure(resourceDependency: ResourceDependency): void {
 		//not used - if a dependcy fails, the awaiting Texture or CubeTexture will never be finalized,
 		// and the default-bitmaps will be used.
 		// this means, that if one Bitmap of a CubeTexture fails,
 		// the CubeTexture will have the DefaultTexture applied for all six Bitmaps.
-		//console.log("_iResolveDependencyFailure", resourceDependency);
+		//console.log("resolveDependencyFailure", resourceDependency);
 		this.externalDependenciesCount--;
 		if (this.externalDependenciesCount == 0) {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
+			this.finishParsing();
 		}
 
 	}
@@ -271,7 +276,7 @@ export class SWFParser extends ParserBase {
 	 *
 	 * @param resourceDependency The dependency to be resolved.
 	 */
-	public _iResolveDependencyName(resourceDependency: ResourceDependency, asset: IAsset): string {
+	public resolveDependencyName(resourceDependency: ResourceDependency, asset: IAsset): string {
 		const oldName: string = asset.name;
 
 		const newName: string = asset.name;
@@ -285,11 +290,13 @@ export class SWFParser extends ParserBase {
 	/**
 	 * @inheritDoc
 	 */
-	public _pProceedParsing(): boolean {
+	protected proceedParsing(): void {
 		//console.log("SWFParser - _pProceedParsing");
 		if (this._progressState === SWFParserProgressState.STARTED) {
 
-			const byteData: ByteArray = this._pGetByteData();
+			this._progressState = SWFParserProgressState.SCANNING;
+
+			const byteData: ByteArray = this.getByteData();
 
 			// fucking ByteArray can be greater that real buffer with leading 0
 			// this is throw error in parser
@@ -299,10 +306,11 @@ export class SWFParser extends ParserBase {
 
 				const head = int8Array.slice(0, 3).reduce((acc, e) => acc += String.fromCharCode(e), '');
 
-				console.error('[SWF Parser] unknown file type:', head);
+				this.dieWithError('SWFParser unknown file type: ' + head);
 
-				this.parsingFailure = true;
-				return false;
+				return;
+			} else if (this.hasTime()) {
+				this.proceedParsing();
 			}
 
 			Stat.rec('parser').begin();
@@ -310,16 +318,13 @@ export class SWFParser extends ParserBase {
 			// get the bytedata
 			// preparse all data. after this step we can deal with tag-objects rather than bytedata
 
-			this._progressState = SWFParserProgressState.DECODING;
-			this._swfFile.url = this._iFileName;
+			this._swfFile.url = this.fileName;
 
 			this.initSWFLoading(int8Array, int8Array.length);
 
 		} else if (this._progressState === SWFParserProgressState.SCANNED) {
 
-			//console.log('Begin parse', this.id);
-
-			this._progressState = SWFParserProgressState.WAIT_FOR_FACTORY;
+			this._progressState = SWFParserProgressState.WAITING_FOR_FACTORY;
 
 			if (this._factory) {
 				this.parseSymbols();
@@ -334,6 +339,7 @@ export class SWFParser extends ParserBase {
 			}
 
 		} else if (this._progressState === SWFParserProgressState.FACTORY_AVAILABLE) {
+
 			if (!this.onFactoryRequest)
 				throw ('Error in SWFParser. no factory and noFactoryRequest method exists.');
 			if (this._factory) {
@@ -342,20 +348,14 @@ export class SWFParser extends ParserBase {
 
 			Stat.rec('parser').end();
 		}
-
-		if (this._progressState !== SWFParserProgressState.FINISHED) {
-			return ParserBase.MORE_TO_PARSE;
-		}
-
-		return ParserBase.PARSING_DONE;
 	}
 
 	private parseSymbols() {
 
 		Stat.rec('parser').rec('symbols').begin();
 
-		(<any> this._factory).url = this._iFileName;
-		this._pContent = this._factory.createDisplayObjectContainer();
+		(<any> this._factory).url = this.fileName;
+		this._content = this._factory.createDisplayObjectContainer();
 		this._awayUnresolvedSymbols = {};
 
 		if (this.abcBlocks.length && (<any> this._factory).executeABCBytes) {
@@ -374,7 +374,7 @@ export class SWFParser extends ParserBase {
 					switch (eagerlySymbol.type) {
 						case SYMBOL_TYPE.IMAGE:
 							//console.log("init image parsing", eagerlySymbol);
-							this._pAddDependency(
+							this.addDependency(
 								eagerlySymbol.id.toString(), null,
 								new Image2DParser(this._factory, eagerlySymbol.definition.alphaData),
 								new Blob([eagerlySymbol.definition.data], { type: eagerlySymbol.definition.mimeType }),
@@ -389,7 +389,7 @@ export class SWFParser extends ParserBase {
 								break;
 							}
 
-							this._pAddDependency (
+							this.addDependency (
 								symbol.id.toString(), null,
 								new FlashWaveAudioParser(),
 								symbol, false, true
@@ -412,13 +412,15 @@ export class SWFParser extends ParserBase {
 
 		}
 		if (this.externalDependenciesCount > 0) {
-			this._progressState = SWFParserProgressState.WAIT_FOR_DEPENDENCY;
-			this._pPauseAndRetrieveDependencies();
+			this._progressState = SWFParserProgressState.WAITING_FOR_DEPENDENCY;
+			this.pauseAndRetrieveDependencies();
 		} else {
 			this.parseSymbolsToAwayJS();
 			this._progressState = SWFParserProgressState.FINISHED;
 
 			Stat.rec('parser').rec('symbols').end();
+
+			this.finishParsing();
 		}
 	}
 
@@ -429,9 +431,9 @@ export class SWFParser extends ParserBase {
 		if (this._lockFinalize) return;
 
 		if (symbol.type !== SYMBOL_TYPE.FONT) {
-			this._pFinalizeAsset(asset);
+			this.finalizeAsset(asset);
 		} else {
-			this._pFinalizeAsset((symbol as any).away);
+			this.finalizeAsset((symbol as any).away);
 		}
 	}
 
@@ -494,13 +496,13 @@ export class SWFParser extends ParserBase {
 
 		// manualy send finalisation event after parsing
 		for (const key in assetsToFinalize) {
-			this._pFinalizeAsset(assetsToFinalize[key]);
+			this.finalizeAsset(assetsToFinalize[key]);
 		}
 
 		if (this._swfFile.sceneAndFrameLabelData) {
 			rootAsset.scenes = this._swfFile.sceneAndFrameLabelData.scenes;
 		}
-		this._pFinalizeAsset(rootAsset, 'scene');
+		this.finalizeAsset(rootAsset, 'scene');
 		//console.log("root-timeline: ", awayMc);
 		//console.log("AwayJS loaded SWF with "+ dictionary.length+" symbols", this._swfFile.sceneAndFrameLabelData);
 
@@ -519,13 +521,6 @@ export class SWFParser extends ParserBase {
 		TextFormatAlign.CENTER,
 		TextFormatAlign.JUSTIFY
 	];
-
-	public _pStartParsing(frameLimit: number): void {
-		//console.log("SWFParser - _pStartParsing");
-
-		super._pStartParsing(frameLimit);
-
-	}
 
 	public dispose(): void {
 
@@ -577,7 +572,7 @@ export class SWFParser extends ParserBase {
 		this._isEncrypted = false;
 		this._currentEncrActionBlocks = null;
 
-		this.readHeaderAndInitialize(initialBytes);
+		this._readHeaderAndInitialize(initialBytes);
 	}
 
 	computeHash(data: Uint8Array) {
@@ -605,7 +600,10 @@ export class SWFParser extends ParserBase {
 		this.computeHash(this.swfData).then(hash => {
 			this.swfFile.hash = hash;
 			this._progressState = SWFParserProgressState.SCANNED;
-			this.scanLoadedData();
+			this._scanLoadedData();
+			
+			if (this.hasTime())
+				this.proceedParsing();
 		});
 	}
 
@@ -623,7 +621,7 @@ export class SWFParser extends ParserBase {
 		let symbol;
 		if (unparsed.tagCode === SwfTagCode.CODE_DEFINE_SPRITE) {
 			// TODO: replace this whole silly `type` business with tagCode checking.
-			symbol = this.parseSpriteTimeline(unparsed);
+			symbol = this._parseSpriteTimeline(unparsed);
 		} else {
 			symbol = this.getParsedTag(unparsed);
 		}
@@ -650,7 +648,7 @@ export class SWFParser extends ParserBase {
 		const tag = handler(this._dataStream, this._swfFile.swfVersion, unparsed.tagCode, tagEnd, this._jpegTables);
 		const finalPos = this._dataStream.pos;
 		if (finalPos !== tagEnd) {
-			this.emitTagSlopWarning(unparsed, tagEnd);
+			this._emitTagSlopWarning(unparsed, tagEnd);
 		}
 
 		const symbol = defineSymbol(tag, this.dictionary, this);
@@ -658,7 +656,7 @@ export class SWFParser extends ParserBase {
 		return symbol;
 	}
 
-	private readHeaderAndInitialize(initialBytes: Uint8Array) {
+	private _readHeaderAndInitialize(initialBytes: Uint8Array) {
 		const swf = this._swfFile;
 
 		swf.swfVersion = initialBytes[3];
@@ -696,19 +694,29 @@ export class SWFParser extends ParserBase {
 			this.swfData.set(initialBytes.subarray(0, 8));
 
 			this._uncompressedLoadedLength = 8;
+
 			// Parts of the header are compressed. Get those out of the way before starting tag parsing.
-			this._decompressor.onData = this.processFirstBatchOfDecompressedData.bind(this);
-			this._decompressor.onError = function (error: any) {
+			this._decompressor.onData = (data: Uint8Array) => {
+
+				Stat.rec('parser').rec('unzip').begin();
+		
+				this._processDecompressedData(data);
+		
+				// may be finished
+				this._decompressor.onData = this._processDecompressedData.bind(this);
+			}
+
+			this._decompressor.onError = (error: any) => {
 				// TODO: Let the loader handle this error.
 				throw new Error(error + ' from:' + this.id);
-			}.bind(this);
+			}
 
 			const subb = initialBytes.subarray(8);
 
 			this._decompressor.push(subb);
 
 		} else {
-			//console.log("readHeaderAndInitialize isUncompressed");
+			//console.log("_readHeaderAndInitialize isUncompressed");
 			this.swfData.set(initialBytes);
 			this._uncompressedLoadedLength = initialBytes.length;
 			this._decompressor = null;
@@ -733,19 +741,7 @@ export class SWFParser extends ParserBase {
 		//console.log("parseHeaderContents this._swfFile.frameCount", this._swfFile.frameCount);
 	}
 
-	private processFirstBatchOfDecompressedData(data: Uint8Array) {
-
-		Stat.rec('parser').rec('unzip').begin();
-
-		this.processDecompressedData(data);
-
-		// may be finished
-		if (this._decompressor) {
-			this._decompressor.onData = this.processDecompressedData.bind(this);
-		}
-	}
-
-	private processDecompressedData(data: Uint8Array) {
+	private _processDecompressedData(data: Uint8Array) {
 		// Make sure we don't cause an exception here
 		// when trying to set out-of-bound data by clamping the number of bytes
 		// to write to the remaining space in our buffer. If this is the case, we probably got a wrong file length from
@@ -766,26 +762,26 @@ export class SWFParser extends ParserBase {
 
 	}
 
-	private scanLoadedData() {
+	private _scanLoadedData() {
 		//SWF.enterTimeline('Scan loaded SWF file tags');
 		this._dataStream.pos = this._lastScanPosition;
 
 		Stat.rec('parser').rec('scanTags').begin();
-		this.scanTagsToOffset(this._uncompressedLoadedLength, true);
+		this._scanTagsToOffset(this._uncompressedLoadedLength, true);
 		Stat.rec('parser').rec('scanTags').end();
 
 		this._lastScanPosition = this._dataStream.pos;
 		//SWF.leaveTimeline();
 	}
 
-	private scanTagsToOffset(endOffset: number, rootTimelineMode: boolean) {
+	private _scanTagsToOffset(endOffset: number, rootTimelineMode: boolean) {
 		// `parsePos` is always at the start of a tag at this point, because it only gets updated
 		// when a tag has been fully parsed.
 
 		const tempTag = new UnparsedTag(0, 0, 0);
 		let pos: number;
 		while ((pos = this._dataStream.pos) < endOffset - 1) {
-			//console.log("scanTagsToOffset", tempTag);
+			//console.log("_scanTagsToOffset", tempTag);
 			if (!this.parseNextTagHeader(tempTag)) {
 				break;
 			}
@@ -800,9 +796,9 @@ export class SWFParser extends ParserBase {
 				this._dataStream.pos = pos;
 				return;
 			}
-			this.scanTag(tempTag, rootTimelineMode);
+			this._scanTag(tempTag, rootTimelineMode);
 			if (this._dataStream.pos !== tagEnd) {
-				this.emitTagSlopWarning(tempTag, tagEnd);
+				this._emitTagSlopWarning(tempTag, tagEnd);
 			}
 		}
 	}
@@ -865,7 +861,7 @@ export class SWFParser extends ParserBase {
 		return out;
 	}
 
-	private scanTag(tag: UnparsedTag, rootTimelineMode: boolean): void {
+	private _scanTag(tag: UnparsedTag, rootTimelineMode: boolean): void {
 		const stream: Stream = this._dataStream;
 		const byteOffset = stream.pos;
 
@@ -885,25 +881,25 @@ export class SWFParser extends ParserBase {
 			// should be ok because it doesn't make sense for them to rely on their parent being
 			// fully defined - so they don't have to come after it -, and any control tags within
 			// the parent will just pick them up the moment they're defined, just as always.
-			this.addLazySymbol(tagCode, byteOffset, tagLength);
+			this._addLazySymbol(tagCode, byteOffset, tagLength);
 			const spriteTagEnd = byteOffset + tagLength;
 			stream.pos += 4; // Jump over symbol ID and frameCount.
-			this.scanTagsToOffset(spriteTagEnd, false);
+			this._scanTagsToOffset(spriteTagEnd, false);
 			if (this._dataStream.pos !== spriteTagEnd) {
-				this.emitTagSlopWarning(tag, spriteTagEnd);
+				this._emitTagSlopWarning(tag, spriteTagEnd);
 			}
 			return;
 		}
 		if (ImageDefinitionTags[tagCode]) {
 			// Images are decoded asynchronously, so we have to deal with them ahead of time to
 			// ensure they're ready when used.
-			const unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
-			this.decodeEmbeddedImage(unparsed);
+			const unparsed = this._addLazySymbol(tagCode, byteOffset, tagLength);
+			this._decodeEmbeddedImage(unparsed);
 			return;
 		}
 		if (tagCode === SwfTagCode.CODE_DEFINE_SOUND) {
 
-			const unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
+			const unparsed = this._addLazySymbol(tagCode, byteOffset, tagLength);
 			const definition = this.getParsedTag(unparsed);
 			const symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, SYMBOL_TYPE.SOUND, definition);
 			/*if (!release && traceLevel.value > 0) {
@@ -916,35 +912,35 @@ export class SWFParser extends ParserBase {
 			return;
 		}
 		if (FontDefinitionTags[tagCode]) {
-			const unparsed = this.addLazySymbol(tagCode, byteOffset, tagLength);
+			const unparsed = this._addLazySymbol(tagCode, byteOffset, tagLength);
 			this.registerEmbeddedFont(unparsed);
 			return;
 		}
 		if (DefinitionTags[tagCode]) {
-			this.addLazySymbol(tagCode, byteOffset, tagLength);
-			this.jumpToNextTag(tagLength);
+			this._addLazySymbol(tagCode, byteOffset, tagLength);
+			this._jumpToNextTag(tagLength);
 			return;
 		}
 
 		if (!rootTimelineMode &&
 			!(tagCode === SwfTagCode.CODE_SYMBOL_CLASS || tagCode === SwfTagCode.CODE_EXPORT_ASSETS)) {
-			this.jumpToNextTag(tagLength);
+			this._jumpToNextTag(tagLength);
 			return;
 		}
 
 		if (ControlTags[tagCode]) {
-			this.addControlTag(tagCode, byteOffset, tagLength);
+			this._addControlTag(tagCode, byteOffset, tagLength);
 			return;
 		}
 
 		//console.log("tagCode", tagCode);
 		switch (tagCode) {
 			case SwfTagCode.CODE_FILE_ATTRIBUTES:
-				this.setFileAttributes(tagLength);
+				this._setFileAttributes(tagLength);
 				break;
 			case SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA:
 				//console.log('CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA ');
-				this.setSceneAndFrameLabelData(tagLength);
+				this._setSceneAndFrameLabelData(tagLength);
 				break;
 			case SwfTagCode.CODE_SET_BACKGROUND_COLOR:
 				this._swfFile.backgroundColor = this._swfFile.backgroundColor = parseRgb(this._dataStream);
@@ -957,7 +953,7 @@ export class SWFParser extends ParserBase {
 						new Uint8Array(0) :
 						this.swfData.subarray(stream.pos, stream.pos + tagLength - 2);
 				}
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			case SwfTagCode.CODE_DO_ABC:
 			case SwfTagCode.CODE_DO_ABC_DEFINE:
@@ -976,7 +972,7 @@ export class SWFParser extends ParserBase {
 					this.abcBlocks.push(abcBlock);
 					stream.pos = tagEnd;
 				} else {
-					this.jumpToNextTag(tagLength);
+					this._jumpToNextTag(tagLength);
 				}
 				break;
 			case SwfTagCode.CODE_SYMBOL_CLASS:
@@ -1009,7 +1005,7 @@ export class SWFParser extends ParserBase {
 					}
 					initActionBlocks.push({ spriteId: spriteId, actionsData: actionsData, encryptedData });
 				}
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			case SwfTagCode.CODE_DO_ACTION:
 				if (this._swfFile.useAVM1) {
@@ -1022,7 +1018,7 @@ export class SWFParser extends ParserBase {
 					}
 					actionBlocks.push({ actionsData: actionsData, precedence: stream.pos, encryptedData });
 				}
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			case SwfTagCode.CODE_SOUND_STREAM_HEAD:
 			case SwfTagCode.CODE_SOUND_STREAM_HEAD2:
@@ -1054,7 +1050,7 @@ export class SWFParser extends ParserBase {
 				stream.pos = tagEnd;
 				break;
 			case SwfTagCode.CODE_SHOW_FRAME:
-				this.finishFrame();
+				this._finishFrame();
 				break;
 			case SwfTagCode.CODE_END:
 				return;
@@ -1100,18 +1096,18 @@ export class SWFParser extends ParserBase {
 			case SwfTagCode.CODE_IMPORT_ASSETS:
 			case SwfTagCode.CODE_IMPORT_ASSETS2:
 				//console.log('Unsupported tag encountered ' + tagCode + ': ' + getSwfTagCodeName(tagCode));
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			case SwfTagCode.CODE_METADATA:
 				//console.log('tag encountered ' + tagCode + ': ' + getSwfTagCodeName(tagCode));
-				this.parseMetaData(tagLength);
+				this._parseMetaData(tagLength);
 				break;
 			// These tags should be supported at some point, but for now, we ignore them.
 			case SwfTagCode.CODE_CSM_TEXT_SETTINGS:
 			case SwfTagCode.CODE_DEFINE_FONT_ALIGN_ZONES:
 			case SwfTagCode.CODE_SCRIPT_LIMITS:
 			case SwfTagCode.CODE_SET_TAB_INDEX:
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			// These tags are used by the player, but not relevant to us.
 			case SwfTagCode.CODE_ENABLE_DEBUGGER:
@@ -1123,13 +1119,13 @@ export class SWFParser extends ParserBase {
 			case SwfTagCode.CODE_PROTECT:
 			case SwfTagCode.CODE_PATHS_ARE_POSTSCRIPT:
 			case SwfTagCode.CODE_TELEMETRY:
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			// These are obsolete Generator-related tags.
 			case SwfTagCode.CODE_GEN_TAG_OBJECTS:
 			case SwfTagCode.CODE_GEN_COMMAND:
 				//console.log('tag encountered ' + tagCode + ': ' + getSwfTagCodeName(tagCode));
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			// These tags aren't used in the player.
 			case SwfTagCode.CODE_CHARACTER_SET:
@@ -1145,12 +1141,12 @@ export class SWFParser extends ParserBase {
 			case SwfTagCode.CODE_STOP_SOUND:
 			case SwfTagCode.CODE_SYNC_FRAME:
 				//console.info("Ignored tag (these shouldn't occur) " + tagCode + ': ' + getSwfTagCodeName(tagCode));
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			case SWF_ENCRYPTED_TAGS.ENCRYPTED:
 				console.log('Tag 255 present. SWF is encrypted');
 				this._isEncrypted = true;
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			case SWF_ENCRYPTED_TAGS.ENCRYPTED_CODE_BLOCK: {
 				if (this._isEncrypted) {
@@ -1158,7 +1154,7 @@ export class SWFParser extends ParserBase {
 					const data = this.swfData.subarray(byteOffset + 2, byteOffset + tagLength);
 					block.push({ data, bytePos: byteOffset + 2, size: tagLength, rawTagId: tagCode });
 				}
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 				break;
 			}
 			default:
@@ -1168,13 +1164,13 @@ export class SWFParser extends ParserBase {
 				} else {
 					console.log('Tag not handled by the parser: ' + tagCode + ': ' + getSwfTagCodeName(tagCode));
 				}
-				this.jumpToNextTag(tagLength);
+				this._jumpToNextTag(tagLength);
 		}
 	}
 
-	parseSpriteTimeline(spriteTag: DictionaryEntry) {
-		//SWF.enterTimeline("parseSpriteTimeline");
-		//console.log("parseSpriteTimeline", spriteTag);
+	private _parseSpriteTimeline(spriteTag: DictionaryEntry) {
+		//SWF.enterTimeline("_parseSpriteTimeline");
+		//console.log("_parseSpriteTimeline", spriteTag);
 		const data = this.swfData;
 		const stream = this._dataStream;
 		const dataView = this._dataView;
@@ -1288,23 +1284,23 @@ export class SWFParser extends ParserBase {
 		return timeline;
 	}
 
-	private parseMetaData(currentTagLength: number) {
+	private _parseMetaData(currentTagLength: number) {
 		//var string=this._dataStream.readString(currentTagLength);
 		this._dataStream.pos += currentTagLength;
 	}
 
-	private jumpToNextTag(currentTagLength: number) {
+	private _jumpToNextTag(currentTagLength: number) {
 		this._dataStream.pos += currentTagLength;
 	}
 
-	private emitTagSlopWarning(tag: UnparsedTag, tagEnd: number) {
+	private _emitTagSlopWarning(tag: UnparsedTag, tagEnd: number) {
 		//const consumedBytes = this._dataStream.pos - tag.byteOffset;
 		//console.log('Scanning ' + getSwfTagCodeName(tag.tagCode) + ' at offset ' + tag.byteOffset +' consumed '
 		//+ consumedBytes + ' of ' + tag.byteLength + ' bytes. (' +(tag.byteLength - consumedBytes) + ' left)');
 		this._dataStream.pos = tagEnd;
 	}
 
-	private finishFrame() {
+	private _finishFrame() {
 		if (this.pendingUpdateDelays === 0) {
 			this._swfFile.framesLoaded++;
 		}
@@ -1325,10 +1321,10 @@ export class SWFParser extends ParserBase {
 		this._currentExports = null;
 	}
 
-	private setFileAttributes(tagLength: number) {
+	private _setFileAttributes(tagLength: number) {
 		// TODO: check what happens to attributes tags that aren't the first tag.
 		if (this._swfFile.attributes) {
-			this.jumpToNextTag(tagLength);
+			this._jumpToNextTag(tagLength);
 		}
 		const bits = this.swfData[this._dataStream.pos];
 		this._dataStream.pos += 4;
@@ -1345,23 +1341,23 @@ export class SWFParser extends ParserBase {
 		//console.log("use AVM1: ", this._swfFile.useAVM1)
 	}
 
-	private setSceneAndFrameLabelData(tagLength: number) {
+	private _setSceneAndFrameLabelData(tagLength: number) {
 		if (this._swfFile.sceneAndFrameLabelData) {
-			this.jumpToNextTag(tagLength);
+			this._jumpToNextTag(tagLength);
 			return;
 		}
 		this._swfFile.sceneAndFrameLabelData = this._swfFile.sceneAndFrameLabelData
 			= parseDefineSceneTag(this._dataStream, SwfTagCode.CODE_DEFINE_SCENE_AND_FRAME_LABEL_DATA);
 	}
 
-	private addControlTag(tagCode: number, byteOffset: number, tagLength: number) {
+	private _addControlTag(tagCode: number, byteOffset: number, tagLength: number) {
 		const controlTags = this._currentControlTags || (this._currentControlTags = []);
 		controlTags.push(new UnparsedTag(tagCode, byteOffset, tagLength));
-		this.jumpToNextTag(tagLength);
+		this._jumpToNextTag(tagLength);
 
 	}
 
-	private addLazySymbol(tagCode: number, byteOffset: number, tagLength: number) {
+	private _addLazySymbol(tagCode: number, byteOffset: number, tagLength: number) {
 		const id = this._dataView.getUint16(this._dataStream.pos, true);
 		const symbol = new DictionaryEntry(id, tagCode, byteOffset, tagLength);
 		this.dictionary[id] = symbol;
@@ -1416,7 +1412,7 @@ export class SWFParser extends ParserBase {
 		stream.pos = unparsed.byteOffset + unparsed.byteLength;
 	}
 
-	private decodeEmbeddedImage(unparsed: UnparsedTag) {
+	private _decodeEmbeddedImage(unparsed: UnparsedTag) {
 		const definition = this.getParsedTag(unparsed);
 		const symbol = new EagerlyParsedDictionaryEntry(definition.id, unparsed, SYMBOL_TYPE.IMAGE, definition);
 		/*if (!release && traceLevel.value > 0) {
@@ -1509,7 +1505,7 @@ function defineSymbol(swfTag, symbols, parser) {
 				rec = d.rec('font');
 				rec.begin();
 			}
-			ret = defineFont(swfTag, parser._iFileName);
+			ret = defineFont(swfTag, parser.fileName);
 			break;
 		}
 		case SwfTagCode.CODE_DEFINE_MORPH_SHAPE:

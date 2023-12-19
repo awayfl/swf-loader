@@ -355,7 +355,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._curFile = this._gameConfig.files.shift();
 		if (this._curFile) {
 			const parser = new SWFParser();
-			parser._iFileName = this._curFile.path;
+			parser.fileName = this._curFile.path;
 			if (this._curFile.resourceType != ResourceType.GAME) {
 				DefaultFontManager.deviceFontsLoading = true;
 			} else {
