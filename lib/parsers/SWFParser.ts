@@ -309,8 +309,6 @@ export class SWFParser extends ParserBase {
 				this.dieWithError('SWFParser unknown file type: ' + head);
 
 				return;
-			} else if (this.hasTime()) {
-				this.proceedParsing();
 			}
 
 			Stat.rec('parser').begin();
@@ -333,9 +331,6 @@ export class SWFParser extends ParserBase {
 					throw ('Error in SWFParser. no factory and noFactoryRequest method exists.');
 
 				this.onFactoryRequest(this._swfFile);
-				if (this._factory) {
-					this.parseSymbols();
-				}
 			}
 
 		} else if (this._progressState === SWFParserProgressState.FACTORY_AVAILABLE) {
