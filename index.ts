@@ -41,7 +41,6 @@ export { MovieClipSoundsManager } from "./lib/factories/timelinesounds/MovieClip
 export { MovieClipSoundStream } from "./lib/factories/timelinesounds/MovieClipSoundStream";
 
 export {
-  MapObject,
   isIndex,
   isNullOrUndefined,
   PromiseWrapper,
@@ -82,7 +81,6 @@ export {
   copyOwnPropertyDescriptors,
   copyPropertiesByList,
   hasOwnGetter,
-  createMap,
   defineReadOnlyProperty,
   toKeyValueArray,
 } from "./lib/factories/base/utilities/ObjectUtilities";

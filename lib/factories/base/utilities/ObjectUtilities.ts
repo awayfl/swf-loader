@@ -1,6 +1,6 @@
 
 import { assert, release } from './Debug';
-import { isNullOrUndefined, isObject, MapObject } from '../utilities';
+import { isNullOrUndefined, isObject } from '../utilities';
 
 export function boxValue(value) {
 	if (isNullOrUndefined(value) || isObject(value)) {
@@ -60,14 +60,6 @@ export function getOwnGetter(object: Object, name: string): () => any {
 export function hasOwnSetter(object: Object, name: string): boolean {
 	const d = Object.getOwnPropertyDescriptor(object, name);
 	return !!(d && !!d.set);
-}
-
-export function createMap<T>(): MapObject<T> {
-	return Object.create(null);
-}
-
-export function createArrayMap<T>(): MapObject<T> {
-	return <MapObject<T>><any>[];
 }
 
 export function defineReadOnlyProperty(object: Object, name: string, value: any) {

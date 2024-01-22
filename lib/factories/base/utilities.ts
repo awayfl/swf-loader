@@ -89,48 +89,6 @@ interface Error {
 	stack: string;
 }
 
-interface Map<K, V> {
-	clear(): void;
-	delete(key: K): boolean;
-	forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, thisArg?: any): void;
-	get(key: K): V;
-	has(key: K): boolean;
-	set(key: K, value: V): Map<K, V>;
-	size: number;
-}
-
-declare var Map: {
-	new <K, V>(): Map<K, V>;
-	prototype: Map<any, any>;
-};
-
-export interface WeakMap<K, V> {
-	clear(): void;
-	delete(key: K): boolean;
-	get(key: K): V;
-	has(key: K): boolean;
-	set(key: K, value: V): WeakMap<K, V>;
-}
-
-declare var WeakMap: {
-	new <K, V>(): WeakMap<K, V>;
-	prototype: WeakMap<any, any>;
-};
-
-export interface Set<T> {
-	add(value: T): Set<T>;
-	clear(): void;
-	delete(value: T): boolean;
-	forEach(callbackfn: (value: T, index: T, set: Set<T>) => void, thisArg?: any): void;
-	has(value: T): boolean;
-	size: number;
-}
-
-export declare var Set: {
-	new <T>(): Set<T>;
-	prototype: Set<any>;
-};
-
 interface Uint8ClampedArray extends ArrayBufferView {
 	BYTES_PER_ELEMENT: number;
 	length: number;
@@ -304,10 +262,6 @@ export function getTicks(): number {
 	return performance.now();
 }
 
-export interface MapObject<T> {
-	[name: string]: T
-}
-
 /**
  * Marsaglia's algorithm, adapted from V8. Use this if you want a deterministic random number.
  */
@@ -429,7 +383,7 @@ export class WeakList<T extends IReferenceCountable> {
 
 	clear() {
 		if (this._map) {
-			this._map.clear();
+			this._map = new WeakMap<T, number>();
 		} else {
 			this._list.length = 0;
 		}

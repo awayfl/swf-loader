@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-import { getTicks, IndentingWriter, MapObject } from './utilities';
-import { createMap } from './utilities/ObjectUtilities';
+import { getTicks, IndentingWriter } from './utilities';
 
 export class Timer {
 	private static _base: Timer = new Timer(null, 'Total');
-	private static _top = Timer._base;
-	private static _flat = new Timer(null, 'Flat');
-	private static _flatStack = [];
-	private _parent: Timer;
-	private _name: string;
-	private _begin: number;
-	private _last: number;
-	private _total: number;
-	private _count: number;
-	private _timers: MapObject<Timer>;
-	constructor(parent: Timer, name: string) {
-		this._parent = parent;
-		this._timers = createMap<Timer>();
-		this._name = name;
-		this._begin = 0;
-		this._last = 0;
-		this._total = 0;
-		this._count = 0;
-	}
+	private static _top: Timer = Timer._base;
+	private static _flat: Timer = new Timer(null, 'Flat');
+	private static _flatStack: Timer[] = [];
+	
+	private _begin: number = 0;
+	private _last: number = 0;
+	private _total: number = 0;
+	private _count: number = 0;
+	private _timers: Record<string, Timer> = {};
+
+	constructor(
+		private _parent: Timer | null,
+		private _name: string
+	) {}
 
 	public static time(name, fn: Function) {
 		Timer.start(name);
@@ -55,8 +49,12 @@ export class Timer {
 
 	public static stop() {
 		Timer._top.stop();
-		Timer._top = Timer._top._parent;
-		Timer._flatStack.pop().stop();
+		const parent = Timer._top._parent
+
+		if (parent) {
+			Timer._top = parent;
+			Timer._flatStack.pop()?.stop();
+		}
 	}
 
 	public static stopStart(name) {
@@ -102,25 +100,24 @@ export class Timer {
 export class Counter {
 	public static instance: Counter = new Counter(true);
 
-	private _enabled: boolean;
-	private _counts: MapObject<number>;
-	private _times: MapObject<number>;
-	get counts(): MapObject<number> {
+	private _counts: Record<string, number> = {};
+	private _times: Record<string, number> = {};
+
+	public get counts(): Record<string, number> {
 		return this._counts;
 	}
 
-	constructor(enabled: boolean) {
-		this._enabled = enabled;
-		this.clear();
-	}
+	constructor(
+		private _enabled: boolean
+	) {}
 
 	public setEnabled(enabled: boolean) {
 		this._enabled = enabled;
 	}
 
 	public clear() {
-		this._counts = createMap<number>();
-		this._times = createMap<number>();
+		this._counts = {};
+		this._times = {};
 	}
 
 	public toJSON() {
@@ -149,7 +146,7 @@ export class Counter {
 		}
 	}
 
-	private _pairToString(times, pair): string {
+	private _pairToString(times: Record<string, number>, pair: [string, number]): string {
 		const name = pair[0];
 		const count = pair[1];
 		const time = times[name];
@@ -164,38 +161,28 @@ export class Counter {
 	}
 
 	public toStringSorted(): string {
-		const self = this;
 		const times = this._times;
-		const pairs = [];
+		const pairs: [string, number][] = [];
 		for (const name in this._counts) {
 			pairs.push([name, this._counts[name]]);
 		}
 		pairs.sort(function (a, b) {
 			return b[1] - a[1];
 		});
-		return (pairs.map(function (pair) {
-			return self._pairToString(times, pair);
-		}).join(', '));
+		return (pairs.map(pair => this._pairToString(times, pair)).join(', '));
 	}
 
 	public traceSorted(writer: IndentingWriter, inline = false) {
-		const self = this;
 		const times = this._times;
-		const pairs = [];
+		const pairs: [string, number][] = [];
 		for (const name in this._counts) {
 			pairs.push([name, this._counts[name]]);
 		}
-		pairs.sort(function (a, b) {
-			return b[1] - a[1];
-		});
+		pairs.sort((a, b) => b[1] - a[1]);
 		if (inline) {
-			writer.writeLn(pairs.map(function (pair) {
-				return self._pairToString(times, pair);
-			}).join(', '));
+			writer.writeLn(pairs.map(pair => this._pairToString(times, pair)).join(', '));
 		} else {
-			pairs.forEach(function (pair) {
-				writer.writeLn(self._pairToString(times, pair));
-			});
+			pairs.forEach(pair => writer.writeLn(this._pairToString(times, pair)));
 		}
 	}
 }
@@ -204,6 +191,7 @@ export class Average {
 	private _samples: Float64Array;
 	private _count: number;
 	private _index: number;
+
 	constructor(max) {
 		this._samples = new Float64Array(max);
 		this._count = 0;
