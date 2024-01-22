@@ -21,7 +21,7 @@ export class Timer {
 	private static _top: Timer = Timer._base;
 	private static _flat: Timer = new Timer(null, 'Flat');
 	private static _flatStack: Timer[] = [];
-	
+
 	private _begin: number = 0;
 	private _last: number = 0;
 	private _total: number = 0;
@@ -49,7 +49,7 @@ export class Timer {
 
 	public static stop() {
 		Timer._top.stop();
-		const parent = Timer._top._parent
+		const parent = Timer._top._parent;
 
 		if (parent) {
 			Timer._top = parent;
