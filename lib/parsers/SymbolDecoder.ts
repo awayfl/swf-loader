@@ -273,7 +273,7 @@ export class SymbolDecoder {
 
 		target = target || this.factory.createTextField(symbol);
 		target._symbol = symbol;
-		target.textFormat = new TextFormat();
+		const newTextFormat = new TextFormat();
 
 		(<any>target).className = symbol.className;
 
@@ -281,20 +281,21 @@ export class SymbolDecoder {
 			this.createAwaySymbol(symbol.tag.fontId) : this.factory.awaySymbols[symbol.tag.fontId]) as any;
 
 		if (flashFont) {
-			target.textFormat.font = flashFont.away;
-			target.textFormat.font_table = <TesselatedFontTable>
+			newTextFormat.font = flashFont.away;
+			newTextFormat.font_table = <TesselatedFontTable>
 				flashFont.away.get_font_table(flashFont.fontStyleName, TesselatedFontTable.assetType);
 		}
 
 		const tag = symbol.tag;
-		target.textFormat.size = tag.fontHeight / 20;
+		newTextFormat.size = tag.fontHeight / 20;
 		target.textColor = (tag.flags & TextFlags.HasColor) ? ColorUtils.f32_RGBA_To_f32_ARGB(tag.color) : 0xffffff;
-		target.textFormat.leftMargin = tag.leftMargin / 20;
-		target.textFormat.rightMargin = tag.rightMargin / 20;
-		target.textFormat.letterSpacing = tag.letterSpacing / 20;
-		target.textFormat.leading = tag.leading / 20;
-		target.textFormat.align = TF_ALIGNS[tag.align];
+		newTextFormat.leftMargin = tag.leftMargin / 20;
+		newTextFormat.rightMargin = tag.rightMargin / 20;
+		newTextFormat.letterSpacing = tag.letterSpacing / 20;
+		newTextFormat.leading = tag.leading / 20;
+		newTextFormat.align = TF_ALIGNS[tag.align];
 
+		target.newTextFormat = newTextFormat;
 		target.textOffsetX = symbol.fillBounds.xMin / 20;
 		target.textOffsetY = symbol.fillBounds.yMin / 20;
 		target.width = ((symbol.fillBounds.xMax - symbol.fillBounds.xMin) / 20);
@@ -488,7 +489,6 @@ export class SymbolDecoder {
 		if (!symbol) {
 			throw new Error('Symbol can\'t be null');
 		}
-		//name = symbol.className;
 
 		// return existed away symbol by ID inside symbol
 		if (!target && this.factory.awaySymbols[symbol.id]) {
@@ -499,7 +499,6 @@ export class SymbolDecoder {
 
 		//Stat.rec("parser").rec("symbols").rec("away").begin();
 
-		//symbol.className && console.log(symbol.type, symbol.className);
 		switch (symbol.type) {
 			case SYMBOL_TYPE.MORPH:
 			{
