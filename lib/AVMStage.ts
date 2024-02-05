@@ -166,7 +166,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._gameConfig = gameConfig;
 
 		// init awayengine
-		this.initAwayEninge();
+		this.initAwayEngine();
 		this._renderer.view.backgroundColor = 0xffffff;
 		//this._stage3Ds[this._stage3Ds.length]=new AwayStage(null, );
 		AudioManager.setVolume(1);
@@ -261,7 +261,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		}
 	}
 
-	private initAwayEninge() {
+	private initAwayEngine() {
 
 		//create the projection
 		this._projection = new PerspectiveProjection();
