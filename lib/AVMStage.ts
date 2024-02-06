@@ -118,7 +118,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._avmHandler.factory;
 	}
 
-	private _requestedRender:boolean = false;
+	private _requestedRender: boolean = false;
 
 	constructor(gameConfig: IGameConfig) {
 
@@ -683,10 +683,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._requestedRender = false;
 	}
 
-
 	public requestRender() {
 		this._requestedRender = true;
 	}
+
 	protected showNextFrame(dt: number) {
 		if (this._isPaused) {
 			MovieClipSoundsManager.enterFrame();
