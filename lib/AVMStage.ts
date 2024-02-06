@@ -118,6 +118,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._avmHandler.factory;
 	}
 
+	private _requestedRender:boolean = false;
+
 	constructor(gameConfig: IGameConfig) {
 
 		super();
@@ -652,7 +654,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	protected main_loop(dt: number) {
-		if (this._isPaused) {
+		if (this._isPaused || !this._frameRate) {
 			return;
 		}
 
@@ -669,20 +671,22 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._time += Math.min(dt, frameMarker);
 
 		if (this._time >= frameMarker) {
-
 			this._currentFps++;
 
 			this.showNextFrame(this._time);
 			this._time -= frameMarker;
+		} else if (this._requestedRender) {
+			FrameScriptManager.execute_queue();
+			this._renderer.render();
 		}
+
+		this._requestedRender = false;
 	}
+
 
 	public requestRender() {
-
-		FrameScriptManager.execute_queue();
-		this._renderer.render();
+		this._requestedRender = true;
 	}
-
 	protected showNextFrame(dt: number) {
 		if (this._isPaused) {
 			MovieClipSoundsManager.enterFrame();
@@ -828,7 +832,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			this._fpsTextField.style.visibility = 'hidden';
 			this._fpsTextField.innerHTML = '';
 			document.body.appendChild(this._fpsTextField);
-			this._showFrameRateIntervalID = window.setInterval(() => this.updateFPS(), 1000);
+			this._showFrameRateIntervalID = window.setInterval(() => this.updateFPS(), 999);
 		} else {
 			if (this._showFrameRateIntervalID != -1) {
 				clearInterval(this._showFrameRateIntervalID);
