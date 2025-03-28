@@ -175,10 +175,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		// init awayengine
 		this.initAwayEngine();
 		this._stage3Ds = Array<Stage>(StageManager.getInstance().numSlotsFree);
-		for(var i:number=0; i < this._stage3Ds.length; i++) {
+		for (let i: number = 0; i < this._stage3Ds.length; i++) {
 			this._stage3Ds[i] = StageManager.getInstance().getFreeStage(false, ContextGLProfile.BASELINE,
-				ContextMode.AUTO, !(i==0))
-			this._stage3Ds[i].clear(0,0,0,0)
+				ContextMode.AUTO, !(i == 0));
+			this._stage3Ds[i].clear(0,0,0,0);
 		}
 		this._renderer.view.backgroundAlpha = 0;
 		AudioManager.setVolume(1);
@@ -540,7 +540,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		let targetHeight = h;
 		this.stage3Ds[0].width = w;
 		this.stage3Ds[0].height = h;
-		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue)
+		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue);
 
 		// todo: correctly implement all StageScaleModes;
 		switch (this._scaleMode) {
@@ -763,7 +763,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._bgRed = ((value >> 16) & 0xff) / 0xff;
 		this._bgGreen = ((value >> 8) & 0xff) / 0xff;
 		this._bgBlue = (value & 0xff) / 0xff;
-		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue)
+		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue);
 	}
 
 	public get frameRate(): number {
