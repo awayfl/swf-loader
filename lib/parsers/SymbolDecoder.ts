@@ -37,13 +37,11 @@ import {
 
 import { MovieClipSoundsManager } from '../factories/timelinesounds/MovieClipSoundsManager';
 import { BitmapImage2D } from '@awayjs/stage';
-import { MethodMaterial } from '@awayjs/materials';
 import { Graphics, Shape, UnparsedTag } from '@awayjs/graphics';
 import { SWFFrame } from './SWFFrame';
 import { ColorUtils, IAsset, Rectangle, WaveAudio } from '@awayjs/core';
 import { Matrix, ColorTransform } from '../factories/base/SWFTags';
 import { SWFParser } from './SWFParser';
-import { BasicPartition } from '@awayjs/view';
 
 const noTimelineDebug = true;
 const noExportsDebug = true;

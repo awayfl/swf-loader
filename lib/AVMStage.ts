@@ -25,7 +25,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { BasicPartition, ContainerNode, IPartitionContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { ContainerNode, IPartitionContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -57,7 +57,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	private _root: DisplayObjectContainer;
 	private _rootNode: ContainerNode;
-	private _partition: BasicPartition;
 	private _renderer: DefaultRenderer;
 	private _view: View;
 	private _pickGroup: PickGroup;
@@ -276,18 +275,16 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		//create the partition
 		this._view = new View(this._projection);
 		this._root = new DisplayObjectContainer();
-		this._root.partitionClass = BasicPartition;
 		this._rootNode = this._root.getAbstraction<ContainerNode>(this._view);
-		this._partition = this._rootNode.partition;
 
 		//create the pickers
 		this._pickGroup = PickGroup.getInstance();
-		this._mousePicker = this._pickGroup.getRaycastPicker(this._partition);
+		this._mousePicker = this._pickGroup.getRaycastPicker(this._rootNode);
 		this._mousePicker.shapeFlag = true;
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
 		//create the renderer
-		this._renderer = this._partition.getAbstraction<DefaultRenderer>(RenderGroup.getInstance(DefaultRenderer));
+		this._renderer = this._rootNode.getAbstraction<DefaultRenderer>(RenderGroup.getInstance(DefaultRenderer));
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
