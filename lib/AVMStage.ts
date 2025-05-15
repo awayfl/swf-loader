@@ -25,7 +25,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
-import { ContainerNode, IPartitionContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { ContainerNode, IContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -784,7 +784,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return localTouchPoints;
 	}
 
-	public unprojectPoint(point: Point, targetCoordinateSpace: IPartitionContainer): Point {
+	public unprojectPoint(point: Point, targetCoordinateSpace: IContainer): Point {
 
 		const localPosition = this._view.getNode(targetCoordinateSpace)
 			.getInverseMatrix3D()
