@@ -173,12 +173,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		// init awayengine
 		this.initAwayEngine();
-		this._stage3Ds = Array<Stage>(StageManager.getInstance().numSlotsFree);
-		for (let i: number = 0; i < this._stage3Ds.length; i++) {
-			this._stage3Ds[i] = StageManager.getInstance().getFreeStage(false, ContextGLProfile.BASELINE,
-				ContextMode.AUTO, !(i == 0));
-			this._stage3Ds[i].clear(0,0,0,0);
-		}
 		this._renderer.view.backgroundAlpha = 0;
 		AudioManager.setVolume(1);
 
@@ -300,6 +294,16 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._rendererStage.container.style.zIndex = '7';
 		this._rendererStage.antiAlias = 0;
 		this._renderer.renderableSorter = null;//new RenderableSort2D();
+
+		//create the stage3ds
+		let stageManager = StageManager.getInstance();
+		this._stage3Ds = Array<Stage>(stageManager.numSlotsFree);
+		for (let i: number = 0; i < this._stage3Ds.length; i++) {
+			this._stage3Ds[i] = 
+				stageManager.getFreeStage(false, ContextGLProfile.BASELINE, 
+					ContextMode.AUTO, !(i == 0));
+			this.stage3Ds[i].visible = false;
+		}
 
 	}
 
@@ -494,7 +498,9 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		// manually move playhead to next frame, so we immediatly render something
 		this.showNextFrame(0);
-		this._rendererStage.container.style.visibility = 'visible';
+		this._rendererStage.visible = true;
+		for(let i = 0; i < this.stage3Ds.length; i++) 
+			this.stage3Ds[i].visible = true;
 	}
 
 	public updateFPS(): void {
@@ -535,9 +541,6 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		// real canvas size can be greater or less render dimension
 		let targetWidth = w;
 		let targetHeight = h;
-		this.stage3Ds[0].width = w;
-		this.stage3Ds[0].height = h;
-		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue);
 
 		// todo: correctly implement all StageScaleModes;
 		switch (this._scaleMode) {
@@ -569,6 +572,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					// limit pixel ratio to 1 and supress auto scale
 					// now stage will ignore pixel ratio and will equal `scaledWidth`
 					this._rendererStage.pixelRatio = 1;
+					if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+						for(let i = 0; i < this.stage3Ds.length; i++) {
+							this.stage3Ds[i].pixelRatio = this._rendererStage.pixelRatio;
+					}
 				}
 
 				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
@@ -598,6 +605,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					// limit pixel ratio to 1 and supress auto scale
 					// now stage will ignore pixel ratio and will equal `scaledWidth`
 					this._rendererStage.pixelRatio = 1;
+					if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+						for(let i = 0; i < this.stage3Ds.length; i++) {
+							this.stage3Ds[i].pixelRatio = this._rendererStage.pixelRatio;
+					}
 				}
 
 				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
@@ -609,19 +620,27 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		// todo: correctly implement all alignModes;
 		switch (this._align) {
+			default:
+				console.log('Stage: only implemented StageAlign is TOP_LEFT');
 			case StageAlign.TOP_LEFT:
 				this._view.x = newX;
 				this._view.y = newY;
-				break;
-			default:
-				this._view.x = newX;
-				this._view.y = newY;
-				console.log('Stage: only implemented StageAlign is TOP_LEFT');
+				if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+					for(let i = 0; i < this.stage3Ds.length; i++) {
+						this.stage3Ds[i].x = newX;
+						this.stage3Ds[i].y = newY;
+					}
 				break;
 		}
 
 		this._view.width = scaledWidth;
 		this._view.height = scaledHeight;
+		if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+			for(let i = 0; i < this.stage3Ds.length; i++) {
+				this.stage3Ds[i].width = scaledWidth;
+				this.stage3Ds[i].height = scaledHeight;
+			}
+		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue);
 
 		// override canvas dimension, we can scale down it
 		// this is REQUIRED because stage set dimension relative scale
