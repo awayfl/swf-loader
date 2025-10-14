@@ -625,11 +625,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			case StageAlign.TOP_LEFT:
 				this._view.x = newX;
 				this._view.y = newY;
-				if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
-					for(let i = 0; i < this.stage3Ds.length; i++) {
-						this.stage3Ds[i].x = newX;
-						this.stage3Ds[i].y = newY;
-					}
+				for(let i = 0; i < this.stage3Ds.length; i++) {
+					this.stage3Ds[i].x = newX;
+					this.stage3Ds[i].y = newY;
+				}
 				break;
 		}
 
