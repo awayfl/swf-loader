@@ -275,7 +275,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		//create the partition
 		this._view = new View(this._projection);
 		this._root = new DisplayObjectContainer();
-		this._rootNode = this._root.getAbstraction<ContainerNode>(this._view);
+		this._rootNode = this._view.abstractions.getAbstraction<ContainerNode>(this._root);
 
 		//create the pickers
 		this._pickGroup = PickGroup.getInstance();
@@ -284,7 +284,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
 		//create the renderer
-		this._renderer = this._rootNode.getAbstraction<DefaultRenderer>(RenderGroup.getInstance(DefaultRenderer));
+		this._renderer = RenderGroup.getInstance(DefaultRenderer).abstractions.getAbstraction<DefaultRenderer>(this._rootNode);
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
