@@ -270,7 +270,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._projection.originX = -1;
 		this._projection.originY = 1;
 		this._projection.transform.moveTo(0, 0, -1000);
-		this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
+		this._projection.scale = 1000 / window.innerHeight;
 
 		//create the partition
 		this._view = new View(this._projection);
@@ -528,7 +528,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		// todo: correctly implement all StageScaleModes;
 		switch (this._scaleMode) {
 			case StageScaleMode.NO_SCALE: {
-				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
+				this._projection.scale = 1000 / h;
 				this._stageWidth = w;
 				this._stageHeight = h;
 				break;
@@ -557,7 +557,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					this._rendererStage.pixelRatio = 1;
 				}
 
-				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
+				this._projection.scale = 1000 / this._stageHeight;
 				break;
 			}
 			case StageScaleMode.EXACT_FIT:
@@ -586,7 +586,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					this._rendererStage.pixelRatio = 1;
 				}
 
-				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
+				this._projection.scale = 1000 / this._stageHeight;
 				break;
 			default:
 				console.log('Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL');
