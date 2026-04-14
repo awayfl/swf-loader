@@ -24,7 +24,7 @@ import {
 	ISceneGraphFactory,
 } from '@awayjs/scene';
 
-import { Stage, BitmapImage2D, Image2DParser, TouchPoint } from '@awayjs/stage';
+import { Stage, BitmapImage2D, Image2DParser, TouchPoint, StageQuality } from '@awayjs/stage';
 import { ContainerNode, IContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
@@ -791,6 +791,14 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			.transformVector(this._view.unproject(point.x, point.y, 1000));
 
 		return new Point(localPosition.x, localPosition.y);
+	}
+
+	public get quality(): StageQuality {
+		return this._view.stage.quality;
+	}
+
+	public set quality(value: StageQuality) {
+		this._view.stage.quality = value;
 	}
 
 	public get scaleMode(): StageScaleMode {
