@@ -24,7 +24,7 @@ import {
 	ISceneGraphFactory,
 } from '@awayjs/scene';
 
-import { Stage, BitmapImage2D, Image2DParser, TouchPoint, StageManager, ContextGLProfile, ContextMode } from '@awayjs/stage';
+import { Stage, BitmapImage2D, Image2DParser, TouchPoint, StageQuality, ContextGLProfile, ContextMode } from '@awayjs/stage';
 import { ContainerNode, IContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
@@ -274,12 +274,12 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._projection.originX = -1;
 		this._projection.originY = 1;
 		this._projection.transform.moveTo(0, 0, -1000);
-		this._projection.fieldOfView = Math.atan(window.innerHeight / 1000 / 2) * 360 / Math.PI;
+		this._projection.scale = 1000 / window.innerHeight;
 
 		//create the partition
 		this._view = new View(this._projection, null, false, ContextGLProfile.BASELINE, ContextMode.AUTO, true);
 		this._root = new DisplayObjectContainer();
-		this._rootNode = this._root.getAbstraction<ContainerNode>(this._view);
+		this._rootNode = this._view.abstractions.getAbstraction<ContainerNode>(this._root);
 
 		//create the pickers
 		this._pickGroup = PickGroup.getInstance();
@@ -288,7 +288,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
 		//create the renderer
-		this._renderer = this._rootNode.getAbstraction<DefaultRenderer>(RenderGroup.getInstance(DefaultRenderer));
+		this._renderer = RenderGroup.getInstance(DefaultRenderer).abstractions.getAbstraction<DefaultRenderer>(this._rootNode);
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.container.style.zIndex = '7';
@@ -545,7 +545,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		// todo: correctly implement all StageScaleModes;
 		switch (this._scaleMode) {
 			case StageScaleMode.NO_SCALE: {
-				this._projection.fieldOfView = Math.atan(h / 1000 / 2) * 360 / Math.PI;
+				this._projection.scale = 1000 / h;
 				this._stageWidth = w;
 				this._stageHeight = h;
 				break;
@@ -578,7 +578,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					}
 				}
 
-				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
+				this._projection.scale = 1000 / this._stageHeight;
 				break;
 			}
 			case StageScaleMode.EXACT_FIT:
@@ -611,7 +611,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					}
 				}
 
-				this._projection.fieldOfView = (Math.atan(this._stageHeight / 1000 / 2) * 360) / Math.PI;
+				this._projection.scale = 1000 / this._stageHeight;
 				break;
 			default:
 				console.log('Stage: only implemented StageScaleMode are NO_SCALE, SHOW_ALL');
@@ -833,6 +833,14 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 			.transformVector(this._view.unproject(point.x, point.y, 1000));
 
 		return new Point(localPosition.x, localPosition.y);
+	}
+
+	public get quality(): StageQuality {
+		return this._view.stage.quality;
+	}
+
+	public set quality(value: StageQuality) {
+		this._view.stage.quality = value;
 	}
 
 	public get scaleMode(): StageScaleMode {
