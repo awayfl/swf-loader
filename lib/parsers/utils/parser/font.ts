@@ -105,6 +105,10 @@ export function defineFont(tag: FontTag, ns: string): any {
 	let fontName = tag.name || uniqueName;
 
 	if (fontName == 'Helvetica') fontName = 'arial';
+	
+	const registrationName = `${fontName}-${tag.id}`;
+
+	
 
 	let openTypeFont;
 	if (tag.code == SwfTagCode.CODE_DEFINE_FONT4) {
@@ -145,7 +149,7 @@ export function defineFont(tag: FontTag, ns: string): any {
 	if (openTypeFont)
 		fontAJS = DefaultFontManager.defineFont_CFF(fontName, ns);
 	else
-		fontAJS = DefaultFontManager.defineFont(fontName, ns);
+		fontAJS = DefaultFontManager.defineFont(registrationName, ns);
 
 	font.away = fontAJS;
 	fontAJS.name = fontName;
