@@ -24,7 +24,7 @@ import {
 	ISceneGraphFactory,
 } from '@awayjs/scene';
 
-import { Stage, BitmapImage2D, Image2DParser, TouchPoint, StageQuality } from '@awayjs/stage';
+import { Stage, BitmapImage2D, Image2DParser, TouchPoint, StageQuality, ContextGLProfile, ContextMode } from '@awayjs/stage';
 import { ContainerNode, IContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
@@ -86,6 +86,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _fpsTextField: HTMLDivElement;
 	private _currentFps: number;
 	private _projection: PerspectiveProjection;
+	private _stage3Ds: Stage[];
 	private _rendererStage: Stage;
 	private _displayState: StageDisplayState;
 
@@ -95,6 +96,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _y: any;
 	private _w: any;
 	private _h: any;
+
+	private _bgRed: number = 0;
+	private _bgGreen: number = 0;
+	private _bgBlue: number = 0;
 
 	private _volume: number = 1;
 	private _isPaused: boolean;
@@ -167,9 +172,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._gameConfig = gameConfig;
 
 		// init awayengine
-		this.initAwayEninge();
-		this._renderer.view.backgroundColor = 0xffffff;
-		//this._stage3Ds[this._stage3Ds.length]=new AwayStage(null, );
+		this.initAwayEngine();
+		this._renderer.view.backgroundAlpha = 0;
 		AudioManager.setVolume(1);
 
 		// resize event listens on window
@@ -262,7 +266,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		}
 	}
 
-	private initAwayEninge() {
+	private initAwayEngine() {
 
 		//create the projection
 		this._projection = new PerspectiveProjection();
@@ -273,7 +277,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._projection.scale = 1000 / window.innerHeight;
 
 		//create the partition
-		this._view = new View(this._projection);
+		this._view = new View(this._projection, null, false, ContextGLProfile.BASELINE, ContextMode.AUTO, true);
 		this._root = new DisplayObjectContainer();
 		this._rootNode = this._view.abstractions.getAbstraction<ContainerNode>(this._root);
 
@@ -287,8 +291,19 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		this._renderer = RenderGroup.getInstance(DefaultRenderer).abstractions.getAbstraction<DefaultRenderer>(this._rootNode);
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
+		this._rendererStage.container.style.zIndex = '7';
 		this._rendererStage.antiAlias = 0;
 		this._renderer.renderableSorter = null;//new RenderableSort2D();
+
+		//create the stage3ds
+		let stageManager = StageManager.getInstance();
+		this._stage3Ds = Array<Stage>(stageManager.numSlotsFree);
+		for (let i: number = 0; i < this._stage3Ds.length; i++) {
+			this._stage3Ds[i] = 
+				stageManager.getFreeStage(false, ContextGLProfile.BASELINE, 
+					ContextMode.AUTO, !(i == 0));
+			this.stage3Ds[i].visible = false;
+		}
 
 	}
 
@@ -483,7 +498,9 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		// manually move playhead to next frame, so we immediatly render something
 		this.showNextFrame(0);
-		this._rendererStage.container.style.visibility = 'visible';
+		this._rendererStage.visible = true;
+		for(let i = 0; i < this.stage3Ds.length; i++) 
+			this.stage3Ds[i].visible = true;
 	}
 
 	public updateFPS(): void {
@@ -555,6 +572,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					// limit pixel ratio to 1 and supress auto scale
 					// now stage will ignore pixel ratio and will equal `scaledWidth`
 					this._rendererStage.pixelRatio = 1;
+					if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+						for(let i = 0; i < this.stage3Ds.length; i++) {
+							this.stage3Ds[i].pixelRatio = this._rendererStage.pixelRatio;
+					}
 				}
 
 				this._projection.scale = 1000 / this._stageHeight;
@@ -584,6 +605,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 					// limit pixel ratio to 1 and supress auto scale
 					// now stage will ignore pixel ratio and will equal `scaledWidth`
 					this._rendererStage.pixelRatio = 1;
+					if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+						for(let i = 0; i < this.stage3Ds.length; i++) {
+							this.stage3Ds[i].pixelRatio = this._rendererStage.pixelRatio;
+					}
 				}
 
 				this._projection.scale = 1000 / this._stageHeight;
@@ -595,19 +620,26 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 		// todo: correctly implement all alignModes;
 		switch (this._align) {
+			default:
+				console.log('Stage: only implemented StageAlign is TOP_LEFT');
 			case StageAlign.TOP_LEFT:
 				this._view.x = newX;
 				this._view.y = newY;
-				break;
-			default:
-				this._view.x = newX;
-				this._view.y = newY;
-				console.log('Stage: only implemented StageAlign is TOP_LEFT');
+				for(let i = 0; i < this.stage3Ds.length; i++) {
+					this.stage3Ds[i].x = newX;
+					this.stage3Ds[i].y = newY;
+				}
 				break;
 		}
 
 		this._view.width = scaledWidth;
 		this._view.height = scaledHeight;
+		if(AVMStage.instance().scaleMode != StageScaleMode.NO_SCALE)
+			for(let i = 0; i < this.stage3Ds.length; i++) {
+				this.stage3Ds[i].width = scaledWidth;
+				this.stage3Ds[i].height = scaledHeight;
+			}
+		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue);
 
 		// override canvas dimension, we can scale down it
 		// this is REQUIRED because stage set dimension relative scale
@@ -640,6 +672,10 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	public unPause() {
 		AudioManager.setVolume(this._volume);
 		this._isPaused = false;
+	}
+
+	public get stage3Ds(): Stage[] {
+		return this._stage3Ds;
 	}
 
 	public get isPaused(): boolean {
@@ -732,11 +768,17 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	}
 
 	public get color(): number {
-		return this._renderer.view.backgroundColor;
+		return this.stage3Ds[0].color;
 	}
 
 	public set color(value: number) {
-		this._renderer.view.backgroundColor = value;
+		this.stage3Ds[0].color = value;
+
+		// Color setter doesn't do anything, so fix color ourselves
+		this._bgRed = ((value >> 16) & 0xff) / 0xff;
+		this._bgGreen = ((value >> 8) & 0xff) / 0xff;
+		this._bgBlue = (value & 0xff) / 0xff;
+		this.stage3Ds[0].clear(this._bgRed, this._bgGreen, this._bgBlue);
 	}
 
 	public get frameRate(): number {
