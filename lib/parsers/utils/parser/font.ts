@@ -105,8 +105,6 @@ export function defineFont(tag: FontTag, ns: string): any {
 	let fontName = tag.name || uniqueName;
 
 	if (fontName == 'Helvetica') fontName = 'arial';
-	
-	const registrationName = `${fontName}-${tag.id}`;
 
 	
 
@@ -146,10 +144,21 @@ export function defineFont(tag: FontTag, ns: string): any {
 		return font;
 	}
 	let fontAJS: Font;
-	if (openTypeFont)
+
+	if (openTypeFont) {
 		fontAJS = DefaultFontManager.defineFont_CFF(fontName, ns);
-	else
-		fontAJS = DefaultFontManager.defineFont(registrationName, ns);
+	} else {
+		fontAJS = DefaultFontManager.defineFont(fontName, ns);
+
+		const existingFontTable = fontAJS.get_font_table(
+			fontStyleName,
+			TesselatedFontTable.assetType
+		);
+
+		if (existingFontTable) {
+			fontAJS = DefaultFontManager.defineFont(`${fontName}-${tag.id}`, ns);
+		}
+	}
 
 	font.away = fontAJS;
 	fontAJS.name = fontName;
