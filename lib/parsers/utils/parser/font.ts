@@ -106,8 +106,6 @@ export function defineFont(tag: FontTag, ns: string): any {
 
 	if (fontName == 'Helvetica') fontName = 'arial';
 
-	
-
 	let openTypeFont;
 	if (tag.code == SwfTagCode.CODE_DEFINE_FONT4) {
 		openTypeFont = OpenTypeParser.parseData(tag);

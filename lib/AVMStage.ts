@@ -25,7 +25,7 @@ import {
 } from '@awayjs/scene';
 
 import { Stage, BitmapImage2D, Image2DParser, TouchPoint, StageQuality } from '@awayjs/stage';
-import { ContainerNode, IContainer, PickGroup, RaycastPicker, View } from '@awayjs/view';
+import { ContainerNode, IContainer, PickGroup, PickPool, RaycastPicker, View } from '@awayjs/view';
 import { DefaultRenderer, RenderGroup } from '@awayjs/renderer';
 
 import { MovieClipSoundsManager } from './factories/timelinesounds/MovieClipSoundsManager';
@@ -59,7 +59,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 	private _rootNode: ContainerNode;
 	private _renderer: DefaultRenderer;
 	private _view: View;
-	private _pickGroup: PickGroup;
+	private _pickPool: PickPool;
 	private _mousePicker: RaycastPicker;
 	private _mouseManager: MouseManager;
 	private _swfFile: SWFFile;
@@ -209,8 +209,8 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		return this._view;
 	}
 
-	public get pickGroup(): PickGroup {
-		return this._pickGroup;
+	public get pickPool(): PickPool {
+		return this._pickPool;
 	}
 
 	public get mousePicker(): RaycastPicker {
@@ -275,16 +275,16 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 		//create the partition
 		this._view = new View(this._projection);
 		this._root = new DisplayObjectContainer();
-		this._rootNode = this._view.abstractions.getAbstraction<ContainerNode>(this._root);
+		this._rootNode = this._root.getNode(this._root);
 
 		//create the pickers
-		this._pickGroup = PickGroup.getInstance();
-		this._mousePicker = this._pickGroup.getRaycastPicker(this._rootNode);
+		this._pickPool = PickGroup.getPool(this._view);
+		this._mousePicker = this._pickPool.getRaycastPicker(this._rootNode);
 		this._mousePicker.shapeFlag = true;
 		this._mouseManager = MouseManager.getInstance(this._view.stage);
 
 		//create the renderer
-		this._renderer = RenderGroup.getInstance(DefaultRenderer).abstractions.getAbstraction<DefaultRenderer>(this._rootNode);
+		this._renderer = RenderGroup.getInstance(DefaultRenderer).getRenderer<DefaultRenderer>(this._view, this._rootNode);
 		this._rendererStage = this._view.stage;
 		this._rendererStage.container.style.visibility = 'hidden';
 		this._rendererStage.antiAlias = 0;
@@ -786,7 +786,7 @@ export class AVMStage extends EventDispatcher implements IAVMStage {
 
 	public unprojectPoint(point: Point, targetCoordinateSpace: IContainer): Point {
 
-		const localPosition = this._view.getNode(targetCoordinateSpace)
+		const localPosition = this._root.getNode(targetCoordinateSpace)
 			.getInverseMatrix3D()
 			.transformVector(this._view.unproject(point.x, point.y, 1000));
 
