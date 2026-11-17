@@ -1338,6 +1338,12 @@ export class SymbolDecoder {
 								propStreamIndex.push(placeObjectTag.blendMode);
 							}
 
+							if (placeObjectTag != null && placeObjectTag.flags & PlaceObjectFlags.HasCacheAsBitmap) {
+								num_updated_props++;
+								propStreamType.push(TimelineActionType.UPDATE_RENDERMODE);
+								propStreamIndex.push(placeObjectTag.bmpCache ? 1 : 0);
+							}
+
 							if (num_updated_props > 0) {
 								updateCnt++;
 								updChildStream.push(child.sessionID);
